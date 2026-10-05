@@ -418,7 +418,7 @@
 
             <div id="checkout-details" class="mt-6 border-t border-gray-200 pt-6 space-y-4">
                 <div class="relative">
-                    <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm" autocomplete="off">
+                    <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." oninput="searchAreaBiteship(this.value)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm" autocomplete="off">
                     <div id="area-results" class="absolute z-10 w-full bg-white border border-gray-200 max-h-40 overflow-y-auto hidden shadow-lg text-sm font-montserrat"></div>
                 </div>
                 <input type="hidden" id="selected-area-id">
