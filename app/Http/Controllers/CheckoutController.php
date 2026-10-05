@@ -92,8 +92,8 @@ class CheckoutController extends Controller
             "shipper_organization" => "Notisse",
             "origin_contact_name" => "Notisse Admin",
             "origin_contact_phone" => "081234567890",
-            "origin_address" => "Jl. Kemang Selatan No. 99, Jakarta Selatan",
-            "origin_area_id" => "IDNP6IDNC148IDND838IDZ12110",
+            "origin_address" => env('STORE_ORIGIN_ADDRESS', "Jl. Sukapura No.62, Dayeuhkolot"),
+            "origin_area_id" => env('STORE_ORIGIN_AREA_ID', "IDNP9IDNC22IDND2044IDZ40353"),
             "destination_contact_name" => $validated['customer_name'],
             "destination_contact_phone" => $validated['customer_phone'],
             "destination_contact_email" => $validated['customer_email'],
@@ -182,7 +182,7 @@ class CheckoutController extends Controller
         $response = Http::withHeaders([
             'Authorization' => env('BITESHIP_API_KEY')
         ])->post('https://api.biteship.com/v1/rates/couriers', [
-            "origin_area_id" => "IDNP6IDNC148IDND838IDZ12110", // Origin: Kebayoran Baru, Jakarta Selatan
+            "origin_area_id" => env('STORE_ORIGIN_AREA_ID', "IDNP9IDNC22IDND2044IDZ40353"),
             "destination_area_id" => $validated['destination_area_id'],
             "couriers" => "jne,sicepat,jnt,anteraja",
             "items" => $biteshipItems
