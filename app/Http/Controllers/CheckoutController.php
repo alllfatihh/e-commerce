@@ -27,6 +27,7 @@ class CheckoutController extends Controller
             'customer_email' => 'required|email',
             'customer_phone' => 'required|string',
             'shipping_address' => 'required|string',
+            'destination_area_id' => 'required|string',
             'items' => 'required|array',
             'shipping_cost' => 'required|numeric',
             'courier_name' => 'required|string',
@@ -56,12 +57,6 @@ class CheckoutController extends Controller
                 'quantity' => $item['quantity'],
                 'size' => $item['size'] ?? 'All Size',
             ]);
-        }
-
-        // Extract Area ID from address string: "Alamat Detail (Area ID: IDNP123...)"
-        $destinationAreaId = '';
-        if (preg_match('/\(Area ID: (.*?)\)/', $validated['shipping_address'], $matches)) {
-            $destinationAreaId = $matches[1];
         }
 
         $biteshipItems = array_map(function($item) {
@@ -98,7 +93,7 @@ class CheckoutController extends Controller
             "destination_contact_phone" => $validated['customer_phone'],
             "destination_contact_email" => $validated['customer_email'],
             "destination_address" => $validated['shipping_address'],
-            "destination_area_id" => $destinationAreaId ?: "IDNP6IDNC148IDND838IDZ12110",
+            "destination_area_id" => $validated['destination_area_id'],
             "courier_company" => $courierCompany,
             "courier_type" => $courierType,
             "delivery_type" => "now",

@@ -2013,7 +2013,8 @@
                 customer_name: loggedInUser.name || "Guest User",
                 customer_email: loggedInUser.email || "guest@example.com",
                 customer_phone: "08123456789", // Di aplikasi nyata ambil dari input user
-                shipping_address: `${address} (Area ID: ${areaId})`,
+                shipping_address: address, // Hanya mengirim alamat, tanpa selipan Area ID
+                destination_area_id: areaId,
                 items: items,
                 shipping_cost: selectedShippingCost,
                 courier_name: selectedCourierName,
