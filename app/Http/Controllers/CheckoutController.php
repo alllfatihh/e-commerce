@@ -28,6 +28,8 @@ class CheckoutController extends Controller
             'customer_phone' => 'required|string',
             'shipping_address' => 'required|string',
             'items' => 'required|array',
+            'shipping_cost' => 'required|numeric',
+            'courier_name' => 'required|string',
         ]);
 
         $totalAmount = 0;
@@ -35,9 +37,7 @@ class CheckoutController extends Controller
             $totalAmount += $item['price'] * $item['quantity'];
         }
 
-        // Tambahan ongkir dummy jika Biteship blm fix origin/destination
-        $shippingCost = 20000;
-        $totalAmount += $shippingCost;
+        $totalAmount += $validated['shipping_cost'];
 
         $order = Order::create([
             'customer_name' => $validated['customer_name'],
@@ -59,8 +59,8 @@ class CheckoutController extends Controller
         }
 
         // Create Order Biteship
-        // (Pastikan endpoint Biteship sesuai dokumen untuk create order)
-        $order->update(['biteship_order_id' => 'BS-' . uniqid(), 'courier_name' => 'JNE Reguler']);
+        // Di aplikasi nyata, Anda bisa memanggil API create order Biteship di sini
+        $order->update(['biteship_order_id' => 'BS-' . uniqid(), 'courier_name' => $validated['courier_name']]);
 
         // Konfigurasi Midtrans
         $params = [
@@ -85,25 +85,49 @@ class CheckoutController extends Controller
         }
     }
 
+    public function searchArea(Request $request)
+    {
+        $keyword = $request->query('keyword');
+        if (!$keyword) return response()->json(['areas' => []]);
+
+        $response = Http::withHeaders([
+            'Authorization' => env('BITESHIP_API_KEY')
+        ])->get('https://api.biteship.com/v1/maps/areas', [
+            'countries' => 'ID',
+            'input' => $keyword,
+            'type' => 'single'
+        ]);
+
+        return response()->json($response->json());
+    }
+
     public function getShippingRates(Request $request)
     {
+        $validated = $request->validate([
+            'destination_area_id' => 'required|string',
+            'items' => 'required|array'
+        ]);
+
+        $biteshipItems = array_map(function($item) {
+            return [
+                "name" => $item['name'],
+                "description" => $item['name'] ?? "Apparel Notisse",
+                "value" => $item['price'],
+                "length" => 20,
+                "width" => 20,
+                "height" => 5,
+                "weight" => 200, // asumsikan 200gram per baju
+                "quantity" => $item['quantity']
+            ];
+        }, $validated['items']);
+
         $response = Http::withHeaders([
             'Authorization' => env('BITESHIP_API_KEY')
         ])->post('https://api.biteship.com/v1/rates/couriers', [
-            "origin_area_id" => "IDNP11IDNC23IDND164IDZ12440", // ID area pengirim
-            "destination_area_id" => $request->destination_area_id ?? "IDNP11IDNC23IDND164IDZ12440",
-            "couriers" => "jne,sicepat,jnt",
-            "items" => [
-                [
-                    "name" => "Streetwear",
-                    "description" => "Apparel Notisse",
-                    "value" => 250000,
-                    "length" => 30,
-                    "width" => 20,
-                    "height" => 5,
-                    "weight" => 500
-                ]
-            ]
+            "origin_area_id" => "IDNP11IDNC23IDND164IDZ12440", // Origin: Jakarta Selatan (contoh)
+            "destination_area_id" => $validated['destination_area_id'],
+            "couriers" => "jne,sicepat,jnt,anteraja",
+            "items" => $biteshipItems
         ]);
 
         return response()->json($response->json());

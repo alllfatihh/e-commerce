@@ -416,14 +416,26 @@
 
             <div id="cart-items-container" class="space-y-6 flex-grow"></div>
 
-            <div class="mt-10 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
+            <div id="checkout-details" class="mt-6 border-t border-gray-200 pt-6 space-y-4">
+                <div class="relative">
+                    <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm" autocomplete="off">
+                    <div id="area-results" class="absolute z-10 w-full bg-white border border-gray-200 max-h-40 overflow-y-auto hidden shadow-lg text-sm font-montserrat"></div>
+                </div>
+                <input type="hidden" id="selected-area-id">
+                <input type="text" id="full-address" placeholder="Detail Alamat (Jalan, RT/RW, No)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm">
+                
+                <div id="shipping-options-container" class="hidden space-y-2 mt-4">
+                    <span class="text-sm font-medium font-montserrat block">Pilih Pengiriman:</span>
+                    <div id="shipping-options" class="flex flex-col space-y-2 text-sm font-montserrat"></div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
                 <div class="flex items-baseline space-x-6">
                     <span class="text-base md:text-lg font-medium text-gray-900 font-montserrat">Estimated total</span>
-                    <span id="cart-total-price" class="text-xl md:text-xl font-regular font-montserrat">Rp 500.000,00
-                        IDR</span>
+                    <span id="cart-total-price" class="text-xl md:text-xl font-regular font-montserrat">Rp 0,00 IDR</span>
                 </div>
-                <p class="text-xs text-gray-400 font-montserrat">taxes, discounts and shipping calculated at checkout.
-                </p>
+                <p class="text-xs text-gray-400 font-montserrat">taxes and shipping calculated.</p>
                 <div class="pt-4 w-full text-right">
                     <button onclick="processCheckout()"
                         class="btn-brush text-sm md:text-base cursor-pointer font-montserrat" id="checkout-btn">
@@ -1843,6 +1855,9 @@
                 container.innerHTML = html;
             }
 
+            if (typeof selectedShippingCost !== 'undefined') {
+                totalAmount += selectedShippingCost;
+            }
             totalElement.innerText = formatRupiah(totalAmount) + ' IDR';
             badgeElement.innerText = `${totalItemCount}`;
         }
@@ -1867,9 +1882,117 @@
             showToast('Added to cart!');
         }
 
+        let selectedShippingCost = 0;
+        let selectedCourierName = "";
+        let searchTimeout;
+
+        async function searchAreaBiteship(keyword) {
+            const areaResults = document.getElementById('area-results');
+            const areaIdHidden = document.getElementById('selected-area-id');
+            const areaInput = document.getElementById('area-search');
+
+            clearTimeout(searchTimeout);
+            if(keyword.length < 3) {
+                areaResults.classList.add('hidden');
+                return;
+            }
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/shipping-areas?keyword=${encodeURIComponent(keyword)}`);
+                    const data = await res.json();
+                    
+                    areaResults.innerHTML = '';
+                    if (data.areas && data.areas.length > 0) {
+                        data.areas.forEach(area => {
+                            const div = document.createElement('div');
+                            div.className = 'p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100';
+                            div.innerText = `${area.name} - ${area.administrative_division_level_2_name}`;
+                            div.onclick = () => {
+                                areaInput.value = `${area.name}, ${area.administrative_division_level_2_name}`;
+                                areaIdHidden.value = area.id;
+                                areaResults.classList.add('hidden');
+                                fetchShippingRates(area.id);
+                            };
+                            areaResults.appendChild(div);
+                        });
+                        areaResults.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    console.error("Gagal mengambil area", e);
+                }
+            }, 500);
+        }
+
+        async function fetchShippingRates(areaId) {
+            const shippingOptions = document.getElementById('shipping-options');
+            const shippingContainer = document.getElementById('shipping-options-container');
+
+            shippingOptions.innerHTML = '<span class="text-gray-400">Menghitung ongkos kirim...</span>';
+            shippingContainer.classList.remove('hidden');
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const items = cartState.map(item => ({
+                name: item.name,
+                price: item.unitPrice,
+                quantity: item.qty
+            }));
+
+            try {
+                const res = await fetch('/shipping-rates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        destination_area_id: areaId,
+                        items: items
+                    })
+                });
+
+                const data = await res.json();
+                shippingOptions.innerHTML = '';
+                
+                if (data.pricing && data.pricing.length > 0) {
+                    data.pricing.forEach(rate => {
+                        const label = document.createElement('label');
+                        label.className = 'flex items-center space-x-2 cursor-pointer';
+                        label.innerHTML = `
+                            <input type="radio" name="courier" value="${rate.price}" class="form-radio text-black" onchange="selectCourier('${rate.courier_name} ${rate.courier_service_name}', ${rate.price})">
+                            <span>${rate.courier_name} ${rate.courier_service_name} - ${formatRupiah(rate.price)}</span>
+                        `;
+                        shippingOptions.appendChild(label);
+                    });
+                } else {
+                    shippingOptions.innerHTML = '<span class="text-red-500">Kurir tidak tersedia ke area ini.</span>';
+                }
+            } catch (e) {
+                console.error("Gagal mengambil ongkir", e);
+                shippingOptions.innerHTML = '<span class="text-red-500">Terjadi kesalahan koneksi.</span>';
+            }
+        }
+
+        window.selectCourier = function(name, cost) {
+            selectedCourierName = name;
+            selectedShippingCost = cost;
+            renderCartItems(); // trigger recalc total in cart
+        }
+
         async function processCheckout() {
             if (cartState.length === 0) {
                 showToast("Cart is empty!");
+                return;
+            }
+
+            const address = document.getElementById('full-address').value;
+            const areaId = document.getElementById('selected-area-id').value;
+            
+            if(!areaId || !address) {
+                showToast("Mohon lengkapi alamat pengiriman!");
+                return;
+            }
+            if(!selectedCourierName) {
+                showToast("Mohon pilih layanan kurir terlebih dahulu!");
                 return;
             }
 
@@ -1889,9 +2012,11 @@
             const payload = {
                 customer_name: loggedInUser.name || "Guest User",
                 customer_email: loggedInUser.email || "guest@example.com",
-                customer_phone: "08123456789", // Mock
-                shipping_address: "Jl. Dago Asri No. 12, Bandung", // Mock
+                customer_phone: "08123456789", // Di aplikasi nyata ambil dari input user
+                shipping_address: `${address} (Area ID: ${areaId})`,
                 items: items,
+                shipping_cost: selectedShippingCost,
+                courier_name: selectedCourierName,
                 _token: csrfToken
             };
 
