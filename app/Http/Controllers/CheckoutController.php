@@ -58,9 +58,64 @@ class CheckoutController extends Controller
             ]);
         }
 
+        // Extract Area ID from address string: "Alamat Detail (Area ID: IDNP123...)"
+        $destinationAreaId = '';
+        if (preg_match('/\(Area ID: (.*?)\)/', $validated['shipping_address'], $matches)) {
+            $destinationAreaId = $matches[1];
+        }
+
+        $biteshipItems = array_map(function($item) {
+            return [
+                "name" => $item['name'],
+                "description" => $item['name'],
+                "value" => $item['price'],
+                "length" => 20,
+                "width" => 20,
+                "height" => 5,
+                "weight" => 200,
+                "quantity" => $item['quantity']
+            ];
+        }, $validated['items']);
+
+        // Pisahkan nama kurir dan service name (misal "JNE REG")
+        $courierParts = explode(' ', $validated['courier_name']);
+        $courierCompany = strtolower($courierParts[0]);
+        $courierType = strtolower($courierParts[1] ?? 'reg');
+
         // Create Order Biteship
-        // Di aplikasi nyata, Anda bisa memanggil API create order Biteship di sini
-        $order->update(['biteship_order_id' => 'BS-' . uniqid(), 'courier_name' => $validated['courier_name']]);
+        $biteshipResponse = Http::withHeaders([
+            'Authorization' => env('BITESHIP_API_KEY')
+        ])->post('https://api.biteship.com/v1/orders', [
+            "shipper_contact_name" => "Notisse Admin",
+            "shipper_contact_phone" => "081234567890",
+            "shipper_contact_email" => "admin@notisse.com",
+            "shipper_organization" => "Notisse",
+            "origin_contact_name" => "Notisse Admin",
+            "origin_contact_phone" => "081234567890",
+            "origin_address" => "Jl. Kemang Selatan No. 99, Jakarta Selatan",
+            "origin_area_id" => "IDNP11IDNC23IDND164IDZ12440",
+            "destination_contact_name" => $validated['customer_name'],
+            "destination_contact_phone" => $validated['customer_phone'],
+            "destination_contact_email" => $validated['customer_email'],
+            "destination_address" => $validated['shipping_address'],
+            "destination_area_id" => $destinationAreaId ?: "IDNP11IDNC23IDND164IDZ12440",
+            "courier_company" => $courierCompany,
+            "courier_type" => $courierType,
+            "delivery_type" => "now",
+            "items" => $biteshipItems
+        ]);
+
+        $biteshipData = $biteshipResponse->json();
+        
+        $biteshipOrderId = 'BS-' . uniqid(); // Fallback
+        if (isset($biteshipData['id'])) {
+            $biteshipOrderId = $biteshipData['id'];
+        }
+
+        $order->update([
+            'biteship_order_id' => $biteshipOrderId, 
+            'courier_name' => $validated['courier_name']
+        ]);
 
         // Konfigurasi Midtrans
         $params = [
