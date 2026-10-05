@@ -93,12 +93,12 @@ class CheckoutController extends Controller
             "origin_contact_name" => "Notisse Admin",
             "origin_contact_phone" => "081234567890",
             "origin_address" => "Jl. Kemang Selatan No. 99, Jakarta Selatan",
-            "origin_area_id" => "IDNP11IDNC23IDND164IDZ12440",
+            "origin_area_id" => "IDNP6IDNC148IDND838IDZ12110",
             "destination_contact_name" => $validated['customer_name'],
             "destination_contact_phone" => $validated['customer_phone'],
             "destination_contact_email" => $validated['customer_email'],
             "destination_address" => $validated['shipping_address'],
-            "destination_area_id" => $destinationAreaId ?: "IDNP11IDNC23IDND164IDZ12440",
+            "destination_area_id" => $destinationAreaId ?: "IDNP6IDNC148IDND838IDZ12110",
             "courier_company" => $courierCompany,
             "courier_type" => $courierType,
             "delivery_type" => "now",
@@ -107,6 +107,9 @@ class CheckoutController extends Controller
 
         $biteshipData = $biteshipResponse->json();
         
+        // --- TAMBAHAN LOGGING UNTUK DEBUG BITESIP ---
+        \Illuminate\Support\Facades\Log::info('Biteship Create Order Response:', (array) $biteshipData);
+
         $biteshipOrderId = 'BS-' . uniqid(); // Fallback
         if (isset($biteshipData['id'])) {
             $biteshipOrderId = $biteshipData['id'];
@@ -179,7 +182,7 @@ class CheckoutController extends Controller
         $response = Http::withHeaders([
             'Authorization' => env('BITESHIP_API_KEY')
         ])->post('https://api.biteship.com/v1/rates/couriers', [
-            "origin_area_id" => "IDNP11IDNC23IDND164IDZ12440", // Origin: Jakarta Selatan (contoh)
+            "origin_area_id" => "IDNP6IDNC148IDND838IDZ12110", // Origin: Kebayoran Baru, Jakarta Selatan
             "destination_area_id" => $validated['destination_area_id'],
             "couriers" => "jne,sicepat,jnt,anteraja",
             "items" => $biteshipItems
