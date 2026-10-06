@@ -347,107 +347,172 @@
             will-change: opacity, transform;
         }
 
-        /* EXACT A24 CART BUTTON STYLING (TYPOGRAPHIC MINIMALISM) */
+        /* ========================================================== */
+        /* EXACT A24 MORPHING CART BUTTON WITH MOVING CONNECTING LINE */
+        /* ========================================================== */
         .header__link--cart {
-            display: inline-flex;
-            align-items: center;
-            letter-spacing: 0.14em;
-            font-size: 11px;
-            font-weight: 500;
-            text-transform: uppercase;
+            display: block;
+            position: fixed;
+            top: 18px;
+            right: 28px;
+            width: 72px;
+            height: 38px;
+            z-index: 55;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
             cursor: pointer;
-            position: relative;
-            color: currentColor;
-            transition: opacity 0.25s ease;
+            color: #000000;
+            transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (max-width: 640px) {
+            .header__link--cart {
+                top: 14px;
+                right: 18px;
+            }
         }
 
         .header__link--cart:hover {
-            opacity: 0.55;
+            opacity: 0.65;
         }
 
+        /* 1. THE MOVING / MORPHING CONNECTING LINE (L-SHAPE THAT SHRINKS & STRETCHES) */
+        .header__link--cart::before {
+            content: "";
+            position: absolute;
+            right: 7px;
+            top: 7px;
+            width: 26px;
+            height: 16px;
+            border-top: 1.2px solid currentColor;
+            border-right: 1.2px solid currentColor;
+            border-bottom: none;
+            border-left: none;
+            box-sizing: border-box;
+            pointer-events: none;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
+                        height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        top 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: width, height, top;
+        }
+
+        /* On hover in default horizontal state: line actively moves/stretches */
+        .header__link--cart:not(.state-minimal):hover::before {
+            width: 32px;
+            transition-delay: 0s;
+        }
+
+        /* 2. DEFAULT HORIZONTAL LABEL */
         .header__link--cart__default-label {
-            letter-spacing: 0.16em;
+            position: absolute;
+            left: 0;
+            top: 0;
             font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
             font-weight: 600;
+            letter-spacing: 0.16em;
+            line-height: 16px;
+            text-transform: uppercase;
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
 
-        /* Signature A24 connecting horizontal dash */
-        .header__link--cart__dash {
-            display: inline-block;
-            width: 14px;
-            height: 1px;
-            background-color: currentColor;
-            margin: 0 7px;
-            opacity: 0.8;
-            transition: width 0.25s ease;
+        /* 3. VERTICAL LABEL (APPEARS ON SCROLL) */
+        .header__link--cart__vertical-label {
+            position: absolute;
+            right: 11px;
+            top: 0px;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.22em;
+            line-height: 1;
+            text-transform: uppercase;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease 0.08s, transform 0.3s ease;
         }
 
-        .header__link--cart:hover .header__link--cart__dash {
-            width: 18px;
-        }
-
-        /* Signature A24 counter styling */
+        /* 4. MONOSPACE COUNTER */
         .header__link--cart__counter {
+            position: absolute;
+            right: 3px;
+            top: 24px;
             font-family: 'Courier New', Courier, Monaco, monospace;
             font-size: 11.5px;
             font-weight: 600;
             line-height: 1;
+            transition: top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Scrolled state: EXACT A24 Vertical Floating Link (NO BOX, NO CARD) */
-        #a24-cart-sticky {
-            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                        opacity 0.25s ease;
-            will-change: opacity, transform;
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            padding: 0 !important;
-            color: #000000;
+        /* ============================================================== */
+        /* SCROLLED MINIMAL STATE (.state-minimal): MOVING LINE ANIMATION */
+        /* ============================================================== */
+        .header__link--cart.state-minimal {
+            width: 24px;
+            height: 96px;
         }
 
-        #a24-cart-sticky.scrolled-active {
-            opacity: 1 !important;
-            pointer-events: auto !important;
-            transform: translateY(0) !important;
+        /* Horizontal segment collapses to 0; Vertical segment stretches to 38px */
+        .header__link--cart.state-minimal::before {
+            width: 0px !important;
+            height: 38px !important;
+            top: 36px !important;
+            right: 7px !important;
+            transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                        height 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
+                        top 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
         }
 
-        #a24-cart-sticky.scrolled-hidden {
+        /* On hover in vertical state: vertical line stretches down further */
+        .header__link--cart.state-minimal:hover::before {
+            height: 46px !important;
+            transition-delay: 0s !important;
+        }
+
+        .header__link--cart.state-minimal .header__link--cart__counter {
+            top: 76px !important;
+            right: 3px !important;
+            transition: top 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+        }
+
+        .header__link--cart.state-minimal:hover .header__link--cart__counter {
+            top: 84px !important;
+            transition-delay: 0s !important;
+        }
+
+        .header__link--cart.state-minimal .header__link--cart__default-label {
             opacity: 0 !important;
             pointer-events: none !important;
-            transform: translateY(-14px) !important;
+            transform: translateY(-4px);
         }
 
-        #a24-cart-sticky:hover {
-            opacity: 0.55 !important;
+        .header__link--cart.state-minimal .header__link--cart__vertical-label {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            transform: rotate(180deg) translateY(0);
         }
 
-        .header__link--cart__vertical-label {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            transform: rotate(180deg);
-            letter-spacing: 0.22em;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 1;
-            text-transform: uppercase;
+        .header__link--cart.state-minimal .header__link--cart__counter {
+            top: 76px !important;
+            right: 3px !important;
         }
 
-        /* Signature A24 vertical connecting stroke */
-        .header__link--cart__vert-dash {
-            display: block;
-            width: 1px;
-            height: 15px;
-            background-color: currentColor;
-            margin: 6px 0;
-            opacity: 0.8;
-            transition: height 0.25s ease;
+        /* Animated moving shimmer line in cart drawer */
+        @keyframes movingLineSlide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
-        #a24-cart-sticky:hover .header__link--cart__vert-dash {
-            height: 20px;
+        .moving-line-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+            animation: movingLineSlide 2.2s infinite ease-in-out;
         }
 
         @keyframes cartBadgePop {
@@ -531,32 +596,22 @@
                 class="header-logo-small absolute h-5 sm:h-5.5 md:h-6 w-auto object-contain select-none">
         </div>
 
-        <!-- Right: SEARCH & CART (Account Removed as requested) -->
+        <!-- Right: SEARCH -->
         <div id="header-right-menu"
-            class="flex items-center space-x-3 sm:space-x-5 text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3">
+            class="flex items-center text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3 pr-20 sm:pr-24">
             <button id="search-trigger" aria-label="Search"
                 class="font-montserrat font-medium hover:opacity-50 hover:scale-105 active:scale-95 transition-all focus:outline-none py-1 px-1 cursor-pointer">
                 SEARCH
             </button>
-            <button id="cart-trigger" aria-label="Cart"
-                class="header__link--cart focus:outline-none">
-                <span class="header__link--cart__default-label">CART</span>
-                <span class="header__link--cart__dash"></span>
-                <span id="header-cart-badge" class="header__link--cart__counter font-bold">2</span>
-            </button>
         </div>
     </header>
 
-    <!-- A24-INSPIRED MINIMAL SCROLL CART TRIGGER (EXACT A24 DESIGN: BORDERLESS & TYPOGRAPHIC) -->
-    <button id="a24-cart-sticky" aria-label="Cart" onclick="openCart()"
-        class="scrolled-hidden fixed top-5 right-5 sm:right-8 z-50 flex flex-col items-center justify-center cursor-pointer group focus:outline-none select-none">
-        <span class="header__link--cart__vertical-label">
-            CART
-        </span>
-        <span class="header__link--cart__vert-dash"></span>
-        <span id="a24-sticky-cart-badge" class="header__link--cart__counter font-bold">
-            2
-        </span>
+    <!-- EXACT A24 UNIFIED MORPHING CART TRIGGER (WITH VISIBLE MOVING LINE ANIMATION) -->
+    <button id="cart-trigger" aria-label="Cart" onclick="openCart()"
+        class="header__link--cart focus:outline-none select-none cursor-pointer">
+        <span class="header__link--cart__default-label">CART</span>
+        <span class="header__link--cart__vertical-label">CART</span>
+        <span id="header-cart-badge" class="header__link--cart__counter font-bold">2</span>
     </button>
 
     <!-- OVERLAY 1: 1/4 SCREEN WIDTH NAVIGATION SIDEBAR -->
@@ -661,7 +716,7 @@
             
             <!-- Top Header & Banner -->
             <div class="flex-shrink-0 bg-white">
-                <div class="flex items-center justify-between pt-6 px-6 sm:px-8 pb-4 border-t border-black">
+                <div class="flex items-center justify-between pt-6 px-6 sm:px-8 pb-3 border-t border-black">
                     <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-black">
                         FREE STANDARD DOMESTIC SHIPPING OVER RP 500.000
                     </span>
@@ -671,6 +726,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
+                </div>
+                <!-- Animated moving line / progress bar -->
+                <div class="mx-6 sm:mx-8 mb-2 h-[2px] bg-neutral-100 overflow-hidden relative">
+                    <div class="h-full bg-black relative w-full overflow-hidden">
+                        <div class="absolute inset-0 moving-line-shimmer"></div>
+                    </div>
                 </div>
             </div>
 
@@ -1977,16 +2038,18 @@
                 }
             }
 
-            // A24 STICKY CART SCROLL ANIMATION (Active when header is hidden on scroll)
-            const stickyCart = document.getElementById('a24-cart-sticky');
-            if (stickyCart) {
-                const headerIsHidden = mainHeader.classList.contains('header-hidden');
-                if (headerIsHidden && currentScrollY > 60 && !isOverlayOpen) {
-                    stickyCart.classList.remove('scrolled-hidden');
-                    stickyCart.classList.add('scrolled-active');
+            // EXACT A24 MORPHING CART BUTTON (Triggers the moving connecting line animation)
+            const cartTrigger = document.getElementById('cart-trigger');
+            if (cartTrigger) {
+                if (isOverlayOpen) {
+                    cartTrigger.classList.add('opacity-0', 'pointer-events-none');
                 } else {
-                    stickyCart.classList.remove('scrolled-active');
-                    stickyCart.classList.add('scrolled-hidden');
+                    cartTrigger.classList.remove('opacity-0', 'pointer-events-none');
+                    if (currentScrollY > 40) {
+                        cartTrigger.classList.add('state-minimal');
+                    } else {
+                        cartTrigger.classList.remove('state-minimal');
+                    }
                 }
             }
 
@@ -1994,6 +2057,7 @@
         }
 
         window.addEventListener('scroll', updateHeaderState, { passive: true });
+        updateHeaderState();
 
         let navigationHistory = ['view-shop'];
         let isAuthenticated = false;
@@ -2311,11 +2375,8 @@
         function openCart() {
             renderCartItems();
             overlayCart.classList.remove('hidden');
-            const stickyCart = document.getElementById('a24-cart-sticky');
-            if (stickyCart) {
-                stickyCart.classList.remove('scrolled-active');
-                stickyCart.classList.add('scrolled-hidden');
-            }
+            const cartTrigger = document.getElementById('cart-trigger');
+            if (cartTrigger) cartTrigger.classList.add('opacity-0', 'pointer-events-none');
             setTimeout(() => {
                 overlayCart.classList.remove('opacity-0');
                 cartDrawerContent.classList.remove('translate-x-full');
@@ -2701,7 +2762,6 @@
             const container = document.getElementById('cart-items-container');
             const totalElement = document.getElementById('cart-total-price');
             const badgeElement = document.getElementById('header-cart-badge');
-            const stickyBadge = document.getElementById('a24-sticky-cart-badge');
             let totalAmount = 0;
             let totalItemCount = 0;
 
@@ -2756,7 +2816,6 @@
             const grandTotal = totalAmount + selectedShippingCost;
             if (totalElement) totalElement.innerText = formatRupiah(grandTotal) + ' IDR';
             if (badgeElement) badgeElement.innerText = totalItemCount;
-            if (stickyBadge) stickyBadge.innerText = totalItemCount;
         }
 
         function triggerBadgePop() {
@@ -2765,12 +2824,6 @@
                 badge.classList.remove('cart-badge-pop');
                 void badge.offsetWidth;
                 badge.classList.add('cart-badge-pop');
-            }
-            const stickyBadge = document.getElementById('a24-sticky-cart-badge');
-            if (stickyBadge) {
-                stickyBadge.classList.remove('cart-badge-pop');
-                void stickyBadge.offsetWidth;
-                stickyBadge.classList.add('cart-badge-pop');
             }
         }
 
