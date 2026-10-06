@@ -364,7 +364,7 @@
             margin: 0 !important;
             cursor: pointer;
             color: #000000;
-            transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.25s ease;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -383,9 +383,9 @@
         .header__link--cart::before {
             content: "";
             position: absolute;
-            right: 7px;
+            right: 0px;
             top: 7px;
-            width: 26px;
+            width: 24px;
             height: 16px;
             border-top: 1.2px solid currentColor;
             border-right: 1.2px solid currentColor;
@@ -393,16 +393,16 @@
             border-left: none;
             box-sizing: border-box;
             pointer-events: none;
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
-                        height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                        top 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                        right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            /* When returning (scrolling UP): vertical shrinks first (0s), horizontal opens after delay (0.15s) */
+            transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
+                        height 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
             will-change: width, height, top;
         }
 
         /* On hover in default horizontal state: line actively moves/stretches */
         .header__link--cart:not(.state-minimal):hover::before {
-            width: 32px;
+            width: 30px;
             transition-delay: 0s;
         }
 
@@ -417,91 +417,90 @@
             letter-spacing: 0.16em;
             line-height: 16px;
             text-transform: uppercase;
-            transition: opacity 0.25s ease, transform 0.25s ease;
+            transition: opacity 0.2s ease 0.15s;
         }
 
         /* 3. VERTICAL LABEL (APPEARS ON SCROLL) */
+        /* Reads top to bottom naturally without rotate(180deg) */
         .header__link--cart__vertical-label {
             position: absolute;
-            right: 11px;
             top: 0px;
-            writing-mode: vertical-rl;
-            transform: rotate(180deg);
+            right: -0.5em;
+            width: 1em;
             font-family: 'Montserrat', sans-serif;
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.22em;
             line-height: 1;
             text-transform: uppercase;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease 0.08s, transform 0.3s ease;
+            transition: opacity 0.2s ease 0s;
         }
 
         /* 4. MONOSPACE COUNTER */
         .header__link--cart__counter {
             position: absolute;
-            right: 3px;
-            top: 24px;
+            right: -0.28em;
+            top: 25px;
             font-family: 'Courier New', Courier, Monaco, monospace;
             font-size: 11.5px;
             font-weight: 600;
             line-height: 1;
-            transition: top 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            text-align: center;
+            transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
         }
 
         /* ============================================================== */
         /* SCROLLED MINIMAL STATE (.state-minimal): MOVING LINE ANIMATION */
         /* ============================================================== */
         .header__link--cart.state-minimal {
-            width: 24px;
+            width: 20px;
             height: 96px;
         }
 
-        /* Horizontal segment collapses to 0; Vertical segment stretches to 38px */
+        /* Horizontal segment collapses to 0 immediately (0s); Vertical segment stretches after delay (0.15s) */
         .header__link--cart.state-minimal::before {
             width: 0px !important;
             height: 38px !important;
             top: 36px !important;
-            right: 7px !important;
-            transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                        height 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
-                        top 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+            right: 0px !important;
+            transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        height 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
+                        top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
         }
 
         /* On hover in vertical state: vertical line stretches down further */
         .header__link--cart.state-minimal:hover::before {
             height: 46px !important;
-            transition-delay: 0s !important;
+            transition: height 0.2s ease 0s !important;
         }
 
         .header__link--cart.state-minimal .header__link--cart__counter {
-            top: 76px !important;
-            right: 3px !important;
-            transition: top 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+            top: 78px !important;
+            right: -0.28em !important;
+            transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
         }
 
         .header__link--cart.state-minimal:hover .header__link--cart__counter {
-            top: 84px !important;
-            transition-delay: 0s !important;
+            top: 86px !important;
+            transition: top 0.2s ease 0s !important;
         }
 
         .header__link--cart.state-minimal .header__link--cart__default-label {
             opacity: 0 !important;
             pointer-events: none !important;
-            transform: translateY(-4px);
+            transition: opacity 0.15s ease 0s !important;
         }
 
         .header__link--cart.state-minimal .header__link--cart__vertical-label {
             opacity: 1 !important;
             pointer-events: auto !important;
-            transform: rotate(180deg) translateY(0);
-        }
-
-        .header__link--cart.state-minimal .header__link--cart__counter {
-            top: 76px !important;
-            right: 3px !important;
+            top: 0px !important;
+            right: -0.5em !important;
+            transition: opacity 0.25s ease 0.15s !important;
         }
 
         /* Animated moving shimmer line in cart drawer */
@@ -2041,7 +2040,7 @@
             // EXACT A24 MORPHING CART BUTTON (Triggers the moving connecting line animation)
             const cartTrigger = document.getElementById('cart-trigger');
             if (cartTrigger) {
-                if (isOverlayOpen) {
+                if (isOverlayOpen || (isShopPage && currentScrollY <= 40)) {
                     cartTrigger.classList.add('opacity-0', 'pointer-events-none');
                 } else {
                     cartTrigger.classList.remove('opacity-0', 'pointer-events-none');
