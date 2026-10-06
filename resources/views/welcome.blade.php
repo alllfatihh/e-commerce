@@ -665,28 +665,22 @@
 
                 <!-- Offering Form -->
                 <form id="artwork-offering-form" onsubmit="handleArtworkOfferingSubmit(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
-                            Nama Lengkap <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" id="offering-buyer-name" required placeholder="Nama lengkap Anda"
-                            class="w-full border border-gray-300 px-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors">
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
-                                Email <span class="text-red-500">*</span>
-                            </label>
-                            <input type="email" id="offering-buyer-email" required placeholder="email@domain.com"
-                                class="w-full border border-gray-300 px-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
-                                WhatsApp / No. HP <span class="text-red-500">*</span>
-                            </label>
-                            <input type="tel" id="offering-buyer-phone" required placeholder="08xxxxxxxxxx"
-                                class="w-full border border-gray-300 px-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors">
+                    <!-- Account Identity Card (Logged in User) -->
+                    <div class="p-3.5 bg-neutral-50 border border-gray-200 rounded-sm">
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-gray-400 font-montserrat block mb-1.5">Akun Penawar (Tercatat di Sistem)</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-xs font-montserrat flex-shrink-0" id="offering-user-avatar">
+                                    JD
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-xs sm:text-sm text-black font-montserrat truncate" id="offering-user-name">John Doe</p>
+                                    <p class="text-[11px] text-gray-500 font-roboto truncate" id="offering-user-email">john.doe@notisse.com</p>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-semibold tracking-wider uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-montserrat flex-shrink-0">
+                                Akun Terverifikasi
+                            </span>
                         </div>
                     </div>
 
@@ -707,55 +701,66 @@
                         <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
                             Catatan / Pesan Pembelian (Opsional)
                         </label>
-                        <textarea id="offering-buyer-message" rows="3" placeholder="Tuliskan alasan atau pesan tambahan untuk Seniman & Kurator Notisse..."
+                        <textarea id="offering-buyer-message" rows="3" placeholder="Tuliskan catatan tambahan atau rencana penempatan karya untuk kurator & seniman..."
                             class="w-full border border-gray-300 px-3.5 py-2 text-sm font-roboto focus:outline-none focus:border-black transition-colors resize-none"></textarea>
                     </div>
 
                     <div class="pt-2">
                         <button type="submit" id="offering-submit-btn"
                             class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-3.5 px-6 font-montserrat text-xs sm:text-sm font-bold tracking-[0.2em] uppercase cursor-pointer flex items-center justify-center space-x-2">
-                            <span>SUBMIT OFFER KE ARTIST & NOTISSE</span>
+                            <span>AJUKAN PENAWARAN (SUBMIT OFFER)</span>
                             <span>&rarr;</span>
                         </button>
                     </div>
                 </form>
 
                 <p class="text-[11px] text-gray-400 text-center font-roboto">
-                    Pengajuan offering bersifat personal & kuratorial. Notifikasi akan diteruskan langsung ke pemilik artwork dan kurator Notisse.
+                    Pengajuan offering tersimpan otomatis di akun Anda dan diteruskan ke kurasi internal Notisse & seniman pemilik karya.
                 </p>
             </div>
 
-            <!-- Success State Body (Initially hidden) -->
+            <!-- Success State Body (Official In-App Confirmation) -->
             <div id="artwork-offering-success-body" class="p-6 sm:p-8 hidden text-center space-y-5">
                 <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
                     &#10003;
                 </div>
                 <div>
-                    <h4 class="text-lg sm:text-xl font-bold font-montserrat text-black">Offering Berhasil Disubmit!</h4>
+                    <h4 class="text-lg sm:text-xl font-bold font-montserrat text-black">Offering Berhasil Diajukan!</h4>
                     <p class="text-xs text-gray-600 font-roboto mt-2 max-w-sm mx-auto leading-relaxed">
-                        Data penawaran Anda telah dicatat. Silakan gunakan tombol di bawah untuk langsung mengirimkan pesan penawaran resmi ke <strong class="text-black">Notisse Official</strong> dan <strong class="text-black">Pemilik Artwork (<span id="success-artist-name">Artis</span>)</strong>.
+                        Penawaran telah tercatat secara resmi di sistem Notisse. Tim kurasi Notisse dan pemilik karya (<strong class="text-black" id="success-artist-name">Mustafa Alatas</strong>) akan mereview penawaran ini.
                     </p>
                 </div>
 
-                <div class="p-3.5 bg-neutral-50 border border-gray-200 text-left space-y-1.5 text-xs font-roboto">
-                    <p><strong>Karya:</strong> <span id="success-artwork-title"></span></p>
-                    <p><strong>Nominal Tawaran:</strong> <span id="success-artwork-price" class="font-bold text-emerald-700"></span></p>
-                    <p><strong>Nama Pembeli:</strong> <span id="success-buyer-name"></span></p>
+                <div class="p-4 bg-neutral-50 border border-gray-200 text-left space-y-2 text-xs font-roboto">
+                    <div class="flex justify-between border-b border-gray-200 pb-1.5">
+                        <span class="text-gray-500 font-montserrat text-[11px] uppercase">Ref. Offering:</span>
+                        <span class="font-mono font-bold text-black" id="success-offering-ref">#NTS-ART-9281</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Akun Pembeli:</span>
+                        <span class="font-medium text-black" id="success-buyer-name">John Doe (john.doe@notisse.com)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Karya Seni:</span>
+                        <span class="font-medium text-black truncate ml-2" id="success-artwork-title">Mereka Ulang Ungkapan Indah Leila</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Nominal Tawaran:</span>
+                        <span class="font-bold text-emerald-700 font-montserrat" id="success-artwork-price">Rp 12.500.000 IDR</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-gray-500">Status Penawaran:</span>
+                        <span class="font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-[10px] uppercase font-montserrat">Dalam Tinjauan Kurasi</span>
+                    </div>
                 </div>
 
-                <div class="space-y-2.5 pt-2">
-                    <a id="success-wa-notisse-link" href="#" target="_blank"
-                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-montserrat py-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors flex items-center justify-center space-x-2">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                        <span>Kirim Pesan ke WhatsApp Notisse</span>
-                    </a>
-                    <a id="success-wa-artist-link" href="#" target="_blank"
-                        class="w-full bg-black hover:bg-neutral-800 text-white font-montserrat py-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors flex items-center justify-center space-x-2">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                        <span>Kirim Pesan ke Pemilik Artwork</span>
-                    </a>
+                <p class="text-[11px] text-gray-400 font-roboto leading-relaxed">
+                    Hasil kurasi penawaran serta instruksi lanjutan akan dikirimkan langsung ke notifikasi akun dan email Anda.
+                </p>
+
+                <div class="pt-2">
                     <button type="button" onclick="closeArtworkOfferingModal()"
-                        class="w-full border border-gray-300 text-gray-700 hover:bg-gray-100 font-montserrat py-2.5 px-4 text-xs font-semibold tracking-wider uppercase transition-colors">
+                        class="w-full bg-black text-white hover:bg-neutral-800 font-montserrat py-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer">
                         Tutup
                     </button>
                 </div>
@@ -2383,17 +2388,33 @@
             if (prevArtist) prevArtist.innerText = currentActiveArtwork.artist;
             if (prevSpecs) prevSpecs.innerText = `${currentActiveArtwork.medium} • ${currentActiveArtwork.dimensions}`;
 
+            // Populate User Account Info from logged-in session / storage
+            let activeUser = loggedInUser;
+            try {
+                const storedUser = localStorage.getItem('notisse_user');
+                if (storedUser) activeUser = JSON.parse(storedUser);
+            } catch (e) {}
+
+            const userNameEl = document.getElementById('offering-user-name');
+            const userEmailEl = document.getElementById('offering-user-email');
+            const userAvatarEl = document.getElementById('offering-user-avatar');
+
+            if (userNameEl) userNameEl.innerText = activeUser.name || 'John Doe';
+            if (userEmailEl) userEmailEl.innerText = activeUser.email || 'john.doe@notisse.com';
+            if (userAvatarEl) {
+                const initials = (activeUser.name || 'John Doe').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                userAvatarEl.innerText = initials || 'NT';
+            }
+
+            // Reset form fields
+            const priceInput = document.getElementById('offering-buyer-price');
+            const messageInput = document.getElementById('offering-buyer-message');
+            if (priceInput) priceInput.value = '';
+            if (messageInput) messageInput.value = '';
+
             // Reset view state
             if (formBody) formBody.classList.remove('hidden');
             if (successBody) successBody.classList.add('hidden');
-
-            // Pre-fill user data if logged in
-            if (isAuthenticated && loggedInUser) {
-                const nameInput = document.getElementById('offering-buyer-name');
-                const emailInput = document.getElementById('offering-buyer-email');
-                if (nameInput && !nameInput.value) nameInput.value = loggedInUser.name || '';
-                if (emailInput && !emailInput.value) emailInput.value = loggedInUser.email || '';
-            }
 
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -2429,78 +2450,58 @@
 
         function handleArtworkOfferingSubmit(e) {
             e.preventDefault();
-            const name = document.getElementById('offering-buyer-name').value.trim();
-            const email = document.getElementById('offering-buyer-email').value.trim();
-            const phone = document.getElementById('offering-buyer-phone').value.trim();
             const price = document.getElementById('offering-buyer-price').value.trim();
             const message = document.getElementById('offering-buyer-message').value.trim();
 
-            if (!name || !email || !phone || !price) {
-                showToast("Harap lengkapi semua kolom bertanda *");
+            if (!price) {
+                showToast("Harap masukkan nominal tawaran");
                 return;
             }
 
-            // Construct acquisition inquiry message
-            const offerMessage = `*NOTISSE ARTWORK ACQUISITION OFFERING*\n` +
-                `------------------------------------\n` +
-                `Halo Tim Notisse & Seniman Pemilik Karya,\n` +
-                `Saya bermaksud mengajukan penawaran pembelian karya seni asli:\n\n` +
-                `*Karya:* ${currentActiveArtwork.title}\n` +
-                `*Seniman:* ${currentActiveArtwork.artist}\n` +
-                `*Spesifikasi:* ${currentActiveArtwork.medium} (${currentActiveArtwork.dimensions})\n` +
-                `*Nominal Tawaran:* Rp ${price} IDR\n\n` +
-                `*Data Pembeli:*\n` +
-                `- Nama: ${name}\n` +
-                `- Email: ${email}\n` +
-                `- WhatsApp: ${phone}\n` +
-                `- Pesan/Catatan: ${message || '-'}\n\n` +
-                `Mohon informasi ketersediaan, konfirmasi kurasi, dan langkah selanjutnya. Terima kasih.\n` +
-                `------------------------------------\n` +
-                `(Diajukan melalui Notisse Online Art Gallery)`;
+            let activeUser = loggedInUser;
+            try {
+                const storedUser = localStorage.getItem('notisse_user');
+                if (storedUser) activeUser = JSON.parse(storedUser);
+            } catch (err) {}
 
-            const encodedMsg = encodeURIComponent(offerMessage);
+            const refId = '#NTS-ART-' + Math.floor(100000 + Math.random() * 900000);
 
-            // WhatsApp link to Notisse official (+6285607714704)
-            const notisseWaUrl = `https://api.whatsapp.com/send?phone=6285607714704&text=${encodedMsg}`;
-            // WhatsApp link to Artist representation
-            const artistWaUrl = `https://api.whatsapp.com/send?phone=6285607714704&text=${encodedMsg}`;
-
-            // Save inquiry locally for persistence / history
+            // Save inquiry locally in system records for the user's account
             try {
                 const storedOffers = JSON.parse(localStorage.getItem('notisse_artwork_offers') || '[]');
                 storedOffers.push({
+                    refId: refId,
                     date: new Date().toISOString(),
                     artwork: currentActiveArtwork,
-                    buyer: { name, email, phone, price, message }
+                    buyer: {
+                        name: activeUser.name,
+                        email: activeUser.email
+                    },
+                    offerPrice: price,
+                    message: message || '',
+                    status: 'Under Review'
                 });
                 localStorage.setItem('notisse_artwork_offers', JSON.stringify(storedOffers));
             } catch (err) {}
 
-            // Populate success screen
+            // Populate success screen details
+            const succRef = document.getElementById('success-offering-ref');
             const succArtist = document.getElementById('success-artist-name');
             const succTitle = document.getElementById('success-artwork-title');
             const succPrice = document.getElementById('success-artwork-price');
             const succBuyer = document.getElementById('success-buyer-name');
 
+            if (succRef) succRef.innerText = refId;
             if (succArtist) succArtist.innerText = currentActiveArtwork.artist;
             if (succTitle) succTitle.innerText = currentActiveArtwork.title;
             if (succPrice) succPrice.innerText = "Rp " + price + " IDR";
-            if (succBuyer) succBuyer.innerText = name + ` (${phone})`;
-
-            const notisseBtn = document.getElementById('success-wa-notisse-link');
-            if (notisseBtn) notisseBtn.href = notisseWaUrl;
-
-            const artistBtn = document.getElementById('success-wa-artist-link');
-            if (artistBtn) artistBtn.href = artistWaUrl;
+            if (succBuyer) succBuyer.innerText = `${activeUser.name} (${activeUser.email})`;
 
             // Switch to success body
             document.getElementById('artwork-offering-form-body').classList.add('hidden');
             document.getElementById('artwork-offering-success-body').classList.remove('hidden');
 
-            showToast("Offering disubmit! Pesan disiapkan untuk Notisse & Artist.");
-
-            // Open WhatsApp directly in new window
-            window.open(notisseWaUrl, '_blank');
+            showToast("Offering diajukan! Penawaran tercatat di sistem.");
         }
 
         /* LIGHTBOX IMAGE VIEWER LOGIC (SIZE CHART & ARTWORK) */
