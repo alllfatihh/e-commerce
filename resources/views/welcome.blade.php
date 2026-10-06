@@ -347,6 +347,50 @@
             will-change: opacity, transform;
         }
 
+        /* A24 INSPIRED SCROLL CART & STICKY MORPH ANIMATION */
+        #a24-cart-sticky {
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        background-color 0.25s ease,
+                        box-shadow 0.25s ease;
+            will-change: opacity, transform;
+        }
+
+        #a24-cart-sticky.scrolled-active {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            transform: translateY(0) scale(1) !important;
+        }
+
+        #a24-cart-sticky.scrolled-hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translateY(-16px) scale(0.92) !important;
+        }
+
+        .vertical-rl-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+        }
+
+        @keyframes cartBadgePop {
+            0% {
+                transform: scale(1);
+            }
+            40% {
+                transform: scale(1.4);
+                color: #d52c2b;
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .cart-badge-pop {
+            animation: cartBadgePop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
         /* OVERLAYS AND STACKING CONTEXTS (MENIMPA RUNNING TEXT FOOTER) */
         #global-marquee {
             z-index: 30 !important;
@@ -369,6 +413,14 @@
 
         #overlay-search {
             z-index: 950 !important;
+        }
+
+        #modal-artwork-offering {
+            z-index: 960 !important;
+        }
+
+        #modal-image-lightbox {
+            z-index: 970 !important;
         }
 
         #toast-container {
@@ -417,6 +469,18 @@
             </button>
         </div>
     </header>
+
+    <!-- A24-INSPIRED STICKY SCROLL CART TRIGGER (APPEARS ON SCROLL) -->
+    <button id="a24-cart-sticky" aria-label="Cart" onclick="openCart()"
+        class="scrolled-hidden fixed top-4 right-4 sm:right-7 z-50 bg-white/95 backdrop-blur-md border border-black/15 shadow-[0_4px_20px_rgba(0,0,0,0.08)] py-3 px-2 sm:px-2.5 flex flex-col items-center justify-center cursor-pointer group hover:bg-black hover:border-black transition-all duration-300 rounded-sm focus:outline-none">
+        <span class="vertical-rl-text text-[10px] sm:text-[11px] font-bold tracking-[0.25em] font-montserrat uppercase text-black group-hover:text-white transition-colors select-none">
+            CART
+        </span>
+        <div class="w-2.5 h-[1px] bg-black/25 group-hover:bg-white/40 my-2 transition-colors"></div>
+        <span id="a24-sticky-cart-badge" class="text-[10px] sm:text-[11px] font-bold font-montserrat text-black group-hover:text-white transition-colors">
+            (2)
+        </span>
+    </button>
 
     <!-- OVERLAY 1: 1/4 SCREEN WIDTH NAVIGATION SIDEBAR -->
     <div id="overlay-menu-backdrop"
@@ -563,6 +627,156 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY 4: ARTWORK OFFERING MODAL (ACQUISITION INQUIRY) -->
+    <div id="modal-artwork-offering"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 sm:p-6"
+        onclick="closeArtworkOfferingModal()">
+        <div class="bg-white w-full max-w-lg shadow-2xl border border-gray-200 transform scale-95 transition-transform duration-300 flex flex-col max-h-[92vh] overflow-hidden"
+            onclick="event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white sticky top-0 z-10">
+                <div>
+                    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block">NOTISSE ART GALLERY ACQUISITION</span>
+                    <h3 class="text-base sm:text-lg font-bold font-montserrat text-black tracking-tight">Artwork Offering / Buy Inquiry</h3>
+                </div>
+                <button onclick="closeArtworkOfferingModal()" aria-label="Close Modal"
+                    class="text-2xl font-light hover:rotate-90 text-gray-500 hover:text-black transition-transform duration-300 focus:outline-none cursor-pointer">
+                    &#10005;
+                </button>
+            </div>
+
+            <!-- Modal Form Body (Scrollable) -->
+            <div id="artwork-offering-form-body" class="p-6 overflow-y-auto space-y-5 flex-grow">
+                <!-- Selected Artwork Card Preview -->
+                <div class="flex items-center space-x-4 p-3.5 bg-neutral-50 border border-gray-200 rounded-sm">
+                    <img id="offering-artwork-img" src="https://placehold.co/400x500/222/fff?text=Artwork" alt="Artwork"
+                        class="w-16 h-20 object-cover bg-gray-200 border border-gray-300 flex-shrink-0">
+                    <div class="space-y-0.5 min-w-0">
+                        <span class="text-[9px] font-semibold tracking-widest uppercase bg-black text-white px-1.5 py-0.5 inline-block font-montserrat mb-1">Original Piece</span>
+                        <p id="offering-artwork-title" class="font-bold text-xs sm:text-sm text-black font-montserrat truncate">Mereka Ulang Ungkapan Indah Leila</p>
+                        <p class="text-xs text-gray-600 font-roboto">Artist: <span id="offering-artwork-artist" class="font-semibold text-black">Mustafa Alatas</span></p>
+                        <p id="offering-artwork-specs" class="text-[11px] text-gray-500 font-roboto">Oil on canvas &bull; 60x60cm</p>
+                    </div>
+                </div>
+
+                <!-- Offering Form -->
+                <form id="artwork-offering-form" onsubmit="handleArtworkOfferingSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
+                            Nama Lengkap <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="offering-buyer-name" required placeholder="Nama lengkap Anda"
+                            class="w-full border border-gray-300 px-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
+                                Email <span class="text-red-500">*</span>
+                            </label>
+                            <input type="email" id="offering-buyer-email" required placeholder="email@domain.com"
+                                class="w-full border border-gray-300 px-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
+                                WhatsApp / No. HP <span class="text-red-500">*</span>
+                            </label>
+                            <input type="tel" id="offering-buyer-phone" required placeholder="08xxxxxxxxxx"
+                                class="w-full border border-gray-300 px-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
+                            Nominal Tawaran (IDR) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-500 font-montserrat">Rp</span>
+                            <input type="text" id="offering-buyer-price" required placeholder="Misal: 7.500.000"
+                                oninput="formatOfferingPriceInput(this)"
+                                class="w-full border border-gray-300 pl-10 pr-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors font-medium">
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-roboto mt-1">Masukkan nominal penawaran yang diajukan untuk karya seni asli.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
+                            Catatan / Pesan Pembelian (Opsional)
+                        </label>
+                        <textarea id="offering-buyer-message" rows="3" placeholder="Tuliskan alasan atau pesan tambahan untuk Seniman & Kurator Notisse..."
+                            class="w-full border border-gray-300 px-3.5 py-2 text-sm font-roboto focus:outline-none focus:border-black transition-colors resize-none"></textarea>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" id="offering-submit-btn"
+                            class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-3.5 px-6 font-montserrat text-xs sm:text-sm font-bold tracking-[0.2em] uppercase cursor-pointer flex items-center justify-center space-x-2">
+                            <span>SUBMIT OFFER KE ARTIST & NOTISSE</span>
+                            <span>&rarr;</span>
+                        </button>
+                    </div>
+                </form>
+
+                <p class="text-[11px] text-gray-400 text-center font-roboto">
+                    Pengajuan offering bersifat personal & kuratorial. Notifikasi akan diteruskan langsung ke pemilik artwork dan kurator Notisse.
+                </p>
+            </div>
+
+            <!-- Success State Body (Initially hidden) -->
+            <div id="artwork-offering-success-body" class="p-6 sm:p-8 hidden text-center space-y-5">
+                <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                    &#10003;
+                </div>
+                <div>
+                    <h4 class="text-lg sm:text-xl font-bold font-montserrat text-black">Offering Berhasil Disubmit!</h4>
+                    <p class="text-xs text-gray-600 font-roboto mt-2 max-w-sm mx-auto leading-relaxed">
+                        Data penawaran Anda telah dicatat. Silakan gunakan tombol di bawah untuk langsung mengirimkan pesan penawaran resmi ke <strong class="text-black">Notisse Official</strong> dan <strong class="text-black">Pemilik Artwork (<span id="success-artist-name">Artis</span>)</strong>.
+                    </p>
+                </div>
+
+                <div class="p-3.5 bg-neutral-50 border border-gray-200 text-left space-y-1.5 text-xs font-roboto">
+                    <p><strong>Karya:</strong> <span id="success-artwork-title"></span></p>
+                    <p><strong>Nominal Tawaran:</strong> <span id="success-artwork-price" class="font-bold text-emerald-700"></span></p>
+                    <p><strong>Nama Pembeli:</strong> <span id="success-buyer-name"></span></p>
+                </div>
+
+                <div class="space-y-2.5 pt-2">
+                    <a id="success-wa-notisse-link" href="#" target="_blank"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-montserrat py-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                        <span>Kirim Pesan ke WhatsApp Notisse</span>
+                    </a>
+                    <a id="success-wa-artist-link" href="#" target="_blank"
+                        class="w-full bg-black hover:bg-neutral-800 text-white font-montserrat py-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                        <span>Kirim Pesan ke Pemilik Artwork</span>
+                    </a>
+                    <button type="button" onclick="closeArtworkOfferingModal()"
+                        class="w-full border border-gray-300 text-gray-700 hover:bg-gray-100 font-montserrat py-2.5 px-4 text-xs font-semibold tracking-wider uppercase transition-colors">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- OVERLAY 5: FULL-SCREEN IMAGE LIGHTBOX MODAL (ZOOM SIZE CHART & ARTWORKS) -->
+    <div id="modal-image-lightbox"
+        class="fixed inset-0 bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center p-4 sm:p-8"
+        onclick="closeLightbox()">
+        <div class="absolute top-4 right-6 flex items-center space-x-4 z-20">
+            <span id="lightbox-caption" class="text-xs text-gray-300 uppercase font-montserrat tracking-widest hidden sm:inline"></span>
+            <button onclick="closeLightbox()" aria-label="Close Lightbox"
+                class="text-3xl text-white hover:text-gray-300 hover:rotate-90 transition-transform duration-300 focus:outline-none cursor-pointer">
+                &#10005;
+            </button>
+        </div>
+        <div class="max-w-4xl max-h-[85vh] flex items-center justify-center p-2" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Enlarged View" class="max-w-full max-h-[82vh] object-contain shadow-2xl rounded-sm">
         </div>
     </div>
 
@@ -731,14 +945,16 @@
                                 </svg>
                             </button>
                             <div id="acc-content-size" class="accordion-content">
-                                <div
-                                    class="accordion-inner pb-4 pt-1 text-[11px] md:text-xs text-gray-500 font-neue-montreal">
-                                    <ul class="list-disc pl-5 space-y-1.5 leading-relaxed font-neue-montreal">
-                                        <li>Small: Width 52 cm | Length 70 cm</li>
-                                        <li>Medium: Width 55 cm | Length 73 cm</li>
-                                        <li>Large: Width 58 cm | Length 76 cm</li>
-                                        <li>Extra Large: Width 61 cm | Length 79 cm</li>
-                                    </ul>
+                                <div class="accordion-inner pb-4 pt-2">
+                                    <div class="border border-gray-200 bg-neutral-50 p-2.5 text-center group cursor-zoom-in rounded-sm"
+                                        onclick="openLightbox('{{ asset('size chart 1.png') }}', 'NOTISSE APPAREL SIZE CHART')">
+                                        <img src="{{ asset('size chart 1.png') }}" alt="Notisse Size Chart"
+                                            class="w-full max-w-sm mx-auto h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02] shadow-sm">
+                                        <p class="text-[10px] text-gray-500 font-montserrat uppercase tracking-wider mt-2.5 flex items-center justify-center space-x-1 font-medium">
+                                            <svg class="w-3.5 h-3.5 stroke-current inline" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                            <span>Klik gambar untuk memperbesar</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1028,68 +1244,155 @@
                 </div>
             </div>
 
-            <!-- TAB CONTENT 2: ARTWORK GALLERY -->
+            <!-- TAB CONTENT 2: ARTWORK GALLERY (WITH OFFERING ACTIONS) -->
             <div id="artist-tab-content-artwork" class="hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Oil on canvas', '60x60cm')"
-                        class="group cursor-pointer">
-                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden">
-                            <img src="https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila" alt="Artwork Leila"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                    <!-- Artwork Item 1 -->
+                    <div class="group bg-white border border-gray-100 hover:border-black/20 p-3 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
+                                class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden cursor-pointer relative">
+                                <img src="https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila" alt="Artwork Leila"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
+                            </div>
+                            <h4 onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
+                                class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline cursor-pointer">
+                                Mereka Ulang Ungkapan Indah Leila
+                            </h4>
+                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
+                            <p class="text-[11px] text-gray-700 font-montserrat font-medium mt-1">Est. Rp 12.500.000</p>
                         </div>
-                        <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline">
-                            Mereka Ulang Ungkapan Indah Leila
-                        </h4>
+                        <div class="pt-4 border-t border-gray-100 mt-4 flex items-center space-x-2">
+                            <button onclick="triggerArtworkOffering('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
+                                class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-2.5 px-3 text-[11px] font-bold tracking-[0.18em] uppercase font-montserrat cursor-pointer flex items-center justify-center space-x-1.5 shadow-sm">
+                                <span>OFFERING</span>
+                                <span>&rarr;</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Oil on canvas', '60x60cm')"
-                        class="group cursor-pointer">
-                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden">
-                            <img src="https://placehold.co/600x800/ccc/333?text=Artwork+Effendi" alt="Artwork Effendi"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <!-- Artwork Item 2 -->
+                    <div class="group bg-white border border-gray-100 hover:border-black/20 p-3 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
+                                class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden cursor-pointer relative">
+                                <img src="https://placehold.co/600x800/ccc/333?text=Artwork+Effendi" alt="Artwork Effendi"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
+                            </div>
+                            <h4 onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
+                                class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline cursor-pointer">
+                                Mereka Ulang Ungkapan Indah Effendi
+                            </h4>
+                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
+                            <p class="text-[11px] text-gray-700 font-montserrat font-medium mt-1">Est. Rp 14.000.000</p>
                         </div>
-                        <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline">
-                            Mereka Ulang Ungkapan Indah Effendi
-                        </h4>
+                        <div class="pt-4 border-t border-gray-100 mt-4 flex items-center space-x-2">
+                            <button onclick="triggerArtworkOffering('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
+                                class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-2.5 px-3 text-[11px] font-bold tracking-[0.18em] uppercase font-montserrat cursor-pointer flex items-center justify-center space-x-1.5 shadow-sm">
+                                <span>OFFERING</span>
+                                <span>&rarr;</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Artwork Item 3 -->
+                    <div class="group bg-white border border-gray-100 hover:border-black/20 p-3 transition-all duration-300 flex flex-col justify-between">
+                        <div>
+                            <div onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
+                                class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden cursor-pointer relative">
+                                <img src="https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa" alt="Figurasi Kuasa"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
+                            </div>
+                            <h4 onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
+                                class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline cursor-pointer">
+                                Figurasi Kuasa Sosial #03
+                            </h4>
+                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Mixed media &bull; 75x90cm</p>
+                            <p class="text-[11px] text-gray-700 font-montserrat font-medium mt-1">Est. Rp 18.000.000</p>
+                        </div>
+                        <div class="pt-4 border-t border-gray-100 mt-4 flex items-center space-x-2">
+                            <button onclick="triggerArtworkOffering('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
+                                class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-2.5 px-3 text-[11px] font-bold tracking-[0.18em] uppercase font-montserrat cursor-pointer flex items-center justify-center space-x-1.5 shadow-sm">
+                                <span>OFFERING</span>
+                                <span>&rarr;</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- VIEW 3C: ARTWORK DETAIL PAGE -->
+        <!-- VIEW 3C: ARTWORK DETAIL PAGE (WITH DIRECT OFFERING ACQUISITION PANEL) -->
         <section id="view-artist-artwork-detail" class="view-page px-6 md:px-12 pt-24 pb-10 max-w-7xl mx-auto">
-            <div class="mb-6">
+            <div class="mb-6 flex items-center justify-between">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK TO ARTIST PROFILE</span>
                 </button>
+                <div class="flex items-center space-x-2 text-xs font-montserrat">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-gray-600 font-medium tracking-wider uppercase text-[11px]">Available for Direct Offering</span>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
-                <div class="md:col-span-7 aspect-[4/3] bg-[#d9d9d9] overflow-hidden">
-                    <img src="https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View" alt="Full Artwork"
-                        class="w-full h-full object-cover">
+                <div class="md:col-span-7 aspect-[4/3] bg-[#d9d9d9] overflow-hidden shadow-sm relative group cursor-zoom-in"
+                    onclick="openLightbox(document.getElementById('artwork-detail-image').src, document.getElementById('artwork-title').innerText)">
+                    <img id="artwork-detail-image" src="https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View" alt="Full Artwork"
+                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
+                    <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-montserrat uppercase px-2.5 py-1 tracking-wider flex items-center space-x-1">
+                        <svg class="w-3 h-3 stroke-current inline" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                        <span>Click to Enlarge</span>
+                    </div>
                 </div>
 
                 <div class="md:col-span-5 space-y-4">
-                    <h2 id="artwork-artist-name" class="text-xl md:text-2xl font-bold font-montserrat text-black">
-                        Mustafa Alatas</h2>
+                    <div>
+                        <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-1">NOTISSE ARTIST COLLABORATION</span>
+                        <h2 id="artwork-artist-name" class="text-xl md:text-2xl font-bold font-montserrat text-black">
+                            Mustafa Alatas</h2>
+                    </div>
+
                     <h3 id="artwork-title" class="text-base md:text-lg italic font-roboto text-black">Mereka Ulang
                         Ungkapan Indah Leila</h3>
 
-                    <div class="text-xs md:text-sm text-gray-700 font-roboto space-y-1">
-                        <p id="artwork-medium">Oil on canvas</p>
-                        <p id="artwork-dimensions">60x60cm</p>
+                    <div class="text-xs md:text-sm text-gray-700 font-roboto space-y-1 py-1 border-y border-gray-100">
+                        <p id="artwork-medium">Medium: Oil on canvas</p>
+                        <p id="artwork-dimensions">Dimensions: 60x60cm</p>
                     </div>
 
-                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto pt-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                        voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
-                        non proident, sunt in culpa qui officia deserunt mollit anim id est laborum...
+                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto pt-2">
+                        Karya seni asli (original physical artwork) yang diciptakan eksklusif oleh seniman. Setiap karya disertai dengan sertifikat autentisitas bertanda tangan kuratorial Notisse.
                     </p>
+
+                    <!-- DIRECT OFFERING ACQUISITION PANEL -->
+                    <div class="pt-6 border-t border-gray-200 space-y-3.5">
+                        <div class="p-3 bg-neutral-50 border border-gray-200 text-xs font-roboto text-gray-600 space-y-1">
+                            <div class="flex items-center justify-between font-montserrat">
+                                <span class="font-semibold uppercase tracking-wider text-black text-[11px]">Metode Pembelian:</span>
+                                <span class="text-emerald-700 font-bold uppercase tracking-wider text-[11px]">Offering / Inquiry</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 leading-relaxed pt-1">
+                                Pembelian artwork berbeda dengan produk pakaian di cart. Sistem offering akan menghubungkan penawaran Anda langsung ke seniman dan kurator Notisse.
+                            </p>
+                        </div>
+
+                        <button onclick="triggerArtworkOfferingCurrent()"
+                            class="w-full bg-black text-white hover:bg-neutral-800 transition-all py-3.5 px-6 font-montserrat text-xs md:text-sm font-bold tracking-[0.2em] uppercase cursor-pointer flex items-center justify-center space-x-2 shadow-md hover:shadow-xl">
+                            <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m-6-6h12"/>
+                            </svg>
+                            <span>OFFERING / BUY ARTWORK</span>
+                        </button>
+
+                        <p class="text-[11px] text-gray-400 font-roboto text-center leading-relaxed">
+                            Penawaran yang Anda submit akan diteruskan ke WhatsApp resmi Notisse & pemilik karya untuk konfirmasi ketersediaan & pembayaran.
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1512,9 +1815,25 @@
             const overlayBackdrop = document.getElementById('overlay-menu-backdrop');
             const overlaySearch = document.getElementById('overlay-search');
             const overlayCart = document.getElementById('overlay-cart');
+            const modalOffering = document.getElementById('modal-artwork-offering');
+            const modalLightbox = document.getElementById('modal-image-lightbox');
             const isOverlayOpen = (overlayBackdrop && !overlayBackdrop.classList.contains('hidden')) ||
                                   (overlaySearch && !overlaySearch.classList.contains('-translate-y-full')) ||
-                                  (overlayCart && !overlayCart.classList.contains('hidden'));
+                                  (overlayCart && !overlayCart.classList.contains('hidden')) ||
+                                  (modalOffering && !modalOffering.classList.contains('hidden')) ||
+                                  (modalLightbox && !modalLightbox.classList.contains('hidden'));
+
+            // A24 STICKY CART SCROLL ANIMATION
+            const stickyCart = document.getElementById('a24-cart-sticky');
+            if (stickyCart) {
+                if (currentScrollY > 40 && !isOverlayOpen) {
+                    stickyCart.classList.remove('scrolled-hidden');
+                    stickyCart.classList.add('scrolled-active');
+                } else {
+                    stickyCart.classList.remove('scrolled-active');
+                    stickyCart.classList.add('scrolled-hidden');
+                }
+            }
 
             if (currentScrollY <= 40) {
                 // At the very top: ALWAYS VISIBLE
@@ -1843,6 +2162,8 @@
                 closeSearch();
                 closeMenu();
                 closeCart();
+                closeArtworkOfferingModal();
+                closeLightbox();
             }
         });
 
@@ -1911,6 +2232,11 @@
         function openCart() {
             renderCartItems();
             overlayCart.classList.remove('hidden');
+            const stickyCart = document.getElementById('a24-cart-sticky');
+            if (stickyCart) {
+                stickyCart.classList.remove('scrolled-active');
+                stickyCart.classList.add('scrolled-hidden');
+            }
             setTimeout(() => {
                 overlayCart.classList.remove('opacity-0');
                 cartDrawerContent.classList.remove('translate-x-full');
@@ -1924,6 +2250,7 @@
             setTimeout(() => {
                 overlayCart.classList.add('hidden');
                 document.body.style.overflow = 'auto';
+                updateHeaderState();
             }, 300);
         }
 
@@ -1989,11 +2316,222 @@
             }
         }
 
-        function openArtistArtworkDetail(title, medium, dimensions) {
-            if (title) document.getElementById('artwork-title').innerText = title;
-            if (medium) document.getElementById('artwork-medium').innerText = medium;
-            if (dimensions) document.getElementById('artwork-dimensions').innerText = dimensions;
+        let currentActiveArtwork = {
+            title: "Mereka Ulang Ungkapan Indah Leila",
+            artist: "Mustafa Alatas",
+            medium: "Oil on canvas",
+            dimensions: "60x60cm",
+            image: "https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View"
+        };
+
+        function openArtistArtworkDetail(title, artist, medium, dimensions, image) {
+            currentActiveArtwork = {
+                title: title || 'Artwork',
+                artist: artist || 'Mustafa Alatas',
+                medium: medium || 'Oil on canvas',
+                dimensions: dimensions || '60x60cm',
+                image: image || 'https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View'
+            };
+
+            const titleEl = document.getElementById('artwork-title');
+            if (titleEl) titleEl.innerText = currentActiveArtwork.title;
+
+            const artistEl = document.getElementById('artwork-artist-name');
+            if (artistEl) artistEl.innerText = currentActiveArtwork.artist;
+
+            const mediumEl = document.getElementById('artwork-medium');
+            if (mediumEl) mediumEl.innerText = "Medium: " + currentActiveArtwork.medium;
+
+            const dimEl = document.getElementById('artwork-dimensions');
+            if (dimEl) dimEl.innerText = "Dimensions: " + currentActiveArtwork.dimensions;
+
+            const imgEl = document.getElementById('artwork-detail-image');
+            if (imgEl && currentActiveArtwork.image) imgEl.src = currentActiveArtwork.image;
+
             showPage('view-artist-artwork-detail');
+        }
+
+        /* ARTWORK OFFERING MODAL LOGIC */
+        function triggerArtworkOffering(title, artist, medium, dimensions, image) {
+            currentActiveArtwork = {
+                title: title || 'Artwork',
+                artist: artist || 'Mustafa Alatas',
+                medium: medium || 'Oil on canvas',
+                dimensions: dimensions || '60x60cm',
+                image: image || 'https://placehold.co/400x500/222/fff?text=Artwork'
+            };
+            openArtworkOfferingModal();
+        }
+
+        function triggerArtworkOfferingCurrent() {
+            openArtworkOfferingModal();
+        }
+
+        function openArtworkOfferingModal() {
+            const modal = document.getElementById('modal-artwork-offering');
+            const formBody = document.getElementById('artwork-offering-form-body');
+            const successBody = document.getElementById('artwork-offering-success-body');
+
+            // Populate Preview Info
+            const prevImg = document.getElementById('offering-artwork-img');
+            const prevTitle = document.getElementById('offering-artwork-title');
+            const prevArtist = document.getElementById('offering-artwork-artist');
+            const prevSpecs = document.getElementById('offering-artwork-specs');
+
+            if (prevImg) prevImg.src = currentActiveArtwork.image || 'https://placehold.co/400x500/222/fff?text=Artwork';
+            if (prevTitle) prevTitle.innerText = currentActiveArtwork.title;
+            if (prevArtist) prevArtist.innerText = currentActiveArtwork.artist;
+            if (prevSpecs) prevSpecs.innerText = `${currentActiveArtwork.medium} • ${currentActiveArtwork.dimensions}`;
+
+            // Reset view state
+            if (formBody) formBody.classList.remove('hidden');
+            if (successBody) successBody.classList.add('hidden');
+
+            // Pre-fill user data if logged in
+            if (isAuthenticated && loggedInUser) {
+                const nameInput = document.getElementById('offering-buyer-name');
+                const emailInput = document.getElementById('offering-buyer-email');
+                if (nameInput && !nameInput.value) nameInput.value = loggedInUser.name || '';
+                if (emailInput && !emailInput.value) emailInput.value = loggedInUser.email || '';
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                const inner = modal.querySelector('div');
+                if (inner) inner.classList.remove('scale-95');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+            updateHeaderState();
+        }
+
+        function closeArtworkOfferingModal() {
+            const modal = document.getElementById('modal-artwork-offering');
+            if (!modal) return;
+            const inner = modal.querySelector('div');
+            if (inner) inner.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                updateHeaderState();
+            }, 300);
+        }
+
+        function formatOfferingPriceInput(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (!val) {
+                input.value = '';
+                return;
+            }
+            input.value = new Intl.NumberFormat('id-ID').format(val);
+        }
+
+        function handleArtworkOfferingSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('offering-buyer-name').value.trim();
+            const email = document.getElementById('offering-buyer-email').value.trim();
+            const phone = document.getElementById('offering-buyer-phone').value.trim();
+            const price = document.getElementById('offering-buyer-price').value.trim();
+            const message = document.getElementById('offering-buyer-message').value.trim();
+
+            if (!name || !email || !phone || !price) {
+                showToast("Harap lengkapi semua kolom bertanda *");
+                return;
+            }
+
+            // Construct acquisition inquiry message
+            const offerMessage = `*NOTISSE ARTWORK ACQUISITION OFFERING*\n` +
+                `------------------------------------\n` +
+                `Halo Tim Notisse & Seniman Pemilik Karya,\n` +
+                `Saya bermaksud mengajukan penawaran pembelian karya seni asli:\n\n` +
+                `*Karya:* ${currentActiveArtwork.title}\n` +
+                `*Seniman:* ${currentActiveArtwork.artist}\n` +
+                `*Spesifikasi:* ${currentActiveArtwork.medium} (${currentActiveArtwork.dimensions})\n` +
+                `*Nominal Tawaran:* Rp ${price} IDR\n\n` +
+                `*Data Pembeli:*\n` +
+                `- Nama: ${name}\n` +
+                `- Email: ${email}\n` +
+                `- WhatsApp: ${phone}\n` +
+                `- Pesan/Catatan: ${message || '-'}\n\n` +
+                `Mohon informasi ketersediaan, konfirmasi kurasi, dan langkah selanjutnya. Terima kasih.\n` +
+                `------------------------------------\n` +
+                `(Diajukan melalui Notisse Online Art Gallery)`;
+
+            const encodedMsg = encodeURIComponent(offerMessage);
+
+            // WhatsApp link to Notisse official (+6285607714704)
+            const notisseWaUrl = `https://api.whatsapp.com/send?phone=6285607714704&text=${encodedMsg}`;
+            // WhatsApp link to Artist representation
+            const artistWaUrl = `https://api.whatsapp.com/send?phone=6285607714704&text=${encodedMsg}`;
+
+            // Save inquiry locally for persistence / history
+            try {
+                const storedOffers = JSON.parse(localStorage.getItem('notisse_artwork_offers') || '[]');
+                storedOffers.push({
+                    date: new Date().toISOString(),
+                    artwork: currentActiveArtwork,
+                    buyer: { name, email, phone, price, message }
+                });
+                localStorage.setItem('notisse_artwork_offers', JSON.stringify(storedOffers));
+            } catch (err) {}
+
+            // Populate success screen
+            const succArtist = document.getElementById('success-artist-name');
+            const succTitle = document.getElementById('success-artwork-title');
+            const succPrice = document.getElementById('success-artwork-price');
+            const succBuyer = document.getElementById('success-buyer-name');
+
+            if (succArtist) succArtist.innerText = currentActiveArtwork.artist;
+            if (succTitle) succTitle.innerText = currentActiveArtwork.title;
+            if (succPrice) succPrice.innerText = "Rp " + price + " IDR";
+            if (succBuyer) succBuyer.innerText = name + ` (${phone})`;
+
+            const notisseBtn = document.getElementById('success-wa-notisse-link');
+            if (notisseBtn) notisseBtn.href = notisseWaUrl;
+
+            const artistBtn = document.getElementById('success-wa-artist-link');
+            if (artistBtn) artistBtn.href = artistWaUrl;
+
+            // Switch to success body
+            document.getElementById('artwork-offering-form-body').classList.add('hidden');
+            document.getElementById('artwork-offering-success-body').classList.remove('hidden');
+
+            showToast("Offering disubmit! Pesan disiapkan untuk Notisse & Artist.");
+
+            // Open WhatsApp directly in new window
+            window.open(notisseWaUrl, '_blank');
+        }
+
+        /* LIGHTBOX IMAGE VIEWER LOGIC (SIZE CHART & ARTWORK) */
+        function openLightbox(src, caption) {
+            const lightbox = document.getElementById('modal-image-lightbox');
+            const img = document.getElementById('lightbox-img');
+            const cap = document.getElementById('lightbox-caption');
+
+            if (!lightbox || !img) return;
+
+            img.src = src;
+            if (cap) cap.innerText = caption || '';
+
+            lightbox.classList.remove('hidden');
+            setTimeout(() => {
+                lightbox.classList.remove('opacity-0');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+            updateHeaderState();
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('modal-image-lightbox');
+            if (!lightbox) return;
+
+            lightbox.classList.add('opacity-0');
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                updateHeaderState();
+            }, 300);
         }
 
         function openArtistEditorialDetail(title) {
@@ -2128,6 +2666,8 @@
             const grandTotal = totalAmount + selectedShippingCost;
             totalElement.innerText = formatRupiah(grandTotal) + ' IDR';
             badgeElement.innerText = `(${totalItemCount})`;
+            const stickyBadge = document.getElementById('a24-sticky-cart-badge');
+            if (stickyBadge) stickyBadge.innerText = `(${totalItemCount})`;
         }
 
         function triggerBadgePop() {
@@ -2136,6 +2676,12 @@
                 badge.classList.remove('cart-badge-pop');
                 void badge.offsetWidth;
                 badge.classList.add('cart-badge-pop');
+            }
+            const stickyBadge = document.getElementById('a24-sticky-cart-badge');
+            if (stickyBadge) {
+                stickyBadge.classList.remove('cart-badge-pop');
+                void stickyBadge.offsetWidth;
+                stickyBadge.classList.add('cart-badge-pop');
             }
         }
 
