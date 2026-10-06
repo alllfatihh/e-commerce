@@ -195,11 +195,53 @@
         }
 
         .overlay-slide {
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+            will-change: transform;
         }
 
         .overlay-backdrop {
-            transition: opacity 0.3s ease;
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #overlay-cart {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        #cart-drawer-content {
+            transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        /* A24 STAGGERED FADE-UP FOR CART DRAWER CONTENT */
+        .cart-animated-item {
+            animation: a24CartFadeUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes a24CartFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* A24 HEADER CART BADGE BOUNCE POP */
+        .cart-badge-pop {
+            animation: a24BadgeBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes a24BadgeBounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.4) translateY(-1px);
+                color: #d52c2b;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -726,7 +768,17 @@
                         </div>
                     </div>
 
-                    <div class="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6">
+                    <!-- MODEL FIT & MEASUREMENTS (TB, BB, SIZE) -->
+                    <div class="pt-1 flex items-center space-x-2 text-xs text-gray-600 font-roboto">
+                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <p class="tracking-wide">
+                            <span class="text-black font-semibold uppercase font-montserrat text-[11px]">Model:</span> TB 178 cm / BB 68 kg — wearing size <span class="font-bold text-black font-montserrat">L</span>
+                        </p>
+                    </div>
+
+                    <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6">
                         <div class="relative w-full sm:w-52 font-montserrat" id="custom-size-dropdown">
                             <button id="size-dropdown-trigger" onclick="toggleSizeDropdown(event)" type="button"
                                 class="w-full border border-black py-2.5 px-3.5 text-xs md:text-sm font-medium uppercase tracking-wider bg-white text-black flex justify-between items-center cursor-pointer hover:bg-black hover:text-white transition-colors duration-200 font-montserrat">
@@ -816,11 +868,23 @@
 
             <!-- ARTIST COLLABORATOR SECTION -->
             <div class="pt-8 border-t border-gray-200">
-                <h2 class="text-xl md:text-2xl font-bold mb-8 tracking-wide text-black font-montserrat">Artist
-                    Collaborator</h2>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <h2 class="text-xl md:text-2xl font-bold tracking-wide text-black font-montserrat uppercase">
+                        Artist Collaborator
+                    </h2>
+                    <!-- Search Bar Sejajar dengan Tulisan Artist Collaborator -->
+                    <div class="relative w-full sm:w-72 md:w-80">
+                        <input type="text" id="artist-search-input" oninput="filterArtists(this.value)"
+                            placeholder="Search artist or city..."
+                            class="w-full bg-transparent border-b border-black py-1.5 pl-7 pr-3 text-xs md:text-sm font-roboto tracking-wide focus:outline-none focus:border-[#d52c2b] placeholder-gray-400 transition-colors">
+                        <svg class="w-4 h-4 text-black absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-4.35z" />
+                        </svg>
+                    </div>
+                </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
+                <div id="artist-collab-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Mustafa Alatas" data-artist-city="Temanggung" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/181818/ffffff?text=Mustafa+Alatas"
                                 alt="Mustafa Alatas"
@@ -830,7 +894,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Temanggung</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asep', 'Palembang')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asep" data-artist-city="Palembang" onclick="openArtistProfile('Asep', 'Palembang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/222222/ffffff?text=Asep" alt="Asep"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -839,7 +903,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Palembang</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepo', 'Jakarta')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepo" data-artist-city="Jakarta" onclick="openArtistProfile('Asepo', 'Jakarta')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/2c2c2c/ffffff?text=Asepo" alt="Asepo"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -848,7 +912,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Jakarta</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepi', 'Padang')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepi" data-artist-city="Padang" onclick="openArtistProfile('Asepi', 'Padang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/333333/ffffff?text=Asepi" alt="Asepi"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -857,7 +921,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Padang</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepu', 'Jakarta')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepu" data-artist-city="Jakarta" onclick="openArtistProfile('Asepu', 'Jakarta')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/3d3d3d/ffffff?text=Asepu" alt="Asepu"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -866,7 +930,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Jakarta</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepa', 'Kebumen')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepa" data-artist-city="Kebumen" onclick="openArtistProfile('Asepa', 'Kebumen')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/444444/ffffff?text=Asepa" alt="Asepa"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -875,7 +939,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Kebumen</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepit', 'Lumajang')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepit" data-artist-city="Lumajang" onclick="openArtistProfile('Asepit', 'Lumajang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/4d4d4d/ffffff?text=Asepit" alt="Asepit"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -884,13 +948,18 @@
                         <p class="text-xs text-gray-500 font-roboto">Lumajang</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepon', 'Pekalongan')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepon" data-artist-city="Pekalongan" onclick="openArtistProfile('Asepon', 'Pekalongan')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/555555/ffffff?text=Asepon" alt="Asepon"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepon</h4>
                         <p class="text-xs text-gray-500 font-roboto">Pekalongan</p>
+                    </div>
+
+                    <!-- Empty State for Artist Search -->
+                    <div id="artist-no-results" class="hidden col-span-2 md:col-span-4 text-center py-12">
+                        <p class="text-gray-400 text-sm font-roboto">No artist found matching your search.</p>
                     </div>
                 </div>
             </div>
@@ -1081,10 +1150,20 @@
                     </p>
                 </div>
 
-                <!-- Right Column: Full Featured Image -->
-                <div class="md:col-span-6 aspect-[4/5] bg-[#d9d9d9] overflow-hidden">
-                    <img src="https://placehold.co/800x1000/d9d9d9/555555?text=Featured+Editorial+Image"
-                        alt="Editorial Feature" class="w-full h-full object-cover">
+                <!-- Right Column: Full Featured Editorial Video -->
+                <div class="md:col-span-6 aspect-[4/5] bg-black overflow-hidden relative group shadow-lg">
+                    <video id="editorial-video-player"
+                        class="w-full h-full object-cover"
+                        autoplay loop muted playsinline controls
+                        poster="{{ asset('home.jpg') }}">
+                        <source src="{{ asset('video/editorial.mp4') }}" type="video/mp4">
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <!-- Editorial Video Watermark Badge -->
+                    <div class="absolute top-4 right-4 pointer-events-none bg-black/60 backdrop-blur-md text-white text-[10px] font-montserrat uppercase px-2.5 py-1 tracking-widest border border-white/20">
+                        Editorial Video
+                    </div>
                 </div>
             </div>
         </section>
@@ -1871,6 +1950,26 @@
             showPage('view-artist-detail');
         }
 
+        function filterArtists(query) {
+            const q = (query || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('#artist-collab-grid .artist-card');
+            let matchCount = 0;
+            cards.forEach(card => {
+                const name = (card.getAttribute('data-artist-name') || '').toLowerCase();
+                const city = (card.getAttribute('data-artist-city') || '').toLowerCase();
+                if (!q || name.includes(q) || city.includes(q)) {
+                    card.style.display = '';
+                    matchCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            const noResults = document.getElementById('artist-no-results');
+            if (noResults) {
+                noResults.style.display = matchCount === 0 ? 'block' : 'none';
+            }
+        }
+
         function switchArtistTab(tab) {
             const btnArtwork = document.getElementById('tab-btn-artwork');
             const btnEditorial = document.getElementById('tab-btn-editorial');
@@ -2001,7 +2100,7 @@
                     totalAmount += itemTotal;
                     totalItemCount += item.qty;
                     html += `
-                        <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100">
+                        <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100 cart-animated-item" style="animation-delay: ${index * 70}ms">
                             <div class="col-span-6 md:col-span-5 flex items-center space-x-3">
                                 <div class="w-12 h-16 bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
                                     <img src="{{ asset('footage-baju.jpg') }}" alt="${item.name}" class="w-full h-full object-cover">
@@ -2031,11 +2130,21 @@
             badgeElement.innerText = `(${totalItemCount})`;
         }
 
+        function triggerBadgePop() {
+            const badge = document.getElementById('header-cart-badge');
+            if (badge) {
+                badge.classList.remove('cart-badge-pop');
+                void badge.offsetWidth;
+                badge.classList.add('cart-badge-pop');
+            }
+        }
+
         function updateCartQty(index, change) {
             if (cartState[index]) {
                 cartState[index].qty += change;
                 if (cartState[index].qty <= 0) cartState.splice(index, 1);
             }
+            triggerBadgePop();
             renderCartItems();
         }
 
@@ -2047,6 +2156,7 @@
                 unitPrice: 250000,
                 qty: 1
             });
+            triggerBadgePop();
             openCart();
             showToast('Added to cart!');
         }
