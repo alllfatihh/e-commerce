@@ -347,31 +347,107 @@
             will-change: opacity, transform;
         }
 
-        /* A24 INSPIRED SCROLL CART & STICKY MORPH ANIMATION */
+        /* EXACT A24 CART BUTTON STYLING (TYPOGRAPHIC MINIMALISM) */
+        .header__link--cart {
+            display: inline-flex;
+            align-items: center;
+            letter-spacing: 0.14em;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            color: currentColor;
+            transition: opacity 0.25s ease;
+        }
+
+        .header__link--cart:hover {
+            opacity: 0.55;
+        }
+
+        .header__link--cart__default-label {
+            letter-spacing: 0.16em;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Signature A24 connecting horizontal dash */
+        .header__link--cart__dash {
+            display: inline-block;
+            width: 14px;
+            height: 1px;
+            background-color: currentColor;
+            margin: 0 7px;
+            opacity: 0.8;
+            transition: width 0.25s ease;
+        }
+
+        .header__link--cart:hover .header__link--cart__dash {
+            width: 18px;
+        }
+
+        /* Signature A24 counter styling */
+        .header__link--cart__counter {
+            font-family: 'Courier New', Courier, Monaco, monospace;
+            font-size: 11.5px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        /* Scrolled state: EXACT A24 Vertical Floating Link (NO BOX, NO CARD) */
         #a24-cart-sticky {
             transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
                         transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                        background-color 0.25s ease,
-                        box-shadow 0.25s ease;
+                        opacity 0.25s ease;
             will-change: opacity, transform;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            color: #000000;
         }
 
         #a24-cart-sticky.scrolled-active {
             opacity: 1 !important;
             pointer-events: auto !important;
-            transform: translateY(0) scale(1) !important;
+            transform: translateY(0) !important;
         }
 
         #a24-cart-sticky.scrolled-hidden {
             opacity: 0 !important;
             pointer-events: none !important;
-            transform: translateY(-16px) scale(0.92) !important;
+            transform: translateY(-14px) !important;
         }
 
-        .vertical-rl-text {
+        #a24-cart-sticky:hover {
+            opacity: 0.55 !important;
+        }
+
+        .header__link--cart__vertical-label {
             writing-mode: vertical-rl;
             text-orientation: mixed;
             transform: rotate(180deg);
+            letter-spacing: 0.22em;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+
+        /* Signature A24 vertical connecting stroke */
+        .header__link--cart__vert-dash {
+            display: block;
+            width: 1px;
+            height: 15px;
+            background-color: currentColor;
+            margin: 6px 0;
+            opacity: 0.8;
+            transition: height 0.25s ease;
+        }
+
+        #a24-cart-sticky:hover .header__link--cart__vert-dash {
+            height: 20px;
         }
 
         @keyframes cartBadgePop {
@@ -379,7 +455,7 @@
                 transform: scale(1);
             }
             40% {
-                transform: scale(1.4);
+                transform: scale(1.35);
                 color: #d52c2b;
             }
             100% {
@@ -463,22 +539,23 @@
                 SEARCH
             </button>
             <button id="cart-trigger" aria-label="Cart"
-                class="font-montserrat font-medium hover:opacity-50 hover:scale-105 active:scale-95 transition-all focus:outline-none py-1 px-1 cursor-pointer flex items-center space-x-1">
-                <span>CART</span>
-                <span id="header-cart-badge" class="transition-all duration-300 font-bold">(2)</span>
+                class="header__link--cart focus:outline-none">
+                <span class="header__link--cart__default-label">CART</span>
+                <span class="header__link--cart__dash"></span>
+                <span id="header-cart-badge" class="header__link--cart__counter font-bold">2</span>
             </button>
         </div>
     </header>
 
-    <!-- A24-INSPIRED STICKY SCROLL CART TRIGGER (APPEARS ON SCROLL) -->
+    <!-- A24-INSPIRED MINIMAL SCROLL CART TRIGGER (EXACT A24 DESIGN: BORDERLESS & TYPOGRAPHIC) -->
     <button id="a24-cart-sticky" aria-label="Cart" onclick="openCart()"
-        class="scrolled-hidden fixed top-4 right-4 sm:right-7 z-50 bg-white/95 backdrop-blur-md border border-black/15 shadow-[0_4px_20px_rgba(0,0,0,0.08)] py-3 px-2 sm:px-2.5 flex flex-col items-center justify-center cursor-pointer group hover:bg-black hover:border-black transition-all duration-300 rounded-sm focus:outline-none">
-        <span class="vertical-rl-text text-[10px] sm:text-[11px] font-bold tracking-[0.25em] font-montserrat uppercase text-black group-hover:text-white transition-colors select-none">
+        class="scrolled-hidden fixed top-5 right-5 sm:right-8 z-50 flex flex-col items-center justify-center cursor-pointer group focus:outline-none select-none">
+        <span class="header__link--cart__vertical-label">
             CART
         </span>
-        <div class="w-2.5 h-[1px] bg-black/25 group-hover:bg-white/40 my-2 transition-colors"></div>
-        <span id="a24-sticky-cart-badge" class="text-[10px] sm:text-[11px] font-bold font-montserrat text-black group-hover:text-white transition-colors">
-            (2)
+        <span class="header__link--cart__vert-dash"></span>
+        <span id="a24-sticky-cart-badge" class="header__link--cart__counter font-bold">
+            2
         </span>
     </button>
 
@@ -574,57 +651,86 @@
         </div>
     </div>
 
-    <!-- OVERLAY 3: MY CART SLIDE-OVER DRAWER -->
+    <!-- OVERLAY 3: MY CART SLIDE-OVER DRAWER (EXACT A24 MINIMALIST DESIGN) -->
     <div id="overlay-cart"
-        class="fixed inset-0 bg-black/40 z-[60] hidden opacity-0 overlay-backdrop transition-opacity duration-400"
+        class="fixed inset-0 bg-black/40 z-[60] hidden opacity-0 overlay-backdrop transition-opacity duration-300"
         onclick="closeCart()">
         <div id="cart-drawer-content"
-            class="absolute right-0 top-0 bottom-0 w-full max-w-4xl bg-white p-6 md:p-10 transform translate-x-full overlay-slide flex flex-col overflow-y-auto shadow-2xl"
+            class="absolute right-0 top-0 bottom-0 w-full max-w-[480px] sm:max-w-[500px] bg-white transform translate-x-full overlay-slide flex flex-col justify-between shadow-2xl overflow-hidden font-montserrat"
             onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-gray-200 pb-3 mb-6">
-                <h2 class="text-2xl md:text-3xl font-semibold tracking-tight font-montserrat">My cart</h2>
-                <button id="cart-close" aria-label="Close Cart"
-                    class="text-3xl font-light hover:rotate-90 transition-transform duration-300 focus:outline-none cursor-pointer">
-                    &#10005;
-                </button>
-            </div>
-
-            <div
-                class="grid grid-cols-12 text-xs text-gray-500 font-regular pb-2 border-b border-gray-200 mb-6 font-neue-montreal">
-                <div class="col-span-6 md:col-span-5">Product</div>
-                <div class="col-span-3 md:col-span-3 text-center">Quantity</div>
-                <div class="hidden md:block md:col-span-2 text-right">Price</div>
-                <div class="col-span-3 md:col-span-2 text-right">Total</div>
-            </div>
-
-            <div id="cart-items-container" class="space-y-6 flex-grow"></div>
-
-            <!-- BITESHIP SHIPPING & ADDRESS DETAILS -->
-            <div id="checkout-details" class="mt-6 border-t border-gray-200 pt-6 space-y-4">
-                <div class="relative">
-                    <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." oninput="searchAreaBiteship(this.value)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm" autocomplete="off">
-                    <div id="area-results" class="absolute z-10 w-full bg-white border border-gray-200 max-h-40 overflow-y-auto hidden shadow-lg text-sm font-montserrat"></div>
-                </div>
-                <input type="hidden" id="selected-area-id">
-                <input type="text" id="full-address" placeholder="Detail Alamat (Jalan, RT/RW, No)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm">
-                
-                <div id="shipping-options-container" class="hidden space-y-2 mt-4">
-                    <span class="text-sm font-medium font-montserrat block">Pilih Pengiriman:</span>
-                    <div id="shipping-options" class="flex flex-col space-y-2 text-sm font-montserrat"></div>
+            
+            <!-- Top Header & Banner -->
+            <div class="flex-shrink-0 bg-white">
+                <div class="flex items-center justify-between pt-6 px-6 sm:px-8 pb-4 border-t border-black">
+                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-black">
+                        FREE STANDARD DOMESTIC SHIPPING OVER RP 500.000
+                    </span>
+                    <button id="cart-close" aria-label="Close Cart"
+                        class="p-1 text-black hover:opacity-50 transition-opacity focus:outline-none cursor-pointer flex items-center justify-center">
+                        <svg class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
-                <div class="flex items-baseline space-x-6">
-                    <span class="text-base md:text-lg font-medium text-gray-900 font-montserrat">Estimated total</span>
-                    <span id="cart-total-price" class="text-xl md:text-xl font-regular font-montserrat">Rp 0,00 IDR</span>
+            <!-- Scrollable Items Area -->
+            <div id="cart-items-container" class="px-6 sm:px-8 py-2 overflow-y-auto flex-grow divide-y divide-neutral-100">
+                <!-- Rendered dynamically via renderCartItems() -->
+            </div>
+
+            <!-- Bottom Section: Shipping, Subtotal, Checkout & Recommendations -->
+            <div class="flex-shrink-0 bg-white border-t border-black">
+                <!-- Shipping Destination (Biteship) -->
+                <div id="checkout-details" class="px-6 sm:px-8 pt-3 pb-2 space-y-2 border-b border-neutral-100 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold tracking-widest uppercase text-gray-500">Shipping Destination</span>
+                        <span id="courier-badge-name" class="text-[10px] font-semibold tracking-wider text-black uppercase">Standard Courier</span>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." oninput="searchAreaBiteship(this.value)" class="w-full border-b border-gray-200 py-1.5 focus:outline-none focus:border-black font-montserrat text-xs placeholder:text-gray-400" autocomplete="off">
+                        <div id="area-results" class="absolute z-20 bottom-full left-0 right-0 bg-white border border-gray-200 max-h-36 overflow-y-auto hidden shadow-lg text-xs font-montserrat"></div>
+                    </div>
+                    <input type="hidden" id="selected-area-id">
+                    <input type="text" id="full-address" placeholder="Detail Alamat (Jalan, RT/RW, No)" class="w-full border-b border-gray-200 py-1.5 focus:outline-none focus:border-black font-montserrat text-xs placeholder:text-gray-400">
+                    
+                    <div id="shipping-options-container" class="hidden space-y-1.5 pt-1">
+                        <span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 block">Pilihan Layanan:</span>
+                        <div id="shipping-options" class="flex flex-col space-y-1.5 text-xs font-montserrat"></div>
+                    </div>
                 </div>
-                <p class="text-xs text-gray-400 font-montserrat">taxes and shipping calculated.</p>
-                <div class="pt-4 w-full text-right">
-                    <button onclick="processCheckout()"
-                        class="btn-brush text-sm md:text-base cursor-pointer font-montserrat" id="checkout-btn">
+
+                <!-- Subtotal Row -->
+                <div class="flex items-baseline justify-between px-6 sm:px-8 py-3.5">
+                    <span class="text-sm font-medium text-black">Subtotal (IDR)</span>
+                    <span id="cart-total-price" class="text-base font-bold font-mono text-black">Rp 0 IDR</span>
+                </div>
+
+                <!-- Checkout Button (Exact A24 Full Width Bold Solid Black) -->
+                <div class="px-6 sm:px-8 pb-4">
+                    <button id="checkout-btn" onclick="processCheckout()"
+                        class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-5 sm:py-6 text-base sm:text-lg font-bold tracking-[0.22em] uppercase font-montserrat flex items-center justify-center cursor-pointer select-none">
                         CHECKOUT
                     </button>
+                </div>
+
+                <!-- WHY NOT ADD? Section (A24 cross-sell recommendation) -->
+                <div class="px-6 sm:px-8 pt-3 pb-5 border-t border-neutral-100 bg-neutral-50/70">
+                    <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-black block mb-2.5">WHY NOT ADD?</span>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-neutral-200 flex-shrink-0 overflow-hidden">
+                                <img src="{{ asset('footage-baju.jpg') }}" alt="Notisse Heavyweight Tote" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h5 class="text-xs font-semibold text-black leading-snug">Notisse Heavyweight Canvas Tote</h5>
+                                <p class="text-[11px] font-mono text-gray-500 mt-0.5">Rp 150.000</p>
+                            </div>
+                        </div>
+                        <button onclick="addCrossSellItem()" class="border border-black px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-black hover:text-white transition-colors cursor-pointer">
+                            ADD
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1249,82 +1355,49 @@
                 </div>
             </div>
 
-            <!-- TAB CONTENT 2: ARTWORK GALLERY (WITH OFFERING ACTIONS) -->
+            <!-- TAB CONTENT 2: ARTWORK GALLERY -->
             <div id="artist-tab-content-artwork" class="hidden space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
                     <!-- Artwork Item 1 -->
-                    <div class="group bg-white border border-gray-100 hover:border-black/20 p-3 transition-all duration-300 flex flex-col justify-between">
-                        <div>
-                            <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
-                                class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden cursor-pointer relative">
-                                <img src="https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila" alt="Artwork Leila"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
-                            </div>
-                            <h4 onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
-                                class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline cursor-pointer">
-                                Mereka Ulang Ungkapan Indah Leila
-                            </h4>
-                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
-                            <p class="text-[11px] text-gray-700 font-montserrat font-medium mt-1">Est. Rp 12.500.000</p>
+                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
+                        class="group cursor-pointer">
+                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
+                            <img src="https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila" alt="Artwork Leila"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
                         </div>
-                        <div class="pt-4 border-t border-gray-100 mt-4 flex items-center space-x-2">
-                            <button onclick="triggerArtworkOffering('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
-                                class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-2.5 px-3 text-[11px] font-bold tracking-[0.18em] uppercase font-montserrat cursor-pointer flex items-center justify-center space-x-1.5 shadow-sm">
-                                <span>OFFERING</span>
-                                <span>&rarr;</span>
-                            </button>
-                        </div>
+                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
+                            Mereka Ulang Ungkapan Indah Leila
+                        </h4>
+                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
                     </div>
 
                     <!-- Artwork Item 2 -->
-                    <div class="group bg-white border border-gray-100 hover:border-black/20 p-3 transition-all duration-300 flex flex-col justify-between">
-                        <div>
-                            <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
-                                class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden cursor-pointer relative">
-                                <img src="https://placehold.co/600x800/ccc/333?text=Artwork+Effendi" alt="Artwork Effendi"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
-                            </div>
-                            <h4 onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
-                                class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline cursor-pointer">
-                                Mereka Ulang Ungkapan Indah Effendi
-                            </h4>
-                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
-                            <p class="text-[11px] text-gray-700 font-montserrat font-medium mt-1">Est. Rp 14.000.000</p>
+                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
+                        class="group cursor-pointer">
+                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
+                            <img src="https://placehold.co/600x800/ccc/333?text=Artwork+Effendi" alt="Artwork Effendi"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
                         </div>
-                        <div class="pt-4 border-t border-gray-100 mt-4 flex items-center space-x-2">
-                            <button onclick="triggerArtworkOffering('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
-                                class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-2.5 px-3 text-[11px] font-bold tracking-[0.18em] uppercase font-montserrat cursor-pointer flex items-center justify-center space-x-1.5 shadow-sm">
-                                <span>OFFERING</span>
-                                <span>&rarr;</span>
-                            </button>
-                        </div>
+                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
+                            Mereka Ulang Ungkapan Indah Effendi
+                        </h4>
+                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
                     </div>
 
                     <!-- Artwork Item 3 -->
-                    <div class="group bg-white border border-gray-100 hover:border-black/20 p-3 transition-all duration-300 flex flex-col justify-between">
-                        <div>
-                            <div onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
-                                class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden cursor-pointer relative">
-                                <img src="https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa" alt="Figurasi Kuasa"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
-                            </div>
-                            <h4 onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
-                                class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline cursor-pointer">
-                                Figurasi Kuasa Sosial #03
-                            </h4>
-                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Mixed media &bull; 75x90cm</p>
-                            <p class="text-[11px] text-gray-700 font-montserrat font-medium mt-1">Est. Rp 18.000.000</p>
+                    <div onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
+                        class="group cursor-pointer">
+                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
+                            <img src="https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa" alt="Figurasi Kuasa"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
                         </div>
-                        <div class="pt-4 border-t border-gray-100 mt-4 flex items-center space-x-2">
-                            <button onclick="triggerArtworkOffering('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
-                                class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-2.5 px-3 text-[11px] font-bold tracking-[0.18em] uppercase font-montserrat cursor-pointer flex items-center justify-center space-x-1.5 shadow-sm">
-                                <span>OFFERING</span>
-                                <span>&rarr;</span>
-                            </button>
-                        </div>
+                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
+                            Figurasi Kuasa Sosial #03
+                        </h4>
+                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Mixed media &bull; 75x90cm</p>
                     </div>
                 </div>
             </div>
@@ -1395,7 +1468,7 @@
                         </button>
 
                         <p class="text-[11px] text-gray-400 font-roboto text-center leading-relaxed">
-                            Penawaran yang Anda submit akan diteruskan ke WhatsApp resmi Notisse & pemilik karya untuk konfirmasi ketersediaan & pembayaran.
+                            Penawaran yang Anda submit akan dicatat ke sistem Notisse dan diverifikasi langsung oleh tim kurator dan seniman.
                         </p>
                     </div>
                 </div>
@@ -1828,18 +1901,6 @@
                                   (modalOffering && !modalOffering.classList.contains('hidden')) ||
                                   (modalLightbox && !modalLightbox.classList.contains('hidden'));
 
-            // A24 STICKY CART SCROLL ANIMATION
-            const stickyCart = document.getElementById('a24-cart-sticky');
-            if (stickyCart) {
-                if (currentScrollY > 40 && !isOverlayOpen) {
-                    stickyCart.classList.remove('scrolled-hidden');
-                    stickyCart.classList.add('scrolled-active');
-                } else {
-                    stickyCart.classList.remove('scrolled-active');
-                    stickyCart.classList.add('scrolled-hidden');
-                }
-            }
-
             if (currentScrollY <= 40) {
                 // At the very top: ALWAYS VISIBLE
                 mainHeader.style.transform = 'translateY(0)';
@@ -1913,6 +1974,19 @@
                         mainHeader.classList.remove('header-hidden');
                         mainHeader.classList.add('header-visible');
                     }
+                }
+            }
+
+            // A24 STICKY CART SCROLL ANIMATION (Active when header is hidden on scroll)
+            const stickyCart = document.getElementById('a24-cart-sticky');
+            if (stickyCart) {
+                const headerIsHidden = mainHeader.classList.contains('header-hidden');
+                if (headerIsHidden && currentScrollY > 60 && !isOverlayOpen) {
+                    stickyCart.classList.remove('scrolled-hidden');
+                    stickyCart.classList.add('scrolled-active');
+                } else {
+                    stickyCart.classList.remove('scrolled-active');
+                    stickyCart.classList.add('scrolled-hidden');
                 }
             }
 
@@ -2627,11 +2701,20 @@
             const container = document.getElementById('cart-items-container');
             const totalElement = document.getElementById('cart-total-price');
             const badgeElement = document.getElementById('header-cart-badge');
+            const stickyBadge = document.getElementById('a24-sticky-cart-badge');
             let totalAmount = 0;
             let totalItemCount = 0;
 
+            if (!container) return;
+
             if (cartState.length === 0) {
-                container.innerHTML = `<div class="text-center py-16 text-gray-400 text-sm font-roboto">Your cart is empty.</div>`;
+                container.innerHTML = `
+                    <div class="py-16 sm:py-24 px-2 flex flex-col justify-center select-none">
+                        <h2 class="text-5xl sm:text-6xl font-bold tracking-tight text-neutral-300 font-montserrat leading-none">
+                            Cart empty ;(
+                        </h2>
+                    </div>
+                `;
             } else {
                 let html = '';
                 cartState.forEach((item, index) => {
@@ -2639,25 +2722,31 @@
                     totalAmount += itemTotal;
                     totalItemCount += item.qty;
                     html += `
-                        <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100 cart-animated-item" style="animation-delay: ${index * 70}ms">
-                            <div class="col-span-6 md:col-span-5 flex items-center space-x-3">
-                                <div class="w-12 h-16 bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
+                        <div class="py-5 flex items-start justify-between space-x-4 cart-animated-item" style="animation-delay: ${index * 60}ms">
+                            <div class="flex items-start space-x-3 sm:space-x-4">
+                                <div class="w-20 h-20 sm:w-22 sm:h-22 bg-neutral-100 flex-shrink-0 overflow-hidden">
                                     <img src="{{ asset('footage-baju.jpg') }}" alt="${item.name}" class="w-full h-full object-cover">
                                 </div>
-                                <div>
-                                    <p class="font-semibold uppercase text-black text-xs md:text-sm font-montserrat">${item.name}</p>
-                                    <p class="text-xs text-gray-500 font-roboto">Size: ${item.size}</p>
+                                <div class="flex flex-col justify-between min-h-[5rem]">
+                                    <div>
+                                        <h4 class="font-medium text-xs sm:text-sm font-montserrat text-black leading-snug">${item.name}</h4>
+                                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Size: ${item.size}</p>
+                                    </div>
+                                    <div class="flex items-center space-x-4 pt-2">
+                                        <div class="inline-flex items-center space-x-2 text-xs font-montserrat text-black select-none">
+                                            <button onclick="updateCartQty(${index}, -1)" class="w-5 h-5 flex items-center justify-center hover:opacity-50 font-bold transition-opacity text-sm cursor-pointer" aria-label="Decrease">&minus;</button>
+                                            <span class="font-mono font-medium px-1 text-xs">${item.qty}</span>
+                                            <button onclick="updateCartQty(${index}, 1)" class="w-5 h-5 flex items-center justify-center hover:opacity-50 font-bold transition-opacity text-sm cursor-pointer" aria-label="Increase">&plus;</button>
+                                        </div>
+                                        <button onclick="removeCartItem(${index})" class="text-[10px] font-bold tracking-widest text-neutral-400 hover:text-black uppercase font-montserrat transition-colors cursor-pointer">
+                                            REMOVE
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-span-3 md:col-span-3 flex justify-center">
-                                <div class="flex items-center border border-gray-400">
-                                    <button onclick="updateCartQty(${index}, -1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto">−</button>
-                                    <span class="px-3 py-1 font-semibold font-roboto">${item.qty}</span>
-                                    <button onclick="updateCartQty(${index}, 1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto">+</button>
-                                </div>
+                            <div class="text-right flex-shrink-0 pt-0.5">
+                                <span class="text-xs sm:text-sm font-semibold font-mono text-black">${formatRupiah(itemTotal)}</span>
                             </div>
-                            <div class="hidden md:block md:col-span-2 text-right font-montserrat">${formatRupiah(item.unitPrice)}</div>
-                            <div class="col-span-3 md:col-span-2 text-right font-medium font-montserrat">${formatRupiah(itemTotal)}</div>
                         </div>
                     `;
                 });
@@ -2665,10 +2754,9 @@
             }
 
             const grandTotal = totalAmount + selectedShippingCost;
-            totalElement.innerText = formatRupiah(grandTotal) + ' IDR';
-            badgeElement.innerText = `(${totalItemCount})`;
-            const stickyBadge = document.getElementById('a24-sticky-cart-badge');
-            if (stickyBadge) stickyBadge.innerText = `(${totalItemCount})`;
+            if (totalElement) totalElement.innerText = formatRupiah(grandTotal) + ' IDR';
+            if (badgeElement) badgeElement.innerText = totalItemCount;
+            if (stickyBadge) stickyBadge.innerText = totalItemCount;
         }
 
         function triggerBadgePop() {
@@ -2693,6 +2781,27 @@
             }
             triggerBadgePop();
             renderCartItems();
+        }
+
+        function removeCartItem(index) {
+            if (cartState[index]) {
+                cartState.splice(index, 1);
+                triggerBadgePop();
+                renderCartItems();
+            }
+        }
+
+        function addCrossSellItem() {
+            cartState.push({
+                id: Date.now(),
+                name: 'NOTISSE CANVAS TOTE',
+                size: 'ALL SIZE',
+                unitPrice: 150000,
+                qty: 1
+            });
+            triggerBadgePop();
+            renderCartItems();
+            showToast("Added Canvas Tote to cart");
         }
 
         function addSelectedToCart() {
