@@ -101,13 +101,13 @@
         }
 
         .animate-marquee {
-            animation: marquee 18s linear infinite;
+            animation: marquee 30s linear infinite;
             will-change: transform;
         }
 
         @media (max-width: 640px) {
             .animate-marquee {
-                animation: marquee 14s linear infinite;
+                animation: marquee 24s linear infinite;
             }
         }
 
