@@ -974,26 +974,22 @@
                         class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Shop</span>
-                        <span class="text-[10px] md:text-xs font-bold ml-2 mt-2 md:mt-3 tracking-widest">2026</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-artist-collab')"
                         class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Artist
                             Collab</span>
-                        <span class="text-[10px] md:text-xs font-bold ml-2 mt-2 md:mt-3 tracking-widest">2026</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-lookbook-list')"
                         class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Lookbook</span>
-                        <span class="text-[10px] md:text-xs font-bold ml-2 mt-2 md:mt-3 tracking-widest">2026</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-about')"
                         class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">About</span>
-                        <span class="text-[10px] md:text-xs font-bold ml-2 mt-2 md:mt-3 tracking-widest">2026</span>
                     </a>
                 </div>
 
