@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notisse - Fashion & Art Brand</title>
-    
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- Midtrans Snap JS -->
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 
@@ -95,12 +95,19 @@
             }
 
             100% {
-                transform: translateX(-50%);
+                transform: translateX(-100%);
             }
         }
 
         .animate-marquee {
-            animation: marquee 15s linear infinite;
+            animation: marquee 18s linear infinite;
+            will-change: transform;
+        }
+
+        @media (max-width: 640px) {
+            .animate-marquee {
+                animation: marquee 14s linear infinite;
+            }
         }
 
         .view-page {
@@ -188,11 +195,53 @@
         }
 
         .overlay-slide {
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+            will-change: transform;
         }
 
         .overlay-backdrop {
-            transition: opacity 0.3s ease;
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #overlay-cart {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        #cart-drawer-content {
+            transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+        }
+
+        /* A24 STAGGERED FADE-UP FOR CART DRAWER CONTENT */
+        .cart-animated-item {
+            animation: a24CartFadeUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes a24CartFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* A24 HEADER CART BADGE BOUNCE POP */
+        .cart-badge-pop {
+            animation: a24BadgeBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes a24BadgeBounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.4) translateY(-1px);
+                color: #d52c2b;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -206,124 +255,395 @@
         ::-webkit-scrollbar-thumb {
             background: #888888;
         }
-
-        /* Dynamic Morphing Cart */
-        #cart-trigger {
-            position: relative;
-            width: 80px;
-            height: 40px;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        #cart-trigger.is-scrolled {
-            width: 20px;
-            height: 112px;
+        /* A24 INSPIRED DUAL LOGO MORPH ON SCROLL */
+        .header-logo-large {
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        filter 0.35s ease;
+            will-change: opacity, transform;
+            transform-origin: center center;
         }
 
-        .cart-letter {
+        .header-logo-small {
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        filter 0.35s ease;
+            will-change: opacity, transform;
+            transform-origin: center center;
+        }
+
+        /* State: Large Wordmark (Top / Hero) */
+        .logo-state-large .header-logo-large {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        .logo-state-large .header-logo-small {
+            opacity: 0;
+            transform: scale(0.65) rotate(-6deg);
+            pointer-events: none;
+        }
+
+        /* State: Small Logo / Monogram (Scrolled) */
+        .logo-state-small .header-logo-large {
+            opacity: 0;
+            transform: scale(0.85);
+            pointer-events: none;
+        }
+        .logo-state-small .header-logo-small {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+            pointer-events: auto;
+            animation: smallLogoPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes smallLogoPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.65) translateY(3px);
+                filter: brightness(1.2) drop-shadow(0 4px 10px rgba(0,0,0,0.15));
+            }
+            60% {
+                transform: scale(1.08) translateY(-1px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+                filter: brightness(1) drop-shadow(0 2px 5px rgba(0,0,0,0.06));
+            }
+        }
+
+        .header-logo-container:hover .header-logo-large {
+            transform: scale(1.04);
+            filter: brightness(1.12);
+        }
+
+        .header-logo-container:hover .header-logo-small {
+            transform: scale(1.1) rotate(2deg);
+            filter: brightness(1.15) drop-shadow(0 3px 8px rgba(0,0,0,0.12));
+        }
+
+        /* A24 SMART HIDE / REVEAL HEADER ON SCROLL */
+        #main-header {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        background-color 0.35s ease,
+                        border-color 0.35s ease,
+                        box-shadow 0.35s ease;
+            will-change: transform;
+        }
+
+        #main-header.header-hidden {
+            transform: translateY(-100%) !important;
+        }
+
+        #main-header.header-visible {
+            transform: translateY(0) !important;
+        }
+
+        #menu-trigger,
+        #header-right-menu {
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        /* ========================================================== */
+        /* EXACT A24 MORPHING CART BUTTON WITH MOVING CONNECTING LINE */
+        /* ========================================================== */
+        .header__link--cart {
+            display: block;
+            position: fixed;
+            top: 18px;
+            right: 28px;
+            width: 72px;
+            height: 38px;
+            z-index: 55;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            cursor: pointer;
+            color: #000000;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        width 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                        height 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (max-width: 640px) {
+            .header__link--cart {
+                top: 14px;
+                right: 18px;
+            }
+        }
+
+        .header__link--cart:hover {
+            opacity: 0.65;
+        }
+
+        /* 1. THE MOVING / MORPHING CONNECTING LINE (L-SHAPE THAT SHRINKS & STRETCHES) */
+        .header__link--cart::before {
+            content: "";
             position: absolute;
+            right: 0px;
+            top: 7px;
+            width: 22px;
+            height: 16px;
+            border-top: 1.2px solid currentColor;
+            border-right: 1.2px solid currentColor;
+            border-bottom: none;
+            border-left: none;
+            box-sizing: border-box;
+            pointer-events: none;
+            /* When returning (scrolling UP): vertical shrinks first (0s), horizontal opens after delay (0.12s) */
+            transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
+                        height 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        left 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        right 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+            will-change: width, height, top, left, right, transform;
+        }
+
+        /* On hover in default horizontal state: line actively moves/stretches */
+        .header__link--cart:not(.state-minimal):hover::before {
+            width: 28px;
+            transition-delay: 0s;
+        }
+
+        /* 2. DEFAULT HORIZONTAL LABEL */
+        .header__link--cart__default-label {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-family: 'Montserrat', sans-serif;
             font-size: 11px;
             font-weight: 600;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: 0.16em;
+            line-height: 16px;
+            text-transform: uppercase;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
+                        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
         }
-        .cart-line-h, .cart-line-v {
+
+        /* 3. VERTICAL LABEL (APPEARS ON SCROLL) */
+        /* Reads top to bottom naturally with generous breathing room */
+        .header__link--cart__vertical-label {
             position: absolute;
-            background-color: currentColor;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .cart-arrow {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .cart-badge {
-            position: absolute;
+            top: 0px;
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            width: auto;
+            font-family: 'Montserrat', sans-serif;
             font-size: 11px;
             font-weight: 600;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: 0.18em;
+            line-height: 1;
+            text-transform: uppercase;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s;
         }
 
-        /* State: Unscrolled (Horizontal) */
-        .l-c { top: 4px; left: 4px; }
-        .l-a { top: 4px; left: 14px; }
-        .l-r { top: 4px; left: 24px; }
-        .l-t { top: 4px; left: 34px; }
+        /* 4. MONOSPACE COUNTER */
+        .header__link--cart__counter {
+            position: absolute;
+            right: -4px;
+            top: 25px;
+            width: 14px;
+            text-align: center;
+            font-family: 'Courier New', Courier, Monaco, monospace;
+            font-size: 11.5px;
+            font-weight: 600;
+            line-height: 1;
+            transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        left 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        right 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+        }
 
-        .cart-line-h { top: 11px; left: 46px; width: 18px; height: 1.5px; opacity: 1; }
-        .cart-line-v { top: 11px; left: 64px; width: 1.5px; height: 12px; }
-        
-        .cart-arrow { top: 19px; left: 58.5px; }
-        .cart-badge { top: 29px; left: 61px; }
+        /* ============================================================== */
+        /* SCROLLED MINIMAL STATE (.state-minimal): MOVING LINE ANIMATION */
+        /* ============================================================== */
+        .header__link--cart.state-minimal {
+            width: 24px;
+            height: 118px;
+        }
 
-        /* State: Scrolled (Vertical) */
-        .is-scrolled .l-c { top: 0px; left: 4px; }
-        .is-scrolled .l-a { top: 14px; left: 4px; }
-        .is-scrolled .l-r { top: 28px; left: 4px; }
-        .is-scrolled .l-t { top: 42px; left: 4px; }
+        /* Horizontal segment collapses to 0 immediately (0s); Vertical segment stretches down with generous spacing (0.12s) */
+        /* Spacing: "CART" ends around top:44px, line starts at top:56px (12px gap!), height:32px (ends at 88px), counter at 98px (10px gap!) */
+        .header__link--cart.state-minimal::before {
+            width: 0px !important;
+            height: 32px !important;
+            top: 56px !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
+            border-top: none !important;
+            border-right: 1.2px solid currentColor !important;
+            transition: width 0.18s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        height 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
+                        top 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
+        }
 
-        .is-scrolled .cart-line-h { top: 62px; left: 8px; width: 0px; height: 1.5px; opacity: 0; }
-        .is-scrolled .cart-line-v { top: 62px; left: 8px; width: 1.5px; height: 24px; }
-        
-        .is-scrolled .cart-arrow { top: 80px; left: 2.5px; }
-        .is-scrolled .cart-badge { top: 92px; left: 4.5px; }
+        /* On hover in vertical state: vertical line stretches down smoothly */
+        .header__link--cart.state-minimal:hover::before {
+            height: 42px !important;
+            transition: height 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
+        }
+
+        .header__link--cart.state-minimal .header__link--cart__counter {
+            top: 98px !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
+            width: auto !important;
+            text-align: center !important;
+            transition: top 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
+        }
+
+        .header__link--cart.state-minimal:hover .header__link--cart__counter {
+            top: 108px !important;
+            transition: top 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
+        }
+
+        .header__link--cart.state-minimal .header__link--cart__default-label {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translateY(-6px) !important;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
+        }
+
+        .header__link--cart.state-minimal .header__link--cart__vertical-label {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            top: 0px !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) translateY(0) !important;
+            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
+                        transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
+        }
+
+        /* Animated moving shimmer line in cart drawer */
+        @keyframes movingLineSlide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .moving-line-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+            animation: movingLineSlide 2.2s infinite ease-in-out;
+        }
+
+        @keyframes cartBadgePop {
+            0% {
+                transform: scale(1);
+            }
+            40% {
+                transform: scale(1.35);
+                color: #d52c2b;
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .cart-badge-pop {
+            animation: cartBadgePop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* OVERLAYS AND STACKING CONTEXTS (MENIMPA RUNNING TEXT FOOTER) */
+        #global-marquee {
+            z-index: 30 !important;
+            color: #d52c2b !important;
+        }
+
+        #global-marquee * {
+            color: #d52c2b !important;
+        }
+
+        #overlay-menu-backdrop,
+        #overlay-cart {
+            z-index: 900 !important;
+        }
+
+        #overlay-menu-sidebar,
+        #cart-drawer-content {
+            z-index: 910 !important;
+        }
+
+        #overlay-search {
+            z-index: 950 !important;
+        }
+
+        #modal-artwork-offering {
+            z-index: 960 !important;
+        }
+
+        #modal-image-lightbox {
+            z-index: 970 !important;
+        }
+
+        #toast-container {
+            z-index: 999 !important;
+        }
     </style>
 </head>
 
 <body
     class="min-h-screen flex flex-col justify-between relative bg-white text-black antialiased selection:bg-black selection:text-white">
 
-    <!-- GLOBAL PERSISTENT HEADER -->
-    <header
-        class="fixed top-0 left-0 w-full z-50 bg-transparent px-6 py-4 flex items-start justify-between transition-all duration-300">
+    <!-- GLOBAL PERSISTENT HEADER (A24-INSPIRED MINIMALIST LUXURY) -->
+    <header id="main-header"
+        class="fixed top-0 left-0 w-full z-50 bg-transparent px-5 sm:px-8 py-3.5 flex items-center justify-between transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]">
         <!-- Left: Hamburger Icon -->
         <button id="menu-trigger" aria-label="Open Navigation Menu"
-            class="p-1 mt-1 focus:outline-none hover:scale-110 active:scale-90 transition-all duration-300 cursor-pointer opacity-0 pointer-events-none">
-            <svg class="w-7 h-7 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            class="p-2 -ml-2 text-black hover:opacity-60 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none flex items-center justify-center opacity-0 pointer-events-none -translate-x-3">
+            <svg class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
             </svg>
         </button>
 
-        <!-- Center: Original Logo Image (logo.png) -->
-        <div class="absolute left-1/2 transform -translate-x-1/2 cursor-pointer hover:opacity-80 transition-opacity flex items-start"
-            onclick="showPage('view-shop')">
-            <img id="header-logo" src="{{ asset('logo.png') }}" alt="Notisse Logo"
-                class="h-6 sm:h-8 md:h-10 w-auto object-contain select-none transition-all duration-300 mt-1">
+        <!-- Center: Dual Animated Logo (Switches to Small Logo on Scroll) -->
+        <div id="header-logo-container"
+            class="header-logo-container logo-state-large absolute left-1/2 transform -translate-x-1/2 cursor-pointer flex items-center justify-center select-none py-1 h-7 sm:h-8"
+            onclick="showPage('view-shop')" title="Back to Shop">
+            <!-- Large Brand Wordmark -->
+            <img id="header-logo-large" src="{{ asset('logo.png') }}" alt="Notisse Logo"
+                class="header-logo-large h-5 sm:h-6 md:h-6.5 w-auto object-contain select-none">
+            <!-- Small Brand Monogram / Icon -->
+            <img id="header-logo-small" src="{{ asset('logowebkecil.png') }}" alt="Notisse Icon"
+                class="header-logo-small absolute h-5 sm:h-5.5 md:h-6 w-auto object-contain select-none">
         </div>
 
-        <!-- Right: ACCOUNT, SEARCH & CART Buttons -->
+        <!-- Right: SEARCH -->
         <div id="header-right-menu"
-            class="flex items-start space-x-2 sm:space-x-5 text-[10px] sm:text-xs font-semibold tracking-widest uppercase transition-all duration-300 mt-1">
-            <button id="account-header-btn" onclick="handleAccountButtonClick()"
-                class="hidden md:inline-block font-helvetica font-medium hover:opacity-60 hover:scale-105 active:scale-95 transition-all focus:outline-none p-1 cursor-pointer">
-                ACCOUNT
-            </button>
-            <button id="search-trigger"
-                class="font-helvetica font-medium hover:opacity-60 hover:scale-105 active:scale-95 transition-all focus:outline-none p-1 cursor-pointer">
+            class="flex items-center text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3 pr-20 sm:pr-24">
+            <button id="search-trigger" aria-label="Search"
+                class="font-montserrat font-medium hover:opacity-50 hover:scale-105 active:scale-95 transition-all focus:outline-none py-1 px-1 cursor-pointer">
                 SEARCH
-            </button>
-            <button id="cart-trigger"
-                class="font-helvetica font-medium hover:opacity-60 active:scale-95 transition-all focus:outline-none p-1 cursor-pointer">
-                <!-- Individual letters for morphing -->
-                <span class="cart-letter l-c">C</span>
-                <span class="cart-letter l-a">A</span>
-                <span class="cart-letter l-r">R</span>
-                <span class="cart-letter l-t">T</span>
-
-                <!-- Animated Lines & Arrow -->
-                <div class="cart-line-h"></div>
-                <div class="cart-line-v"></div>
-                <svg class="cart-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                </svg>
-
-                <span id="header-cart-badge" class="cart-badge">2</span>
             </button>
         </div>
     </header>
 
+    <!-- EXACT A24 UNIFIED MORPHING CART TRIGGER (WITH VISIBLE MOVING LINE ANIMATION) -->
+    <button id="cart-trigger" aria-label="Cart" onclick="openCart()"
+        class="header__link--cart focus:outline-none select-none cursor-pointer">
+        <span class="header__link--cart__default-label">CART</span>
+        <span class="header__link--cart__vertical-label">CART</span>
+        <span id="header-cart-badge" class="header__link--cart__counter font-bold">2</span>
+    </button>
+
     <!-- OVERLAY 1: 1/4 SCREEN WIDTH NAVIGATION SIDEBAR -->
     <div id="overlay-menu-backdrop"
-        class="fixed inset-0 bg-black/50 z-50 hidden opacity-0 overlay-backdrop transition-opacity duration-300"
+        class="fixed inset-0 bg-black/50 z-[60] hidden opacity-0 overlay-backdrop transition-opacity duration-300"
         onclick="closeMenu()">
         <div id="overlay-menu-sidebar"
             class="absolute left-0 top-0 bottom-0 w-full sm:w-80 md:w-1/4 bg-[#d52c2b] text-white p-6 md:p-10 transform -translate-x-full overlay-slide flex flex-col justify-between shadow-2xl"
@@ -347,45 +667,67 @@
                     class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">ABOUT</a>
             </nav>
 
-            <div class="flex flex-col space-y-4 font-roboto mb-2">
-                <a href="javascript:void(0)" onclick="navigateTo('view-contact')"
-                    class="text-sm md:text-base font-normal tracking-widest text-gray-400 hover:text-white transition-all duration-300 w-fit">CONTACT</a>
+            <div class="flex items-center space-x-6 sm:space-x-8 font-roboto mb-2">
                 <a href="javascript:void(0)" onclick="closeMenu(); handleAccountButtonClick();"
                     class="text-sm md:text-base font-normal tracking-widest text-gray-400 hover:text-white transition-all duration-300 w-fit">ACCOUNT</a>
+                <a href="javascript:void(0)" onclick="navigateTo('view-contact')"
+                    class="text-sm md:text-base font-normal tracking-widest text-gray-400 hover:text-white transition-all duration-300 w-fit">CONTACT</a>
             </div>
 
         </div>
     </div>
 
-    <!-- OVERLAY 2: TOP-BAR LIVE SEARCH DROPDOWN -->
+    <!-- OVERLAY 2: FULL-SCREEN EDITORIAL LIVE SEARCH -->
     <div id="overlay-search"
-        class="fixed top-0 left-0 right-0 bg-white border-b border-gray-300 shadow-2xl z-50 transform -translate-y-full overlay-slide px-6 py-6 md:px-12 transition-transform duration-300 max-h-[85vh] overflow-y-auto">
-        <div class="max-w-6xl mx-auto space-y-6">
-            <!-- Search Header Bar -->
-            <div class="flex items-center justify-between gap-4">
-                <div class="relative flex-grow flex items-center border-b border-black pb-1">
+        class="fixed inset-0 w-full h-full bg-white z-[90] transform -translate-y-full overlay-slide flex flex-col transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto">
+        <!-- Search Sticky Top Bar -->
+        <div class="sticky top-0 bg-white/95 backdrop-blur-md z-30 px-6 sm:px-10 py-4 sm:py-5 border-b border-gray-100 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-[11px] sm:text-xs font-bold tracking-[0.22em] uppercase font-montserrat text-black">SEARCH</span>
+                <span class="text-gray-300 text-xs select-none">/</span>
+                <span class="text-[11px] text-gray-400 tracking-wider font-roboto uppercase hidden sm:inline">NOTISSE ARCHIVE</span>
+            </div>
+            <button id="search-close" aria-label="Close Search"
+                class="group text-xs sm:text-sm font-semibold tracking-widest uppercase hover:text-gray-500 transition-colors flex items-center space-x-2 cursor-pointer focus:outline-none py-1">
+                <span>CLOSE</span>
+                <span class="text-base sm:text-lg group-hover:rotate-90 transition-transform duration-300 leading-none">&#10005;</span>
+            </button>
+        </div>
+
+        <!-- Main Full Screen Content Container -->
+        <div class="flex-grow w-full max-w-7xl mx-auto px-6 sm:px-10 py-8 md:py-12 flex flex-col">
+            <!-- Large Editorial Search Input -->
+            <div class="w-full max-w-4xl mx-auto mb-8 md:mb-12">
+                <div class="relative flex items-center border-b-2 border-black pb-3">
                     <input type="text" id="search-input" oninput="handleLiveSearch(this.value)"
-                        placeholder="Type to search products (e.g. 'O', 'Tee', 'Black')..."
-                        class="w-full text-base md:text-xl bg-transparent focus:outline-none placeholder-gray-400 font-light font-roboto py-1">
-                    <button aria-label="Submit Search"
-                        class="ml-2 text-xl md:text-2xl hover:translate-x-1 transition-transform focus:outline-none cursor-pointer">
+                        placeholder="Search collection, product name, or artist..."
+                        autocomplete="off"
+                        class="w-full text-xl sm:text-3xl md:text-4xl bg-transparent focus:outline-none placeholder:text-gray-300 font-light font-roboto py-1 text-black">
+                    <button onclick="handleLiveSearch(document.getElementById('search-input').value)" aria-label="Submit Search"
+                        class="ml-3 text-2xl md:text-3xl text-black hover:translate-x-1.5 transition-transform focus:outline-none cursor-pointer">
                         &rarr;
                     </button>
                 </div>
-                <button id="search-close" aria-label="Close Search"
-                    class="text-2xl font-light hover:rotate-90 hover:text-gray-600 transition-transform duration-300 focus:outline-none cursor-pointer p-1">
-                    &#10005;
-                </button>
+
+                <!-- Quick Filter Suggestion Chips -->
+                <div class="flex flex-wrap items-center gap-2 pt-4">
+                    <span class="text-[11px] uppercase tracking-wider text-gray-400 font-montserrat mr-1 font-medium">Popular:</span>
+                    <button onclick="applySearchQuery('Tee')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Tee</button>
+                    <button onclick="applySearchQuery('Raja Diamuk')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Raja Diamuk</button>
+                    <button onclick="applySearchQuery('Tank')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Tank</button>
+                    <button onclick="applySearchQuery('Shirt')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Shirt</button>
+                    <button onclick="applySearchQuery('Blazer')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Blazer</button>
+                </div>
             </div>
 
             <!-- Dynamic Search Result Header -->
             <div id="search-results-meta"
-                class="text-xs uppercase tracking-widest text-gray-400 font-montserrat font-semibold hidden">
+                class="text-xs uppercase tracking-widest text-gray-400 font-montserrat font-semibold mb-6 hidden">
                 PRODUCTS (<span id="search-results-count">0</span>)
             </div>
 
-            <!-- Dynamic Live Results Grid Container -->
-            <div id="search-results-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 pt-2">
+            <!-- Dynamic Live Results Grid Container (Full Screen Multi-Column Grid) -->
+            <div id="search-results-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 flex-grow">
                 <!-- Live search items render dynamically here -->
             </div>
         </div>
@@ -393,7 +735,7 @@
 
     <!-- OVERLAY 3: MY CART SLIDE-OVER DRAWER -->
     <div id="overlay-cart"
-        class="fixed inset-0 bg-black/40 z-50 hidden opacity-0 overlay-backdrop transition-opacity duration-400"
+        class="fixed inset-0 bg-black/40 z-[60] hidden opacity-0 overlay-backdrop transition-opacity duration-400"
         onclick="closeCart()">
         <div id="cart-drawer-content"
             class="absolute right-0 top-0 bottom-0 w-full max-w-4xl bg-white p-6 md:p-10 transform translate-x-full overlay-slide flex flex-col overflow-y-auto shadow-2xl"
@@ -416,21 +758,19 @@
 
             <div id="cart-items-container" class="space-y-6 flex-grow"></div>
 
+            <!-- BITESHIP SHIPPING & ADDRESS DETAILS -->
             <div id="checkout-details" class="mt-6 border-t border-gray-200 pt-6 space-y-4">
-                @if(auth()->check() && auth()->user()->area_id)
-                <div class="text-sm font-montserrat p-3 bg-gray-50 border border-gray-200">
-                    <p class="font-bold mb-1">{{ auth()->user()->name }} ({{ auth()->user()->phone }})</p>
-                    <p class="text-gray-600">{{ auth()->user()->address }}</p>
+                <div class="relative">
+                    <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." oninput="searchAreaBiteship(this.value)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm" autocomplete="off">
+                    <div id="area-results" class="absolute z-10 w-full bg-white border border-gray-200 max-h-40 overflow-y-auto hidden shadow-lg text-sm font-montserrat"></div>
                 </div>
-                <div id="shipping-options-container" class="space-y-2 mt-4">
+                <input type="hidden" id="selected-area-id">
+                <input type="text" id="full-address" placeholder="Detail Alamat (Jalan, RT/RW, No)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm">
+                
+                <div id="shipping-options-container" class="hidden space-y-2 mt-4">
                     <span class="text-sm font-medium font-montserrat block">Pilih Pengiriman:</span>
                     <div id="shipping-options" class="flex flex-col space-y-2 text-sm font-montserrat"></div>
                 </div>
-                @else
-                <div class="text-sm text-gray-500 font-montserrat">
-                    Anda akan diminta mengisi data pengiriman pada langkah selanjutnya.
-                </div>
-                @endif
             </div>
 
             <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
@@ -446,6 +786,161 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY 4: ARTWORK OFFERING MODAL (ACQUISITION INQUIRY) -->
+    <div id="modal-artwork-offering"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 sm:p-6"
+        onclick="closeArtworkOfferingModal()">
+        <div class="bg-white w-full max-w-lg shadow-2xl border border-gray-200 transform scale-95 transition-transform duration-300 flex flex-col max-h-[92vh] overflow-hidden"
+            onclick="event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white sticky top-0 z-10">
+                <div>
+                    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block">NOTISSE ART GALLERY ACQUISITION</span>
+                    <h3 class="text-base sm:text-lg font-bold font-montserrat text-black tracking-tight">Artwork Offering / Buy Inquiry</h3>
+                </div>
+                <button onclick="closeArtworkOfferingModal()" aria-label="Close Modal"
+                    class="text-2xl font-light hover:rotate-90 text-gray-500 hover:text-black transition-transform duration-300 focus:outline-none cursor-pointer">
+                    &#10005;
+                </button>
+            </div>
+
+            <!-- Modal Form Body (Scrollable) -->
+            <div id="artwork-offering-form-body" class="p-6 overflow-y-auto space-y-5 flex-grow">
+                <!-- Selected Artwork Card Preview -->
+                <div class="flex items-center space-x-4 p-3.5 bg-neutral-50 border border-gray-200 rounded-sm">
+                    <img id="offering-artwork-img" src="https://placehold.co/400x500/222/fff?text=Artwork" alt="Artwork"
+                        class="w-16 h-20 object-cover bg-gray-200 border border-gray-300 flex-shrink-0">
+                    <div class="space-y-0.5 min-w-0">
+                        <span class="text-[9px] font-semibold tracking-widest uppercase bg-black text-white px-1.5 py-0.5 inline-block font-montserrat mb-1">Original Piece</span>
+                        <p id="offering-artwork-title" class="font-bold text-xs sm:text-sm text-black font-montserrat truncate">Mereka Ulang Ungkapan Indah Leila</p>
+                        <p class="text-xs text-gray-600 font-roboto">Artist: <span id="offering-artwork-artist" class="font-semibold text-black">Mustafa Alatas</span></p>
+                        <p id="offering-artwork-specs" class="text-[11px] text-gray-500 font-roboto">Oil on canvas &bull; 60x60cm</p>
+                    </div>
+                </div>
+
+                <!-- Offering Form -->
+                <form id="artwork-offering-form" onsubmit="handleArtworkOfferingSubmit(event)" class="space-y-4">
+                    <!-- Account Identity Card (Logged in User) -->
+                    <div class="p-3.5 bg-neutral-50 border border-gray-200 rounded-sm">
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-gray-400 font-montserrat block mb-1.5">Akun Penawar (Tercatat di Sistem)</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-xs font-montserrat flex-shrink-0" id="offering-user-avatar">
+                                    JD
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-xs sm:text-sm text-black font-montserrat truncate" id="offering-user-name">John Doe</p>
+                                    <p class="text-[11px] text-gray-500 font-roboto truncate" id="offering-user-email">john.doe@notisse.com</p>
+                                </div>
+                            </div>
+                            <span class="text-[9px] font-semibold tracking-wider uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-montserrat flex-shrink-0">
+                                Akun Terverifikasi
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
+                            Nominal Tawaran (IDR) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-500 font-montserrat">Rp</span>
+                            <input type="text" id="offering-buyer-price" required placeholder="Misal: 7.500.000"
+                                oninput="formatOfferingPriceInput(this)"
+                                class="w-full border border-gray-300 pl-10 pr-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors font-medium">
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-roboto mt-1">Masukkan nominal penawaran yang diajukan untuk karya seni asli.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
+                            Catatan / Pesan Pembelian (Opsional)
+                        </label>
+                        <textarea id="offering-buyer-message" rows="3" placeholder="Tuliskan catatan tambahan atau rencana penempatan karya untuk kurator & seniman..."
+                            class="w-full border border-gray-300 px-3.5 py-2 text-sm font-roboto focus:outline-none focus:border-black transition-colors resize-none"></textarea>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" id="offering-submit-btn"
+                            class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-3.5 px-6 font-montserrat text-xs sm:text-sm font-bold tracking-[0.2em] uppercase cursor-pointer flex items-center justify-center space-x-2">
+                            <span>AJUKAN PENAWARAN (SUBMIT OFFER)</span>
+                            <span>&rarr;</span>
+                        </button>
+                    </div>
+                </form>
+
+                <p class="text-[11px] text-gray-400 text-center font-roboto">
+                    Pengajuan offering tersimpan otomatis di akun Anda dan diteruskan ke kurasi internal Notisse & seniman pemilik karya.
+                </p>
+            </div>
+
+            <!-- Success State Body (Official In-App Confirmation) -->
+            <div id="artwork-offering-success-body" class="p-6 sm:p-8 hidden text-center space-y-5">
+                <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl font-bold">
+                    &#10003;
+                </div>
+                <div>
+                    <h4 class="text-lg sm:text-xl font-bold font-montserrat text-black">Offering Berhasil Diajukan!</h4>
+                    <p class="text-xs text-gray-600 font-roboto mt-2 max-w-sm mx-auto leading-relaxed">
+                        Penawaran telah tercatat secara resmi di sistem Notisse. Tim kurasi Notisse dan pemilik karya (<strong class="text-black" id="success-artist-name">Mustafa Alatas</strong>) akan mereview penawaran ini.
+                    </p>
+                </div>
+
+                <div class="p-4 bg-neutral-50 border border-gray-200 text-left space-y-2 text-xs font-roboto">
+                    <div class="flex justify-between border-b border-gray-200 pb-1.5">
+                        <span class="text-gray-500 font-montserrat text-[11px] uppercase">Ref. Offering:</span>
+                        <span class="font-mono font-bold text-black" id="success-offering-ref">#NTS-ART-9281</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Akun Pembeli:</span>
+                        <span class="font-medium text-black" id="success-buyer-name">John Doe (john.doe@notisse.com)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Karya Seni:</span>
+                        <span class="font-medium text-black truncate ml-2" id="success-artwork-title">Mereka Ulang Ungkapan Indah Leila</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Nominal Tawaran:</span>
+                        <span class="font-bold text-emerald-700 font-montserrat" id="success-artwork-price">Rp 12.500.000 IDR</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-1">
+                        <span class="text-gray-500">Status Penawaran:</span>
+                        <span class="font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-[10px] uppercase font-montserrat">Dalam Tinjauan Kurasi</span>
+                    </div>
+                </div>
+
+                <p class="text-[11px] text-gray-400 font-roboto leading-relaxed">
+                    Hasil kurasi penawaran serta instruksi lanjutan akan dikirimkan langsung ke notifikasi akun dan email Anda.
+                </p>
+
+                <div class="pt-2">
+                    <button type="button" onclick="closeArtworkOfferingModal()"
+                        class="w-full bg-black text-white hover:bg-neutral-800 font-montserrat py-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- OVERLAY 5: FULL-SCREEN IMAGE LIGHTBOX MODAL (ZOOM SIZE CHART & ARTWORKS) -->
+    <div id="modal-image-lightbox"
+        class="fixed inset-0 bg-black/90 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center p-4 sm:p-8"
+        onclick="closeLightbox()">
+        <div class="absolute top-4 right-6 flex items-center space-x-4 z-20">
+            <span id="lightbox-caption" class="text-xs text-gray-300 uppercase font-montserrat tracking-widest hidden sm:inline"></span>
+            <button onclick="closeLightbox()" aria-label="Close Lightbox"
+                class="text-3xl text-white hover:text-gray-300 hover:rotate-90 transition-transform duration-300 focus:outline-none cursor-pointer">
+                &#10005;
+            </button>
+        </div>
+        <div class="max-w-4xl max-h-[85vh] flex items-center justify-center p-2" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Enlarged View" class="max-w-full max-h-[82vh] object-contain shadow-2xl rounded-sm">
         </div>
     </div>
 
@@ -499,13 +994,17 @@
                     </a>
                 </div>
 
-                <button onclick="prevSlide()"
-                    class="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-white text-4xl md:text-5xl hover:scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] flex items-center justify-center focus:outline-none transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
-                    &#10094;
+                <button onclick="prevSlide()" aria-label="Previous Slide"
+                    class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 text-white/75 hover:text-white p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-115 active:scale-90 cursor-pointer z-20 focus:outline-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7" />
+                    </svg>
                 </button>
-                <button onclick="nextSlide()"
-                    class="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-white text-4xl md:text-5xl hover:scale-110 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] flex items-center justify-center focus:outline-none transition-all opacity-0 group-hover:opacity-100 cursor-pointer">
-                    &#10095;
+                <button onclick="nextSlide()" aria-label="Next Slide"
+                    class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 text-white/75 hover:text-white p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-115 active:scale-90 cursor-pointer z-20 focus:outline-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+                    <svg class="w-6 h-6 md:w-8 md:h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5l7 7-7 7" />
+                    </svg>
                 </button>
 
                 <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
@@ -523,7 +1022,7 @@
             <div class="w-full">
                 <div class="grid grid-cols-2 lg:grid-cols-4 bg-black gap-[1px] border-b border-black">
                     @foreach($products as $product)
-                        <div onclick="openProductDetail({{ $product->id }})"
+                        <div onclick="openProductDetail('{{ addslashes($product->name) }}', 'Rp {{ number_format($product->price, 2, ',', '.') }}')"
                             class="group cursor-pointer bg-white flex flex-col justify-between h-full hover:bg-gray-50 transition-colors duration-300">
 
                             <div class="relative w-full aspect-[3/4] bg-[#f4f4f4] overflow-hidden">
@@ -564,9 +1063,6 @@
                             class="text-2xl md:text-3xl font-semibold uppercase tracking-wider text-black font-montserrat">
                             RAJA DIAMUK MASSA TEE V1
                         </h1>
-                        <p id="pdetail-price" class="text-lg md:text-xl font-medium mt-1 font-montserrat text-black">
-                            RP 250.000,00
-                        </p>
                         <p class="text-xs md:text-sm text-gray-600 mt-2 font-montserrat">
                             by <span onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')"
                                 class="underline hover:text-black cursor-pointer font-medium transition-colors font-montserrat">Mustafa
@@ -613,14 +1109,16 @@
                                 </svg>
                             </button>
                             <div id="acc-content-size" class="accordion-content">
-                                <div
-                                    class="accordion-inner pb-4 pt-1 text-[11px] md:text-xs text-gray-500 font-neue-montreal">
-                                    <ul class="list-disc pl-5 space-y-1.5 leading-relaxed font-neue-montreal">
-                                        <li>Small: Width 52 cm | Length 70 cm</li>
-                                        <li>Medium: Width 55 cm | Length 73 cm</li>
-                                        <li>Large: Width 58 cm | Length 76 cm</li>
-                                        <li>Extra Large: Width 61 cm | Length 79 cm</li>
-                                    </ul>
+                                <div class="accordion-inner pb-4 pt-2">
+                                    <div class="border border-gray-200 bg-neutral-50 p-2.5 text-center group cursor-zoom-in rounded-sm"
+                                        onclick="openLightbox('{{ asset('size chart 1.png') }}', 'NOTISSE APPAREL SIZE CHART')">
+                                        <img src="{{ asset('size chart 1.png') }}" alt="Notisse Size Chart"
+                                            class="w-full max-w-sm mx-auto h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02] shadow-sm">
+                                        <p class="text-[10px] text-gray-500 font-montserrat uppercase tracking-wider mt-2.5 flex items-center justify-center space-x-1 font-medium">
+                                            <svg class="w-3.5 h-3.5 stroke-current inline" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                                            <span>Klik gambar untuk memperbesar</span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -650,7 +1148,17 @@
                         </div>
                     </div>
 
-                    <div class="pt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6">
+                    <!-- MODEL FIT & MEASUREMENTS (TB, BB, SIZE) -->
+                    <div class="pt-1 flex items-center space-x-2 text-xs text-gray-600 font-roboto">
+                        <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <p class="tracking-wide">
+                            <span class="text-black font-semibold uppercase font-montserrat text-[11px]">Model:</span> TB 178 cm / BB 68 kg — wearing size <span class="font-bold text-black font-montserrat">L</span>
+                        </p>
+                    </div>
+
+                    <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6">
                         <div class="relative w-full sm:w-52 font-montserrat" id="custom-size-dropdown">
                             <button id="size-dropdown-trigger" onclick="toggleSizeDropdown(event)" type="button"
                                 class="w-full border border-black py-2.5 px-3.5 text-xs md:text-sm font-medium uppercase tracking-wider bg-white text-black flex justify-between items-center cursor-pointer hover:bg-black hover:text-white transition-colors duration-200 font-montserrat">
@@ -692,7 +1200,7 @@
 
                 <div class="w-full space-y-6">
                     <div class="w-full border border-black aspect-[3/4] bg-white overflow-hidden shadow-sm">
-                        <img src="{{ asset('footage-baju.jpg') }}" alt="Front View"
+                        <img id="pdetail-image" src="{{ asset('footage-baju.jpg') }}" alt="Front View"
                             class="w-full h-full object-cover">
                     </div>
                     <div class="w-full border border-black aspect-[3/4] bg-white overflow-hidden shadow-sm">
@@ -708,7 +1216,7 @@
         </section>
 
         <!-- VIEW 3: ARTIST COLLAB LIST PAGE -->
-        <section id="view-artist-collab" class="view-page px-4 md:px-12 py-10 max-w-7xl mx-auto">
+        <section id="view-artist-collab" class="view-page px-4 md:px-12 pt-20 sm:pt-24 pb-12 max-w-7xl mx-auto">
             <div class="mb-16">
                 <h2 class="text-xl md:text-2xl font-bold mb-6 tracking-wide text-black font-montserrat">Newcomer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
@@ -740,11 +1248,23 @@
 
             <!-- ARTIST COLLABORATOR SECTION -->
             <div class="pt-8 border-t border-gray-200">
-                <h2 class="text-xl md:text-2xl font-bold mb-8 tracking-wide text-black font-montserrat">Artist
-                    Collaborator</h2>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <h2 class="text-xl md:text-2xl font-bold tracking-wide text-black font-montserrat uppercase">
+                        Artist Collaborator
+                    </h2>
+                    <!-- Search Bar Sejajar dengan Tulisan Artist Collaborator -->
+                    <div class="relative w-full sm:w-72 md:w-80">
+                        <input type="text" id="artist-search-input" oninput="filterArtists(this.value)"
+                            placeholder="Search artist or city..."
+                            class="w-full bg-transparent border-b border-black py-1.5 pl-7 pr-3 text-xs md:text-sm font-roboto tracking-wide focus:outline-none focus:border-[#d52c2b] placeholder-gray-400 transition-colors">
+                        <svg class="w-4 h-4 text-black absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-4.35z" />
+                        </svg>
+                    </div>
+                </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
+                <div id="artist-collab-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Mustafa Alatas" data-artist-city="Temanggung" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/181818/ffffff?text=Mustafa+Alatas"
                                 alt="Mustafa Alatas"
@@ -754,7 +1274,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Temanggung</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asep', 'Palembang')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asep" data-artist-city="Palembang" onclick="openArtistProfile('Asep', 'Palembang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/222222/ffffff?text=Asep" alt="Asep"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -763,7 +1283,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Palembang</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepo', 'Jakarta')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepo" data-artist-city="Jakarta" onclick="openArtistProfile('Asepo', 'Jakarta')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/2c2c2c/ffffff?text=Asepo" alt="Asepo"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -772,7 +1292,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Jakarta</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepi', 'Padang')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepi" data-artist-city="Padang" onclick="openArtistProfile('Asepi', 'Padang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/333333/ffffff?text=Asepi" alt="Asepi"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -781,7 +1301,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Padang</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepu', 'Jakarta')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepu" data-artist-city="Jakarta" onclick="openArtistProfile('Asepu', 'Jakarta')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/3d3d3d/ffffff?text=Asepu" alt="Asepu"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -790,7 +1310,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Jakarta</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepa', 'Kebumen')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepa" data-artist-city="Kebumen" onclick="openArtistProfile('Asepa', 'Kebumen')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/444444/ffffff?text=Asepa" alt="Asepa"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -799,7 +1319,7 @@
                         <p class="text-xs text-gray-500 font-roboto">Kebumen</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepit', 'Lumajang')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepit" data-artist-city="Lumajang" onclick="openArtistProfile('Asepit', 'Lumajang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/4d4d4d/ffffff?text=Asepit" alt="Asepit"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -808,13 +1328,18 @@
                         <p class="text-xs text-gray-500 font-roboto">Lumajang</p>
                     </div>
 
-                    <div class="group cursor-pointer" onclick="openArtistProfile('Asepon', 'Pekalongan')">
+                    <div class="artist-card group cursor-pointer" data-artist-name="Asepon" data-artist-city="Pekalongan" onclick="openArtistProfile('Asepon', 'Pekalongan')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
                             <img src="https://placehold.co/500x500/555555/ffffff?text=Asepon" alt="Asepon"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepon</h4>
                         <p class="text-xs text-gray-500 font-roboto">Pekalongan</p>
+                    </div>
+
+                    <!-- Empty State for Artist Search -->
+                    <div id="artist-no-results" class="hidden col-span-2 md:col-span-4 text-center py-12">
+                        <p class="text-gray-400 text-sm font-roboto">No artist found matching your search.</p>
                     </div>
                 </div>
             </div>
@@ -885,66 +1410,120 @@
 
             <!-- TAB CONTENT 2: ARTWORK GALLERY -->
             <div id="artist-tab-content-artwork" class="hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Oil on canvas', '60x60cm')"
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                    <!-- Artwork Item 1 -->
+                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
                         class="group cursor-pointer">
-                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden">
+                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
                             <img src="https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila" alt="Artwork Leila"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
                         </div>
-                        <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline">
+                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
                             Mereka Ulang Ungkapan Indah Leila
                         </h4>
+                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
                     </div>
 
-                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Oil on canvas', '60x60cm')"
+                    <!-- Artwork Item 2 -->
+                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
                         class="group cursor-pointer">
-                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden">
+                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
                             <img src="https://placehold.co/600x800/ccc/333?text=Artwork+Effendi" alt="Artwork Effendi"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
                         </div>
-                        <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline">
+                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
                             Mereka Ulang Ungkapan Indah Effendi
                         </h4>
+                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
+                    </div>
+
+                    <!-- Artwork Item 3 -->
+                    <div onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
+                        class="group cursor-pointer">
+                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
+                            <img src="https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa" alt="Figurasi Kuasa"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
+                        </div>
+                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
+                            Figurasi Kuasa Sosial #03
+                        </h4>
+                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Mixed media &bull; 75x90cm</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- VIEW 3C: ARTWORK DETAIL PAGE -->
+        <!-- VIEW 3C: ARTWORK DETAIL PAGE (WITH DIRECT OFFERING ACQUISITION PANEL) -->
         <section id="view-artist-artwork-detail" class="view-page px-6 md:px-12 pt-24 pb-10 max-w-7xl mx-auto">
-            <div class="mb-6">
+            <div class="mb-6 flex items-center justify-between">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK TO ARTIST PROFILE</span>
                 </button>
+                <div class="flex items-center space-x-2 text-xs font-montserrat">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-gray-600 font-medium tracking-wider uppercase text-[11px]">Available for Direct Offering</span>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
-                <div class="md:col-span-7 aspect-[4/3] bg-[#d9d9d9] overflow-hidden">
-                    <img src="https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View" alt="Full Artwork"
-                        class="w-full h-full object-cover">
+                <div class="md:col-span-7 aspect-[4/3] bg-[#d9d9d9] overflow-hidden shadow-sm relative group cursor-zoom-in"
+                    onclick="openLightbox(document.getElementById('artwork-detail-image').src, document.getElementById('artwork-title').innerText)">
+                    <img id="artwork-detail-image" src="https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View" alt="Full Artwork"
+                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
+                    <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-montserrat uppercase px-2.5 py-1 tracking-wider flex items-center space-x-1">
+                        <svg class="w-3 h-3 stroke-current inline" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                        <span>Click to Enlarge</span>
+                    </div>
                 </div>
 
                 <div class="md:col-span-5 space-y-4">
-                    <h2 id="artwork-artist-name" class="text-xl md:text-2xl font-bold font-montserrat text-black">
-                        Mustafa Alatas</h2>
+                    <div>
+                        <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-1">NOTISSE ARTIST COLLABORATION</span>
+                        <h2 id="artwork-artist-name" class="text-xl md:text-2xl font-bold font-montserrat text-black">
+                            Mustafa Alatas</h2>
+                    </div>
+
                     <h3 id="artwork-title" class="text-base md:text-lg italic font-roboto text-black">Mereka Ulang
                         Ungkapan Indah Leila</h3>
 
-                    <div class="text-xs md:text-sm text-gray-700 font-roboto space-y-1">
-                        <p id="artwork-medium">Oil on canvas</p>
-                        <p id="artwork-dimensions">60x60cm</p>
+                    <div class="text-xs md:text-sm text-gray-700 font-roboto space-y-1 py-1 border-y border-gray-100">
+                        <p id="artwork-medium">Medium: Oil on canvas</p>
+                        <p id="artwork-dimensions">Dimensions: 60x60cm</p>
                     </div>
 
-                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto pt-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                        voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
-                        non proident, sunt in culpa qui officia deserunt mollit anim id est laborum...
+                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto pt-2">
+                        Karya seni asli (original physical artwork) yang diciptakan eksklusif oleh seniman. Setiap karya disertai dengan sertifikat autentisitas bertanda tangan kuratorial Notisse.
                     </p>
+
+                    <!-- DIRECT OFFERING ACQUISITION PANEL -->
+                    <div class="pt-6 border-t border-gray-200 space-y-3.5">
+                        <div class="p-3 bg-neutral-50 border border-gray-200 text-xs font-roboto text-gray-600 space-y-1">
+                            <div class="flex items-center justify-between font-montserrat">
+                                <span class="font-semibold uppercase tracking-wider text-black text-[11px]">Metode Pembelian:</span>
+                                <span class="text-emerald-700 font-bold uppercase tracking-wider text-[11px]">Offering / Inquiry</span>
+                            </div>
+                            <p class="text-[11px] text-gray-500 leading-relaxed pt-1">
+                                Pembelian artwork berbeda dengan produk pakaian di cart. Sistem offering akan menghubungkan penawaran Anda langsung ke seniman dan kurator Notisse.
+                            </p>
+                        </div>
+
+                        <button onclick="triggerArtworkOfferingCurrent()"
+                            class="w-full bg-black text-white hover:bg-neutral-800 transition-all py-3.5 px-6 font-montserrat text-xs md:text-sm font-bold tracking-[0.2em] uppercase cursor-pointer flex items-center justify-center space-x-2 shadow-md hover:shadow-xl">
+                            <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m-6-6h12"/>
+                            </svg>
+                            <span>OFFERING / BUY ARTWORK</span>
+                        </button>
+
+                        <p class="text-[11px] text-gray-400 font-roboto text-center leading-relaxed">
+                            Penawaran yang Anda submit akan dicatat ke sistem Notisse dan diverifikasi langsung oleh tim kurator dan seniman.
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1005,10 +1584,20 @@
                     </p>
                 </div>
 
-                <!-- Right Column: Full Featured Image -->
-                <div class="md:col-span-6 aspect-[4/5] bg-[#d9d9d9] overflow-hidden">
-                    <img src="https://placehold.co/800x1000/d9d9d9/555555?text=Featured+Editorial+Image"
-                        alt="Editorial Feature" class="w-full h-full object-cover">
+                <!-- Right Column: Full Featured Editorial Video -->
+                <div class="md:col-span-6 aspect-[4/5] bg-black overflow-hidden relative group shadow-lg">
+                    <video id="editorial-video-player"
+                        class="w-full h-full object-cover"
+                        autoplay loop muted playsinline controls
+                        poster="{{ asset('home.jpg') }}">
+                        <source src="{{ asset('video/editorial.mp4') }}" type="video/mp4">
+                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <!-- Editorial Video Watermark Badge -->
+                    <div class="absolute top-4 right-4 pointer-events-none bg-black/60 backdrop-blur-md text-white text-[10px] font-montserrat uppercase px-2.5 py-1 tracking-widest border border-white/20">
+                        Editorial Video
+                    </div>
                 </div>
             </div>
         </section>
@@ -1108,43 +1697,18 @@
 
         <!-- VIEW 6: ABOUT BRAND PAGE -->
         <section id="view-about"
-            class="view-page min-h-[calc(100vh-80px)] flex flex-col px-6 md:px-12 pt-28 pb-12 relative">
-            <div class="mb-6 absolute top-28 left-6 md:left-12">
-                <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
-                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK</span>
-                </button>
-            </div>
-            <div class="flex-grow flex flex-col justify-center items-center">
-            <div class="max-w-3xl mx-auto text-center space-y-4 md:space-y-6">
+            class="view-page min-h-[calc(100vh-80px)] flex flex-col justify-center items-start px-6 sm:px-12 md:px-16 lg:px-20 xl:px-24 py-16 md:py-24 pb-28 md:pb-32 max-w-full">
+            <div class="w-full text-left space-y-7 sm:space-y-9 md:space-y-12 lg:space-y-15">
                 <p
-                    class="text-black text-xl sm:text-2xl md:text-3xl font-light leading-relaxed tracking-wide font-roboto">
-                    Notisse is an alternative movement in art exhibition
+                    class="text-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-[5.5vw] font-bold leading-[1.18] sm:leading-[1.18] tracking-tight font-roboto">
+                    NOTISSE IS AN ALTERNATIVE MOVEMENT IN ART EXHIBITION.WOVEN INTO THE FABRIC OF EVERYDAY LIFE.SO ART BECOMES PART OF DAILY ACTIVITY NOT A SEPARATE OCCASION.
                 </p>
-                <p
-                    class="text-black text-xl sm:text-2xl md:text-3xl font-light leading-relaxed tracking-wide font-roboto">
-                    woven into the fabric of everyday life
-                </p>
-                <p
-                    class="text-black text-xl sm:text-2xl md:text-3xl font-light leading-relaxed tracking-wide font-roboto">
-                    so art becomes part of daily activity not a separate occasion.
-                </p>
-            </div>
             </div>
         </section>
 
         <!-- VIEW 6B: CONTACT PAGE -->
         <section id="view-contact"
-            class="view-page px-8 sm:px-16 md:px-24 pt-28 pb-16 md:pb-24 max-w-5xl mx-auto min-h-[calc(100vh-80px)] flex flex-col relative">
-            <div class="mb-6 absolute top-28 left-8 sm:left-16 md:left-24">
-                <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
-                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK</span>
-                </button>
-            </div>
-            <div class="flex-grow flex flex-col justify-center">
+            class="view-page px-8 sm:px-16 md:px-24 py-16 md:py-24 max-w-5xl mx-auto min-h-[calc(100vh-80px)] flex flex-col justify-center">
             <div class="space-y-12 text-left font-roboto">
                 <!-- Workshop Section -->
                 <div class="space-y-2">
@@ -1169,19 +1733,11 @@
                         +62 856 0771 4704
                     </p>
                 </div>
-                </div>
-            </div>
             </div>
         </section>
+
         <!-- VIEW 7: LOGIN PAGE -->
-        <section id="view-login" class="view-page px-6 pt-28 pb-12 max-w-md mx-auto relative">
-            <div class="mb-6 absolute top-28 left-6 md:-left-12">
-                <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
-                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK</span>
-                </button>
-            </div>
+        <section id="view-login" class="view-page px-6 py-12 max-w-md mx-auto">
             <div class="text-center mb-8">
                 <div class="flex justify-center mb-4">
                     <img src="{{ asset('logowebkecil.png') }}" alt="Notisse Logo" class="h-12 w-auto object-contain">
@@ -1231,14 +1787,7 @@
         </section>
 
         <!-- VIEW 8: REGISTER / DAFTAR AKUN PAGE -->
-        <section id="view-register" class="view-page px-6 pt-28 pb-12 max-w-md mx-auto relative">
-            <div class="mb-6 absolute top-28 left-6 md:-left-12">
-                <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
-                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK</span>
-                </button>
-            </div>
+        <section id="view-register" class="view-page px-6 py-12 max-w-md mx-auto">
             <div class="bg-white border border-black rounded-2xl p-8 sm:p-10 shadow-2xl space-y-6">
                 <!-- Signature N/Notisse Logo Top Center -->
                 <div class="flex justify-center">
@@ -1290,18 +1839,11 @@
         </section>
 
         <!-- VIEW 9: LOGGED-IN ACCOUNT DASHBOARD -->
-        <section id="view-account-profile" class="view-page px-6 md:px-12 pt-28 pb-12 max-w-5xl mx-auto space-y-8">
-            <div class="mb-4">
-                <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
-                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK</span>
-                </button>
-            </div>
+        <section id="view-account-profile" class="view-page px-6 md:px-12 py-12 max-w-5xl mx-auto space-y-8">
             <div class="flex justify-between items-center border-b border-gray-200 pb-4">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-bold font-montserrat uppercase text-black">Akun Saya</h1>
-                    <p id="user-display-email" class="text-xs text-gray-500 font-roboto mt-1">{{ auth()->check() ? auth()->user()->email : 'user@notisse.com' }}</p>
+                    <p id="user-display-email" class="text-xs text-gray-500 font-roboto mt-1">user@notisse.com</p>
                 </div>
                 <button onclick="handleLogout()"
                     class="text-xs font-semibold uppercase tracking-wider text-red-600 hover:underline cursor-pointer font-montserrat">
@@ -1312,8 +1854,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Order History Summary -->
                 <div class="md:col-span-2 space-y-4">
-                    <h3 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Riwayat Pesanan
-                    </h3>
+                    <h3 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Riwayat Pesanan</h3>
                     <div id="order-history-container" class="space-y-4">
                         <div class="border border-gray-200 rounded-lg p-6 space-y-4 bg-gray-50 text-center">
                             <p class="text-gray-500 font-roboto text-sm">Memuat pesanan...</p>
@@ -1327,10 +1868,12 @@
                         Pengiriman</h3>
                     <div
                         class="border border-gray-200 rounded-lg p-6 text-xs font-roboto space-y-2 leading-relaxed bg-white">
-                        <p class="font-bold text-black text-sm font-montserrat" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</p>
-                        <p class="text-gray-600" id="user-display-address">{{ auth()->check() && auth()->user()->address ? auth()->user()->address : 'Belum ada alamat pengiriman.' }}</p>
+                        <p class="font-bold text-black text-sm font-montserrat" id="user-display-name">John Doe</p>
+                        <p class="text-gray-600">Jl. Dago Asri No. 12, Coblong</p>
+                        <p class="text-gray-600">Kota Bandung, Jawa Barat 40135</p>
+                        <p class="text-gray-600">Indonesia</p>
                         <div class="pt-2">
-                            <button onclick="showEditProfile()"
+                            <button onclick="showToast('Fitur ubah alamat segera hadir.')"
                                 class="underline text-black font-semibold cursor-pointer">
                                 Edit Alamat
                             </button>
@@ -1340,118 +1883,188 @@
             </div>
         </section>
 
-        <!-- VIEW 10: EDIT PROFILE / ALAMAT -->
-        <section id="view-edit-profile" class="view-page px-6 md:px-12 pt-28 pb-12 max-w-xl mx-auto space-y-8">
-            <div class="mb-4 flex items-center justify-between">
-                <button onclick="goBack()" class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
-                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK</span>
-                </button>
-                <h1 class="text-xl font-bold font-montserrat uppercase text-black">Edit Profil</h1>
-            </div>
-
-            <div id="edit-profile-error" class="hidden bg-red-100 text-red-700 p-3 rounded text-sm border border-red-200"></div>
-            <div id="edit-profile-success" class="hidden bg-green-100 text-green-700 p-3 rounded text-sm border border-green-200"></div>
-
-            <form onsubmit="handleEditProfileSubmit(event)" class="space-y-6">
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nama Lengkap</label>
-                    <input type="text" id="edit-name" required class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">No. HP / Whatsapp</label>
-                    <input type="text" id="edit-phone" required class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto">
-                </div>
-                
-                <div class="relative">
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Cari Kecamatan / Kode Pos</label>
-                    <input type="text" id="edit-area-search" class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto" placeholder="Ketik nama kecamatan..." autocomplete="off">
-                    <ul id="edit-area-results" class="absolute z-10 w-full bg-white border border-gray-300 shadow-lg rounded mt-1 hidden max-h-48 overflow-y-auto"></ul>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Alamat Lengkap</label>
-                    <textarea id="edit-address" required class="w-full border border-gray-300 rounded p-3 text-sm h-24 focus:outline-none focus:border-black font-roboto resize-none" placeholder="Nama Jalan, RT/RW, Patokan..."></textarea>
-                </div>
-
-                <input type="hidden" id="edit-area-id" required>
-
-                <div class="pt-4">
-                    <button type="submit" id="edit-profile-btn" class="w-full bg-black text-white font-bold font-montserrat uppercase py-4 rounded hover:bg-gray-800 transition-colors cursor-pointer">
-                        Simpan Perubahan
-                    </button>
-                </div>
-            </form>
-        </section>
-
     </main>
 
     <!-- RUANG KOSONG AGAR BISA DI-SCROLL KE BAWAH -->
     <div class="h-[150vh] w-full bg-white"></div>
 
     <!-- MARQUEE TEXT GLOBAL -->
-    <div
-        class="fixed bottom-0 left-0 z-[100] w-full border-t border-black overflow-hidden flex whitespace-nowrap py-2 md:py-2.5 bg-black shadow-lg">
+    <div id="global-marquee"
+        class="fixed bottom-0 left-0 z-30 w-full border-t border-black overflow-hidden flex whitespace-nowrap py-2 md:py-2.5 bg-black shadow-lg">
         <div
-            class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.25em] text-white">
-            NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span>&nbsp;
+            class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
+            NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
         <div
-            class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.25em] text-white">
-            NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span>&nbsp;
+            class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
+            NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
     </div>
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast-notification"
-        class="fixed top-24 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-full shadow-lg z-[60] flex items-center space-x-3 transition-all duration-300 opacity-0 translate-y-4 hidden font-montserrat text-sm tracking-wide">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <span id="toast-message" class="font-medium">Notification message</span>
-    </div>
-
     <!-- JAVASCRIPT CONTROLLER -->
     <script>
+        // LIVE DATABASE & BRAND ASSETS (NO PLACEHOLDERS)
+        const productsData = [
+            @if(isset($products) && count($products) > 0)
+                @foreach($products as $prod)
+                {
+                    id: {{ $prod->id }},
+                    name: "{{ addslashes($prod->name) }}",
+                    price: "Rp {{ number_format($prod->price, 2, ',', '.') }}",
+                    image: "{{ asset($prod->image) }}",
+                    artist: "{{ addslashes($prod->description ?? 'Notisse Collection') }}"
+                },
+                @endforeach
+            @endif
+            { id: 101, name: "Muscle Tank V2 - White", price: "Rp 180.000,00", image: "{{ asset('footage-baju.jpg') }}", artist: "Asep" },
+            { id: 102, name: "Accessorized Slim Tee V2 - Black", price: "Rp 220.000,00", image: "{{ asset('footagebaju2.jpg') }}", artist: "Mustafa Alatas" },
+            { id: 103, name: "Rugged Long Sleeve Tee V2 - Gray", price: "Rp 280.000,00", image: "{{ asset('footage-baju-belakang.jpg') }}", artist: "Asepi" },
+            { id: 104, name: "Sweatshirt - Gray", price: "Rp 350.000,00", image: "{{ asset('footage-baju.jpg') }}", artist: "Asepu" },
+            { id: 105, name: "Pleated Denim V1", price: "Rp 450.000,00", image: "{{ asset('footagebaju2.jpg') }}", artist: "Asepa" }
+        ];
+
         let currentSelectedSize = "M";
         let currentSlideIndex = 0;
         let slideInterval = null;
 
-        // Interactive Logo and Menus on Scroll
-        window.addEventListener('scroll', () => {
-            const logo = document.getElementById('header-logo');
-            const menuLeft = document.getElementById('menu-trigger');
-            const cartTrigger = document.getElementById('cart-trigger');
+        let lastScrollY = window.scrollY;
+        const scrollDelta = 8;
 
-            if (window.scrollY > 50) {
-                if (logo) logo.src = "{{ asset('logowebkecil.png') }}";
-                if (menuLeft) {
-                    menuLeft.classList.remove('opacity-0', 'pointer-events-none');
-                    menuLeft.classList.add('opacity-100', 'pointer-events-auto');
-                }
-                if (cartTrigger) {
-                    cartTrigger.classList.add('is-scrolled');
+        // A24-Inspired Header (Hide on Scroll Down, Reveal on Scroll Up & Morph Logo)
+        function updateHeaderState() {
+            const activePage = document.querySelector('.view-page.active-view');
+            const isShopPage = !activePage || activePage.id === 'view-shop';
+            const mainHeader = document.getElementById('main-header');
+            const logoContainer = document.getElementById('header-logo-container');
+            const menuLeft = document.getElementById('menu-trigger');
+            const menuRight = document.getElementById('header-right-menu');
+            const currentScrollY = window.scrollY;
+            const diff = currentScrollY - lastScrollY;
+
+            if (!mainHeader) return;
+
+            // Check if any modal/overlay is currently opened
+            const overlayBackdrop = document.getElementById('overlay-menu-backdrop');
+            const overlaySearch = document.getElementById('overlay-search');
+            const overlayCart = document.getElementById('overlay-cart');
+            const modalOffering = document.getElementById('modal-artwork-offering');
+            const modalLightbox = document.getElementById('modal-image-lightbox');
+            const isOverlayOpen = (overlayBackdrop && !overlayBackdrop.classList.contains('hidden')) ||
+                                  (overlaySearch && !overlaySearch.classList.contains('-translate-y-full')) ||
+                                  (overlayCart && !overlayCart.classList.contains('hidden')) ||
+                                  (modalOffering && !modalOffering.classList.contains('hidden')) ||
+                                  (modalLightbox && !modalLightbox.classList.contains('hidden'));
+
+            if (currentScrollY <= 40) {
+                // At the very top: ALWAYS VISIBLE
+                mainHeader.style.transform = 'translateY(0)';
+                mainHeader.classList.remove('header-hidden');
+                mainHeader.classList.add('header-visible');
+
+                if (isShopPage) {
+                    // Shop Hero State: transparent, hidden controls, large wordmark
+                    mainHeader.classList.remove('bg-white/90', 'backdrop-blur-md', 'border-b', 'border-black/[0.08]', 'shadow-[0_2px_12px_rgba(0,0,0,0.03)]');
+                    mainHeader.classList.add('bg-transparent', 'border-transparent');
+
+                    if (menuLeft) {
+                        menuLeft.classList.remove('opacity-100', 'pointer-events-auto', 'translate-x-0');
+                        menuLeft.classList.add('opacity-0', 'pointer-events-none', '-translate-x-3');
+                    }
+                    if (menuRight) {
+                        menuRight.classList.remove('opacity-100', 'pointer-events-auto', 'translate-x-0');
+                        menuRight.classList.add('opacity-0', 'pointer-events-none', 'translate-x-3');
+                    }
+                    if (logoContainer) {
+                        logoContainer.classList.remove('logo-state-small');
+                        logoContainer.classList.add('logo-state-large');
+                    }
+                } else {
+                    // Other pages top state: white/blur, controls visible, large wordmark
+                    mainHeader.classList.add('bg-white/90', 'backdrop-blur-md', 'border-b', 'border-black/[0.08]', 'shadow-[0_2px_12px_rgba(0,0,0,0.03)]');
+                    mainHeader.classList.remove('bg-transparent', 'border-transparent');
+
+                    if (menuLeft) {
+                        menuLeft.classList.remove('opacity-0', 'pointer-events-none', '-translate-x-3');
+                        menuLeft.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
+                    }
+                    if (menuRight) {
+                        menuRight.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-3');
+                        menuRight.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
+                    }
+                    if (logoContainer) {
+                        logoContainer.classList.remove('logo-state-small');
+                        logoContainer.classList.add('logo-state-large');
+                    }
                 }
             } else {
-                if (logo) logo.src = "{{ asset('logo.png') }}";
+                // When scrolled down beyond top (> 40px)
+                // Set sticky style (white/blur, controls visible, small logo)
+                mainHeader.classList.add('bg-white/90', 'backdrop-blur-md', 'border-b', 'border-black/[0.08]', 'shadow-[0_2px_12px_rgba(0,0,0,0.03)]');
+                mainHeader.classList.remove('bg-transparent', 'border-transparent');
+
                 if (menuLeft) {
-                    menuLeft.classList.remove('opacity-100', 'pointer-events-auto');
-                    menuLeft.classList.add('opacity-0', 'pointer-events-none');
+                    menuLeft.classList.remove('opacity-0', 'pointer-events-none', '-translate-x-3');
+                    menuLeft.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
                 }
-                if (cartTrigger) {
-                    cartTrigger.classList.remove('is-scrolled');
+                if (menuRight) {
+                    menuRight.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-3');
+                    menuRight.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
+                }
+                if (logoContainer) {
+                    logoContainer.classList.add('logo-state-small');
+                    logoContainer.classList.remove('logo-state-large');
+                }
+
+                // SMART HIDE ON SCROLL DOWN, REVEAL ON SCROLL UP
+                if (!isOverlayOpen) {
+                    if (diff > scrollDelta && currentScrollY > 70) {
+                        // Scrolling DOWN -> HIDE HEADER
+                        mainHeader.style.transform = 'translateY(-100%)';
+                        mainHeader.classList.add('header-hidden');
+                        mainHeader.classList.remove('header-visible');
+                    } else if (diff < -scrollDelta) {
+                        // Scrolling UP -> REVEAL HEADER
+                        mainHeader.style.transform = 'translateY(0)';
+                        mainHeader.classList.remove('header-hidden');
+                        mainHeader.classList.add('header-visible');
+                    }
                 }
             }
-        });
+
+            // EXACT A24 MORPHING CART BUTTON (Triggers the moving connecting line animation)
+            const cartTrigger = document.getElementById('cart-trigger');
+            if (cartTrigger) {
+                if (isOverlayOpen || (isShopPage && currentScrollY <= 40)) {
+                    cartTrigger.classList.add('opacity-0', 'pointer-events-none');
+                } else {
+                    cartTrigger.classList.remove('opacity-0', 'pointer-events-none');
+                    // In A24, cart is in minimal (vertical) state ONLY when header is hidden on scroll down.
+                    // When scrolling up and header reappears (not header-hidden), cart returns to horizontal!
+                    const isHeaderHidden = mainHeader.classList.contains('header-hidden');
+                    if (isHeaderHidden) {
+                        cartTrigger.classList.add('state-minimal');
+                    } else {
+                        cartTrigger.classList.remove('state-minimal');
+                    }
+                }
+            }
+
+            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+        }
+
+        window.addEventListener('scroll', updateHeaderState, { passive: true });
+        updateHeaderState();
 
         let navigationHistory = ['view-shop'];
-        let isAuthenticated = localStorage.getItem('notisse_auth') === 'true';
-        let loggedInUser = @json(auth()->user());
+        let isAuthenticated = false;
+        let loggedInUser = {
+            name: "John Doe",
+            email: "john.doe@notisse.com"
+        };
 
-        let productsData = @json($products);
-        let currentProduct = null;
-
-        let cartState = [];
+        let cartState = [
+            { id: 1, name: "RAJA DIAMUK MASSA TEE V1", size: "M", unitPrice: 250000, qty: 1 },
+            { id: 2, name: "RAJA DIAMUK MASSA TEE V1", size: "L", unitPrice: 250000, qty: 1 }
+        ];
 
         const overlayMenuBackdrop = document.getElementById('overlay-menu-backdrop');
         const overlayMenuSidebar = document.getElementById('overlay-menu-sidebar');
@@ -1478,8 +2091,15 @@
             const targetPage = document.getElementById(pageId);
             if (targetPage) targetPage.classList.add('active-view');
             closeSizeDropdown();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            sessionStorage.setItem('current_page', pageId);
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            lastScrollY = 0;
+            const mainHeader = document.getElementById('main-header');
+            if (mainHeader) {
+                mainHeader.style.transform = 'translateY(0)';
+                mainHeader.classList.remove('header-hidden');
+                mainHeader.classList.add('header-visible');
+            }
+            updateHeaderState();
         }
 
         function goBack() {
@@ -1498,11 +2118,11 @@
 
         /* ACCOUNT FUNCTIONALITIES */
         function handleAccountButtonClick() {
-            if (loggedInUser) {
+            if (isAuthenticated) {
                 showPage('view-account-profile');
                 fetchOrderHistory();
             } else {
-                window.location.href = '/auth/checkout';
+                showPage('view-login');
             }
         }
 
@@ -1512,6 +2132,7 @@
                 const orders = await response.json();
                 
                 const container = document.getElementById('order-history-container');
+                if (!container) return;
                 container.innerHTML = '';
                 
                 if (orders.length === 0) {
@@ -1525,32 +2146,32 @@
                 
                 orders.forEach(order => {
                     let itemsHtml = '';
-                    order.items.forEach(item => {
-                        itemsHtml += `
-                        <div class="flex items-center space-x-4 mt-4">
-                            <div class="w-12 h-16 bg-gray-300 flex-shrink-0">
-                                <img src="https://placehold.co/200x250/d9d9d9/555555?text=Tee" class="w-full h-full object-cover">
+                    if (order.items && order.items.length > 0) {
+                        order.items.forEach(item => {
+                            itemsHtml += `
+                            <div class="flex items-center space-x-4 mt-4">
+                                <div class="w-12 h-16 bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
+                                    <img src="{{ asset('footage-baju.jpg') }}" alt="${item.product_name}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="text-xs font-roboto">
+                                    <p class="font-bold text-black font-montserrat uppercase">${item.product_name}</p>
+                                    <p class="text-gray-500">Ukuran: ${item.size} | Jumlah: ${item.quantity}</p>
+                                    <p class="font-semibold text-black mt-1">Rp ${parseInt(item.price).toLocaleString('id-ID')},00</p>
+                                </div>
                             </div>
-                            <div class="text-xs font-roboto">
-                                <p class="font-bold text-black font-montserrat">${item.product_name}</p>
-                                <p class="text-gray-500">Ukuran: ${item.size} | Jumlah: ${item.quantity}</p>
-                                <p class="font-semibold text-black mt-1">Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
-                            </div>
-                        </div>
-                        `;
-                    });
+                            `;
+                        });
+                    }
 
                     let statusClass = "bg-black text-white";
-                    let actionButtons = '';
-                    if (order.status.toLowerCase() === 'paid') {
+                    let cancelButton = '';
+                    const st = (order.status || '').toLowerCase();
+                    if (st === 'paid') {
                         statusClass = "bg-green-600 text-white";
-                    } else if (order.status.toLowerCase() === 'pending') {
+                    } else if (st === 'pending') {
                         statusClass = "bg-yellow-500 text-black";
-                        actionButtons = `
-                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-montserrat mt-2 w-full">Bayar Sekarang</button>
-                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-montserrat mt-2 w-full text-center">Batalkan</button>
-                        `;
-                    } else if (order.status.toLowerCase() === 'cancelled') {
+                        cancelButton = `<button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-montserrat mt-2 cursor-pointer">Batalkan</button>`;
+                    } else if (st === 'cancelled') {
                         statusClass = "bg-red-600 text-white";
                     }
 
@@ -1563,9 +2184,7 @@
                             </div>
                             <div class="flex flex-col items-end">
                                 <span class="px-2.5 py-1 ${statusClass} font-bold rounded text-[10px] tracking-wider uppercase font-montserrat">${order.status}</span>
-                                <div class="mt-2 w-full flex flex-col gap-1">
-                                    ${actionButtons}
-                                </div>
+                                ${cancelButton}
                             </div>
                         </div>
                         ${itemsHtml}
@@ -1573,7 +2192,7 @@
                     `;
                 });
             } catch(e) {
-                console.error(e);
+                console.error("Gagal memuat pesanan:", e);
             }
         }
 
@@ -1586,59 +2205,12 @@
                 });
                 if (response.ok) {
                     showToast("Pesanan berhasil dibatalkan.");
-                    setTimeout(() => window.location.reload(), 1000);
+                    fetchOrderHistory();
                 } else {
                     showToast("Gagal membatalkan pesanan.");
                 }
             } catch (e) {
                 console.error(e);
-                showToast("Terjadi kesalahan sistem.");
-            }
-        }
-
-        async function payOrder(id) {
-            try {
-                const response = await fetch(`/my-orders/${id}/pay`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                    }
-                });
-                const data = await response.json();
-                
-                if (data.snap_token) {
-                    snap.pay(data.snap_token, {
-                        onSuccess: async function(result) {
-                            showToast("Payment success!");
-                            await fetch('/midtrans/local-success', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ order_id: result.order_id })
-                            });
-                            fetchOrderHistory();
-                        },
-                        onPending: async function(result) {
-                            showToast("Waiting your payment...");
-                            await fetch('/midtrans/local-success', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ order_id: result.order_id })
-                            });
-                            fetchOrderHistory();
-                            showToast("Payment success (Simulated)!");
-                        },
-                        onError: function(result) {
-                            showToast("Payment failed!");
-                        },
-                        onClose: function() {
-                            showToast('You closed the popup without finishing the payment');
-                        }
-                    });
-                } else {
-                    showToast(data.error || "Gagal memproses pembayaran");
-                }
-            } catch (err) {
-                console.error(err);
                 showToast("Terjadi kesalahan sistem.");
             }
         }
@@ -1650,9 +2222,6 @@
             localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
             document.getElementById('user-display-email').innerText = loggedInUser.email;
             document.getElementById('user-display-name').innerText = loggedInUser.name;
-            if (document.getElementById('user-display-address')) {
-                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'Belum ada alamat pengiriman.';
-            }
             showToast('Berhasil Login!');
             showPage('view-account-profile');
             fetchOrderHistory();
@@ -1663,27 +2232,17 @@
             isAuthenticated = true;
             localStorage.setItem('notisse_auth', 'true');
             localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
-            document.getElementById('user-display-email').innerText = loggedInUser.email;
-            document.getElementById('user-display-name').innerText = loggedInUser.name;
-            if (document.getElementById('user-display-address')) {
-                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'Belum ada alamat pengiriman.';
-            }
             showToast('Akun Berhasil Dibuat!');
             showPage('view-account-profile');
             fetchOrderHistory();
         }
 
-        async function handleLogout() {
-            try {
-                await fetch('/logout', { method: 'POST' });
-            } catch (e) {
-                console.error(e);
-            }
+        function handleLogout() {
             isAuthenticated = false;
-            loggedInUser = null;
             localStorage.removeItem('notisse_auth');
             localStorage.removeItem('notisse_user');
-            window.location.reload();
+            showToast('Anda telah logout.');
+            showPage('view-shop');
         }
 
         function openMenu() {
@@ -1708,61 +2267,93 @@
         menuClose.addEventListener('click', closeMenu);
 
         /* LOGIKA REAL-TIME / INSTANT LIVE SEARCH */
+        /* LOGIKA REAL-TIME / INSTANT LIVE SEARCH (FULL-SCREEN EDITORIAL) */
         function openSearch() {
             overlaySearch.classList.remove('-translate-y-full');
+            document.body.style.overflow = 'hidden';
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
                 setTimeout(() => searchInput.focus(), 150);
+                handleLiveSearch(searchInput.value || "");
             }
         }
 
         function closeSearch() {
             overlaySearch.classList.add('-translate-y-full');
+            document.body.style.overflow = 'auto';
+        }
+
+        function applySearchQuery(query) {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.value = query;
+                handleLiveSearch(query);
+            }
         }
 
         searchTrigger.addEventListener('click', openSearch);
         searchClose.addEventListener('click', closeSearch);
+
+        // Close on ESC key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSearch();
+                closeMenu();
+                closeCart();
+                closeArtworkOfferingModal();
+                closeLightbox();
+            }
+        });
 
         function handleLiveSearch(query) {
             const gridContainer = document.getElementById('search-results-grid');
             const metaContainer = document.getElementById('search-results-meta');
             const countSpan = document.getElementById('search-results-count');
 
-            const cleanQuery = query.trim().toLowerCase();
+            const cleanQuery = (query || "").trim().toLowerCase();
 
-            if (cleanQuery === "") {
-                gridContainer.innerHTML = "";
-                metaContainer.classList.add('hidden');
-                return;
+            // Filter produk berdasarkan nama produk atau artis/deskripsi
+            const filteredProducts = cleanQuery === "" 
+                ? productsData 
+                : productsData.filter(item => {
+                    return item.name.toLowerCase().includes(cleanQuery) || 
+                           (item.artist && item.artist.toLowerCase().includes(cleanQuery));
+                });
+
+            if (countSpan) countSpan.innerText = filteredProducts.length;
+            if (metaContainer) {
+                metaContainer.classList.remove('hidden');
+                metaContainer.innerHTML = cleanQuery === "" 
+                    ? `ALL COLLECTION PRODUCTS (<span id="search-results-count">${filteredProducts.length}</span>)` 
+                    : `SEARCH RESULTS (<span id="search-results-count">${filteredProducts.length}</span>)`;
             }
-
-            // Filter produk berdasarkan nama produk atau nama seniman
-            const filteredProducts = productsData.filter(item => {
-                return item.name.toLowerCase().includes(cleanQuery) || item.artist.toLowerCase().includes(cleanQuery);
-            });
-
-            countSpan.innerText = filteredProducts.length;
-            metaContainer.classList.remove('hidden');
 
             if (filteredProducts.length === 0) {
                 gridContainer.innerHTML = `
-                    <div class="col-span-full text-center py-12 text-gray-400 font-roboto text-sm">
-                        No products found matching "<span class="text-black font-semibold">${query}</span>".
+                    <div class="col-span-full text-center py-20 text-gray-400 font-roboto text-sm space-y-2">
+                        <p class="text-base text-black font-montserrat uppercase font-semibold">No products found matching "<span class="underline">${query}</span>"</p>
+                        <p class="text-xs text-gray-400 font-roboto">Try searching for keywords like "Tee", "Tank", "Shirt", or "Blazer".</p>
                     </div>
                 `;
                 return;
             }
 
-            // Render daftar produk secara instan ke grid
+            // Render daftar produk secara instan ke grid dengan gambar asli
             let html = '';
             filteredProducts.forEach(item => {
+                const escapedName = item.name.replace(/'/g, "\\'");
                 html += `
-                    <div onclick="selectSearchResult('${item.name}', '${item.price}')" class="group cursor-pointer">
-                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-2 overflow-hidden border border-gray-100">
-                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div onclick="selectSearchResult('${escapedName}', '${item.price}', '${item.image}')" 
+                        class="group cursor-pointer flex flex-col justify-between bg-white border border-gray-100 hover:border-black transition-all duration-300 p-2.5 sm:p-3 shadow-sm hover:shadow-md">
+                        <div class="relative w-full aspect-[3/4] bg-[#f4f4f4] mb-3 overflow-hidden">
+                            <img src="${item.image}" alt="${item.name}" 
+                                onerror="this.src='{{ asset('footage-baju.jpg') }}'"
+                                class="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
                         </div>
-                        <h4 class="font-montserrat font-semibold text-xs md:text-sm text-black group-hover:underline truncate">${item.name}</h4>
-                        <p class="font-montserrat text-xs text-gray-500">${item.price}</p>
+                        <div class="flex flex-col justify-between flex-grow pt-1 border-t border-gray-100">
+                            <h4 class="font-montserrat font-semibold text-xs sm:text-sm text-black group-hover:underline truncate uppercase">${item.name}</h4>
+                            <p class="font-montserrat text-xs text-gray-500 mt-1">${item.price}</p>
+                        </div>
                     </div>
                 `;
             });
@@ -1770,24 +2361,22 @@
             gridContainer.innerHTML = html;
         }
 
-        function selectSearchResult(name, price) {
+        function selectSearchResult(name, price, image) {
             closeSearch();
-            openProductDetail(name, price);
+            openProductDetail(name, price, image);
         }
 
         /* CART DRAWER LOGIC */
         function openCart() {
             renderCartItems();
             overlayCart.classList.remove('hidden');
+            const cartTrigger = document.getElementById('cart-trigger');
+            if (cartTrigger) cartTrigger.classList.add('opacity-0', 'pointer-events-none');
             setTimeout(() => {
                 overlayCart.classList.remove('opacity-0');
                 cartDrawerContent.classList.remove('translate-x-full');
             }, 10);
             document.body.style.overflow = 'hidden';
-            
-            if (loggedInUser && loggedInUser.area_id && cartState.length > 0) {
-                fetchShippingRates(loggedInUser.area_id);
-            }
         }
 
         function closeCart() {
@@ -1796,48 +2385,22 @@
             setTimeout(() => {
                 overlayCart.classList.add('hidden');
                 document.body.style.overflow = 'auto';
+                updateHeaderState();
             }, 300);
         }
 
         cartTrigger.addEventListener('click', openCart);
         cartClose.addEventListener('click', closeCart);
 
-        function openProductDetail(productId) {
-            currentProduct = productsData.find(p => p.id === productId);
-            if (!currentProduct) return;
-            
-            document.getElementById('pdetail-title').innerText = currentProduct.name;
-            const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(currentProduct.price);
-            if (document.getElementById('pdetail-price')) {
-                document.getElementById('pdetail-price').innerText = formattedPrice;
+        function openProductDetail(title, price, image) {
+            if (title) {
+                const titleEl = document.getElementById('pdetail-title');
+                if (titleEl) titleEl.innerText = title;
             }
-            
-            const sizeMenu = document.getElementById('size-dropdown-menu');
-            sizeMenu.innerHTML = '';
-            
-            if (currentProduct.stocks && currentProduct.stocks.length > 0) {
-                currentProduct.stocks.forEach(stock => {
-                    if (stock.stock > 0) {
-                        sizeMenu.innerHTML += `
-                            <div onclick="selectSize('${stock.size}')"
-                                class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-montserrat">
-                                <span>${stock.size} <span class="lowercase tracking-normal font-normal opacity-60 ml-2">(Sisa: ${stock.stock})</span></span><span class="text-xs opacity-50">${stock.size}</span>
-                            </div>
-                        `;
-                    } else {
-                        sizeMenu.innerHTML += `
-                            <div class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b border-gray-100 flex justify-between items-center font-montserrat text-gray-300 cursor-not-allowed">
-                                <span>${stock.size} (Habis)</span><span class="text-xs opacity-50">${stock.size}</span>
-                            </div>
-                        `;
-                    }
-                });
-            } else {
-                sizeMenu.innerHTML = '<div class="px-4 py-2.5 text-xs">Stock Tidak Tersedia</div>';
+            if (image) {
+                const imgEl = document.getElementById('pdetail-image');
+                if (imgEl) imgEl.src = image;
             }
-            
-            document.getElementById('selected-size-label').innerText = 'Select size: ';
-            currentSelectedSize = null;
             showPage('view-product-detail');
         }
 
@@ -1847,6 +2410,26 @@
             document.getElementById('editorial-section-title').innerText = "Articles Featuring " + name;
             switchArtistTab('editorial');
             showPage('view-artist-detail');
+        }
+
+        function filterArtists(query) {
+            const q = (query || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('#artist-collab-grid .artist-card');
+            let matchCount = 0;
+            cards.forEach(card => {
+                const name = (card.getAttribute('data-artist-name') || '').toLowerCase();
+                const city = (card.getAttribute('data-artist-city') || '').toLowerCase();
+                if (!q || name.includes(q) || city.includes(q)) {
+                    card.style.display = '';
+                    matchCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            const noResults = document.getElementById('artist-no-results');
+            if (noResults) {
+                noResults.style.display = matchCount === 0 ? 'block' : 'none';
+            }
         }
 
         function switchArtistTab(tab) {
@@ -1868,11 +2451,218 @@
             }
         }
 
-        function openArtistArtworkDetail(title, medium, dimensions) {
-            if (title) document.getElementById('artwork-title').innerText = title;
-            if (medium) document.getElementById('artwork-medium').innerText = medium;
-            if (dimensions) document.getElementById('artwork-dimensions').innerText = dimensions;
+        let currentActiveArtwork = {
+            title: "Mereka Ulang Ungkapan Indah Leila",
+            artist: "Mustafa Alatas",
+            medium: "Oil on canvas",
+            dimensions: "60x60cm",
+            image: "https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View"
+        };
+
+        function openArtistArtworkDetail(title, artist, medium, dimensions, image) {
+            currentActiveArtwork = {
+                title: title || 'Artwork',
+                artist: artist || 'Mustafa Alatas',
+                medium: medium || 'Oil on canvas',
+                dimensions: dimensions || '60x60cm',
+                image: image || 'https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View'
+            };
+
+            const titleEl = document.getElementById('artwork-title');
+            if (titleEl) titleEl.innerText = currentActiveArtwork.title;
+
+            const artistEl = document.getElementById('artwork-artist-name');
+            if (artistEl) artistEl.innerText = currentActiveArtwork.artist;
+
+            const mediumEl = document.getElementById('artwork-medium');
+            if (mediumEl) mediumEl.innerText = "Medium: " + currentActiveArtwork.medium;
+
+            const dimEl = document.getElementById('artwork-dimensions');
+            if (dimEl) dimEl.innerText = "Dimensions: " + currentActiveArtwork.dimensions;
+
+            const imgEl = document.getElementById('artwork-detail-image');
+            if (imgEl && currentActiveArtwork.image) imgEl.src = currentActiveArtwork.image;
+
             showPage('view-artist-artwork-detail');
+        }
+
+        /* ARTWORK OFFERING MODAL LOGIC */
+        function triggerArtworkOffering(title, artist, medium, dimensions, image) {
+            currentActiveArtwork = {
+                title: title || 'Artwork',
+                artist: artist || 'Mustafa Alatas',
+                medium: medium || 'Oil on canvas',
+                dimensions: dimensions || '60x60cm',
+                image: image || 'https://placehold.co/400x500/222/fff?text=Artwork'
+            };
+            openArtworkOfferingModal();
+        }
+
+        function triggerArtworkOfferingCurrent() {
+            openArtworkOfferingModal();
+        }
+
+        function openArtworkOfferingModal() {
+            const modal = document.getElementById('modal-artwork-offering');
+            const formBody = document.getElementById('artwork-offering-form-body');
+            const successBody = document.getElementById('artwork-offering-success-body');
+
+            // Populate Preview Info
+            const prevImg = document.getElementById('offering-artwork-img');
+            const prevTitle = document.getElementById('offering-artwork-title');
+            const prevArtist = document.getElementById('offering-artwork-artist');
+            const prevSpecs = document.getElementById('offering-artwork-specs');
+
+            if (prevImg) prevImg.src = currentActiveArtwork.image || 'https://placehold.co/400x500/222/fff?text=Artwork';
+            if (prevTitle) prevTitle.innerText = currentActiveArtwork.title;
+            if (prevArtist) prevArtist.innerText = currentActiveArtwork.artist;
+            if (prevSpecs) prevSpecs.innerText = `${currentActiveArtwork.medium} • ${currentActiveArtwork.dimensions}`;
+
+            // Populate User Account Info from logged-in session / storage
+            let activeUser = loggedInUser;
+            try {
+                const storedUser = localStorage.getItem('notisse_user');
+                if (storedUser) activeUser = JSON.parse(storedUser);
+            } catch (e) {}
+
+            const userNameEl = document.getElementById('offering-user-name');
+            const userEmailEl = document.getElementById('offering-user-email');
+            const userAvatarEl = document.getElementById('offering-user-avatar');
+
+            if (userNameEl) userNameEl.innerText = activeUser.name || 'John Doe';
+            if (userEmailEl) userEmailEl.innerText = activeUser.email || 'john.doe@notisse.com';
+            if (userAvatarEl) {
+                const initials = (activeUser.name || 'John Doe').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                userAvatarEl.innerText = initials || 'NT';
+            }
+
+            // Reset form fields
+            const priceInput = document.getElementById('offering-buyer-price');
+            const messageInput = document.getElementById('offering-buyer-message');
+            if (priceInput) priceInput.value = '';
+            if (messageInput) messageInput.value = '';
+
+            // Reset view state
+            if (formBody) formBody.classList.remove('hidden');
+            if (successBody) successBody.classList.add('hidden');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                const inner = modal.querySelector('div');
+                if (inner) inner.classList.remove('scale-95');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+            updateHeaderState();
+        }
+
+        function closeArtworkOfferingModal() {
+            const modal = document.getElementById('modal-artwork-offering');
+            if (!modal) return;
+            const inner = modal.querySelector('div');
+            if (inner) inner.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                updateHeaderState();
+            }, 300);
+        }
+
+        function formatOfferingPriceInput(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (!val) {
+                input.value = '';
+                return;
+            }
+            input.value = new Intl.NumberFormat('id-ID').format(val);
+        }
+
+        function handleArtworkOfferingSubmit(e) {
+            e.preventDefault();
+            const price = document.getElementById('offering-buyer-price').value.trim();
+            const message = document.getElementById('offering-buyer-message').value.trim();
+
+            if (!price) {
+                showToast("Harap masukkan nominal tawaran");
+                return;
+            }
+
+            let activeUser = loggedInUser;
+            try {
+                const storedUser = localStorage.getItem('notisse_user');
+                if (storedUser) activeUser = JSON.parse(storedUser);
+            } catch (err) {}
+
+            const refId = '#NTS-ART-' + Math.floor(100000 + Math.random() * 900000);
+
+            // Save inquiry locally in system records for the user's account
+            try {
+                const storedOffers = JSON.parse(localStorage.getItem('notisse_artwork_offers') || '[]');
+                storedOffers.push({
+                    refId: refId,
+                    date: new Date().toISOString(),
+                    artwork: currentActiveArtwork,
+                    buyer: {
+                        name: activeUser.name,
+                        email: activeUser.email
+                    },
+                    offerPrice: price,
+                    message: message || '',
+                    status: 'Under Review'
+                });
+                localStorage.setItem('notisse_artwork_offers', JSON.stringify(storedOffers));
+            } catch (err) {}
+
+            // Populate success screen details
+            const succRef = document.getElementById('success-offering-ref');
+            const succArtist = document.getElementById('success-artist-name');
+            const succTitle = document.getElementById('success-artwork-title');
+            const succPrice = document.getElementById('success-artwork-price');
+            const succBuyer = document.getElementById('success-buyer-name');
+
+            if (succRef) succRef.innerText = refId;
+            if (succArtist) succArtist.innerText = currentActiveArtwork.artist;
+            if (succTitle) succTitle.innerText = currentActiveArtwork.title;
+            if (succPrice) succPrice.innerText = "Rp " + price + " IDR";
+            if (succBuyer) succBuyer.innerText = `${activeUser.name} (${activeUser.email})`;
+
+            // Switch to success body
+            document.getElementById('artwork-offering-form-body').classList.add('hidden');
+            document.getElementById('artwork-offering-success-body').classList.remove('hidden');
+
+            showToast("Offering diajukan! Penawaran tercatat di sistem.");
+        }
+
+        /* LIGHTBOX IMAGE VIEWER LOGIC (SIZE CHART & ARTWORK) */
+        function openLightbox(src, caption) {
+            const lightbox = document.getElementById('modal-image-lightbox');
+            const img = document.getElementById('lightbox-img');
+            const cap = document.getElementById('lightbox-caption');
+
+            if (!lightbox || !img) return;
+
+            img.src = src;
+            if (cap) cap.innerText = caption || '';
+
+            lightbox.classList.remove('hidden');
+            setTimeout(() => {
+                lightbox.classList.remove('opacity-0');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+            updateHeaderState();
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('modal-image-lightbox');
+            if (!lightbox) return;
+
+            lightbox.classList.add('opacity-0');
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                updateHeaderState();
+            }, 300);
         }
 
         function openArtistEditorialDetail(title) {
@@ -1959,12 +2749,18 @@
             return 'Rp ' + amount.toLocaleString('id-ID') + ',00';
         }
 
+        let selectedShippingCost = 0;
+        let selectedCourierName = "";
+        let searchTimeout;
+
         function renderCartItems() {
             const container = document.getElementById('cart-items-container');
             const totalElement = document.getElementById('cart-total-price');
             const badgeElement = document.getElementById('header-cart-badge');
             let totalAmount = 0;
             let totalItemCount = 0;
+
+            if (!container) return;
 
             if (cartState.length === 0) {
                 container.innerHTML = `<div class="text-center py-16 text-gray-400 text-sm font-roboto">Your cart is empty.</div>`;
@@ -1975,10 +2771,10 @@
                     totalAmount += itemTotal;
                     totalItemCount += item.qty;
                     html += `
-                        <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100">
+                        <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100 cart-animated-item" style="animation-delay: ${index * 70}ms">
                             <div class="col-span-6 md:col-span-5 flex items-center space-x-3">
-                                <div class="w-12 h-16 bg-gray-200 flex-shrink-0">
-                                    <img src="https://placehold.co/200x250/d9d9d9/555555?text=Tee" class="w-full h-full object-cover">
+                                <div class="w-12 h-16 bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
+                                    <img src="{{ asset('footage-baju.jpg') }}" alt="${item.name}" class="w-full h-full object-cover">
                                 </div>
                                 <div>
                                     <p class="font-semibold uppercase text-black text-xs md:text-sm font-montserrat">${item.name}</p>
@@ -1987,9 +2783,9 @@
                             </div>
                             <div class="col-span-3 md:col-span-3 flex justify-center">
                                 <div class="flex items-center border border-gray-400">
-                                    <button onclick="updateCartQty(${index}, -1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto">−</button>
+                                    <button onclick="updateCartQty(${index}, -1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto cursor-pointer">−</button>
                                     <span class="px-3 py-1 font-semibold font-roboto">${item.qty}</span>
-                                    <button onclick="updateCartQty(${index}, 1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto">+</button>
+                                    <button onclick="updateCartQty(${index}, 1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto cursor-pointer">+</button>
                                 </div>
                             </div>
                             <div class="hidden md:block md:col-span-2 text-right font-montserrat">${formatRupiah(item.unitPrice)}</div>
@@ -2000,70 +2796,62 @@
                 container.innerHTML = html;
             }
 
-            if (typeof selectedShippingCost !== 'undefined') {
-                totalAmount += selectedShippingCost;
+            const grandTotal = totalAmount + selectedShippingCost;
+            if (totalElement) totalElement.innerText = formatRupiah(grandTotal) + ' IDR';
+            if (badgeElement) badgeElement.innerText = totalItemCount;
+        }
+
+        function triggerBadgePop() {
+            const badge = document.getElementById('header-cart-badge');
+            if (badge) {
+                badge.classList.remove('cart-badge-pop');
+                void badge.offsetWidth;
+                badge.classList.add('cart-badge-pop');
             }
-            totalElement.innerText = formatRupiah(totalAmount) + ' IDR';
-            badgeElement.innerText = `${totalItemCount}`;
         }
 
         function updateCartQty(index, change) {
             if (cartState[index]) {
-                const item = cartState[index];
-                if (change > 0) {
-                    const product = productsData.find(p => p.id === item.id);
-                    const stockObj = product ? product.stocks.find(s => s.size === item.size) : null;
-                    const limit = stockObj ? stockObj.stock : 0;
-                    if (item.qty + change > limit) {
-                        showToast('Stock maksimal tercapai!');
-                        return;
-                    }
-                }
-                item.qty += change;
-                if (item.qty <= 0) cartState.splice(index, 1);
+                cartState[index].qty += change;
+                if (cartState[index].qty <= 0) cartState.splice(index, 1);
             }
+            triggerBadgePop();
             renderCartItems();
         }
 
-        function addSelectedToCart() {
-            if (!currentProduct) return;
-            if (!currentSelectedSize) {
-                showToast('Please select a size!');
-                return;
+        function removeCartItem(index) {
+            if (cartState[index]) {
+                cartState.splice(index, 1);
+                triggerBadgePop();
+                renderCartItems();
             }
+        }
 
-            const productStock = currentProduct.stocks.find(s => s.size === currentSelectedSize);
-            const stockLimit = productStock ? productStock.stock : 0;
-            const existing = cartState.find(c => c.id === currentProduct.id && c.size === currentSelectedSize);
-            
-            if (existing) {
-                if (existing.qty < stockLimit) {
-                    existing.qty++;
-                } else {
-                    showToast('Stock habis!');
-                    return;
-                }
-            } else {
-                if (stockLimit >= 1) {
-                    cartState.push({
-                        id: currentProduct.id,
-                        name: currentProduct.name,
-                        size: currentSelectedSize,
-                        unitPrice: parseFloat(currentProduct.price),
-                        qty: 1
-                    });
-                } else {
-                    showToast('Stock habis!');
-                    return;
-                }
-            }
+        function addCrossSellItem() {
+            cartState.push({
+                id: Date.now(),
+                name: 'NOTISSE CANVAS TOTE',
+                size: 'ALL SIZE',
+                unitPrice: 150000,
+                qty: 1
+            });
+            triggerBadgePop();
+            renderCartItems();
+            showToast("Added Canvas Tote to cart");
+        }
+
+        function addSelectedToCart() {
+            cartState.push({
+                id: Date.now(),
+                name: 'RAJA DIAMUK MASSA TEE V1',
+                size: currentSelectedSize || 'M',
+                unitPrice: 250000,
+                qty: 1
+            });
+            triggerBadgePop();
             openCart();
             showToast('Added to cart!');
         }
-
-        let selectedShippingCost = 0;
-        let selectedCourierName = "";
-        let searchTimeout;
 
         async function searchAreaBiteship(keyword) {
             const areaResults = document.getElementById('area-results');
@@ -2071,8 +2859,8 @@
             const areaInput = document.getElementById('area-search');
 
             clearTimeout(searchTimeout);
-            if(keyword.length < 3) {
-                areaResults.classList.add('hidden');
+            if(!keyword || keyword.length < 3) {
+                if (areaResults) areaResults.classList.add('hidden');
                 return;
             }
             searchTimeout = setTimeout(async () => {
@@ -2080,6 +2868,7 @@
                     const res = await fetch(`/shipping-areas?keyword=${encodeURIComponent(keyword)}`);
                     const data = await res.json();
                     
+                    if (!areaResults) return;
                     areaResults.innerHTML = '';
                     if (data.areas && data.areas.length > 0) {
                         data.areas.forEach(area => {
@@ -2106,8 +2895,8 @@
             const shippingOptions = document.getElementById('shipping-options');
             const shippingContainer = document.getElementById('shipping-options-container');
 
-            shippingOptions.innerHTML = '<span class="text-gray-400">Menghitung ongkos kirim...</span>';
-            shippingContainer.classList.remove('hidden');
+            if (shippingOptions) shippingOptions.innerHTML = '<span class="text-gray-400">Menghitung ongkos kirim...</span>';
+            if (shippingContainer) shippingContainer.classList.remove('hidden');
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             const items = cartState.map(item => ({
@@ -2130,7 +2919,7 @@
                 });
 
                 const data = await res.json();
-                shippingOptions.innerHTML = '';
+                if (shippingOptions) shippingOptions.innerHTML = '';
                 
                 if (data.pricing && data.pricing.length > 0) {
                     data.pricing.forEach(rate => {
@@ -2143,11 +2932,11 @@
                         shippingOptions.appendChild(label);
                     });
                 } else {
-                    shippingOptions.innerHTML = '<span class="text-red-500">Kurir tidak tersedia ke area ini.</span>';
+                    if (shippingOptions) shippingOptions.innerHTML = '<span class="text-red-500">Kurir tidak tersedia ke area ini.</span>';
                 }
             } catch (e) {
                 console.error("Gagal mengambil ongkir", e);
-                shippingOptions.innerHTML = '<span class="text-red-500">Terjadi kesalahan koneksi.</span>';
+                if (shippingOptions) shippingOptions.innerHTML = '<span class="text-red-500">Terjadi kesalahan koneksi.</span>';
             }
         }
 
@@ -2155,7 +2944,7 @@
             selectedCourierName = name;
             selectedShippingCost = cost;
             renderCartItems(); // trigger recalc total in cart
-        }
+        };
 
         async function processCheckout() {
             if (cartState.length === 0) {
@@ -2163,19 +2952,23 @@
                 return;
             }
 
-            if (!loggedInUser || !loggedInUser.area_id) {
-                window.location.href = '/auth/checkout';
+            const address = document.getElementById('full-address')?.value || '';
+            const areaId = document.getElementById('selected-area-id')?.value || '';
+            
+            if(!areaId || !address) {
+                showToast("Mohon lengkapi alamat pengiriman!");
                 return;
             }
-
             if(!selectedCourierName) {
                 showToast("Mohon pilih layanan kurir terlebih dahulu!");
                 return;
             }
 
             const btn = document.getElementById('checkout-btn');
-            btn.innerText = "PROCESSING...";
-            btn.disabled = true;
+            if (btn) {
+                btn.innerText = "PROCESSING...";
+                btn.disabled = true;
+            }
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
@@ -2187,11 +2980,11 @@
             }));
 
             const payload = {
-                customer_name: loggedInUser.name,
-                customer_email: loggedInUser.email,
-                customer_phone: loggedInUser.phone,
-                shipping_address: loggedInUser.address, 
-                destination_area_id: loggedInUser.area_id,
+                customer_name: loggedInUser.name || "Guest User",
+                customer_email: loggedInUser.email || "guest@example.com",
+                customer_phone: "08123456789",
+                shipping_address: address,
+                destination_area_id: areaId,
                 items: items,
                 shipping_cost: selectedShippingCost,
                 courier_name: selectedCourierName,
@@ -2210,26 +3003,7 @@
 
                 const data = await response.json();
                 
-                if (response.status === 403 && data.pending_order) {
-                    showToast(data.error);
-                    closeCart();
-                    showPage('view-account-profile');
-                    fetchOrderHistory();
-                    return;
-                }
-                
                 if (data.snap_token) {
-                    // Update local stock data consistency
-                    cartState.forEach(item => {
-                        const product = productsData.find(p => p.id === item.id);
-                        if (product) {
-                            const stockObj = product.stocks.find(s => s.size === item.size);
-                            if (stockObj && stockObj.stock >= item.qty) {
-                                stockObj.stock -= item.qty;
-                            }
-                        }
-                    });
-
                     snap.pay(data.snap_token, {
                         onSuccess: async function(result) {
                             showToast("Payment success!");
@@ -2242,7 +3016,12 @@
                             });
                             
                             cartState = [];
+                            selectedShippingCost = 0;
+                            selectedCourierName = "";
                             renderCartItems();
+                            closeCart();
+                            showPage('view-account-profile');
+                            fetchOrderHistory();
                         },
                         onPending: async function(result) {
                             showToast("Waiting your payment...");
@@ -2255,8 +3034,13 @@
                             });
                             
                             cartState = [];
+                            selectedShippingCost = 0;
+                            selectedCourierName = "";
                             renderCartItems();
                             showToast("Payment success (Simulated)!");
+                            closeCart();
+                            showPage('view-account-profile');
+                            fetchOrderHistory();
                         },
                         onError: function(result) {
                             showToast("Payment failed!");
@@ -2266,160 +3050,29 @@
                         }
                     });
                 } else {
-                    showToast(data.error || "Failed to create transaction.");
+                    showToast("Failed to create transaction.");
                 }
             } catch (error) {
                 console.error(error);
                 showToast("Error processing checkout.");
             } finally {
-                btn.innerText = "CHECKOUT";
-                btn.disabled = false;
+                if (btn) {
+                    btn.innerText = "CHECKOUT";
+                    btn.disabled = false;
+                }
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            
             const lastPage = sessionStorage.getItem('current_page') || 'view-shop';
             showPage(lastPage);
-            
-            if(lastPage === 'view-account-profile' && loggedInUser) {
+            if(lastPage === 'view-account-profile' && isAuthenticated) {
                 fetchOrderHistory();
             }
+            updateHeaderState();
             renderCartItems();
             startAutoSlide();
-            
-            if (urlParams.get('open_checkout') === 'true') {
-                openCart();
-            }
         });
-        // ====== EDIT PROFILE LOGIC ======
-        let editAreaSearchTimeout = null;
-        const editAreaSearchInput = document.getElementById('edit-area-search');
-        const editAreaResultsBox = document.getElementById('edit-area-results');
-
-        function showEditProfile() {
-            if (!loggedInUser) return;
-            document.getElementById('edit-name').value = loggedInUser.name || '';
-            document.getElementById('edit-phone').value = loggedInUser.phone || '';
-            document.getElementById('edit-address').value = loggedInUser.address || '';
-            document.getElementById('edit-area-id').value = loggedInUser.area_id || '';
-            
-            document.getElementById('edit-profile-error').classList.add('hidden');
-            document.getElementById('edit-profile-success').classList.add('hidden');
-            
-            showPage('view-edit-profile');
-        }
-
-        if (editAreaSearchInput) {
-            editAreaSearchInput.addEventListener('input', function(e) {
-                clearTimeout(editAreaSearchTimeout);
-                const keyword = e.target.value;
-                
-                if (keyword.length < 3) {
-                    editAreaResultsBox.classList.add('hidden');
-                    return;
-                }
-
-                editAreaSearchTimeout = setTimeout(() => {
-                    fetch(`/shipping-areas?keyword=${keyword}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            editAreaResultsBox.innerHTML = '';
-                            if (data.areas && data.areas.length > 0) {
-                                data.areas.forEach(area => {
-                                    const li = document.createElement('li');
-                                    li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-roboto border-b border-gray-100';
-                                    li.innerText = area.name;
-                                    li.onclick = () => {
-                                        editAreaSearchInput.value = area.name;
-                                        document.getElementById('edit-area-id').value = area.id;
-                                        editAreaResultsBox.classList.add('hidden');
-                                    };
-                                    editAreaResultsBox.appendChild(li);
-                                });
-                                editAreaResultsBox.classList.remove('hidden');
-                            } else {
-                                editAreaResultsBox.classList.add('hidden');
-                            }
-                        });
-                }, 500);
-            });
-
-            document.addEventListener('click', function(e) {
-                if (!editAreaSearchInput.contains(e.target) && !editAreaResultsBox.contains(e.target)) {
-                    editAreaResultsBox.classList.add('hidden');
-                }
-            });
-        }
-
-        async function handleEditProfileSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('edit-profile-btn');
-            const errorBox = document.getElementById('edit-profile-error');
-            const successBox = document.getElementById('edit-profile-success');
-            const originalText = btn.innerText;
-
-            errorBox.classList.add('hidden');
-            successBox.classList.add('hidden');
-
-            const payload = {
-                name: document.getElementById('edit-name').value,
-                phone: document.getElementById('edit-phone').value,
-                address: document.getElementById('edit-address').value,
-                area_id: document.getElementById('edit-area-id').value,
-            };
-
-            if (!payload.area_id) {
-                errorBox.innerText = 'Pilih kecamatan dari daftar pencarian terlebih dahulu.';
-                errorBox.classList.remove('hidden');
-                return;
-            }
-
-            btn.innerText = 'MENYIMPAN...';
-            btn.disabled = true;
-
-            try {
-                const response = await fetch('/update-profile', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await response.json();
-                if (response.ok && data.success) {
-                    successBox.innerText = 'Profil berhasil diperbarui.';
-                    successBox.classList.remove('hidden');
-                    
-                    // Update frontend state
-                    loggedInUser.name = payload.name;
-                    loggedInUser.phone = payload.phone;
-                    loggedInUser.address = payload.address;
-                    loggedInUser.area_id = payload.area_id;
-                    
-                    localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
-                    document.getElementById('user-display-name').innerText = loggedInUser.name;
-                    document.getElementById('user-display-address').innerText = loggedInUser.address;
-                    
-                    setTimeout(() => {
-                        showPage('view-account-profile');
-                    }, 1500);
-                } else {
-                    errorBox.innerText = data.message || 'Gagal menyimpan perubahan.';
-                    errorBox.classList.remove('hidden');
-                }
-            } catch (err) {
-                errorBox.innerText = 'Terjadi kesalahan jaringan.';
-                errorBox.classList.remove('hidden');
-            } finally {
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        }
-
     </script>
 </body>
 
