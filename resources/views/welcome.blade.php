@@ -933,7 +933,7 @@
             <div id="artwork-offering-form-body" class="p-6 overflow-y-auto space-y-5 flex-grow">
                 <!-- Selected Artwork Card Preview -->
                 <div class="flex items-center space-x-4 p-3.5 bg-neutral-50 border border-gray-200 rounded-sm">
-                    <img id="offering-artwork-img" src="https://placehold.co/400x500/222/fff?text=Artwork" alt="Artwork"
+                    <img id="offering-artwork-img" src="{{ asset('footage-baju.jpg') }}" alt="Artwork"
                         class="w-16 h-20 object-cover bg-gray-200 border border-gray-300 flex-shrink-0">
                     <div class="space-y-0.5 min-w-0">
                         <span
@@ -1373,13 +1373,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
                         onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
-                        <img src="https://placehold.co/800x500/222222/ffffff?text=Mustafa+Portrait"
+                        <img src="{{ asset('artwork.jpeg') }}"
                             alt="Mustafa Portrait"
                             class="w-full h-full object-cover grayscale group-hover:scale-105 transition-all duration-500">
                     </div>
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
                         onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
-                        <img src="https://placehold.co/800x500/3d5a45/ffffff?text=Mustafa+Artwork" alt="Mustafa Artwork"
+                        <img src="{{ asset('home.jpg') }}" alt="Mustafa Artwork"
                             class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
                     </div>
                 </div>
@@ -1420,7 +1420,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Mustafa Alatas"
                         data-artist-city="Temanggung" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/181818/ffffff?text=Mustafa+Alatas"
+                            <img src="{{ asset('footagebaju2.jpg') }}"
                                 alt="Mustafa Alatas"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
@@ -1431,7 +1431,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asep" data-artist-city="Palembang"
                         onclick="openArtistProfile('Asep', 'Palembang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/222222/ffffff?text=Asep" alt="Asep"
+                            <img src="{{ asset('footagebaju2.jpg') }}" alt="Asep"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asep</h4>
@@ -1441,7 +1441,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepo" data-artist-city="Jakarta"
                         onclick="openArtistProfile('Asepo', 'Jakarta')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/2c2c2c/ffffff?text=Asepo" alt="Asepo"
+                            <img src="{{ asset('footagebaju2.jpg') }}" alt="Asepo"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepo</h4>
@@ -1451,7 +1451,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepi" data-artist-city="Padang"
                         onclick="openArtistProfile('Asepi', 'Padang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/333333/ffffff?text=Asepi" alt="Asepi"
+                            <img src="{{ asset('home.jpg') }}" alt="Asepi"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepi</h4>
@@ -1461,7 +1461,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepu" data-artist-city="Jakarta"
                         onclick="openArtistProfile('Asepu', 'Jakarta')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/3d3d3d/ffffff?text=Asepu" alt="Asepu"
+                            <img src="{{ asset('home1.jpg') }}" alt="Asepu"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepu</h4>
@@ -1471,7 +1471,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepa" data-artist-city="Kebumen"
                         onclick="openArtistProfile('Asepa', 'Kebumen')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/444444/ffffff?text=Asepa" alt="Asepa"
+                            <img src="{{ asset('home2.png') }}" alt="Asepa"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepa</h4>
@@ -1481,7 +1481,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepit" data-artist-city="Lumajang"
                         onclick="openArtistProfile('Asepit', 'Lumajang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/4d4d4d/ffffff?text=Asepit" alt="Asepit"
+                            <img src="{{ asset('home2.png') }}" alt="Asepit"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepit</h4>
@@ -1491,7 +1491,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepon"
                         data-artist-city="Pekalongan" onclick="openArtistProfile('Asepon', 'Pekalongan')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/555555/ffffff?text=Asepon" alt="Asepon"
+                            <img src="{{ asset('artwork.jpeg') }}" alt="Asepon"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepon</h4>
@@ -1519,7 +1519,7 @@
             <!-- Artist Header Bio -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-10">
                 <div class="md:col-span-4 aspect-[4/5] bg-gray-200 overflow-hidden">
-                    <img src="https://placehold.co/600x750/333333/ffffff?text=Mustafa+Alatas" alt="Mustafa Alatas"
+                    <img src="{{ asset('home2.png') }}" alt="Mustafa Alatas"
                         class="w-full h-full object-cover grayscale">
                 </div>
 
@@ -1559,7 +1559,7 @@
                     <div onclick="openArtistEditorialDetail('Mereka Ulang Kerumitan Ungkapan Indah')"
                         class="group cursor-pointer">
                         <div class="w-full aspect-square bg-[#d9d9d9] mb-3 overflow-hidden">
-                            <img src="https://placehold.co/600x600/d9d9d9/555555?text=Editorial+Article" alt="Article"
+                            <img src="{{ asset('home1.jpg') }}" alt="Article"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline">
@@ -1573,10 +1573,10 @@
             <div id="artist-tab-content-artwork" class="hidden space-y-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
                     <!-- Artwork Item 1 -->
-                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
+                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', '{{ asset('artwork.jpeg') }}')"
                         class="group cursor-pointer">
                         <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
-                            <img src="https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila" alt="Artwork Leila"
+                            <img src="{{ asset('home.jpg') }}" alt="Artwork Leila"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <span
                                 class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
@@ -1588,10 +1588,10 @@
                     </div>
 
                     <!-- Artwork Item 2 -->
-                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
+                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', '{{ asset('footagebaju2.jpg') }}')"
                         class="group cursor-pointer">
                         <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
-                            <img src="https://placehold.co/600x800/ccc/333?text=Artwork+Effendi" alt="Artwork Effendi"
+                            <img src="{{ asset('home1.jpg') }}" alt="Artwork Effendi"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <span
                                 class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
@@ -1603,10 +1603,10 @@
                     </div>
 
                     <!-- Artwork Item 3 -->
-                    <div onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
+                    <div onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', '{{ asset('home.jpg') }}')"
                         class="group cursor-pointer">
                         <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
-                            <img src="https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa" alt="Figurasi Kuasa"
+                            <img src="{{ asset('footage-baju.jpg') }}" alt="Figurasi Kuasa"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <span
                                 class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
@@ -1639,7 +1639,7 @@
                 <div class="md:col-span-7 aspect-[4/3] bg-[#d9d9d9] overflow-hidden shadow-sm relative group cursor-zoom-in"
                     onclick="openLightbox(document.getElementById('artwork-detail-image').src, document.getElementById('artwork-title').innerText)">
                     <img id="artwork-detail-image"
-                        src="https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View" alt="Full Artwork"
+                        src="{{ asset('footagebaju2.jpg') }}" alt="Full Artwork"
                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
                     <div
                         class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-montserrat uppercase px-2.5 py-1 tracking-wider flex items-center space-x-1">
@@ -1746,7 +1746,7 @@
                         </div>
                         <div>
                             <div class="w-full aspect-[3/2] bg-[#d9d9d9] overflow-hidden mb-1.5">
-                                <img src="https://placehold.co/400x300/444/fff?text=Artwork" alt="Artwork"
+                                <img src="{{ asset('footage-baju-belakang.jpg') }}" alt="Artwork"
                                     class="w-full h-full object-cover">
                             </div>
                             <p class="text-[10px] text-gray-400 font-roboto">Raja Diamuk Massa, 2024. Photo by .... .
@@ -2173,15 +2173,15 @@
     <script>
         // MOCK DATABASE PRODUK KONTEN BRAND
         const productsData = [
-            { id: 1, name: "Raja Diamuk Massa Tee V1", price: "Rp 250.000,00", image: "https://placehold.co/600x800/d9d9d9/555555?text=Raja+Diamuk+Tee", artist: "Mustafa Alatas" },
-            { id: 2, name: "Muscle Tank V2 - Black", price: "Rp 180.000,00", image: "https://placehold.co/600x800/181818/ffffff?text=Muscle+Tank+Black", artist: "Asep" },
-            { id: 3, name: "Muscle Tank V2 - White", price: "Rp 180.000,00", image: "https://placehold.co/600x800/ffffff/111111?text=Muscle+Tank+White", artist: "Asep" },
-            { id: 4, name: "Relaxed Tailored Shirt V1", price: "Rp 320.000,00", image: "https://placehold.co/600x800/f0f0f0/222222?text=Tailored+Shirt", artist: "Asepo" },
-            { id: 5, name: "Accessorized Slim Tee V2 - Black", price: "Rp 220.000,00", image: "https://placehold.co/600x800/111111/ffffff?text=Slim+Tee+Black", artist: "Mustafa Alatas" },
-            { id: 6, name: "Rugged Long Sleeve Tee V2 - Gray", price: "Rp 280.000,00", image: "https://placehold.co/600x800/888888/ffffff?text=Long+Sleeve+Gray", artist: "Asepi" },
-            { id: 7, name: "Sweatshirt - Gray", price: "Rp 350.000,00", image: "https://placehold.co/600x800/cccccc/333333?text=Sweatshirt+Gray", artist: "Asepu" },
-            { id: 8, name: "Pleated Denim V1", price: "Rp 450.000,00", image: "https://placehold.co/600x800/1e293b/ffffff?text=Pleated+Denim", artist: "Asepa" },
-            { id: 9, name: "Collarless Leather Blazer", price: "Rp 650.000,00", image: "https://placehold.co/600x800/262626/ffffff?text=Leather+Blazer", artist: "Asepon" }
+            { id: 1, name: "Raja Diamuk Massa Tee V1", price: "Rp 250.000,00", image: "{{ asset('home1.jpg') }}", artist: "Mustafa Alatas" },
+            { id: 2, name: "Muscle Tank V2 - Black", price: "Rp 180.000,00", image: "{{ asset('artwork.jpeg') }}", artist: "Asep" },
+            { id: 3, name: "Muscle Tank V2 - White", price: "Rp 180.000,00", image: "{{ asset('home.jpg') }}", artist: "Asep" },
+            { id: 4, name: "Relaxed Tailored Shirt V1", price: "Rp 320.000,00", image: "{{ asset('home.jpg') }}", artist: "Asepo" },
+            { id: 5, name: "Accessorized Slim Tee V2 - Black", price: "Rp 220.000,00", image: "{{ asset('home.jpg') }}", artist: "Mustafa Alatas" },
+            { id: 6, name: "Rugged Long Sleeve Tee V2 - Gray", price: "Rp 280.000,00", image: "{{ asset('home2.png') }}", artist: "Asepi" },
+            { id: 7, name: "Sweatshirt - Gray", price: "Rp 350.000,00", image: "{{ asset('footage-baju-belakang.jpg') }}", artist: "Asepu" },
+            { id: 8, name: "Pleated Denim V1", price: "Rp 450.000,00", image: "{{ asset('artwork.jpeg') }}", artist: "Asepa" },
+            { id: 9, name: "Collarless Leather Blazer", price: "Rp 650.000,00", image: "{{ asset('footage-baju.jpg') }}", artist: "Asepon" }
         ];
 
         let currentSelectedSize = "M";
@@ -2776,7 +2776,7 @@
             artist: "Mustafa Alatas",
             medium: "Oil on canvas",
             dimensions: "60x60cm",
-            image: "https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View"
+            image: "{{ asset('footage-baju-belakang.jpg') }}"
         };
 
         function openArtistArtworkDetail(title, artist, medium, dimensions, image) {
@@ -2785,7 +2785,7 @@
                 artist: artist || 'Mustafa Alatas',
                 medium: medium || 'Oil on canvas',
                 dimensions: dimensions || '60x60cm',
-                image: image || 'https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View'
+                image: image || '{{ asset('home1.jpg') }}'
             };
 
             const titleEl = document.getElementById('artwork-title');
@@ -2813,7 +2813,7 @@
                 artist: artist || 'Mustafa Alatas',
                 medium: medium || 'Oil on canvas',
                 dimensions: dimensions || '60x60cm',
-                image: image || 'https://placehold.co/400x500/222/fff?text=Artwork'
+                image: image || '{{ asset('home.jpg') }}'
             };
             openArtworkOfferingModal();
         }
@@ -2833,7 +2833,7 @@
             const prevArtist = document.getElementById('offering-artwork-artist');
             const prevSpecs = document.getElementById('offering-artwork-specs');
 
-            if (prevImg) prevImg.src = currentActiveArtwork.image || 'https://placehold.co/400x500/222/fff?text=Artwork';
+            if (prevImg) prevImg.src = currentActiveArtwork.image || '{{ asset('footage-baju-belakang.jpg') }}';
             if (prevTitle) prevTitle.innerText = currentActiveArtwork.title;
             if (prevArtist) prevArtist.innerText = currentActiveArtwork.artist;
             if (prevSpecs) prevSpecs.innerText = `${currentActiveArtwork.medium} • ${currentActiveArtwork.dimensions}`;
