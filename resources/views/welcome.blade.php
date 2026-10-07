@@ -1210,11 +1210,11 @@
                             class="w-full h-full object-cover">
                     </div>
                     <div class="w-full border border-black aspect-[3/4] bg-white overflow-hidden shadow-sm">
-                        <img src="{{ asset('footage-baju-belakang.jpg') }}" alt="Back Graphic"
+                        <img id="pdetail-back-image" src="{{ asset('footage-baju-belakang.jpg') }}" alt="Back Graphic"
                             class="w-full h-full object-cover">
                     </div>
                     <div class="w-full border border-black aspect-[3/4] bg-white overflow-hidden shadow-sm">
-                        <img src="{{ asset('footagebaju2.jpg') }}"
+                        <img id="pdetail-footage-image" src="{{ asset('footagebaju2.jpg') }}"
                             alt="Detail Close up" class="w-full h-full object-cover">
                     </div>
                 </div>
@@ -1270,78 +1270,32 @@
                 </div>
 
                 <div id="artist-collab-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                    <div class="artist-card group cursor-pointer" data-artist-name="Mustafa Alatas" data-artist-city="Temanggung" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
-                        <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/181818/ffffff?text=Mustafa+Alatas"
-                                alt="Mustafa Alatas"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    @if(isset($artists) && $artists->count() > 0)
+                        @foreach($artists as $artItem)
+                            @php
+                                $aPhoto = $artItem->photo ? (Str::startsWith($artItem->photo, 'http') ? $artItem->photo : (file_exists(public_path('storage/' . $artItem->photo)) ? asset('storage/' . $artItem->photo) : asset($artItem->photo))) : 'https://placehold.co/500x500/181818/ffffff?text=' . urlencode($artItem->name);
+                            @endphp
+                            <div class="artist-card group cursor-pointer" data-artist-name="{{ $artItem->name }}" data-artist-city="{{ $artItem->city }}" onclick="openArtistProfile('{{ addslashes($artItem->name) }}', '{{ addslashes($artItem->city) }}')">
+                                <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
+                                    <img src="{{ $aPhoto }}"
+                                        alt="{{ $artItem->name }}"
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                </div>
+                                <h4 class="font-bold text-sm md:text-base text-black font-roboto">{{ $artItem->name }}</h4>
+                                <p class="text-xs text-gray-500 font-roboto">{{ $artItem->city ?: 'Indonesia' }}</p>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="artist-card group cursor-pointer" data-artist-name="Mustafa Alatas" data-artist-city="Temanggung" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
+                            <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
+                                <img src="https://placehold.co/500x500/181818/ffffff?text=Mustafa+Alatas"
+                                    alt="Mustafa Alatas"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <h4 class="font-bold text-sm md:text-base text-black font-roboto">Mustafa Alatas</h4>
+                            <p class="text-xs text-gray-500 font-roboto">Temanggung</p>
                         </div>
-                        <h4 class="font-bold text-sm md:text-base text-black font-roboto">Mustafa Alatas</h4>
-                        <p class="text-xs text-gray-500 font-roboto">Temanggung</p>
-                    </div>
-
-                    <div class="artist-card group cursor-pointer" data-artist-name="Asep" data-artist-city="Palembang" onclick="openArtistProfile('Asep', 'Palembang')">
-                        <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/222222/ffffff?text=Asep" alt="Asep"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asep</h4>
-                        <p class="text-xs text-gray-500 font-roboto">Palembang</p>
-                    </div>
-
-                    <div class="artist-card group cursor-pointer" data-artist-name="Asepo" data-artist-city="Jakarta" onclick="openArtistProfile('Asepo', 'Jakarta')">
-                        <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/2c2c2c/ffffff?text=Asepo" alt="Asepo"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepo</h4>
-                        <p class="text-xs text-gray-500 font-roboto">Jakarta</p>
-                    </div>
-
-                    <div class="artist-card group cursor-pointer" data-artist-name="Asepi" data-artist-city="Padang" onclick="openArtistProfile('Asepi', 'Padang')">
-                        <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/333333/ffffff?text=Asepi" alt="Asepi"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepi</h4>
-                        <p class="text-xs text-gray-500 font-roboto">Padang</p>
-                    </div>
-
-                    <div class="artist-card group cursor-pointer" data-artist-name="Asepu" data-artist-city="Jakarta" onclick="openArtistProfile('Asepu', 'Jakarta')">
-                        <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/3d3d3d/ffffff?text=Asepu" alt="Asepu"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepu</h4>
-                        <p class="text-xs text-gray-500 font-roboto">Jakarta</p>
-                    </div>
-
-                    <div class="artist-card group cursor-pointer" data-artist-name="Asepa" data-artist-city="Kebumen" onclick="openArtistProfile('Asepa', 'Kebumen')">
-                        <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/444444/ffffff?text=Asepa" alt="Asepa"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepa</h4>
-                        <p class="text-xs text-gray-500 font-roboto">Kebumen</p>
-                    </div>
-
-                    <div class="artist-card group cursor-pointer" data-artist-name="Asepit" data-artist-city="Lumajang" onclick="openArtistProfile('Asepit', 'Lumajang')">
-                        <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/4d4d4d/ffffff?text=Asepit" alt="Asepit"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepit</h4>
-                        <p class="text-xs text-gray-500 font-roboto">Lumajang</p>
-                    </div>
-
-                    <div class="artist-card group cursor-pointer" data-artist-name="Asepon" data-artist-city="Pekalongan" onclick="openArtistProfile('Asepon', 'Pekalongan')">
-                        <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="https://placehold.co/500x500/555555/ffffff?text=Asepon" alt="Asepon"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepon</h4>
-                        <p class="text-xs text-gray-500 font-roboto">Pekalongan</p>
-                    </div>
+                    @endif
 
                     <!-- Empty State for Artist Search -->
                     <div id="artist-no-results" class="hidden col-span-2 md:col-span-4 text-center py-12">
@@ -2186,6 +2140,7 @@
         }
 
         let productsData = @json($products);
+        let artistsData = @json($artists ?? []);
         let currentProduct = null;
         let cartState = [];
         try {
@@ -2719,6 +2674,72 @@
                 }
             }
 
+            // Update Back View Image
+            const backImgEl = document.getElementById('pdetail-back-image');
+            if (backImgEl) {
+                if (currentProduct.back_image) {
+                    const bSrc = currentProduct.back_image.startsWith('http') || currentProduct.back_image.startsWith('/') 
+                        ? currentProduct.back_image 
+                        : '/' + currentProduct.back_image;
+                    backImgEl.src = bSrc;
+                } else {
+                    backImgEl.src = "{{ asset('footage-baju-belakang.jpg') }}";
+                }
+            }
+
+            // Update On-Model Footage Image
+            const footImgEl = document.getElementById('pdetail-footage-image');
+            if (footImgEl) {
+                if (currentProduct.footage_image) {
+                    const fSrc = currentProduct.footage_image.startsWith('http') || currentProduct.footage_image.startsWith('/') 
+                        ? currentProduct.footage_image 
+                        : '/' + currentProduct.footage_image;
+                    footImgEl.src = fSrc;
+                } else {
+                    footImgEl.src = "{{ asset('footagebaju2.jpg') }}";
+                }
+            }
+
+            // Update Size Chart Image & Lightbox Click
+            const sizeChartBox = document.getElementById('pdetail-size-box');
+            const sizeChartImg = document.getElementById('pdetail-size-img');
+            const chartSrc = currentProduct.size_chart_image 
+                ? (currentProduct.size_chart_image.startsWith('http') || currentProduct.size_chart_image.startsWith('/') ? currentProduct.size_chart_image : '/' + currentProduct.size_chart_image)
+                : "{{ asset('size chart 1.png') }}";
+            if (sizeChartImg) sizeChartImg.src = chartSrc;
+            if (sizeChartBox) sizeChartBox.onclick = () => openLightbox(chartSrc, (currentProduct.name || 'NOTISSE APPAREL') + ' SIZE CHART');
+
+            // Update Artist byline
+            const artistEl = document.getElementById('pdetail-artist');
+            if (artistEl) {
+                const artistName = currentProduct.artist || 'Mustafa Alatas';
+                artistEl.innerText = artistName;
+                artistEl.onclick = () => openArtistProfile(artistName, 'Temanggung');
+            }
+
+            // Update Description & Fabric Specs
+            const descContent = document.getElementById('pdetail-desc-content');
+            if (descContent) {
+                let html = '';
+                if (currentProduct.specs) {
+                    html += `<div class="mb-3 p-2.5 bg-neutral-50 border border-neutral-200 text-[11px] font-mono text-gray-800">
+                                <strong>FABRIC & FIT SPECS:</strong> ${currentProduct.specs}
+                             </div>`;
+                }
+                if (currentProduct.description) {
+                    html += `<p class="leading-relaxed text-[11px] md:text-xs text-gray-600 mb-2">${currentProduct.description}</p>`;
+                }
+                if (!html) {
+                    html = `<ul class="list-disc pl-5 space-y-1.5 leading-relaxed font-neue-montreal text-gray-500">
+                                <li>Heavyweight 24s Cotton Combed construction</li>
+                                <li>High-density screenprinted artwork on back and chest</li>
+                                <li>Boxy relaxed fit with reinforced ribbed collar</li>
+                                <li>Crafted & printed in Bandung, Indonesia</li>
+                            </ul>`;
+                }
+                descContent.innerHTML = html;
+            }
+
             const sizeMenu = document.getElementById('size-dropdown-menu');
             if (sizeMenu) {
                 sizeMenu.innerHTML = '';
@@ -2751,9 +2772,26 @@
         }
 
         function openArtistProfile(name, location) {
+            const artist = (typeof artistsData !== 'undefined' && artistsData) ? artistsData.find(a => (a.name || '').toLowerCase() === (name || '').toLowerCase()) : null;
+
             document.getElementById('artist-profile-name').innerText = name;
-            document.getElementById('artist-profile-location').innerText = location;
+            document.getElementById('artist-profile-location').innerText = artist && artist.city ? artist.city : (location || 'Indonesia');
             document.getElementById('editorial-section-title').innerText = "Articles Featuring " + name;
+
+            if (artist) {
+                if (artist.bio) {
+                    const bioEl = document.querySelector('#view-artist-detail .md\\:col-span-8 p.text-gray-700');
+                    if (bioEl) bioEl.innerText = artist.bio;
+                }
+                if (artist.photo) {
+                    const photoEl = document.querySelector('#view-artist-detail .md\\:col-span-4 img');
+                    if (photoEl) {
+                        const pSrc = artist.photo.startsWith('http') || artist.photo.startsWith('/') ? artist.photo : '/' + artist.photo;
+                        photoEl.src = pSrc;
+                    }
+                }
+            }
+
             switchArtistTab('editorial');
             showPage('view-artist-detail');
         }
