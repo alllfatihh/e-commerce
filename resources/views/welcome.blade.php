@@ -1738,7 +1738,7 @@
                     <div class="grid grid-cols-2 gap-4 my-6">
                         <div>
                             <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5">
-                                <img src="https://placehold.co/400x500/222/fff?text=Portrait" alt="Portrait"
+                                <img src="{{ asset('artwork.jpeg') }}" alt="Portrait"
                                     class="w-full h-full object-cover">
                             </div>
                             <p class="text-[10px] text-gray-400 font-roboto">Portrait of Mustafa Alatas. Photo by ......
