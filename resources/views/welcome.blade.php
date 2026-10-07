@@ -1431,7 +1431,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asep" data-artist-city="Palembang"
                         onclick="openArtistProfile('Asep', 'Palembang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="{{ asset('footagebaju2.jpg') }}" alt="Asep"
+                            <img src="{{ asset('asep.jpeg') }}" alt="Asep"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asep</h4>
@@ -1441,7 +1441,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepo" data-artist-city="Jakarta"
                         onclick="openArtistProfile('Asepo', 'Jakarta')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="{{ asset('footagebaju2.jpg') }}" alt="Asepo"
+                            <img src="{{ asset('asepo.jpeg') }}" alt="Asepo"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepo</h4>
@@ -1451,7 +1451,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepi" data-artist-city="Padang"
                         onclick="openArtistProfile('Asepi', 'Padang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="{{ asset('home.jpg') }}" alt="Asepi"
+                            <img src="{{ asset('asepi.jpeg') }}" alt="Asepi"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepi</h4>
