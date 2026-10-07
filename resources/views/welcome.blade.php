@@ -364,7 +364,7 @@
             margin: 0 !important;
             cursor: pointer;
             color: #000000;
-            transition: opacity 0.25s ease;
+            transition: opacity 0.25s ease, width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -396,8 +396,11 @@
             /* When returning (scrolling UP): vertical shrinks first (0s), horizontal opens after delay (0.15s) */
             transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
                         height 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
-            will-change: width, height, top;
+                        top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        left 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        right 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+            will-change: width, height, top, left, right, transform;
         }
 
         /* On hover in default horizontal state: line actively moves/stretches */
@@ -421,12 +424,13 @@
         }
 
         /* 3. VERTICAL LABEL (APPEARS ON SCROLL) */
-        /* Reads top to bottom naturally without rotate(180deg) */
+        /* Reads top to bottom naturally */
         .header__link--cart__vertical-label {
             position: absolute;
             top: 0px;
-            right: -0.5em;
-            width: 1em;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
             font-family: 'Montserrat', sans-serif;
             font-size: 11px;
             font-weight: 600;
@@ -443,30 +447,39 @@
         /* 4. MONOSPACE COUNTER */
         .header__link--cart__counter {
             position: absolute;
-            right: -0.28em;
+            right: -4px;
             top: 25px;
+            width: 14px;
+            text-align: center;
             font-family: 'Courier New', Courier, Monaco, monospace;
             font-size: 11.5px;
             font-weight: 600;
             line-height: 1;
-            text-align: center;
-            transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+            transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        left 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        right 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
         }
 
         /* ============================================================== */
         /* SCROLLED MINIMAL STATE (.state-minimal): MOVING LINE ANIMATION */
         /* ============================================================== */
         .header__link--cart.state-minimal {
-            width: 20px;
+            width: 24px;
             height: 96px;
         }
 
         /* Horizontal segment collapses to 0 immediately (0s); Vertical segment stretches after delay (0.15s) */
+        /* Centered on exact same axis as vertical label & counter */
         .header__link--cart.state-minimal::before {
             width: 0px !important;
             height: 38px !important;
             top: 36px !important;
-            right: 0px !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
+            border-top: none !important;
+            border-right: 1.2px solid currentColor !important;
             transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
                         height 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
                         top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
@@ -480,7 +493,11 @@
 
         .header__link--cart.state-minimal .header__link--cart__counter {
             top: 78px !important;
-            right: -0.28em !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
+            width: auto !important;
+            text-align: center !important;
             transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
         }
 
@@ -499,7 +516,9 @@
             opacity: 1 !important;
             pointer-events: auto !important;
             top: 0px !important;
-            right: -0.5em !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
             transition: opacity 0.25s ease 0.15s !important;
         }
 
@@ -705,92 +724,57 @@
         </div>
     </div>
 
-    <!-- OVERLAY 3: MY CART SLIDE-OVER DRAWER (EXACT A24 MINIMALIST DESIGN) -->
+    <!-- OVERLAY 3: MY CART SLIDE-OVER DRAWER -->
     <div id="overlay-cart"
-        class="fixed inset-0 bg-black/40 z-[60] hidden opacity-0 overlay-backdrop transition-opacity duration-300"
+        class="fixed inset-0 bg-black/40 z-[60] hidden opacity-0 overlay-backdrop transition-opacity duration-400"
         onclick="closeCart()">
         <div id="cart-drawer-content"
-            class="absolute right-0 top-0 bottom-0 w-full max-w-[480px] sm:max-w-[500px] bg-white transform translate-x-full overlay-slide flex flex-col justify-between shadow-2xl overflow-hidden font-montserrat"
+            class="absolute right-0 top-0 bottom-0 w-full max-w-4xl bg-white p-6 md:p-10 transform translate-x-full overlay-slide flex flex-col overflow-y-auto shadow-2xl"
             onclick="event.stopPropagation()">
-            
-            <!-- Top Header & Banner -->
-            <div class="flex-shrink-0 bg-white">
-                <div class="flex items-center justify-between pt-6 px-6 sm:px-8 pb-3 border-t border-black">
-                    <span class="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-black">
-                        FREE STANDARD DOMESTIC SHIPPING OVER RP 500.000
-                    </span>
-                    <button id="cart-close" aria-label="Close Cart"
-                        class="p-1 text-black hover:opacity-50 transition-opacity focus:outline-none cursor-pointer flex items-center justify-center">
-                        <svg class="w-5 h-5 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.3">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+            <div class="flex justify-between items-center border-b border-gray-200 pb-3 mb-6">
+                <h2 class="text-2xl md:text-3xl font-semibold tracking-tight font-montserrat">My cart</h2>
+                <button id="cart-close" aria-label="Close Cart"
+                    class="text-3xl font-light hover:rotate-90 transition-transform duration-300 focus:outline-none cursor-pointer">
+                    &#10005;
+                </button>
+            </div>
+
+            <div
+                class="grid grid-cols-12 text-xs text-gray-500 font-regular pb-2 border-b border-gray-200 mb-6 font-neue-montreal">
+                <div class="col-span-6 md:col-span-5">Product</div>
+                <div class="col-span-3 md:col-span-3 text-center">Quantity</div>
+                <div class="hidden md:block md:col-span-2 text-right">Price</div>
+                <div class="col-span-3 md:col-span-2 text-right">Total</div>
+            </div>
+
+            <div id="cart-items-container" class="space-y-6 flex-grow"></div>
+
+            <!-- BITESHIP SHIPPING & ADDRESS DETAILS -->
+            <div id="checkout-details" class="mt-6 border-t border-gray-200 pt-6 space-y-4">
+                <div class="relative">
+                    <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." oninput="searchAreaBiteship(this.value)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm" autocomplete="off">
+                    <div id="area-results" class="absolute z-10 w-full bg-white border border-gray-200 max-h-40 overflow-y-auto hidden shadow-lg text-sm font-montserrat"></div>
                 </div>
-                <!-- Animated moving line / progress bar -->
-                <div class="mx-6 sm:mx-8 mb-2 h-[2px] bg-neutral-100 overflow-hidden relative">
-                    <div class="h-full bg-black relative w-full overflow-hidden">
-                        <div class="absolute inset-0 moving-line-shimmer"></div>
-                    </div>
+                <input type="hidden" id="selected-area-id">
+                <input type="text" id="full-address" placeholder="Detail Alamat (Jalan, RT/RW, No)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm">
+                
+                <div id="shipping-options-container" class="hidden space-y-2 mt-4">
+                    <span class="text-sm font-medium font-montserrat block">Pilih Pengiriman:</span>
+                    <div id="shipping-options" class="flex flex-col space-y-2 text-sm font-montserrat"></div>
                 </div>
             </div>
 
-            <!-- Scrollable Items Area -->
-            <div id="cart-items-container" class="px-6 sm:px-8 py-2 overflow-y-auto flex-grow divide-y divide-neutral-100">
-                <!-- Rendered dynamically via renderCartItems() -->
-            </div>
-
-            <!-- Bottom Section: Shipping, Subtotal, Checkout & Recommendations -->
-            <div class="flex-shrink-0 bg-white border-t border-black">
-                <!-- Shipping Destination (Biteship) -->
-                <div id="checkout-details" class="px-6 sm:px-8 pt-3 pb-2 space-y-2 border-b border-neutral-100 text-xs">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-bold tracking-widest uppercase text-gray-500">Shipping Destination</span>
-                        <span id="courier-badge-name" class="text-[10px] font-semibold tracking-wider text-black uppercase">Standard Courier</span>
-                    </div>
-                    <div class="relative">
-                        <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." oninput="searchAreaBiteship(this.value)" class="w-full border-b border-gray-200 py-1.5 focus:outline-none focus:border-black font-montserrat text-xs placeholder:text-gray-400" autocomplete="off">
-                        <div id="area-results" class="absolute z-20 bottom-full left-0 right-0 bg-white border border-gray-200 max-h-36 overflow-y-auto hidden shadow-lg text-xs font-montserrat"></div>
-                    </div>
-                    <input type="hidden" id="selected-area-id">
-                    <input type="text" id="full-address" placeholder="Detail Alamat (Jalan, RT/RW, No)" class="w-full border-b border-gray-200 py-1.5 focus:outline-none focus:border-black font-montserrat text-xs placeholder:text-gray-400">
-                    
-                    <div id="shipping-options-container" class="hidden space-y-1.5 pt-1">
-                        <span class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 block">Pilihan Layanan:</span>
-                        <div id="shipping-options" class="flex flex-col space-y-1.5 text-xs font-montserrat"></div>
-                    </div>
+            <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
+                <div class="flex items-baseline space-x-6">
+                    <span class="text-base md:text-lg font-medium text-gray-900 font-montserrat">Estimated total</span>
+                    <span id="cart-total-price" class="text-xl md:text-xl font-regular font-montserrat">Rp 0,00 IDR</span>
                 </div>
-
-                <!-- Subtotal Row -->
-                <div class="flex items-baseline justify-between px-6 sm:px-8 py-3.5">
-                    <span class="text-sm font-medium text-black">Subtotal (IDR)</span>
-                    <span id="cart-total-price" class="text-base font-bold font-mono text-black">Rp 0 IDR</span>
-                </div>
-
-                <!-- Checkout Button (Exact A24 Full Width Bold Solid Black) -->
-                <div class="px-6 sm:px-8 pb-4">
-                    <button id="checkout-btn" onclick="processCheckout()"
-                        class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-5 sm:py-6 text-base sm:text-lg font-bold tracking-[0.22em] uppercase font-montserrat flex items-center justify-center cursor-pointer select-none">
+                <p class="text-xs text-gray-400 font-montserrat">taxes and shipping calculated.</p>
+                <div class="pt-4 w-full text-right">
+                    <button onclick="processCheckout()"
+                        class="btn-brush text-sm md:text-base cursor-pointer font-montserrat" id="checkout-btn">
                         CHECKOUT
                     </button>
-                </div>
-
-                <!-- WHY NOT ADD? Section (A24 cross-sell recommendation) -->
-                <div class="px-6 sm:px-8 pt-3 pb-5 border-t border-neutral-100 bg-neutral-50/70">
-                    <span class="text-[10px] font-bold tracking-[0.2em] uppercase text-black block mb-2.5">WHY NOT ADD?</span>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-12 h-12 bg-neutral-200 flex-shrink-0 overflow-hidden">
-                                <img src="{{ asset('footage-baju.jpg') }}" alt="Notisse Heavyweight Tote" class="w-full h-full object-cover">
-                            </div>
-                            <div>
-                                <h5 class="text-xs font-semibold text-black leading-snug">Notisse Heavyweight Canvas Tote</h5>
-                                <p class="text-[11px] font-mono text-gray-500 mt-0.5">Rp 150.000</p>
-                            </div>
-                        </div>
-                        <button onclick="addCrossSellItem()" class="border border-black px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-black hover:text-white transition-colors cursor-pointer">
-                            ADD
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -2044,7 +2028,10 @@
                     cartTrigger.classList.add('opacity-0', 'pointer-events-none');
                 } else {
                     cartTrigger.classList.remove('opacity-0', 'pointer-events-none');
-                    if (currentScrollY > 40) {
+                    // In A24, cart is in minimal (vertical) state ONLY when header is hidden on scroll down.
+                    // When scrolling up and header reappears (not header-hidden), cart returns to horizontal!
+                    const isHeaderHidden = mainHeader.classList.contains('header-hidden');
+                    if (isHeaderHidden) {
                         cartTrigger.classList.add('state-minimal');
                     } else {
                         cartTrigger.classList.remove('state-minimal');
@@ -2767,13 +2754,7 @@
             if (!container) return;
 
             if (cartState.length === 0) {
-                container.innerHTML = `
-                    <div class="py-16 sm:py-24 px-2 flex flex-col justify-center select-none">
-                        <h2 class="text-5xl sm:text-6xl font-bold tracking-tight text-neutral-300 font-montserrat leading-none">
-                            Cart empty ;(
-                        </h2>
-                    </div>
-                `;
+                container.innerHTML = `<div class="text-center py-16 text-gray-400 text-sm font-roboto">Your cart is empty.</div>`;
             } else {
                 let html = '';
                 cartState.forEach((item, index) => {
@@ -2781,31 +2762,25 @@
                     totalAmount += itemTotal;
                     totalItemCount += item.qty;
                     html += `
-                        <div class="py-5 flex items-start justify-between space-x-4 cart-animated-item" style="animation-delay: ${index * 60}ms">
-                            <div class="flex items-start space-x-3 sm:space-x-4">
-                                <div class="w-20 h-20 sm:w-22 sm:h-22 bg-neutral-100 flex-shrink-0 overflow-hidden">
+                        <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100 cart-animated-item" style="animation-delay: ${index * 70}ms">
+                            <div class="col-span-6 md:col-span-5 flex items-center space-x-3">
+                                <div class="w-12 h-16 bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
                                     <img src="{{ asset('footage-baju.jpg') }}" alt="${item.name}" class="w-full h-full object-cover">
                                 </div>
-                                <div class="flex flex-col justify-between min-h-[5rem]">
-                                    <div>
-                                        <h4 class="font-medium text-xs sm:text-sm font-montserrat text-black leading-snug">${item.name}</h4>
-                                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Size: ${item.size}</p>
-                                    </div>
-                                    <div class="flex items-center space-x-4 pt-2">
-                                        <div class="inline-flex items-center space-x-2 text-xs font-montserrat text-black select-none">
-                                            <button onclick="updateCartQty(${index}, -1)" class="w-5 h-5 flex items-center justify-center hover:opacity-50 font-bold transition-opacity text-sm cursor-pointer" aria-label="Decrease">&minus;</button>
-                                            <span class="font-mono font-medium px-1 text-xs">${item.qty}</span>
-                                            <button onclick="updateCartQty(${index}, 1)" class="w-5 h-5 flex items-center justify-center hover:opacity-50 font-bold transition-opacity text-sm cursor-pointer" aria-label="Increase">&plus;</button>
-                                        </div>
-                                        <button onclick="removeCartItem(${index})" class="text-[10px] font-bold tracking-widest text-neutral-400 hover:text-black uppercase font-montserrat transition-colors cursor-pointer">
-                                            REMOVE
-                                        </button>
-                                    </div>
+                                <div>
+                                    <p class="font-semibold uppercase text-black text-xs md:text-sm font-montserrat">${item.name}</p>
+                                    <p class="text-xs text-gray-500 font-roboto">Size: ${item.size}</p>
                                 </div>
                             </div>
-                            <div class="text-right flex-shrink-0 pt-0.5">
-                                <span class="text-xs sm:text-sm font-semibold font-mono text-black">${formatRupiah(itemTotal)}</span>
+                            <div class="col-span-3 md:col-span-3 flex justify-center">
+                                <div class="flex items-center border border-gray-400">
+                                    <button onclick="updateCartQty(${index}, -1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto cursor-pointer">−</button>
+                                    <span class="px-3 py-1 font-semibold font-roboto">${item.qty}</span>
+                                    <button onclick="updateCartQty(${index}, 1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto cursor-pointer">+</button>
+                                </div>
                             </div>
+                            <div class="hidden md:block md:col-span-2 text-right font-montserrat">${formatRupiah(item.unitPrice)}</div>
+                            <div class="col-span-3 md:col-span-2 text-right font-medium font-montserrat">${formatRupiah(itemTotal)}</div>
                         </div>
                     `;
                 });
