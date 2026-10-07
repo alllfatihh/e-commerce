@@ -573,7 +573,7 @@
         /* 4. MONOSPACE COUNTER */
         .header__link--cart__counter {
             position: absolute;
-            right: -4px;
+            right: -6.5px;
             top: 31px;
             /* Arrow tip is at 27px, so 4px gap */
             width: 14px;
