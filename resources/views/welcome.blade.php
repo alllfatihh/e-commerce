@@ -1373,7 +1373,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
                         onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
-                        <img src="{{ asset('artwork.jpeg') }}"
+                        <img src="{{ asset('masmus.jpeg') }}"
                             alt="Mustafa Portrait"
                             class="w-full h-full object-cover grayscale group-hover:scale-105 transition-all duration-500">
                     </div>
@@ -1420,7 +1420,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Mustafa Alatas"
                         data-artist-city="Temanggung" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="{{ asset('footagebaju2.jpg') }}"
+                            <img src="{{ asset('masmus.jpeg') }}"
                                 alt="Mustafa Alatas"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
@@ -1519,7 +1519,7 @@
             <!-- Artist Header Bio -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-10">
                 <div class="md:col-span-4 aspect-[4/5] bg-gray-200 overflow-hidden">
-                    <img src="{{ asset('home2.png') }}" alt="Mustafa Alatas"
+                    <img src="{{ asset('masmus.jpeg') }}" alt="Mustafa Alatas"
                         class="w-full h-full object-cover grayscale">
                 </div>
 
