@@ -471,27 +471,44 @@
                         <!-- Info -->
                         <div class="p-4 space-y-2">
                             <h3 class="font-montserrat font-bold text-base text-gray-900 uppercase">{{ $art->name }}</h3>
-                            <p class="line-clamp-3 text-xs text-gray-500 font-roboto leading-relaxed">
+                            <p class="line-clamp-2 text-xs text-gray-500 font-roboto leading-relaxed">
                                 {{ $art->bio ?: 'Seniman kolaborator eksklusif lini tekstil dan garmen atelier Notisse.' }}
                             </p>
+
+                            <!-- Linked Creations Badges -->
+                            <div class="flex items-center gap-2 pt-2 border-t border-gray-100 text-[10px] font-montserrat font-bold uppercase">
+                                <span class="px-2 py-0.5 bg-neutral-100 text-neutral-800 rounded-sm">🎨 {{ $art->artworks->count() }} Artworks</span>
+                                <span class="px-2 py-0.5 bg-red-50 text-brandRed rounded-sm">📰 {{ $art->editorials->count() }} Editorial</span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Actions -->
-                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-montserrat text-xs">
-                        <span class="text-[10px] text-gray-400 font-mono">ID: #ART-{{ $art->id }}</span>
-                        <div class="flex items-center gap-3">
-                            <button onclick="openEditArtistModal({{ $art->id }}, '{{ addslashes($art->name) }}', '{{ addslashes($art->city ?? '') }}', '{{ addslashes($art->bio ?? '') }}', '{{ $art->photo ? asset($art->photo) : '' }}', '{{ $art->artwork_preview ? asset($art->artwork_preview) : '' }}')"
-                                class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
-                                Edit
-                            </button>
-                            <form action="/admin/artists/{{ $art->id }}" method="POST" class="inline"
-                                  onsubmit="return confirm('Hapus seniman {{ addslashes($art->name) }}?')">
-                                @method('DELETE') @csrf
-                                <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer">
-                                    Delete
+                    <div class="p-3 bg-gray-50 border-t border-gray-100 space-y-2 font-montserrat text-xs">
+                        <button type="button" onclick="viewArtistCreations({{ $art->id }})"
+                                class="w-full text-center py-1.5 px-3 bg-brandDark text-white text-[10px] font-bold uppercase tracking-wider hover:bg-black transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>Kelola Karya & Editorial Seniman</span>
+                            <span>&rarr;</span>
+                        </button>
+                        <div class="flex items-center justify-between pt-1">
+                            <div class="flex items-center gap-2 text-[10px]">
+                                <button type="button" onclick="openAddArtworkModal({{ $art->id }})" class="text-neutral-700 hover:text-black font-bold uppercase underline cursor-pointer">+ Artwork</button>
+                                <span class="text-gray-300">&bull;</span>
+                                <button type="button" onclick="openAddEditorialModal({{ $art->id }})" class="text-brandRed hover:underline font-bold uppercase cursor-pointer">+ Editorial</button>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openEditArtistModal({{ $art->id }}, '{{ addslashes($art->name) }}', '{{ addslashes($art->city ?? '') }}', '{{ addslashes($art->bio ?? '') }}', '{{ $art->photo ? asset($art->photo) : '' }}', '{{ $art->artwork_preview ? asset($art->artwork_preview) : '' }}')"
+                                    class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer text-[11px]">
+                                    Edit
                                 </button>
-                            </form>
+                                <form action="/admin/artists/{{ $art->id }}" method="POST" class="inline"
+                                      onsubmit="return confirm('Hapus seniman {{ addslashes($art->name) }} beserta seluruh karya & editorialnya?')">
+                                    @method('DELETE') @csrf
+                                    <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer text-[11px]">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -507,59 +524,124 @@
              SECTION 3: ARTWORKS & ARTIST EDITORIAL
         ───────────────────────────────────────────────────────── --}}
         <section id="section-artworks" class="section-card hidden">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
                     <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Artworks & Artist Editorial</h2>
-                    <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola karya seni orisinil untuk program penawaran akuisisi kolektor serta editorial seniman kolaborator.</p>
+                    <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola karya seni fisik orisinil (lukisan/mixed media) dan artikel editorial kuratorial yang terhubung secara spesifik per seniman.</p>
                 </div>
-                <button onclick="openAddArtworkModal()" class="btn-primary flex items-center gap-2 shrink-0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    <span>Add Artwork / Editorial</span>
-                </button>
+                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                    <button onclick="openAddArtworkModal()" class="btn-primary flex items-center gap-2 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span>+ Tambah Artwork Fisik</span>
+                    </button>
+                    <button onclick="openAddEditorialModal()" class="btn-accent flex items-center gap-2 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        <span>+ Tambah Editorial Artikel</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse($artworks as $art)
-                <div class="bg-white border border-gray-200 overflow-hidden flex flex-col justify-between group shadow-sm">
+            <!-- Filter Toolbar (Per Seniman & Per Tipe) -->
+            <div class="bg-gray-50 border border-gray-200 p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-gray-500 shrink-0">Filter Seniman:</label>
+                        <select id="creation-filter-artist" onchange="filterCreations()" class="admin-input text-xs py-1.5 bg-white max-w-[240px]">
+                            <option value="all">Semua Seniman (All Artists - {{ $artists->count() }})</option>
+                            @foreach($artists as $artObj)
+                                <option value="{{ $artObj->id }}">{{ $artObj->name }} ({{ $artObj->city ?: 'Indonesia' }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <label class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-gray-500 shrink-0">Tipe:</label>
+                        <select id="creation-filter-type" onchange="filterCreations()" class="admin-input text-xs py-1.5 bg-white">
+                            <option value="all">Semua Tipe (Total: {{ $artworks->count() + $editorials->count() }})</option>
+                            <option value="artwork">🎨 Hanya Artwork Fisik ({{ $artworks->count() }})</option>
+                            <option value="editorial">📰 Hanya Editorial Artikel ({{ $editorials->count() }})</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-[11px] font-montserrat font-semibold text-gray-400 shrink-0">
+                    Menampilkan <span id="creation-count-display" class="font-bold text-gray-900">{{ $artworks->count() + $editorials->count() }}</span> konten kurasi
+                </div>
+            </div>
+
+            <!-- Creation Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="creations-grid">
+                {{-- ARTWORKS --}}
+                @foreach($artworks as $art)
+                @php
+                    $aImg = $art->image;
+                    if ($aImg) {
+                        if (Str::startsWith($aImg, 'http')) { $artUrl = $aImg; }
+                        elseif (file_exists(public_path('storage/' . $aImg))) { $artUrl = asset('storage/' . $aImg); }
+                        else { $artUrl = asset($aImg); }
+                    } else {
+                        $artUrl = 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork';
+                    }
+                    $artistOwner = $art->artist;
+                @endphp
+                <div class="creation-item bg-white border border-gray-200 overflow-hidden flex flex-col justify-between group shadow-sm transition-all hover:border-black"
+                     data-artist-id="{{ $art->artist_id }}" data-type="artwork">
                     <div>
+                        <!-- Artist Header Bar -->
+                        <div class="px-4 py-2.5 bg-neutral-900 text-white flex items-center justify-between border-b border-neutral-800">
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-full overflow-hidden bg-white/20 inline-block shrink-0">
+                                    <img src="{{ $artistOwner && $artistOwner->photo ? (Str::startsWith($artistOwner->photo, 'http') ? $artistOwner->photo : asset($artistOwner->photo)) : 'https://placehold.co/100x100/333/fff?text=A' }}"
+                                         class="w-full h-full object-cover">
+                                </span>
+                                <span class="font-montserrat font-bold text-xs uppercase tracking-wide truncate max-w-[170px]">
+                                    {{ $artistOwner ? $artistOwner->name : 'Seniman Kolaborator' }}
+                                </span>
+                            </div>
+                            <span class="text-[9px] font-montserrat font-bold uppercase tracking-widest px-2 py-0.5 bg-neutral-800 text-brandAccent border border-brandAccent/30">
+                                🎨 Artwork
+                            </span>
+                        </div>
+
                         <!-- Thumbnail -->
                         <div class="aspect-[4/3] bg-gray-100 relative overflow-hidden border-b border-gray-200">
-                            @php
-                                $aImg = $art->image;
-                                if ($aImg) {
-                                    if (Str::startsWith($aImg, 'http')) { $artUrl = $aImg; }
-                                    elseif (file_exists(public_path('storage/' . $aImg))) { $artUrl = asset('storage/' . $aImg); }
-                                    else { $artUrl = asset($aImg); }
-                                } else {
-                                    $artUrl = asset('footagebaju2.jpg');
-                                }
-                            @endphp
-                            <img src="{{ $artUrl }}" alt="{{ $art->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='/footagebaju2.jpg'">
+                            <img src="{{ $artUrl }}" alt="{{ $art->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/600x800/d9d9d9/555555?text=Artwork'">
                             <div class="absolute top-3 left-3">
                                 <span class="text-[9px] font-bold font-montserrat tracking-widest uppercase bg-black text-white px-2 py-0.5 shadow-sm">
                                     {{ $art->status ?: 'Available for Acquisition' }}
                                 </span>
                             </div>
+                            @if($art->year)
+                            <div class="absolute bottom-2.5 right-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-mono px-2 py-0.5">
+                                {{ $art->year }}
+                            </div>
+                            @endif
                         </div>
 
                         <!-- Card Body -->
-                        <div class="p-5 space-y-2.5">
+                        <div class="p-4 space-y-2.5">
                             <div>
-                                <span class="text-[10px] font-montserrat font-bold uppercase tracking-wider text-gray-400">{{ $art->artist_name ?: 'Curated Artist' }} &bull; {{ $art->year ?: '2024' }}</span>
-                                <h3 class="font-montserrat font-bold text-base text-gray-900 uppercase mt-0.5">{{ $art->title }}</h3>
+                                <h3 class="font-montserrat font-bold text-base text-gray-900 uppercase leading-snug">{{ $art->title }}</h3>
+                                <p class="text-xs text-gray-500 font-roboto mt-0.5">
+                                    {{ $art->medium ?: 'Oil on Canvas' }} @if($art->dimensions) &bull; {{ $art->dimensions }} @endif
+                                </p>
                             </div>
-                            <div class="text-xs text-gray-600 font-roboto space-y-1">
-                                <p><strong class="text-gray-900">Medium:</strong> {{ $art->medium ?: 'Oil on Canvas' }}</p>
-                                <p class="line-clamp-2 text-gray-500 leading-relaxed">{{ $art->description ?: 'Karya seni orisinil dalam program kolaborasi galeri Notisse.' }}</p>
-                            </div>
+                            @if($art->price)
+                            <p class="text-xs font-mono font-bold text-emerald-700">
+                                Est. Nilai: Rp {{ number_format($art->price, 0, ',', '.') }}
+                            </p>
+                            @endif
+                            <p class="line-clamp-2 text-xs text-gray-600 font-roboto leading-relaxed">
+                                {{ $art->description ?: 'Karya seni fisik orisinil oleh seniman kolaborator Notisse.' }}
+                            </p>
                         </div>
                     </div>
 
                     <!-- Card Actions -->
-                    <div class="px-5 py-3.5 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-gray-400 uppercase">REF: #NTS-ART-{{ $art->id }}</span>
-                        <div class="flex items-center gap-3 font-montserrat text-xs">
-                            <button onclick="openEditArtworkModal({{ $art->id }}, '{{ addslashes($art->title) }}', '{{ addslashes($art->artist_name ?? '') }}', '{{ addslashes($art->medium ?? '') }}', '{{ addslashes($art->year ?? '') }}', '{{ addslashes($art->status ?? '') }}', '{{ addslashes($art->description ?? '') }}')"
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-montserrat text-xs">
+                        <span class="text-[10px] font-mono text-gray-400 uppercase">#ARTW-{{ $art->id }}</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="openEditArtworkModal({{ $art->id }}, {{ $art->artist_id }}, '{{ addslashes($art->title) }}', '{{ addslashes($art->medium ?? '') }}', '{{ addslashes($art->dimensions ?? '') }}', '{{ addslashes($art->year ?? '') }}', '{{ addslashes($art->status ?? '') }}', '{{ $art->price ?? '' }}', '{{ addslashes($art->description ?? '') }}')"
                                 class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
                                 Edit
                             </button>
@@ -573,11 +655,90 @@
                         </div>
                     </div>
                 </div>
-                @empty
-                <div class="col-span-full p-12 bg-white border border-gray-200 text-center text-gray-400 font-roboto text-sm">
-                    Belum ada karya seni atau artist editorial. Klik "Add Artwork / Editorial" di atas untuk menambahkan.
+                @endforeach
+
+                {{-- EDITORIALS --}}
+                @foreach($editorials as $edit)
+                @php
+                    $eImg = $edit->image;
+                    if ($eImg) {
+                        if (Str::startsWith($eImg, 'http')) { $editUrl = $eImg; }
+                        elseif (file_exists(public_path('storage/' . $eImg))) { $editUrl = asset('storage/' . $eImg); }
+                        else { $editUrl = asset($eImg); }
+                    } else {
+                        $editUrl = 'https://placehold.co/600x600/d9d9d9/555555?text=Editorial';
+                    }
+                    $artistOwner = $edit->artist;
+                @endphp
+                <div class="creation-item bg-white border border-gray-200 overflow-hidden flex flex-col justify-between group shadow-sm transition-all hover:border-brandRed"
+                     data-artist-id="{{ $edit->artist_id }}" data-type="editorial">
+                    <div>
+                        <!-- Artist Header Bar -->
+                        <div class="px-4 py-2.5 bg-brandRed text-white flex items-center justify-between border-b border-red-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-full overflow-hidden bg-white/20 inline-block shrink-0">
+                                    <img src="{{ $artistOwner && $artistOwner->photo ? (Str::startsWith($artistOwner->photo, 'http') ? $artistOwner->photo : asset($artistOwner->photo)) : 'https://placehold.co/100x100/333/fff?text=A' }}"
+                                         class="w-full h-full object-cover">
+                                </span>
+                                <span class="font-montserrat font-bold text-xs uppercase tracking-wide truncate max-w-[170px]">
+                                    {{ $artistOwner ? $artistOwner->name : 'Seniman Kolaborator' }}
+                                </span>
+                            </div>
+                            <span class="text-[9px] font-montserrat font-bold uppercase tracking-widest px-2 py-0.5 bg-white text-brandRed font-black">
+                                📰 Editorial
+                            </span>
+                        </div>
+
+                        <!-- Thumbnail -->
+                        <div class="aspect-[4/3] bg-gray-100 relative overflow-hidden border-b border-gray-200">
+                            <img src="{{ $editUrl }}" alt="{{ $edit->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/600x600/d9d9d9/555555?text=Editorial'">
+                            @if($edit->video_url)
+                            <div class="absolute top-3 left-3 bg-black/85 text-white text-[9px] font-montserrat uppercase px-2 py-0.5 flex items-center gap-1 font-bold">
+                                <svg class="w-3 h-3 text-brandAccent" fill="currentColor" viewBox="0 0 20 20"><polygon points="5 3 19 10 5 17 5 3"/></svg>
+                                <span>Includes Video</span>
+                            </div>
+                            @endif
+                            <div class="absolute bottom-2.5 right-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-roboto px-2 py-0.5">
+                                {{ $edit->author ?: 'Editorial Notisse' }}
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-4 space-y-2.5">
+                            <div>
+                                <h3 class="font-montserrat font-bold text-base text-gray-900 uppercase leading-snug">{{ $edit->title }}</h3>
+                                <p class="text-xs text-gray-400 font-roboto mt-0.5">Penulis: {{ $edit->author ?: 'Tim Kuratorial' }}</p>
+                            </div>
+                            <p class="line-clamp-2 text-xs text-gray-600 font-roboto leading-relaxed">
+                                {{ $edit->excerpt ?: Str::limit($edit->content, 120) }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Card Actions -->
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-montserrat text-xs">
+                        <span class="text-[10px] font-mono text-gray-400 uppercase">#EDIT-{{ $edit->id }}</span>
+                        <div class="flex items-center gap-3">
+                            <button onclick="openEditEditorialModal({{ $edit->id }}, {{ $edit->artist_id }}, '{{ addslashes($edit->title) }}', '{{ addslashes($edit->author ?? '') }}', '{{ addslashes($edit->excerpt ?? '') }}', '{{ addslashes($edit->video_url ?? '') }}', '{{ addslashes($edit->content ?? '') }}')"
+                                class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
+                                Edit
+                            </button>
+                            <form action="/admin/editorials/{{ $edit->id }}" method="POST" class="inline"
+                                  onsubmit="return confirm('Hapus artikel editorial {{ addslashes($edit->title) }}?')">
+                                @method('DELETE') @csrf
+                                <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                @endforelse
+                @endforeach
+
+                <!-- Empty state if no items or filter zero -->
+                <div id="creations-empty-state" class="hidden col-span-full p-12 bg-white border border-gray-200 text-center text-gray-400 font-roboto text-sm">
+                    Tidak ada karya seni atau artikel editorial yang sesuai dengan filter yang dipilih.
+                </div>
             </div>
         </section>
 
@@ -909,14 +1070,14 @@
 </div>
 
 {{-- ══════════════════════════════════════════════════════════════
-     MODAL 3: ADD / EDIT ARTWORK & EDITORIAL
+     MODAL 3: ADD / EDIT ARTWORK (KARYA SENI FISIK)
 ══════════════════════════════════════════════════════════════ --}}
 <div id="modal-artwork" class="modal-backdrop" onclick="closeArtworkModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
             <div>
-                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block">Editorial Curatorial</span>
-                <h3 id="modal-artwork-title" class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Add Artwork / Editorial</h3>
+                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block">Karya Seni Fisik Seniman</span>
+                <h3 id="modal-artwork-title" class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Artwork Fisik</h3>
             </div>
             <button onclick="closeArtworkModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
         </div>
@@ -925,45 +1086,58 @@
             @csrf
             <input type="hidden" id="artwork-form-method" name="_method" value="POST" disabled>
 
+            <!-- PILIH SENIMAN (WAJIB & JELAS) -->
+            <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-sm">
+                <label class="block text-[11px] font-montserrat font-bold uppercase tracking-widest text-black mb-1.5">
+                    Seniman Pemilik Karya *
+                </label>
+                <select name="artist_id" id="art-artist-id" required class="admin-input bg-white font-medium">
+                    <option value="">-- Pilih Seniman Kolaborator --</option>
+                    @foreach($artists as $artObj)
+                        <option value="{{ $artObj->id }}">{{ $artObj->name }} &bull; {{ $artObj->city ?: 'Indonesia' }}</option>
+                    @endforeach
+                </select>
+                <p class="text-[10px] text-gray-500 font-roboto mt-1">Karya ini akan langsung terhubung ke profil seniman yang Anda pilih dan tampil di galeri storefront.</p>
+            </div>
+
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Artwork Title *</label>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Karya Seni (Title) *</label>
                 <input type="text" name="title" id="art-title" required placeholder="Contoh: Mereka Ulang Ungkapan Indah Leila" class="admin-input">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Artist Collaborator Name</label>
-                    <input list="artists-datalist-2" name="artist_name" id="art-artist" placeholder="Pilih atau ketik nama seniman..." class="admin-input">
-                    <datalist id="artists-datalist-2">
-                        @foreach($artists as $art)
-                            <option value="{{ $art->name }}">
-                        @endforeach
-                    </datalist>
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Medium / Teknik</label>
+                    <input type="text" name="medium" id="art-medium" placeholder="Contoh: Oil on canvas" class="admin-input">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Year Created</label>
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Dimensi (Ukuran Kanvas)</label>
+                    <input type="text" name="dimensions" id="art-dimensions" placeholder="Contoh: 60x60cm" class="admin-input">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Tahun Pembuatan</label>
                     <input type="text" name="year" id="art-year" placeholder="Contoh: 2024" class="admin-input">
                 </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Medium & Dimensions</label>
-                    <input type="text" name="medium" id="art-medium" placeholder="Contoh: Oil on linen &bull; 80x100cm" class="admin-input">
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Status Ketersediaan</label>
+                    <input type="text" name="status" id="art-status" placeholder="Contoh: Available for Direct Offering" class="admin-input">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Status / Availability</label>
-                    <input type="text" name="status" id="art-status" placeholder="Contoh: Available for Acquisition" class="admin-input">
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Est. Nilai / Harga (IDR)</label>
+                    <input type="number" name="price" id="art-price" placeholder="Contoh: 15000000" class="admin-input">
                 </div>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Curatorial Notes & Description</label>
-                <textarea name="description" id="art-desc" rows="3" placeholder="Tuliskan latar belakang karya seni, narasi visual, dan pesan seniman..." class="admin-input resize-none leading-relaxed"></textarea>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Catatan Kuratorial & Deskripsi</label>
+                <textarea name="description" id="art-desc" rows="3" placeholder="Tuliskan latar belakang karya seni, narasi visual, dan pesan filosofis seniman..." class="admin-input resize-none leading-relaxed"></textarea>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Artwork Image (High-Res)</label>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Karya Seni High-Res (Physical Artwork)</label>
                 <input type="file" name="image" id="artwork-img-input" accept="image/*"
                     onchange="previewImage(this,'artwork-img-preview')"
                     class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
@@ -971,15 +1145,88 @@
             </div>
 
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
-                <button type="button" onclick="closeArtworkModal()" class="btn-outline cursor-pointer">Cancel</button>
-                <button type="submit" class="btn-primary cursor-pointer">Save Artwork</button>
+                <button type="button" onclick="closeArtworkModal()" class="btn-outline cursor-pointer">Batal</button>
+                <button type="submit" class="btn-primary cursor-pointer">Simpan Artwork</button>
             </div>
         </form>
     </div>
 </div>
 
 {{-- ══════════════════════════════════════════════════════════════
-     MODAL 4: EDIT SITE MEDIA (With Product Link Option)
+     MODAL 4: ADD / EDIT EDITORIAL (ARTIKEL / WAWANCARA SENIMAN)
+══════════════════════════════════════════════════════════════ --}}
+<div id="modal-editorial" class="modal-backdrop" onclick="closeEditorialModal()">
+    <div class="modal-box max-w-2xl" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+            <div>
+                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-brandRed block">Editorial & Curatorial Writing</span>
+                <h3 id="modal-editorial-title" class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Artikel Editorial</h3>
+            </div>
+            <button onclick="closeEditorialModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
+        </div>
+
+        <form id="editorial-form" action="/admin/editorials" method="POST" enctype="multipart/form-data" class="space-y-4">
+            @csrf
+            <input type="hidden" id="editorial-form-method" name="_method" value="POST" disabled>
+
+            <!-- PILIH SENIMAN (WAJIB & JELAS) -->
+            <div class="p-3 bg-red-50 border border-red-200 rounded-sm">
+                <label class="block text-[11px] font-montserrat font-bold uppercase tracking-widest text-brandRed mb-1.5">
+                    Seniman Terkait Artikel Ini *
+                </label>
+                <select name="artist_id" id="edit-artist-id" required class="admin-input bg-white font-medium">
+                    <option value="">-- Pilih Seniman Yang Ditampilkan --</option>
+                    @foreach($artists as $artObj)
+                        <option value="{{ $artObj->id }}">{{ $artObj->name }} &bull; {{ $artObj->city ?: 'Indonesia' }}</option>
+                    @endforeach
+                </select>
+                <p class="text-[10px] text-gray-500 font-roboto mt-1">Artikel editorial ini akan muncul di tab "Editorial" pada profil seniman yang dipilih.</p>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Artikel Editorial *</label>
+                <input type="text" name="title" id="edit-title" required placeholder="Contoh: Menafsir Kuasa dan Sosial dalam Lukisan Figuratif" class="admin-input">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Penulis / Kurator</label>
+                    <input type="text" name="author" id="edit-author" placeholder="Contoh: Laksa Dawantara / Tim Notisse" class="admin-input">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Video File / URL (Opsional)</label>
+                    <input type="text" name="video_url" id="edit-video" placeholder="Contoh: video/editorial.mp4 atau URL video" class="admin-input">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Ringkasan / Excerpt Singkat</label>
+                <textarea name="excerpt" id="edit-excerpt" rows="2" placeholder="Ringkasan 1-2 kalimat pengantar artikel untuk preview kartu..." class="admin-input resize-none leading-relaxed"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Isi Lengkap Tulisan Editorial</label>
+                <textarea name="content" id="edit-content" rows="6" placeholder="Tuliskan esai lengkap, kutipan wawancara seniman, dan refleksi karya seni..." class="admin-input resize-none leading-relaxed font-roboto"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Sampul / Featured Article Image</label>
+                <input type="file" name="image" id="editorial-img-input" accept="image/*"
+                    onchange="previewImage(this,'editorial-img-preview')"
+                    class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
+                <img id="editorial-img-preview" class="mt-3 w-40 h-28 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                <button type="button" onclick="closeEditorialModal()" class="btn-outline cursor-pointer">Batal</button>
+                <button type="submit" class="btn-primary bg-brandRed hover:bg-black cursor-pointer">Simpan Artikel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ══════════════════════════════════════════════════════════════
+     MODAL 5: EDIT SITE MEDIA (With Product Link Option)
 ══════════════════════════════════════════════════════════════ --}}
 <div id="modal-media" class="modal-backdrop" onclick="closeMediaModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
@@ -1163,28 +1410,77 @@
         document.getElementById('modal-artist').classList.remove('open');
     }
 
+    // ── Filter Creations (Artwork & Editorial per Seniman) ──────
+    function filterCreations() {
+        const artistFilter = document.getElementById('creation-filter-artist').value;
+        const typeFilter   = document.getElementById('creation-filter-type').value;
+        const items = document.querySelectorAll('#creations-grid .creation-item');
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            const itemArtist = item.getAttribute('data-artist-id');
+            const itemType   = item.getAttribute('data-type');
+
+            const matchArtist = (artistFilter === 'all' || itemArtist === artistFilter);
+            const matchType   = (typeFilter === 'all' || itemType === typeFilter);
+
+            if (matchArtist && matchType) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        const emptyState = document.getElementById('creations-empty-state');
+        if (emptyState) {
+            emptyState.classList.toggle('hidden', visibleCount > 0);
+        }
+
+        const countDisplay = document.getElementById('creation-count-display');
+        if (countDisplay) {
+            countDisplay.innerText = visibleCount;
+        }
+    }
+
+    function viewArtistCreations(artistId) {
+        showSection('artworks');
+        const select = document.getElementById('creation-filter-artist');
+        if (select) {
+            select.value = String(artistId);
+            filterCreations();
+        }
+    }
+
     // ── Artwork modal ───────────────────────────────────────────
-    function openAddArtworkModal() {
-        document.getElementById('modal-artwork-title').textContent = 'Add Artwork / Editorial';
+    function openAddArtworkModal(artistId = null) {
+        document.getElementById('modal-artwork-title').textContent = 'Tambah Artwork Fisik';
         document.getElementById('artwork-form').action = '/admin/artworks';
         document.getElementById('artwork-form').reset();
         document.getElementById('artwork-form-method').disabled = true;
+
+        if (artistId) {
+            document.getElementById('art-artist-id').value = String(artistId);
+        }
+
         document.getElementById('artwork-img-preview').classList.add('hidden');
         document.getElementById('modal-artwork').classList.add('open');
     }
 
-    function openEditArtworkModal(id, title, artist, medium, year, status, desc) {
-        document.getElementById('modal-artwork-title').textContent = 'Edit Artwork / Editorial';
+    function openEditArtworkModal(id, artistId, title, medium, dimensions, year, status, price, desc) {
+        document.getElementById('modal-artwork-title').textContent = 'Edit Artwork Fisik';
         document.getElementById('artwork-form').action = '/admin/artworks/' + id;
         document.getElementById('artwork-form-method').value = 'PUT';
         document.getElementById('artwork-form-method').disabled = false;
 
-        document.getElementById('art-title').value  = title;
-        document.getElementById('art-artist').value = artist || '';
-        document.getElementById('art-medium').value = medium || '';
-        document.getElementById('art-year').value   = year || '';
-        document.getElementById('art-status').value = status || '';
-        document.getElementById('art-desc').value   = desc || '';
+        document.getElementById('art-artist-id').value = artistId || '';
+        document.getElementById('art-title').value      = title || '';
+        document.getElementById('art-medium').value     = medium || '';
+        document.getElementById('art-dimensions').value = dimensions || '';
+        document.getElementById('art-year').value       = year || '';
+        document.getElementById('art-status').value     = status || '';
+        document.getElementById('art-price').value      = price || '';
+        document.getElementById('art-desc').value       = desc || '';
         document.getElementById('artwork-img-preview').classList.add('hidden');
 
         document.getElementById('modal-artwork').classList.add('open');
@@ -1192,6 +1488,42 @@
 
     function closeArtworkModal() {
         document.getElementById('modal-artwork').classList.remove('open');
+    }
+
+    // ── Editorial modal ──────────────────────────────────────────
+    function openAddEditorialModal(artistId = null) {
+        document.getElementById('modal-editorial-title').textContent = 'Tambah Artikel Editorial';
+        document.getElementById('editorial-form').action = '/admin/editorials';
+        document.getElementById('editorial-form').reset();
+        document.getElementById('editorial-form-method').disabled = true;
+
+        if (artistId) {
+            document.getElementById('edit-artist-id').value = String(artistId);
+        }
+
+        document.getElementById('editorial-img-preview').classList.add('hidden');
+        document.getElementById('modal-editorial').classList.add('open');
+    }
+
+    function openEditEditorialModal(id, artistId, title, author, excerpt, videoUrl, content) {
+        document.getElementById('modal-editorial-title').textContent = 'Edit Artikel Editorial';
+        document.getElementById('editorial-form').action = '/admin/editorials/' + id;
+        document.getElementById('editorial-form-method').value = 'PUT';
+        document.getElementById('editorial-form-method').disabled = false;
+
+        document.getElementById('edit-artist-id').value = artistId || '';
+        document.getElementById('edit-title').value     = title || '';
+        document.getElementById('edit-author').value    = author || '';
+        document.getElementById('edit-excerpt').value   = excerpt || '';
+        document.getElementById('edit-video').value     = videoUrl || '';
+        document.getElementById('edit-content').value   = content || '';
+        document.getElementById('editorial-img-preview').classList.add('hidden');
+
+        document.getElementById('modal-editorial').classList.add('open');
+    }
+
+    function closeEditorialModal() {
+        document.getElementById('modal-editorial').classList.remove('open');
     }
 
     // ── Media modal ─────────────────────────────────────────────
@@ -1218,6 +1550,7 @@
             closeProductModal();
             closeArtistModal();
             closeArtworkModal();
+            closeEditorialModal();
             closeMediaModal();
         }
     });

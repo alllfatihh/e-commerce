@@ -1351,67 +1351,26 @@
             <!-- TAB CONTENT 1: EDITORIAL ARTICLES -->
             <div id="artist-tab-content-editorial" class="space-y-6">
                 <h3 class="text-sm md:text-base font-bold font-montserrat text-black mb-6" id="editorial-section-title">
-                    Articles Featuring Mustafa Alatas
+                    Articles Featuring Artist
                 </h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="openArtistEditorialDetail('Mereka Ulang Kerumitan Ungkapan Indah')"
-                        class="group cursor-pointer">
-                        <div class="w-full aspect-square bg-[#d9d9d9] mb-3 overflow-hidden">
-                            <img src="https://placehold.co/600x600/d9d9d9/555555?text=Editorial+Article" alt="Article"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline">
-                            Mereka Ulang Kerumitan Ungkapan Indah
-                        </h4>
-                    </div>
+                <div id="artist-editorial-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Populated dynamically via JS per artist -->
+                </div>
+
+                <div id="artist-editorial-empty" class="hidden text-center py-12 bg-gray-50 border border-gray-100 text-gray-400 font-roboto text-sm">
+                    Belum ada artikel editorial yang dipublikasikan untuk seniman ini.
                 </div>
             </div>
 
             <!-- TAB CONTENT 2: ARTWORK GALLERY -->
             <div id="artist-tab-content-artwork" class="hidden space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-                    <!-- Artwork Item 1 -->
-                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Leila', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila')"
-                        class="group cursor-pointer">
-                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
-                            <img src="https://placehold.co/600x800/d9d9d9/555555?text=Artwork+Leila" alt="Artwork Leila"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
-                        </div>
-                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
-                            Mereka Ulang Ungkapan Indah Leila
-                        </h4>
-                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
-                    </div>
+                <div id="artist-artwork-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                    <!-- Populated dynamically via JS per artist -->
+                </div>
 
-                    <!-- Artwork Item 2 -->
-                    <div onclick="openArtistArtworkDetail('Mereka Ulang Ungkapan Indah Effendi', 'Mustafa Alatas', 'Oil on canvas', '60x60cm', 'https://placehold.co/600x800/ccc/333?text=Artwork+Effendi')"
-                        class="group cursor-pointer">
-                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
-                            <img src="https://placehold.co/600x800/ccc/333?text=Artwork+Effendi" alt="Artwork Effendi"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
-                        </div>
-                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
-                            Mereka Ulang Ungkapan Indah Effendi
-                        </h4>
-                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Oil on canvas &bull; 60x60cm</p>
-                    </div>
-
-                    <!-- Artwork Item 3 -->
-                    <div onclick="openArtistArtworkDetail('Figurasi Kuasa Sosial #03', 'Mustafa Alatas', 'Mixed media on canvas', '75x90cm', 'https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa')"
-                        class="group cursor-pointer">
-                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
-                            <img src="https://placehold.co/600x800/222/eee?text=Figurasi+Kuasa" alt="Figurasi Kuasa"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">Original</span>
-                        </div>
-                        <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
-                            Figurasi Kuasa Sosial #03
-                        </h4>
-                        <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Mixed media &bull; 75x90cm</p>
-                    </div>
+                <div id="artist-artwork-empty" class="hidden text-center py-12 bg-gray-50 border border-gray-100 text-gray-400 font-roboto text-sm">
+                    Belum ada karya seni fisik yang dipublikasikan untuk seniman ini.
                 </div>
             </div>
         </section>
@@ -1502,55 +1461,43 @@
                 <!-- Left Column: Article Text & Captioned Images -->
                 <div class="md:col-span-6 space-y-6">
                     <div>
-                        <h1 class="text-xl md:text-2xl font-bold font-montserrat text-black leading-snug">
+                        <h1 id="editorial-detail-title" class="text-xl md:text-2xl font-bold font-montserrat text-black leading-snug">
                             Mustafa Alatas Menafsir Kuasa dan Sosial dalam Lukisan Figuratif dan Simbolisme
                         </h1>
-                        <p class="text-xs text-gray-500 font-roboto mt-2">Laksa Dawantara</p>
+                        <p id="editorial-detail-author" class="text-xs text-gray-500 font-roboto mt-2">Laksa Dawantara</p>
                     </div>
 
-                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                        voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
-                        non proident, sunt in culpa qui officia deserunt mollit anim id est laborum...
-                    </p>
+                    <div id="editorial-detail-content" class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto space-y-4">
+                        <p>
+                            Dokumentasi wacana dan catatan proses berkarya seniman bersama Notisse.
+                        </p>
+                    </div>
 
                     <div class="grid grid-cols-2 gap-4 my-6">
                         <div>
                             <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5">
-                                <img src="https://placehold.co/400x500/222/fff?text=Portrait" alt="Portrait"
+                                <img id="editorial-detail-portrait" src="https://placehold.co/400x500/222/fff?text=Portrait" alt="Portrait"
                                     class="w-full h-full object-cover">
                             </div>
-                            <p class="text-[10px] text-gray-400 font-roboto">Portrait of Mustafa Alatas. Photo by ......
-                            </p>
+                            <p class="text-[10px] text-gray-400 font-roboto">Dokumentasi kuratorial seniman Notisse.</p>
                         </div>
                         <div>
-                            <div class="w-full aspect-[3/2] bg-[#d9d9d9] overflow-hidden mb-1.5">
-                                <img src="https://placehold.co/400x300/444/fff?text=Artwork" alt="Artwork"
+                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5">
+                                <img id="editorial-detail-artwork" src="https://placehold.co/400x500/444/fff?text=Artwork" alt="Artwork"
                                     class="w-full h-full object-cover">
                             </div>
-                            <p class="text-[10px] text-gray-400 font-roboto">Raja Diamuk Massa, 2024. Photo by .... .
-                                Courtesy of Medium.</p>
+                            <p class="text-[10px] text-gray-400 font-roboto">Karya seni terkait dalam artikel.</p>
                         </div>
                     </div>
-
-                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                        voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
-                        non proident, sunt in culpa qui officia deserunt mollit anim id est laborum...
-                    </p>
                 </div>
 
                 <!-- Right Column: Full Featured Editorial Video -->
-                <div class="md:col-span-6 aspect-[4/5] bg-black overflow-hidden relative group shadow-lg">
+                <div id="editorial-video-container" class="md:col-span-6 aspect-[4/5] bg-black overflow-hidden relative group shadow-lg">
                     <video id="editorial-video-player"
                         class="w-full h-full object-cover"
                         autoplay loop muted playsinline controls
                         poster="{{ asset('home.jpg') }}">
-                        <source src="{{ asset('video/editorial.mp4') }}" type="video/mp4">
+                        <source id="editorial-video-source" src="{{ asset('video/editorial.mp4') }}" type="video/mp4">
                         <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
@@ -1999,6 +1946,7 @@
 
     <!-- JAVASCRIPT CONTROLLER -->
     <script>
+        const artistsData = @json($artists ?? []);
 
         let currentSelectedSize = "M";
         let currentSlideIndex = 0;
@@ -2792,6 +2740,72 @@
                 }
             }
 
+            // Populate Editorial Articles dynamically per artist
+            const edGrid = document.getElementById('artist-editorial-grid');
+            const edEmpty = document.getElementById('artist-editorial-empty');
+            if (edGrid) {
+                edGrid.innerHTML = '';
+                const editorials = (artist && artist.editorials) ? artist.editorials : [];
+                if (editorials.length > 0) {
+                    if (edEmpty) edEmpty.classList.add('hidden');
+                    edGrid.classList.remove('hidden');
+                    editorials.forEach(ed => {
+                        const edImg = ed.image ? (ed.image.startsWith('http') || ed.image.startsWith('/') ? ed.image : '/' + ed.image) : 'https://placehold.co/600x600/d9d9d9/555555?text=Editorial';
+                        const card = document.createElement('div');
+                        card.className = 'group cursor-pointer';
+                        card.onclick = () => openArtistEditorialDetailById(ed.id);
+                        card.innerHTML = `
+                            <div class="w-full aspect-square bg-[#d9d9d9] mb-3 overflow-hidden relative">
+                                <img src="${edImg}" alt="${ed.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                ${ed.video_url ? '<span class="absolute top-2.5 right-2.5 bg-black/80 text-white text-[9px] font-montserrat uppercase px-2 py-0.5 tracking-wider">Video</span>' : ''}
+                            </div>
+                            <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline leading-snug">
+                                ${ed.title}
+                            </h4>
+                            <p class="text-[11px] text-gray-500 font-roboto mt-1">${ed.author || 'Editorial Notisse'}</p>
+                        `;
+                        edGrid.appendChild(card);
+                    });
+                } else {
+                    edGrid.classList.add('hidden');
+                    if (edEmpty) edEmpty.classList.remove('hidden');
+                }
+            }
+
+            // Populate Artworks dynamically per artist
+            const artGrid = document.getElementById('artist-artwork-grid');
+            const artEmpty = document.getElementById('artist-artwork-empty');
+            if (artGrid) {
+                artGrid.innerHTML = '';
+                const artworks = (artist && artist.artworks) ? artist.artworks : [];
+                if (artworks.length > 0) {
+                    if (artEmpty) artEmpty.classList.add('hidden');
+                    artGrid.classList.remove('hidden');
+                    artworks.forEach(artw => {
+                        const artImg = artw.image ? (artw.image.startsWith('http') || artw.image.startsWith('/') ? artw.image : '/' + artw.image) : 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork';
+                        const card = document.createElement('div');
+                        card.className = 'group cursor-pointer';
+                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg);
+                        card.innerHTML = `
+                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
+                                <img src="${artImg}" alt="${artw.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">
+                                    ${artw.status || 'Original'}
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
+                                ${artw.title}
+                            </h4>
+                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">${artw.medium || 'Artwork'} ${artw.dimensions ? '&bull; ' + artw.dimensions : ''}</p>
+                        `;
+                        artGrid.appendChild(card);
+                    });
+                } else {
+                    artGrid.classList.add('hidden');
+                    if (artEmpty) artEmpty.classList.remove('hidden');
+                }
+            }
+
             switchArtistTab('editorial');
             showPage('view-artist-detail');
         }
@@ -3050,6 +3064,67 @@
         }
 
         function openArtistEditorialDetail(title) {
+            showPage('view-artist-editorial-detail');
+        }
+
+        function openArtistEditorialDetailById(id) {
+            let foundEd = null;
+            let foundArtist = null;
+            if (typeof artistsData !== 'undefined' && artistsData) {
+                for (const a of artistsData) {
+                    if (a.editorials) {
+                        const ed = a.editorials.find(e => e.id == id);
+                        if (ed) {
+                            foundEd = ed;
+                            foundArtist = a;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (foundEd) {
+                const titleEl = document.getElementById('editorial-detail-title');
+                if (titleEl) titleEl.innerText = foundEd.title;
+
+                const authorEl = document.getElementById('editorial-detail-author');
+                if (authorEl) authorEl.innerText = (foundEd.author || 'Tim Editorial Notisse') + (foundArtist ? ' • Featuring ' + foundArtist.name : '');
+
+                const contentContainer = document.getElementById('editorial-detail-content');
+                if (contentContainer) {
+                    contentContainer.innerHTML = '';
+                    const text = foundEd.content || foundEd.excerpt || 'Dokumentasi editorial seniman Notisse.';
+                    const paragraphs = text.split('\n');
+                    paragraphs.forEach(p => {
+                        const trimmed = p.trim();
+                        if (trimmed) {
+                            const pEl = document.createElement('p');
+                            pEl.className = 'leading-relaxed text-xs md:text-sm text-gray-700 font-roboto';
+                            pEl.innerText = trimmed;
+                            contentContainer.appendChild(pEl);
+                        }
+                    });
+                }
+
+                const edImg = foundEd.image ? (foundEd.image.startsWith('http') || foundEd.image.startsWith('/') ? foundEd.image : '/' + foundEd.image) : 'https://placehold.co/400x500/222/fff?text=Editorial';
+                const portraitEl = document.getElementById('editorial-detail-portrait');
+                if (portraitEl) {
+                    portraitEl.src = (foundArtist && foundArtist.photo) ? (foundArtist.photo.startsWith('http') || foundArtist.photo.startsWith('/') ? foundArtist.photo : '/' + foundArtist.photo) : edImg;
+                }
+                const artworkEl = document.getElementById('editorial-detail-artwork');
+                if (artworkEl) artworkEl.src = edImg;
+
+                const videoPlayer = document.getElementById('editorial-video-player');
+                const videoSource = document.getElementById('editorial-video-source');
+                const videoContainer = document.getElementById('editorial-video-container');
+                if (foundEd.video_url && videoPlayer && videoSource) {
+                    if (videoContainer) videoContainer.classList.remove('hidden');
+                    const vSrc = foundEd.video_url.startsWith('http') || foundEd.video_url.startsWith('/') ? foundEd.video_url : '/' + foundEd.video_url;
+                    videoSource.src = vSrc;
+                    videoPlayer.load();
+                }
+            }
+
             showPage('view-artist-editorial-detail');
         }
 

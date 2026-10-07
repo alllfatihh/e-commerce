@@ -12,4 +12,14 @@ class Artist extends Model
     {
         return $this->hasMany(Product::class, 'artist', 'name');
     }
+
+    public function artworks()
+    {
+        return $this->hasMany(Artwork::class);
+    }
+
+    public function editorials()
+    {
+        return $this->hasMany(Editorial::class);
+    }
 }
