@@ -52,6 +52,9 @@
         <!-- LEFT COLUMN: Form -->
         <div class="w-full md:w-1/2 lg:w-3/5 bg-white p-6 md:p-12 lg:p-16 flex justify-end order-2 md:order-1 border-r border-gray-200">
             <div class="max-w-lg w-full">
+                <a href="/?open_checkout=true" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-black mb-6 tracking-wider uppercase font-roboto transition-colors">
+                    &larr; Kembali ke Keranjang
+                </a>
                 
                 <div class="mb-8">
                     <h2 class="text-xl font-bold font-helvetica mb-2">Contact</h2>
@@ -159,17 +162,16 @@
                 subtotal += itemPrice * itemQty;
                 
                 let imgUrl = item.image || '';
-                if (imgUrl && !imgUrl.startsWith('http')) {
-                    if (imgUrl.includes('/')) imgUrl = '/storage/' + imgUrl;
-                    else imgUrl = '/' + imgUrl;
+                if (imgUrl && !imgUrl.startsWith('http') && !imgUrl.startsWith('/')) {
+                    imgUrl = '/' + imgUrl;
                 }
                 
                 const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(itemPrice * itemQty);
 
                 summaryContainer.innerHTML += `
                     <div class="flex items-center gap-4 relative">
-                        <div class="relative w-16 h-16 border border-gray-300 bg-white rounded-lg flex-shrink-0">
-                            <img src="${imgUrl}" class="w-full h-full object-cover rounded-lg">
+                        <div class="relative w-16 h-16 border border-gray-300 bg-white rounded-lg flex-shrink-0 overflow-hidden">
+                            <img src="${imgUrl || '/footage-baju.jpg'}" class="w-full h-full object-cover rounded-lg" onerror="this.src='/footage-baju.jpg'">
                             <span class="absolute -top-2 -right-2 bg-gray-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">${itemQty}</span>
                         </div>
                         <div class="flex-grow">

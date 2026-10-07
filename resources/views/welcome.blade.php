@@ -2102,8 +2102,23 @@
 
         let productsData = @json($products);
         let currentProduct = null;
-
         let cartState = [];
+        try {
+            const savedCart = localStorage.getItem('notisse_cart');
+            if (savedCart) {
+                cartState = JSON.parse(savedCart);
+            }
+        } catch (e) {
+            console.error("Gagal memuat keranjang dari localStorage:", e);
+        }
+
+        function saveCartState() {
+            try {
+                localStorage.setItem('notisse_cart', JSON.stringify(cartState));
+            } catch (e) {
+                console.error("Gagal menyimpan keranjang ke localStorage:", e);
+            }
+        }
 
         const overlayMenuBackdrop = document.getElementById('overlay-menu-backdrop');
         const overlayMenuSidebar = document.getElementById('overlay-menu-sidebar');
@@ -2928,24 +2943,36 @@
             const container = document.getElementById('cart-items-container');
             const totalElement = document.getElementById('cart-total-price');
             const badgeElement = document.getElementById('header-cart-badge');
+            const counterElement = document.getElementById('header-cart-counter');
             let totalAmount = 0;
             let totalItemCount = 0;
 
             if (!container) return;
 
-            if (cartState.length === 0) {
+            if (!cartState || cartState.length === 0) {
                 container.innerHTML = `<div class="text-center py-16 text-gray-400 text-sm font-roboto">Your cart is empty.</div>`;
             } else {
                 let html = '';
                 cartState.forEach((item, index) => {
-                    const itemTotal = item.unitPrice * item.qty;
+                    const itemPrice = item.unitPrice || item.price || 0;
+                    const itemTotal = itemPrice * item.qty;
                     totalAmount += itemTotal;
                     totalItemCount += item.qty;
+
+                    let itemImg = item.image || '';
+                    if (itemImg) {
+                        if (!itemImg.startsWith('http') && !itemImg.startsWith('/')) {
+                            itemImg = '/' + itemImg;
+                        }
+                    } else {
+                        itemImg = "{{ asset('footage-baju.jpg') }}";
+                    }
+
                     html += `
                         <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100 cart-animated-item" style="animation-delay: ${index * 70}ms">
                             <div class="col-span-6 md:col-span-5 flex items-center space-x-3">
                                 <div class="w-12 h-16 bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
-                                    <img src="{{ asset('footage-baju.jpg') }}" alt="${item.name}" class="w-full h-full object-cover">
+                                    <img src="${itemImg}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='{{ asset('footage-baju.jpg') }}'">
                                 </div>
                                 <div>
                                     <p class="font-semibold uppercase text-black text-xs md:text-sm font-montserrat">${item.name}</p>
@@ -2959,7 +2986,7 @@
                                     <button onclick="updateCartQty(${index}, 1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto cursor-pointer">+</button>
                                 </div>
                             </div>
-                            <div class="hidden md:block md:col-span-2 text-right font-montserrat">${formatRupiah(item.unitPrice)}</div>
+                            <div class="hidden md:block md:col-span-2 text-right font-montserrat">${formatRupiah(itemPrice)}</div>
                             <div class="col-span-3 md:col-span-2 text-right font-medium font-montserrat">${formatRupiah(itemTotal)}</div>
                         </div>
                     `;
@@ -2970,6 +2997,9 @@
             const grandTotal = totalAmount + selectedShippingCost;
             if (totalElement) totalElement.innerText = formatRupiah(grandTotal) + ' IDR';
             if (badgeElement) badgeElement.innerText = totalItemCount;
+            if (counterElement) counterElement.innerText = totalItemCount;
+
+            saveCartState();
         }
 
         function triggerBadgePop() {
@@ -2987,7 +3017,7 @@
                 if (change > 0) {
                     const product = productsData.find(p => p.id === item.id);
                     const stockObj = product ? product.stocks.find(s => s.size === item.size) : null;
-                    const limit = stockObj ? stockObj.stock : 0;
+                    const limit = stockObj ? stockObj.stock : 99;
                     if (item.qty + change > limit) {
                         showToast('Stock maksimal tercapai!');
                         return;
@@ -2996,6 +3026,7 @@
                 item.qty += change;
                 if (item.qty <= 0) cartState.splice(index, 1);
             }
+            saveCartState();
             triggerBadgePop();
             renderCartItems();
         }
@@ -3003,6 +3034,7 @@
         function removeCartItem(index) {
             if (cartState[index]) {
                 cartState.splice(index, 1);
+                saveCartState();
                 triggerBadgePop();
                 renderCartItems();
             }
@@ -3010,12 +3042,15 @@
 
         function addCrossSellItem() {
             cartState.push({
-                id: Date.now(),
+                id: 99999,
                 name: 'NOTISSE CANVAS TOTE',
                 size: 'ALL SIZE',
                 unitPrice: 150000,
+                price: 150000,
+                image: 'footage-baju.jpg',
                 qty: 1
             });
+            saveCartState();
             triggerBadgePop();
             renderCartItems();
             showToast("Added Canvas Tote to cart");
@@ -3044,11 +3079,14 @@
                 }
             } else {
                 if (stockLimit >= 1) {
+                    const pPrice = parseFloat(currentProduct.price) || 250000;
                     cartState.push({
                         id: currentProduct.id,
                         name: currentProduct.name,
                         size: currentSelectedSize,
-                        unitPrice: parseFloat(currentProduct.price),
+                        unitPrice: pPrice,
+                        price: pPrice,
+                        image: currentProduct.image || '',
                         qty: 1
                     });
                 } else {
@@ -3056,6 +3094,7 @@
                     return;
                 }
             }
+            saveCartState();
             triggerBadgePop();
             renderCartItems();
             openCart();
@@ -3432,6 +3471,22 @@
                 btn.disabled = false;
             }
         }
+
+        // Initial Cart & URL Trigger Setup
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCartItems();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('open_checkout') === 'true') {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                setTimeout(() => {
+                    openCart();
+                    if (loggedInUser && loggedInUser.area_id && cartState.length > 0) {
+                        fetchShippingRates(loggedInUser.area_id);
+                    }
+                }, 300);
+            }
+        });
 
     </script>
 </body>
