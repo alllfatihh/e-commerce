@@ -28,9 +28,9 @@ Route::post('/update-profile', [AuthController::class, 'updateProfile'])->withou
 use App\Http\Controllers\AdminController;
 Route::get('/admin', [AdminController::class, 'index']);
 Route::post('/admin/products', [AdminController::class, 'storeProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::post('/admin/products/{id}', [AdminController::class, 'updateProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::match(['post', 'put'], '/admin/products/{id}', [AdminController::class, 'updateProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::delete('/admin/products/{id}', [AdminController::class, 'deleteProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::post('/admin/media/{id}', [AdminController::class, 'updateMedia'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::match(['post', 'put'], '/admin/media/{id}', [AdminController::class, 'updateMedia'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 

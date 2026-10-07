@@ -31,7 +31,7 @@ class AdminController extends Controller
             'price'       => 'required|numeric',
             'description' => 'nullable|string',
             'image'       => 'nullable|image|max:4096',
-            'stocks'      => 'array'
+            'stocks'      => 'nullable|array'
         ]);
 
         $data = $request->only('name', 'price', 'description');
@@ -67,7 +67,7 @@ class AdminController extends Controller
             'price'       => 'required|numeric',
             'description' => 'nullable|string',
             'image'       => 'nullable|image|max:4096',
-            'stocks'      => 'array'
+            'stocks'      => 'nullable|array'
         ]);
 
         $data = $request->only('name', 'price', 'description');
