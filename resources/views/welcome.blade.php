@@ -1845,86 +1845,171 @@
         </section>
 
         <!-- VIEW 9: LOGGED-IN ACCOUNT DASHBOARD -->
-        <section id="view-account-profile" class="view-page px-6 md:px-12 py-12 max-w-5xl mx-auto space-y-8">
-            <div class="flex justify-between items-center border-b border-gray-200 pb-4">
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-bold font-montserrat uppercase text-black">Akun Saya</h1>
-                    <p id="user-display-email" class="text-xs text-gray-500 font-roboto mt-1">{{ auth()->check() ? auth()->user()->email : 'user@notisse.com' }}</p>
-                </div>
-                <button onclick="handleLogout()"
-                    class="text-xs font-semibold uppercase tracking-wider text-red-600 hover:underline cursor-pointer font-montserrat">
-                    Logout
+        <section id="view-account-profile" class="view-page px-4 sm:px-6 md:px-12 pt-32 md:pt-40 pb-28 max-w-5xl mx-auto space-y-10">
+            <!-- Back to Shop -->
+            <div>
+                <button onclick="showPage('view-shop')"
+                    class="group inline-flex items-center space-x-2 text-xs font-semibold tracking-widest text-neutral-400 hover:text-black uppercase transition-colors font-montserrat focus:outline-none cursor-pointer">
+                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
+                    <span>Kembali ke Toko</span>
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Order History Summary -->
-                <div class="md:col-span-2 space-y-4">
-                    <h3 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Riwayat Pesanan</h3>
-                    <div id="order-history-container" class="space-y-4">
-                        <div class="border border-gray-200 rounded-lg p-6 space-y-4 bg-gray-50 text-center">
-                            <p class="text-gray-500 font-roboto text-sm">Memuat pesanan...</p>
+            <!-- Profile Hero Header Banner -->
+            <div class="border border-black bg-white p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
+                <div class="flex items-center space-x-5">
+                    <div class="w-16 h-16 bg-black text-white flex items-center justify-center font-bold text-xl font-montserrat tracking-wider border border-black shrink-0">
+                        {{ auth()->check() ? strtoupper(substr(auth()->user()->name ?? 'N', 0, 2)) : 'NT' }}
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 class="text-xl md:text-2xl font-bold font-montserrat uppercase tracking-tight text-black" id="account-header-name">
+                                {{ auth()->check() ? auth()->user()->name : 'Member Notisse' }}
+                            </h1>
+                            <span class="text-[9px] font-bold font-montserrat tracking-widest uppercase bg-black text-white px-2 py-0.5">VERIFIED CLIENT</span>
                         </div>
+                        <p id="user-display-email" class="text-xs text-neutral-500 font-roboto">
+                            {{ auth()->check() ? auth()->user()->email : 'user@notisse.com' }}
+                        </p>
                     </div>
                 </div>
+                <div class="flex items-center gap-3 self-start md:self-auto">
+                    <button onclick="showEditProfile()"
+                        class="px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider font-montserrat cursor-pointer">
+                        Edit Profil
+                    </button>
+                    <button onclick="handleLogout()"
+                        class="px-4 py-2 bg-neutral-100 hover:bg-red-600 hover:text-white text-neutral-700 transition-colors text-xs font-semibold uppercase tracking-wider font-montserrat cursor-pointer">
+                        Logout
+                    </button>
+                </div>
+            </div>
 
-                <!-- Account Address Details -->
-                <div class="space-y-4">
-                    <h3 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Alamat
-                        Pengiriman</h3>
-                    <div
-                        class="border border-gray-200 rounded-lg p-6 text-xs font-roboto space-y-2 leading-relaxed bg-white">
-                        <p class="font-bold text-black text-sm font-montserrat" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</p>
-                        <p class="text-gray-600" id="user-display-address">{{ auth()->check() && auth()->user()->address ? auth()->user()->address : 'Belum ada alamat pengiriman.' }}</p>
-                        <div class="pt-2">
-                            <button onclick="showEditProfile()"
-                                class="underline text-black font-semibold cursor-pointer">
-                                Edit Alamat
-                            </button>
+            <!-- Profile Section Tabs -->
+            <div class="flex border-b border-gray-200 gap-2 sm:gap-6 overflow-x-auto">
+                <button onclick="switchAccountTab('orders')" id="acc-tab-orders"
+                    class="acc-tab-btn active pb-3 text-xs sm:text-sm font-bold font-montserrat uppercase tracking-wider border-b-2 border-black text-black cursor-pointer whitespace-nowrap">
+                    Riwayat Pesanan
+                </button>
+                <button onclick="switchAccountTab('address')" id="acc-tab-address"
+                    class="acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-montserrat uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap">
+                    Buku Alamat
+                </button>
+                <button onclick="switchAccountTab('offers')" id="acc-tab-offers"
+                    class="acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-montserrat uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap">
+                    Penawaran Karya Seni
+                </button>
+            </div>
+
+            <!-- TAB 1: ORDER HISTORY -->
+            <div id="acc-pane-orders" class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Pesanan Belanja</h2>
+                        <p class="text-xs text-gray-400 font-roboto mt-0.5">Daftar transaksi produk Notisse yang terhubung ke pembayaran Midtrans.</p>
+                    </div>
+                    <button onclick="fetchOrderHistory()" class="text-xs font-montserrat font-semibold uppercase tracking-wider hover:underline text-gray-500 hover:text-black">
+                        Refresh
+                    </button>
+                </div>
+
+                <div id="order-history-container" class="space-y-4">
+                    <div class="border border-gray-200 p-8 text-center bg-gray-50">
+                        <p class="text-gray-400 font-roboto text-sm">Memuat pesanan...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ADDRESS BOOK -->
+            <div id="acc-pane-address" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Alamat Pengiriman Utama</h2>
+                        <p class="text-xs text-gray-400 font-roboto mt-0.5">Alamat ini digunakan untuk kalkulasi ongkos kirim Biteship saat checkout.</p>
+                    </div>
+                    <button onclick="showEditProfile()" class="text-xs font-montserrat font-bold uppercase tracking-wider text-black underline">
+                        Ubah Alamat
+                    </button>
+                </div>
+
+                <div class="border border-gray-200 p-6 md:p-8 bg-white space-y-4">
+                    <div class="flex justify-between items-start border-b border-gray-100 pb-4">
+                        <div>
+                            <span class="text-[10px] font-bold font-montserrat tracking-widest uppercase bg-neutral-100 text-neutral-600 px-2 py-0.5 inline-block mb-1.5">Alamat Terpilih</span>
+                            <h3 class="font-bold text-black text-base font-montserrat" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</h3>
+                            <p class="text-xs text-gray-500 font-roboto mt-0.5" id="user-display-phone">{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : 'No. HP belum diatur' }}</p>
                         </div>
+                        <button onclick="showEditProfile()" class="text-xs font-semibold uppercase tracking-wider text-black hover:underline font-montserrat">
+                            Edit
+                        </button>
+                    </div>
+                    <div>
+                        <p class="text-xs font-roboto text-gray-700 leading-relaxed" id="user-display-address">
+                            {{ auth()->check() && auth()->user()->address ? auth()->user()->address : 'Belum ada alamat pengiriman. Silakan tambahkan alamat untuk kemudahan checkout.' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: ARTWORK OFFERS INQUIRIES -->
+            <div id="acc-pane-offers" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Penawaran Karya Seni (Acquisition Inquiries)</h2>
+                    <p class="text-xs text-gray-400 font-roboto mt-0.5">Daftar penawaran harga karya seni editorial Notisse yang Anda ajukan untuk kurasi.</p>
+                </div>
+
+                <div id="account-art-offers-list" class="space-y-4">
+                    <div class="border border-gray-200 p-8 text-center bg-gray-50">
+                        <p class="text-gray-400 font-roboto text-sm">Belum ada penawaran karya seni yang diajukan.</p>
+                        <button onclick="showPage('view-artist-detail')" class="mt-3 text-xs font-bold font-montserrat uppercase underline tracking-wider">
+                            Jelajahi Galeri Seni
+                        </button>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- VIEW 10: EDIT PROFILE / ALAMAT -->
-        <section id="view-edit-profile" class="view-page px-6 md:px-12 pt-28 pb-12 max-w-xl mx-auto space-y-8">
+        <section id="view-edit-profile" class="view-page px-4 sm:px-6 md:px-12 pt-32 md:pt-40 pb-28 max-w-xl mx-auto space-y-8">
             <div class="mb-4 flex items-center justify-between">
                 <button onclick="goBack()" class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK</span>
+                    <span>KEMBALI</span>
                 </button>
-                <h1 class="text-xl font-bold font-montserrat uppercase text-black">Edit Profil</h1>
+                <h1 class="text-xl font-bold font-montserrat uppercase text-black">Edit Profil & Alamat</h1>
             </div>
 
-            <div id="edit-profile-error" class="hidden bg-red-100 text-red-700 p-3 rounded text-sm border border-red-200"></div>
-            <div id="edit-profile-success" class="hidden bg-green-100 text-green-700 p-3 rounded text-sm border border-green-200"></div>
+            <div id="edit-profile-error" class="hidden bg-red-100 text-red-700 p-3 text-sm border border-red-200"></div>
+            <div id="edit-profile-success" class="hidden bg-green-100 text-green-700 p-3 text-sm border border-green-200"></div>
 
-            <form onsubmit="handleEditProfileSubmit(event)" class="space-y-6">
+            <form onsubmit="handleEditProfileSubmit(event)" class="space-y-6 bg-white border border-gray-200 p-6 md:p-8">
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nama Lengkap</label>
-                    <input type="text" id="edit-name" required class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Nama Lengkap *</label>
+                    <input type="text" id="edit-name" required class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-roboto">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">No. HP / Whatsapp</label>
-                    <input type="text" id="edit-phone" required class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">No. HP / Whatsapp *</label>
+                    <input type="text" id="edit-phone" required class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-roboto">
                 </div>
                 
                 <div class="relative">
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Cari Kecamatan / Kode Pos</label>
-                    <input type="text" id="edit-area-search" class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto" placeholder="Ketik nama kecamatan..." autocomplete="off">
-                    <ul id="edit-area-results" class="absolute z-10 w-full bg-white border border-gray-300 shadow-lg rounded mt-1 hidden max-h-48 overflow-y-auto"></ul>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Cari Kecamatan / Kota (Biteship) *</label>
+                    <input type="text" id="edit-area-search" class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-roboto" placeholder="Ketik nama kecamatan..." autocomplete="off">
+                    <ul id="edit-area-results" class="absolute z-20 w-full bg-white border border-gray-300 shadow-xl mt-1 hidden max-h-48 overflow-y-auto"></ul>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Alamat Lengkap</label>
-                    <textarea id="edit-address" required class="w-full border border-gray-300 rounded p-3 text-sm h-24 focus:outline-none focus:border-black font-roboto resize-none" placeholder="Nama Jalan, RT/RW, Patokan..."></textarea>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Alamat Lengkap *</label>
+                    <textarea id="edit-address" required class="w-full border border-gray-300 p-3 text-sm h-24 focus:outline-none focus:border-black font-roboto resize-none" placeholder="Nama Jalan, RT/RW, Nomor Rumah, Patokan..."></textarea>
                 </div>
 
                 <input type="hidden" id="edit-area-id" required>
 
-                <div class="pt-4">
-                    <button type="submit" id="edit-profile-btn" class="w-full bg-black text-white font-bold font-montserrat uppercase py-4 rounded hover:bg-gray-800 transition-colors cursor-pointer">
+                <div class="pt-4 border-t border-gray-100 flex gap-3">
+                    <button type="button" onclick="goBack()" class="w-1/3 border border-gray-300 py-3.5 text-xs font-bold font-montserrat uppercase hover:bg-gray-50 transition-colors cursor-pointer">
+                        Batal
+                    </button>
+                    <button type="submit" id="edit-profile-btn" class="w-2/3 bg-black text-white font-bold font-montserrat uppercase py-3.5 text-xs tracking-wider hover:bg-neutral-800 transition-colors cursor-pointer">
                         Simpan Perubahan
                     </button>
                 </div>
@@ -2179,6 +2264,81 @@
                 window.location.href = '/auth/checkout';
             }
         }
+
+        function switchAccountTab(tab) {
+            const tabs = ['orders', 'address', 'offers'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`acc-tab-${t}`);
+                const pane = document.getElementById(`acc-pane-${t}`);
+                if (btn && pane) {
+                    if (t === tab) {
+                        btn.className = "acc-tab-btn active pb-3 text-xs sm:text-sm font-bold font-montserrat uppercase tracking-wider border-b-2 border-black text-black cursor-pointer whitespace-nowrap";
+                        pane.classList.remove('hidden');
+                    } else {
+                        btn.className = "acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-montserrat uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap";
+                        pane.classList.add('hidden');
+                    }
+                }
+            });
+
+            if (tab === 'orders') {
+                fetchOrderHistory();
+            } else if (tab === 'offers') {
+                renderArtworkOffers();
+            }
+        }
+
+        function renderArtworkOffers() {
+            const container = document.getElementById('account-art-offers-list');
+            if (!container) return;
+            
+            let offers = [];
+            try {
+                offers = JSON.parse(localStorage.getItem('notisse_artwork_offers') || '[]');
+            } catch (e) {
+                offers = [];
+            }
+            
+            if (offers.length === 0) {
+                container.innerHTML = `
+                    <div class="border border-gray-200 p-8 text-center bg-gray-50">
+                        <p class="text-gray-400 font-roboto text-sm">Belum ada penawaran karya seni yang diajukan.</p>
+                        <button onclick="showPage('view-artist-detail')" class="mt-3 text-xs font-bold font-montserrat uppercase underline tracking-wider cursor-pointer">
+                            Jelajahi Galeri Seni & Editorial
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = offers.map((offer) => {
+                const artwork = offer.artwork || {};
+                const displayDate = offer.date ? new Date(offer.date).toLocaleDateString('id-ID') : '-';
+                return `
+                    <div class="border border-gray-200 p-6 bg-white space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-100 gap-2">
+                            <div>
+                                <span class="text-[10px] font-mono font-bold tracking-widest uppercase bg-black text-white px-2 py-0.5 inline-block">${offer.refId || '#NTS-ART'}</span>
+                                <span class="text-xs text-gray-400 font-roboto ml-2">${displayDate}</span>
+                            </div>
+                            <span class="text-[10px] font-semibold tracking-wider uppercase text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-montserrat w-fit">
+                                ${offer.status || 'Dalam Tinjauan Kurasi'}
+                            </span>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <img src="${artwork.image || '/footage-baju.jpg'}" alt="${artwork.title || 'Artwork'}" class="w-16 h-20 object-cover bg-gray-100 border border-gray-200 flex-shrink-0">
+                            <div class="space-y-1 min-w-0 flex-1">
+                                <h4 class="font-bold text-sm text-black font-montserrat truncate">${artwork.title || 'Karya Seni Notisse'}</h4>
+                                <p class="text-xs text-gray-500 font-roboto">Seniman: <span class="font-semibold text-black">${artwork.artist || 'Curated Artist'}</span></p>
+                                <p class="text-xs text-emerald-700 font-montserrat font-bold pt-1">Nominal Ditawarkan: Rp ${offer.offerPrice} IDR</p>
+                                ${offer.message ? `<p class="text-xs text-gray-500 font-roboto italic bg-neutral-50 p-2 border border-neutral-100 mt-2">"${offer.message}"</p>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).reverse().join('');
+        }
+
 
         async function fetchOrderHistory() {
             try {
