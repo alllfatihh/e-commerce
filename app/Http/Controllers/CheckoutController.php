@@ -22,6 +22,16 @@ class CheckoutController extends Controller
 
     public function process(Request $request)
     {
+        if (auth()->check()) {
+            $pendingOrder = Order::where('user_id', auth()->id())->where('status', 'pending')->first();
+            if ($pendingOrder) {
+                return response()->json([
+                    'error' => 'Anda masih memiliki transaksi yang belum diselesaikan.',
+                    'pending_order' => true
+                ], 403);
+            }
+        }
+
         $validated = $request->validate([
             'customer_name' => 'required|string',
             'customer_email' => 'required|email',
@@ -40,7 +50,21 @@ class CheckoutController extends Controller
 
         $totalAmount += $validated['shipping_cost'];
 
+        // PRE-CHECK STOCK
+        foreach ($validated['items'] as $item) {
+            $productId = $item['id'] ?? null;
+            $size = $item['size'] ?? 'All Size';
+            
+            if ($productId) {
+                $stockRecord = \App\Models\ProductStock::where('product_id', $productId)->where('size', $size)->first();
+                if (!$stockRecord || $stockRecord->stock < $item['quantity']) {
+                    return response()->json(['success' => false, 'error' => 'Maaf, stok produk "' . $item['name'] . '" (' . $size . ') tidak mencukupi.'], 400);
+                }
+            }
+        }
+
         $order = Order::create([
+            'user_id' => auth()->id(),
             'customer_name' => $validated['customer_name'],
             'customer_email' => $validated['customer_email'],
             'customer_phone' => $validated['customer_phone'],
@@ -50,13 +74,21 @@ class CheckoutController extends Controller
         ]);
 
         foreach ($validated['items'] as $item) {
+            $productId = $item['id'] ?? null;
+            $size = $item['size'] ?? 'All Size';
+            
             OrderItem::create([
                 'order_id' => $order->id,
+                'product_id' => $productId,
                 'product_name' => $item['name'],
                 'price' => $item['price'],
                 'quantity' => $item['quantity'],
-                'size' => $item['size'] ?? 'All Size',
+                'size' => $size,
             ]);
+
+            if ($productId) {
+                \App\Models\ProductStock::where('product_id', $productId)->where('size', $size)->decrement('stock', $item['quantity']);
+            }
         }
 
         $biteshipItems = array_map(function($item) {
@@ -75,6 +107,7 @@ class CheckoutController extends Controller
         // Pisahkan nama kurir dan service name (misal "JNE REG")
         $courierParts = explode(' ', $validated['courier_name']);
         $courierCompany = strtolower($courierParts[0]);
+        if ($courierCompany === 'j&t') $courierCompany = 'jnt';
         $courierType = strtolower($courierParts[1] ?? 'reg');
 
         // Create Order Biteship
@@ -224,6 +257,7 @@ class CheckoutController extends Controller
         $order = Order::find($order_id);
         if(!$order) return response()->json('Order not found', 404);
 
+        $oldStatus = $order->status;
         if ($transaction == 'capture') {
             if ($type == 'credit_card') {
                 if ($fraud == 'challenge') {
@@ -236,6 +270,16 @@ class CheckoutController extends Controller
             $order->status = 'paid';
         } else if (in_array($transaction, ['deny', 'expire', 'cancel'])) {
             $order->status = 'cancelled';
+        }
+
+        if ($oldStatus !== 'cancelled' && $order->status === 'cancelled') {
+            foreach ($order->items as $item) {
+                if ($item->product_id) {
+                    \App\Models\ProductStock::where('product_id', $item->product_id)
+                        ->where('size', $item->size)
+                        ->increment('stock', $item->quantity);
+                }
+            }
         }
 
         $order->save();

@@ -244,16 +244,16 @@
         }
 
         /* State: Unscrolled (Horizontal) */
-        .l-c { top: 0px; left: 0px; }
-        .l-a { top: 0px; left: 10px; }
-        .l-r { top: 0px; left: 20px; }
-        .l-t { top: 0px; left: 30px; }
+        .l-c { top: 4px; left: 4px; }
+        .l-a { top: 4px; left: 14px; }
+        .l-r { top: 4px; left: 24px; }
+        .l-t { top: 4px; left: 34px; }
 
-        .cart-line-h { top: 7px; left: 42px; width: 18px; height: 1.5px; opacity: 1; }
-        .cart-line-v { top: 7px; left: 60px; width: 1.5px; height: 12px; }
+        .cart-line-h { top: 11px; left: 46px; width: 18px; height: 1.5px; opacity: 1; }
+        .cart-line-v { top: 11px; left: 64px; width: 1.5px; height: 12px; }
         
-        .cart-arrow { top: 15px; left: 54.5px; }
-        .cart-badge { top: 25px; left: 57px; }
+        .cart-arrow { top: 19px; left: 58.5px; }
+        .cart-badge { top: 29px; left: 61px; }
 
         /* State: Scrolled (Vertical) */
         .is-scrolled .l-c { top: 0px; left: 4px; }
@@ -417,17 +417,20 @@
             <div id="cart-items-container" class="space-y-6 flex-grow"></div>
 
             <div id="checkout-details" class="mt-6 border-t border-gray-200 pt-6 space-y-4">
-                <div class="relative">
-                    <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." oninput="searchAreaBiteship(this.value)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm" autocomplete="off">
-                    <div id="area-results" class="absolute z-10 w-full bg-white border border-gray-200 max-h-40 overflow-y-auto hidden shadow-lg text-sm font-montserrat"></div>
+                @if(auth()->check() && auth()->user()->area_id)
+                <div class="text-sm font-montserrat p-3 bg-gray-50 border border-gray-200">
+                    <p class="font-bold mb-1">{{ auth()->user()->name }} ({{ auth()->user()->phone }})</p>
+                    <p class="text-gray-600">{{ auth()->user()->address }}</p>
                 </div>
-                <input type="hidden" id="selected-area-id">
-                <input type="text" id="full-address" placeholder="Detail Alamat (Jalan, RT/RW, No)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm">
-                
-                <div id="shipping-options-container" class="hidden space-y-2 mt-4">
+                <div id="shipping-options-container" class="space-y-2 mt-4">
                     <span class="text-sm font-medium font-montserrat block">Pilih Pengiriman:</span>
                     <div id="shipping-options" class="flex flex-col space-y-2 text-sm font-montserrat"></div>
                 </div>
+                @else
+                <div class="text-sm text-gray-500 font-montserrat">
+                    Anda akan diminta mengisi data pengiriman pada langkah selanjutnya.
+                </div>
+                @endif
             </div>
 
             <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
@@ -520,7 +523,7 @@
             <div class="w-full">
                 <div class="grid grid-cols-2 lg:grid-cols-4 bg-black gap-[1px] border-b border-black">
                     @foreach($products as $product)
-                        <div onclick="openProductDetail('{{ addslashes($product->name) }}', 'Rp {{ number_format($product->price, 2, ',', '.') }}')"
+                        <div onclick="openProductDetail({{ $product->id }})"
                             class="group cursor-pointer bg-white flex flex-col justify-between h-full hover:bg-gray-50 transition-colors duration-300">
 
                             <div class="relative w-full aspect-[3/4] bg-[#f4f4f4] overflow-hidden">
@@ -561,6 +564,9 @@
                             class="text-2xl md:text-3xl font-semibold uppercase tracking-wider text-black font-montserrat">
                             RAJA DIAMUK MASSA TEE V1
                         </h1>
+                        <p id="pdetail-price" class="text-lg md:text-xl font-medium mt-1 font-montserrat text-black">
+                            RP 250.000,00
+                        </p>
                         <p class="text-xs md:text-sm text-gray-600 mt-2 font-montserrat">
                             by <span onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')"
                                 class="underline hover:text-black cursor-pointer font-medium transition-colors font-montserrat">Mustafa
@@ -1295,7 +1301,7 @@
             <div class="flex justify-between items-center border-b border-gray-200 pb-4">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-bold font-montserrat uppercase text-black">Akun Saya</h1>
-                    <p id="user-display-email" class="text-xs text-gray-500 font-roboto mt-1">user@notisse.com</p>
+                    <p id="user-display-email" class="text-xs text-gray-500 font-roboto mt-1">{{ auth()->check() ? auth()->user()->email : 'user@notisse.com' }}</p>
                 </div>
                 <button onclick="handleLogout()"
                     class="text-xs font-semibold uppercase tracking-wider text-red-600 hover:underline cursor-pointer font-montserrat">
@@ -1321,12 +1327,10 @@
                         Pengiriman</h3>
                     <div
                         class="border border-gray-200 rounded-lg p-6 text-xs font-roboto space-y-2 leading-relaxed bg-white">
-                        <p class="font-bold text-black text-sm font-montserrat" id="user-display-name">John Doe</p>
-                        <p class="text-gray-600">Jl. Dago Asri No. 12, Coblong</p>
-                        <p class="text-gray-600">Kota Bandung, Jawa Barat 40135</p>
-                        <p class="text-gray-600">Indonesia</p>
+                        <p class="font-bold text-black text-sm font-montserrat" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</p>
+                        <p class="text-gray-600" id="user-display-address">{{ auth()->check() && auth()->user()->address ? auth()->user()->address : 'Belum ada alamat pengiriman.' }}</p>
                         <div class="pt-2">
-                            <button onclick="showToast('Fitur ubah alamat segera hadir.')"
+                            <button onclick="showEditProfile()"
                                 class="underline text-black font-semibold cursor-pointer">
                                 Edit Alamat
                             </button>
@@ -1334,6 +1338,50 @@
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- VIEW 10: EDIT PROFILE / ALAMAT -->
+        <section id="view-edit-profile" class="view-page px-6 md:px-12 pt-28 pb-12 max-w-xl mx-auto space-y-8">
+            <div class="mb-4 flex items-center justify-between">
+                <button onclick="goBack()" class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
+                    <span>BACK</span>
+                </button>
+                <h1 class="text-xl font-bold font-montserrat uppercase text-black">Edit Profil</h1>
+            </div>
+
+            <div id="edit-profile-error" class="hidden bg-red-100 text-red-700 p-3 rounded text-sm border border-red-200"></div>
+            <div id="edit-profile-success" class="hidden bg-green-100 text-green-700 p-3 rounded text-sm border border-green-200"></div>
+
+            <form onsubmit="handleEditProfileSubmit(event)" class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nama Lengkap</label>
+                    <input type="text" id="edit-name" required class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">No. HP / Whatsapp</label>
+                    <input type="text" id="edit-phone" required class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto">
+                </div>
+                
+                <div class="relative">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Cari Kecamatan / Kode Pos</label>
+                    <input type="text" id="edit-area-search" class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto" placeholder="Ketik nama kecamatan..." autocomplete="off">
+                    <ul id="edit-area-results" class="absolute z-10 w-full bg-white border border-gray-300 shadow-lg rounded mt-1 hidden max-h-48 overflow-y-auto"></ul>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Alamat Lengkap</label>
+                    <textarea id="edit-address" required class="w-full border border-gray-300 rounded p-3 text-sm h-24 focus:outline-none focus:border-black font-roboto resize-none" placeholder="Nama Jalan, RT/RW, Patokan..."></textarea>
+                </div>
+
+                <input type="hidden" id="edit-area-id" required>
+
+                <div class="pt-4">
+                    <button type="submit" id="edit-profile-btn" class="w-full bg-black text-white font-bold font-montserrat uppercase py-4 rounded hover:bg-gray-800 transition-colors cursor-pointer">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
         </section>
 
     </main>
@@ -1353,21 +1401,18 @@
             NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span> NOTISSE<sup class="text-[8px] md:text-[10px] font-normal tracking-normal text-gray-400">&reg;</sup> <span class="mx-3 md:mx-5 text-gray-500 font-light">///</span>&nbsp;
         </div>
     </div>
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-notification"
+        class="fixed top-24 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-full shadow-lg z-[60] flex items-center space-x-3 transition-all duration-300 opacity-0 translate-y-4 hidden font-montserrat text-sm tracking-wide">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span id="toast-message" class="font-medium">Notification message</span>
+    </div>
+
     <!-- JAVASCRIPT CONTROLLER -->
     <script>
-        // MOCK DATABASE PRODUK KONTEN BRAND
-        const productsData = [
-            { id: 1, name: "Raja Diamuk Massa Tee V1", price: "Rp 250.000,00", image: "https://placehold.co/600x800/d9d9d9/555555?text=Raja+Diamuk+Tee", artist: "Mustafa Alatas" },
-            { id: 2, name: "Muscle Tank V2 - Black", price: "Rp 180.000,00", image: "https://placehold.co/600x800/181818/ffffff?text=Muscle+Tank+Black", artist: "Asep" },
-            { id: 3, name: "Muscle Tank V2 - White", price: "Rp 180.000,00", image: "https://placehold.co/600x800/ffffff/111111?text=Muscle+Tank+White", artist: "Asep" },
-            { id: 4, name: "Relaxed Tailored Shirt V1", price: "Rp 320.000,00", image: "https://placehold.co/600x800/f0f0f0/222222?text=Tailored+Shirt", artist: "Asepo" },
-            { id: 5, name: "Accessorized Slim Tee V2 - Black", price: "Rp 220.000,00", image: "https://placehold.co/600x800/111111/ffffff?text=Slim+Tee+Black", artist: "Mustafa Alatas" },
-            { id: 6, name: "Rugged Long Sleeve Tee V2 - Gray", price: "Rp 280.000,00", image: "https://placehold.co/600x800/888888/ffffff?text=Long+Sleeve+Gray", artist: "Asepi" },
-            { id: 7, name: "Sweatshirt - Gray", price: "Rp 350.000,00", image: "https://placehold.co/600x800/cccccc/333333?text=Sweatshirt+Gray", artist: "Asepu" },
-            { id: 8, name: "Pleated Denim V1", price: "Rp 450.000,00", image: "https://placehold.co/600x800/1e293b/ffffff?text=Pleated+Denim", artist: "Asepa" },
-            { id: 9, name: "Collarless Leather Blazer", price: "Rp 650.000,00", image: "https://placehold.co/600x800/262626/ffffff?text=Leather+Blazer", artist: "Asepon" }
-        ];
-
         let currentSelectedSize = "M";
         let currentSlideIndex = 0;
         let slideInterval = null;
@@ -1401,15 +1446,12 @@
 
         let navigationHistory = ['view-shop'];
         let isAuthenticated = localStorage.getItem('notisse_auth') === 'true';
-        let loggedInUser = JSON.parse(localStorage.getItem('notisse_user')) || {
-            name: "John Doe",
-            email: "john.doe@notisse.com"
-        };
+        let loggedInUser = @json(auth()->user());
 
-        let cartState = [
-            { id: 1, name: "RAJA DIAMUK MASSA TEE V1", size: "M", unitPrice: 250000, qty: 1 },
-            { id: 2, name: "RAJA DIAMUK MASSA TEE V1", size: "L", unitPrice: 250000, qty: 1 }
-        ];
+        let productsData = @json($products);
+        let currentProduct = null;
+
+        let cartState = [];
 
         const overlayMenuBackdrop = document.getElementById('overlay-menu-backdrop');
         const overlayMenuSidebar = document.getElementById('overlay-menu-sidebar');
@@ -1456,11 +1498,11 @@
 
         /* ACCOUNT FUNCTIONALITIES */
         function handleAccountButtonClick() {
-            if (isAuthenticated) {
+            if (loggedInUser) {
                 showPage('view-account-profile');
                 fetchOrderHistory();
             } else {
-                showPage('view-login');
+                window.location.href = '/auth/checkout';
             }
         }
 
@@ -1499,12 +1541,15 @@
                     });
 
                     let statusClass = "bg-black text-white";
-                    let cancelButton = '';
+                    let actionButtons = '';
                     if (order.status.toLowerCase() === 'paid') {
                         statusClass = "bg-green-600 text-white";
                     } else if (order.status.toLowerCase() === 'pending') {
                         statusClass = "bg-yellow-500 text-black";
-                        cancelButton = `<button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-montserrat mt-2">Batalkan</button>`;
+                        actionButtons = `
+                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-montserrat mt-2 w-full">Bayar Sekarang</button>
+                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-montserrat mt-2 w-full text-center">Batalkan</button>
+                        `;
                     } else if (order.status.toLowerCase() === 'cancelled') {
                         statusClass = "bg-red-600 text-white";
                     }
@@ -1518,7 +1563,9 @@
                             </div>
                             <div class="flex flex-col items-end">
                                 <span class="px-2.5 py-1 ${statusClass} font-bold rounded text-[10px] tracking-wider uppercase font-montserrat">${order.status}</span>
-                                ${cancelButton}
+                                <div class="mt-2 w-full flex flex-col gap-1">
+                                    ${actionButtons}
+                                </div>
                             </div>
                         </div>
                         ${itemsHtml}
@@ -1539,12 +1586,59 @@
                 });
                 if (response.ok) {
                     showToast("Pesanan berhasil dibatalkan.");
-                    fetchOrderHistory();
+                    setTimeout(() => window.location.reload(), 1000);
                 } else {
                     showToast("Gagal membatalkan pesanan.");
                 }
             } catch (e) {
                 console.error(e);
+                showToast("Terjadi kesalahan sistem.");
+            }
+        }
+
+        async function payOrder(id) {
+            try {
+                const response = await fetch(`/my-orders/${id}/pay`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.snap_token) {
+                    snap.pay(data.snap_token, {
+                        onSuccess: async function(result) {
+                            showToast("Payment success!");
+                            await fetch('/midtrans/local-success', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ order_id: result.order_id })
+                            });
+                            fetchOrderHistory();
+                        },
+                        onPending: async function(result) {
+                            showToast("Waiting your payment...");
+                            await fetch('/midtrans/local-success', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ order_id: result.order_id })
+                            });
+                            fetchOrderHistory();
+                            showToast("Payment success (Simulated)!");
+                        },
+                        onError: function(result) {
+                            showToast("Payment failed!");
+                        },
+                        onClose: function() {
+                            showToast('You closed the popup without finishing the payment');
+                        }
+                    });
+                } else {
+                    showToast(data.error || "Gagal memproses pembayaran");
+                }
+            } catch (err) {
+                console.error(err);
                 showToast("Terjadi kesalahan sistem.");
             }
         }
@@ -1556,6 +1650,9 @@
             localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
             document.getElementById('user-display-email').innerText = loggedInUser.email;
             document.getElementById('user-display-name').innerText = loggedInUser.name;
+            if (document.getElementById('user-display-address')) {
+                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'Belum ada alamat pengiriman.';
+            }
             showToast('Berhasil Login!');
             showPage('view-account-profile');
             fetchOrderHistory();
@@ -1566,17 +1663,27 @@
             isAuthenticated = true;
             localStorage.setItem('notisse_auth', 'true');
             localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
+            document.getElementById('user-display-email').innerText = loggedInUser.email;
+            document.getElementById('user-display-name').innerText = loggedInUser.name;
+            if (document.getElementById('user-display-address')) {
+                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'Belum ada alamat pengiriman.';
+            }
             showToast('Akun Berhasil Dibuat!');
             showPage('view-account-profile');
             fetchOrderHistory();
         }
 
-        function handleLogout() {
+        async function handleLogout() {
+            try {
+                await fetch('/logout', { method: 'POST' });
+            } catch (e) {
+                console.error(e);
+            }
             isAuthenticated = false;
+            loggedInUser = null;
             localStorage.removeItem('notisse_auth');
             localStorage.removeItem('notisse_user');
-            showToast('Anda telah logout.');
-            showPage('view-shop');
+            window.location.reload();
         }
 
         function openMenu() {
@@ -1677,6 +1784,10 @@
                 cartDrawerContent.classList.remove('translate-x-full');
             }, 10);
             document.body.style.overflow = 'hidden';
+            
+            if (loggedInUser && loggedInUser.area_id && cartState.length > 0) {
+                fetchShippingRates(loggedInUser.area_id);
+            }
         }
 
         function closeCart() {
@@ -1691,8 +1802,42 @@
         cartTrigger.addEventListener('click', openCart);
         cartClose.addEventListener('click', closeCart);
 
-        function openProductDetail(title, price) {
-            if (title) document.getElementById('pdetail-title').innerText = title;
+        function openProductDetail(productId) {
+            currentProduct = productsData.find(p => p.id === productId);
+            if (!currentProduct) return;
+            
+            document.getElementById('pdetail-title').innerText = currentProduct.name;
+            const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(currentProduct.price);
+            if (document.getElementById('pdetail-price')) {
+                document.getElementById('pdetail-price').innerText = formattedPrice;
+            }
+            
+            const sizeMenu = document.getElementById('size-dropdown-menu');
+            sizeMenu.innerHTML = '';
+            
+            if (currentProduct.stocks && currentProduct.stocks.length > 0) {
+                currentProduct.stocks.forEach(stock => {
+                    if (stock.stock > 0) {
+                        sizeMenu.innerHTML += `
+                            <div onclick="selectSize('${stock.size}')"
+                                class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-montserrat">
+                                <span>${stock.size} <span class="lowercase tracking-normal font-normal opacity-60 ml-2">(Sisa: ${stock.stock})</span></span><span class="text-xs opacity-50">${stock.size}</span>
+                            </div>
+                        `;
+                    } else {
+                        sizeMenu.innerHTML += `
+                            <div class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b border-gray-100 flex justify-between items-center font-montserrat text-gray-300 cursor-not-allowed">
+                                <span>${stock.size} (Habis)</span><span class="text-xs opacity-50">${stock.size}</span>
+                            </div>
+                        `;
+                    }
+                });
+            } else {
+                sizeMenu.innerHTML = '<div class="px-4 py-2.5 text-xs">Stock Tidak Tersedia</div>';
+            }
+            
+            document.getElementById('selected-size-label').innerText = 'Select size: ';
+            currentSelectedSize = null;
             showPage('view-product-detail');
         }
 
@@ -1864,20 +2009,54 @@
 
         function updateCartQty(index, change) {
             if (cartState[index]) {
-                cartState[index].qty += change;
-                if (cartState[index].qty <= 0) cartState.splice(index, 1);
+                const item = cartState[index];
+                if (change > 0) {
+                    const product = productsData.find(p => p.id === item.id);
+                    const stockObj = product ? product.stocks.find(s => s.size === item.size) : null;
+                    const limit = stockObj ? stockObj.stock : 0;
+                    if (item.qty + change > limit) {
+                        showToast('Stock maksimal tercapai!');
+                        return;
+                    }
+                }
+                item.qty += change;
+                if (item.qty <= 0) cartState.splice(index, 1);
             }
             renderCartItems();
         }
 
         function addSelectedToCart() {
-            cartState.push({
-                id: Date.now(),
-                name: 'RAJA DIAMUK MASSA TEE V1',
-                size: currentSelectedSize || 'M',
-                unitPrice: 250000,
-                qty: 1
-            });
+            if (!currentProduct) return;
+            if (!currentSelectedSize) {
+                showToast('Please select a size!');
+                return;
+            }
+
+            const productStock = currentProduct.stocks.find(s => s.size === currentSelectedSize);
+            const stockLimit = productStock ? productStock.stock : 0;
+            const existing = cartState.find(c => c.id === currentProduct.id && c.size === currentSelectedSize);
+            
+            if (existing) {
+                if (existing.qty < stockLimit) {
+                    existing.qty++;
+                } else {
+                    showToast('Stock habis!');
+                    return;
+                }
+            } else {
+                if (stockLimit >= 1) {
+                    cartState.push({
+                        id: currentProduct.id,
+                        name: currentProduct.name,
+                        size: currentSelectedSize,
+                        unitPrice: parseFloat(currentProduct.price),
+                        qty: 1
+                    });
+                } else {
+                    showToast('Stock habis!');
+                    return;
+                }
+            }
             openCart();
             showToast('Added to cart!');
         }
@@ -1984,13 +2163,11 @@
                 return;
             }
 
-            const address = document.getElementById('full-address').value;
-            const areaId = document.getElementById('selected-area-id').value;
-            
-            if(!areaId || !address) {
-                showToast("Mohon lengkapi alamat pengiriman!");
+            if (!loggedInUser || !loggedInUser.area_id) {
+                window.location.href = '/auth/checkout';
                 return;
             }
+
             if(!selectedCourierName) {
                 showToast("Mohon pilih layanan kurir terlebih dahulu!");
                 return;
@@ -2010,11 +2187,11 @@
             }));
 
             const payload = {
-                customer_name: loggedInUser.name || "Guest User",
-                customer_email: loggedInUser.email || "guest@example.com",
-                customer_phone: "08123456789", // Di aplikasi nyata ambil dari input user
-                shipping_address: address, // Hanya mengirim alamat, tanpa selipan Area ID
-                destination_area_id: areaId,
+                customer_name: loggedInUser.name,
+                customer_email: loggedInUser.email,
+                customer_phone: loggedInUser.phone,
+                shipping_address: loggedInUser.address, 
+                destination_area_id: loggedInUser.area_id,
                 items: items,
                 shipping_cost: selectedShippingCost,
                 courier_name: selectedCourierName,
@@ -2033,7 +2210,26 @@
 
                 const data = await response.json();
                 
+                if (response.status === 403 && data.pending_order) {
+                    showToast(data.error);
+                    closeCart();
+                    showPage('view-account-profile');
+                    fetchOrderHistory();
+                    return;
+                }
+                
                 if (data.snap_token) {
+                    // Update local stock data consistency
+                    cartState.forEach(item => {
+                        const product = productsData.find(p => p.id === item.id);
+                        if (product) {
+                            const stockObj = product.stocks.find(s => s.size === item.size);
+                            if (stockObj && stockObj.stock >= item.qty) {
+                                stockObj.stock -= item.qty;
+                            }
+                        }
+                    });
+
                     snap.pay(data.snap_token, {
                         onSuccess: async function(result) {
                             showToast("Payment success!");
@@ -2070,7 +2266,7 @@
                         }
                     });
                 } else {
-                    showToast("Failed to create transaction.");
+                    showToast(data.error || "Failed to create transaction.");
                 }
             } catch (error) {
                 console.error(error);
@@ -2082,14 +2278,148 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
             const lastPage = sessionStorage.getItem('current_page') || 'view-shop';
             showPage(lastPage);
-            if(lastPage === 'view-account-profile' && isAuthenticated) {
+            
+            if(lastPage === 'view-account-profile' && loggedInUser) {
                 fetchOrderHistory();
             }
             renderCartItems();
             startAutoSlide();
+            
+            if (urlParams.get('open_checkout') === 'true') {
+                openCart();
+            }
         });
+        // ====== EDIT PROFILE LOGIC ======
+        let editAreaSearchTimeout = null;
+        const editAreaSearchInput = document.getElementById('edit-area-search');
+        const editAreaResultsBox = document.getElementById('edit-area-results');
+
+        function showEditProfile() {
+            if (!loggedInUser) return;
+            document.getElementById('edit-name').value = loggedInUser.name || '';
+            document.getElementById('edit-phone').value = loggedInUser.phone || '';
+            document.getElementById('edit-address').value = loggedInUser.address || '';
+            document.getElementById('edit-area-id').value = loggedInUser.area_id || '';
+            
+            document.getElementById('edit-profile-error').classList.add('hidden');
+            document.getElementById('edit-profile-success').classList.add('hidden');
+            
+            showPage('view-edit-profile');
+        }
+
+        if (editAreaSearchInput) {
+            editAreaSearchInput.addEventListener('input', function(e) {
+                clearTimeout(editAreaSearchTimeout);
+                const keyword = e.target.value;
+                
+                if (keyword.length < 3) {
+                    editAreaResultsBox.classList.add('hidden');
+                    return;
+                }
+
+                editAreaSearchTimeout = setTimeout(() => {
+                    fetch(`/shipping-areas?keyword=${keyword}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            editAreaResultsBox.innerHTML = '';
+                            if (data.areas && data.areas.length > 0) {
+                                data.areas.forEach(area => {
+                                    const li = document.createElement('li');
+                                    li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-roboto border-b border-gray-100';
+                                    li.innerText = area.name;
+                                    li.onclick = () => {
+                                        editAreaSearchInput.value = area.name;
+                                        document.getElementById('edit-area-id').value = area.id;
+                                        editAreaResultsBox.classList.add('hidden');
+                                    };
+                                    editAreaResultsBox.appendChild(li);
+                                });
+                                editAreaResultsBox.classList.remove('hidden');
+                            } else {
+                                editAreaResultsBox.classList.add('hidden');
+                            }
+                        });
+                }, 500);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!editAreaSearchInput.contains(e.target) && !editAreaResultsBox.contains(e.target)) {
+                    editAreaResultsBox.classList.add('hidden');
+                }
+            });
+        }
+
+        async function handleEditProfileSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('edit-profile-btn');
+            const errorBox = document.getElementById('edit-profile-error');
+            const successBox = document.getElementById('edit-profile-success');
+            const originalText = btn.innerText;
+
+            errorBox.classList.add('hidden');
+            successBox.classList.add('hidden');
+
+            const payload = {
+                name: document.getElementById('edit-name').value,
+                phone: document.getElementById('edit-phone').value,
+                address: document.getElementById('edit-address').value,
+                area_id: document.getElementById('edit-area-id').value,
+            };
+
+            if (!payload.area_id) {
+                errorBox.innerText = 'Pilih kecamatan dari daftar pencarian terlebih dahulu.';
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            btn.innerText = 'MENYIMPAN...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    successBox.innerText = 'Profil berhasil diperbarui.';
+                    successBox.classList.remove('hidden');
+                    
+                    // Update frontend state
+                    loggedInUser.name = payload.name;
+                    loggedInUser.phone = payload.phone;
+                    loggedInUser.address = payload.address;
+                    loggedInUser.area_id = payload.area_id;
+                    
+                    localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
+                    document.getElementById('user-display-name').innerText = loggedInUser.name;
+                    document.getElementById('user-display-address').innerText = loggedInUser.address;
+                    
+                    setTimeout(() => {
+                        showPage('view-account-profile');
+                    }, 1500);
+                } else {
+                    errorBox.innerText = data.message || 'Gagal menyimpan perubahan.';
+                    errorBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorBox.innerText = 'Terjadi kesalahan jaringan.';
+                errorBox.classList.remove('hidden');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
     </script>
 </body>
 
