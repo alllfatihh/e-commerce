@@ -1946,8 +1946,6 @@
 
     <!-- JAVASCRIPT CONTROLLER -->
     <script>
-        const artistsData = @json($artists ?? []);
-
         let currentSelectedSize = "M";
         let currentSlideIndex = 0;
         let slideInterval = null;
