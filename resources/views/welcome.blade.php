@@ -723,7 +723,7 @@
 
         <!-- Right: SEARCH -->
         <div id="header-right-menu"
-            class="absolute right-[94px] top-[14px] sm:right-[106px] sm:top-[18px] flex items-center text-[11px] font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3">
+            class="absolute right-[104px] top-[14px] sm:right-[116px] sm:top-[18px] flex items-center text-[11px] font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3">
             <button id="search-trigger" aria-label="Search"
                 class="font-montserrat hover:opacity-50 hover:scale-105 active:scale-95 transition-all focus:outline-none cursor-pointer leading-[16px]">
                 SEARCH
