@@ -364,7 +364,9 @@
             margin: 0 !important;
             cursor: pointer;
             color: #000000;
-            transition: opacity 0.25s ease, width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                        width 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+                        height 0.32s cubic-bezier(0.16, 1, 0.3, 1);
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -385,7 +387,7 @@
             position: absolute;
             right: 0px;
             top: 7px;
-            width: 24px;
+            width: 22px;
             height: 16px;
             border-top: 1.2px solid currentColor;
             border-right: 1.2px solid currentColor;
@@ -393,8 +395,8 @@
             border-left: none;
             box-sizing: border-box;
             pointer-events: none;
-            /* When returning (scrolling UP): vertical shrinks first (0s), horizontal opens after delay (0.15s) */
-            transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
+            /* When returning (scrolling UP): vertical shrinks first (0s), horizontal opens after delay (0.12s) */
+            transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
                         height 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
                         top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
                         left 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
@@ -405,7 +407,7 @@
 
         /* On hover in default horizontal state: line actively moves/stretches */
         .header__link--cart:not(.state-minimal):hover::before {
-            width: 30px;
+            width: 28px;
             transition-delay: 0s;
         }
 
@@ -420,28 +422,32 @@
             letter-spacing: 0.16em;
             line-height: 16px;
             text-transform: uppercase;
-            transition: opacity 0.2s ease 0.15s;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
+                        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
         }
 
         /* 3. VERTICAL LABEL (APPEARS ON SCROLL) */
-        /* Reads top to bottom naturally */
+        /* Reads top to bottom naturally with generous breathing room */
         .header__link--cart__vertical-label {
             position: absolute;
             top: 0px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(6px);
             width: auto;
             font-family: 'Montserrat', sans-serif;
             font-size: 11px;
             font-weight: 600;
-            letter-spacing: 0.22em;
+            letter-spacing: 0.18em;
             line-height: 1;
             text-transform: uppercase;
             writing-mode: vertical-rl;
             text-orientation: mixed;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s ease 0s;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s;
         }
 
         /* 4. MONOSPACE COUNTER */
@@ -466,50 +472,52 @@
         /* ============================================================== */
         .header__link--cart.state-minimal {
             width: 24px;
-            height: 96px;
+            height: 118px;
         }
 
-        /* Horizontal segment collapses to 0 immediately (0s); Vertical segment stretches after delay (0.15s) */
-        /* Centered on exact same axis as vertical label & counter */
+        /* Horizontal segment collapses to 0 immediately (0s); Vertical segment stretches down with generous spacing (0.12s) */
+        /* Spacing: "CART" ends around top:44px, line starts at top:56px (12px gap!), height:32px (ends at 88px), counter at 98px (10px gap!) */
         .header__link--cart.state-minimal::before {
             width: 0px !important;
-            height: 38px !important;
-            top: 36px !important;
+            height: 32px !important;
+            top: 56px !important;
             left: 50% !important;
             right: auto !important;
             transform: translateX(-50%) !important;
             border-top: none !important;
             border-right: 1.2px solid currentColor !important;
-            transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        height 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s,
-                        top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
+            transition: width 0.18s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        height 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
+                        top 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
         }
 
-        /* On hover in vertical state: vertical line stretches down further */
+        /* On hover in vertical state: vertical line stretches down smoothly */
         .header__link--cart.state-minimal:hover::before {
-            height: 46px !important;
-            transition: height 0.2s ease 0s !important;
+            height: 42px !important;
+            transition: height 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
         }
 
         .header__link--cart.state-minimal .header__link--cart__counter {
-            top: 78px !important;
+            top: 98px !important;
             left: 50% !important;
             right: auto !important;
             transform: translateX(-50%) !important;
             width: auto !important;
             text-align: center !important;
-            transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0.15s !important;
+            transition: top 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
         }
 
         .header__link--cart.state-minimal:hover .header__link--cart__counter {
-            top: 86px !important;
-            transition: top 0.2s ease 0s !important;
+            top: 108px !important;
+            transition: top 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
         }
 
         .header__link--cart.state-minimal .header__link--cart__default-label {
             opacity: 0 !important;
             pointer-events: none !important;
-            transition: opacity 0.15s ease 0s !important;
+            transform: translateY(-6px) !important;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
         }
 
         .header__link--cart.state-minimal .header__link--cart__vertical-label {
@@ -518,8 +526,9 @@
             top: 0px !important;
             left: 50% !important;
             right: auto !important;
-            transform: translateX(-50%) !important;
-            transition: opacity 0.25s ease 0.15s !important;
+            transform: translateX(-50%) translateY(0) !important;
+            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
+                        transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
         }
 
         /* Animated moving shimmer line in cart drawer */
@@ -1918,7 +1927,7 @@
         let slideInterval = null;
 
         let lastScrollY = window.scrollY;
-        const scrollDelta = 6;
+        const scrollDelta = 8;
 
         // A24-Inspired Header (Hide on Scroll Down, Reveal on Scroll Up & Morph Logo)
         function updateHeaderState() {
