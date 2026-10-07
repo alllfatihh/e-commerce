@@ -1461,7 +1461,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepu" data-artist-city="Jakarta"
                         onclick="openArtistProfile('Asepu', 'Jakarta')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="{{ asset('home1.jpg') }}" alt="Asepu"
+                            <img src="{{ asset('masmus.jpeg') }}" alt="Asepu"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepu</h4>
@@ -1471,7 +1471,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepa" data-artist-city="Kebumen"
                         onclick="openArtistProfile('Asepa', 'Kebumen')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="{{ asset('home2.png') }}" alt="Asepa"
+                            <img src="{{ asset('asep.jpeg') }}" alt="Asepa"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepa</h4>
@@ -1481,7 +1481,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepit" data-artist-city="Lumajang"
                         onclick="openArtistProfile('Asepit', 'Lumajang')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="{{ asset('home2.png') }}" alt="Asepit"
+                            <img src="{{ asset('asepo.jpeg') }}" alt="Asepit"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepit</h4>
@@ -1491,7 +1491,7 @@
                     <div class="artist-card group cursor-pointer" data-artist-name="Asepon"
                         data-artist-city="Pekalongan" onclick="openArtistProfile('Asepon', 'Pekalongan')">
                         <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
-                            <img src="{{ asset('artwork.jpeg') }}" alt="Asepon"
+                            <img src="{{ asset('asepi.jpeg') }}" alt="Asepon"
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <h4 class="font-bold text-sm md:text-base text-black font-roboto">Asepon</h4>
