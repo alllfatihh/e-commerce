@@ -760,17 +760,20 @@
 
             <!-- BITESHIP SHIPPING & ADDRESS DETAILS -->
             <div id="checkout-details" class="mt-6 border-t border-gray-200 pt-6 space-y-4">
-                <div class="relative">
-                    <input type="text" id="area-search" placeholder="Cari Kecamatan/Kode Pos..." oninput="searchAreaBiteship(this.value)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm" autocomplete="off">
-                    <div id="area-results" class="absolute z-10 w-full bg-white border border-gray-200 max-h-40 overflow-y-auto hidden shadow-lg text-sm font-montserrat"></div>
+                @if(auth()->check() && auth()->user()->area_id)
+                <div class="text-sm font-montserrat p-3 bg-gray-50 border border-gray-200">
+                    <p class="font-bold mb-1">{{ auth()->user()->name }} ({{ auth()->user()->phone }})</p>
+                    <p class="text-gray-600">{{ auth()->user()->address }}</p>
                 </div>
-                <input type="hidden" id="selected-area-id">
-                <input type="text" id="full-address" placeholder="Detail Alamat (Jalan, RT/RW, No)" class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-black font-montserrat text-sm">
-                
-                <div id="shipping-options-container" class="hidden space-y-2 mt-4">
+                <div id="shipping-options-container" class="space-y-2 mt-4">
                     <span class="text-sm font-medium font-montserrat block">Pilih Pengiriman:</span>
                     <div id="shipping-options" class="flex flex-col space-y-2 text-sm font-montserrat"></div>
                 </div>
+                @else
+                <div class="text-sm text-gray-500 font-montserrat">
+                    Anda akan diminta mengisi data pengiriman pada langkah selanjutnya.
+                </div>
+                @endif
             </div>
 
             <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
@@ -1022,7 +1025,7 @@
             <div class="w-full">
                 <div class="grid grid-cols-2 lg:grid-cols-4 bg-black gap-[1px] border-b border-black">
                     @foreach($products as $product)
-                        <div onclick="openProductDetail('{{ addslashes($product->name) }}', 'Rp {{ number_format($product->price, 2, ',', '.') }}')"
+                        <div onclick="openProductDetail({{ $product->id }})"
                             class="group cursor-pointer bg-white flex flex-col justify-between h-full hover:bg-gray-50 transition-colors duration-300">
 
                             <div class="relative w-full aspect-[3/4] bg-[#f4f4f4] overflow-hidden">
@@ -1063,6 +1066,9 @@
                             class="text-2xl md:text-3xl font-semibold uppercase tracking-wider text-black font-montserrat">
                             RAJA DIAMUK MASSA TEE V1
                         </h1>
+                        <p id="pdetail-price" class="text-lg md:text-xl font-medium mt-1 font-montserrat text-black">
+                            RP 250.000,00
+                        </p>
                         <p class="text-xs md:text-sm text-gray-600 mt-2 font-montserrat">
                             by <span onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')"
                                 class="underline hover:text-black cursor-pointer font-medium transition-colors font-montserrat">Mustafa
@@ -1843,7 +1849,7 @@
             <div class="flex justify-between items-center border-b border-gray-200 pb-4">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-bold font-montserrat uppercase text-black">Akun Saya</h1>
-                    <p id="user-display-email" class="text-xs text-gray-500 font-roboto mt-1">user@notisse.com</p>
+                    <p id="user-display-email" class="text-xs text-gray-500 font-roboto mt-1">{{ auth()->check() ? auth()->user()->email : 'user@notisse.com' }}</p>
                 </div>
                 <button onclick="handleLogout()"
                     class="text-xs font-semibold uppercase tracking-wider text-red-600 hover:underline cursor-pointer font-montserrat">
@@ -1868,12 +1874,10 @@
                         Pengiriman</h3>
                     <div
                         class="border border-gray-200 rounded-lg p-6 text-xs font-roboto space-y-2 leading-relaxed bg-white">
-                        <p class="font-bold text-black text-sm font-montserrat" id="user-display-name">John Doe</p>
-                        <p class="text-gray-600">Jl. Dago Asri No. 12, Coblong</p>
-                        <p class="text-gray-600">Kota Bandung, Jawa Barat 40135</p>
-                        <p class="text-gray-600">Indonesia</p>
+                        <p class="font-bold text-black text-sm font-montserrat" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</p>
+                        <p class="text-gray-600" id="user-display-address">{{ auth()->check() && auth()->user()->address ? auth()->user()->address : 'Belum ada alamat pengiriman.' }}</p>
                         <div class="pt-2">
-                            <button onclick="showToast('Fitur ubah alamat segera hadir.')"
+                            <button onclick="showEditProfile()"
                                 class="underline text-black font-semibold cursor-pointer">
                                 Edit Alamat
                             </button>
@@ -1881,6 +1885,50 @@
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- VIEW 10: EDIT PROFILE / ALAMAT -->
+        <section id="view-edit-profile" class="view-page px-6 md:px-12 pt-28 pb-12 max-w-xl mx-auto space-y-8">
+            <div class="mb-4 flex items-center justify-between">
+                <button onclick="goBack()" class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
+                    <span>BACK</span>
+                </button>
+                <h1 class="text-xl font-bold font-montserrat uppercase text-black">Edit Profil</h1>
+            </div>
+
+            <div id="edit-profile-error" class="hidden bg-red-100 text-red-700 p-3 rounded text-sm border border-red-200"></div>
+            <div id="edit-profile-success" class="hidden bg-green-100 text-green-700 p-3 rounded text-sm border border-green-200"></div>
+
+            <form onsubmit="handleEditProfileSubmit(event)" class="space-y-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nama Lengkap</label>
+                    <input type="text" id="edit-name" required class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">No. HP / Whatsapp</label>
+                    <input type="text" id="edit-phone" required class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto">
+                </div>
+                
+                <div class="relative">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Cari Kecamatan / Kode Pos</label>
+                    <input type="text" id="edit-area-search" class="w-full border border-gray-300 rounded p-3 text-sm focus:outline-none focus:border-black font-roboto" placeholder="Ketik nama kecamatan..." autocomplete="off">
+                    <ul id="edit-area-results" class="absolute z-10 w-full bg-white border border-gray-300 shadow-lg rounded mt-1 hidden max-h-48 overflow-y-auto"></ul>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Alamat Lengkap</label>
+                    <textarea id="edit-address" required class="w-full border border-gray-300 rounded p-3 text-sm h-24 focus:outline-none focus:border-black font-roboto resize-none" placeholder="Nama Jalan, RT/RW, Patokan..."></textarea>
+                </div>
+
+                <input type="hidden" id="edit-area-id" required>
+
+                <div class="pt-4">
+                    <button type="submit" id="edit-profile-btn" class="w-full bg-black text-white font-bold font-montserrat uppercase py-4 rounded hover:bg-gray-800 transition-colors cursor-pointer">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
         </section>
 
     </main>
@@ -1900,27 +1948,18 @@
             NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
     </div>
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-notification"
+        class="fixed top-24 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-full shadow-lg z-[60] flex items-center space-x-3 transition-all duration-300 opacity-0 translate-y-4 hidden font-montserrat text-sm tracking-wide">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span id="toast-message" class="font-medium">Notification message</span>
+    </div>
+
     <!-- JAVASCRIPT CONTROLLER -->
     <script>
-        // LIVE DATABASE & BRAND ASSETS (NO PLACEHOLDERS)
-        const productsData = [
-            @if(isset($products) && count($products) > 0)
-                @foreach($products as $prod)
-                {
-                    id: {{ $prod->id }},
-                    name: "{{ addslashes($prod->name) }}",
-                    price: "Rp {{ number_format($prod->price, 2, ',', '.') }}",
-                    image: "{{ asset($prod->image) }}",
-                    artist: "{{ addslashes($prod->description ?? 'Notisse Collection') }}"
-                },
-                @endforeach
-            @endif
-            { id: 101, name: "Muscle Tank V2 - White", price: "Rp 180.000,00", image: "{{ asset('footage-baju.jpg') }}", artist: "Asep" },
-            { id: 102, name: "Accessorized Slim Tee V2 - Black", price: "Rp 220.000,00", image: "{{ asset('footagebaju2.jpg') }}", artist: "Mustafa Alatas" },
-            { id: 103, name: "Rugged Long Sleeve Tee V2 - Gray", price: "Rp 280.000,00", image: "{{ asset('footage-baju-belakang.jpg') }}", artist: "Asepi" },
-            { id: 104, name: "Sweatshirt - Gray", price: "Rp 350.000,00", image: "{{ asset('footage-baju.jpg') }}", artist: "Asepu" },
-            { id: 105, name: "Pleated Denim V1", price: "Rp 450.000,00", image: "{{ asset('footagebaju2.jpg') }}", artist: "Asepa" }
-        ];
 
         let currentSelectedSize = "M";
         let currentSlideIndex = 0;
@@ -2055,16 +2094,16 @@
         updateHeaderState();
 
         let navigationHistory = ['view-shop'];
-        let isAuthenticated = false;
-        let loggedInUser = {
-            name: "John Doe",
-            email: "john.doe@notisse.com"
-        };
+        let isAuthenticated = localStorage.getItem('notisse_auth') === 'true' || {{ auth()->check() ? 'true' : 'false' }};
+        let loggedInUser = @json(auth()->user());
+        if (!loggedInUser && localStorage.getItem('notisse_user')) {
+            try { loggedInUser = JSON.parse(localStorage.getItem('notisse_user')); } catch(e){}
+        }
 
-        let cartState = [
-            { id: 1, name: "RAJA DIAMUK MASSA TEE V1", size: "M", unitPrice: 250000, qty: 1 },
-            { id: 2, name: "RAJA DIAMUK MASSA TEE V1", size: "L", unitPrice: 250000, qty: 1 }
-        ];
+        let productsData = @json($products);
+        let currentProduct = null;
+
+        let cartState = [];
 
         const overlayMenuBackdrop = document.getElementById('overlay-menu-backdrop');
         const overlayMenuSidebar = document.getElementById('overlay-menu-sidebar');
@@ -2118,11 +2157,11 @@
 
         /* ACCOUNT FUNCTIONALITIES */
         function handleAccountButtonClick() {
-            if (isAuthenticated) {
+            if (loggedInUser) {
                 showPage('view-account-profile');
                 fetchOrderHistory();
             } else {
-                showPage('view-login');
+                window.location.href = '/auth/checkout';
             }
         }
 
@@ -2164,13 +2203,16 @@
                     }
 
                     let statusClass = "bg-black text-white";
-                    let cancelButton = '';
+                    let actionButtons = '';
                     const st = (order.status || '').toLowerCase();
                     if (st === 'paid') {
                         statusClass = "bg-green-600 text-white";
                     } else if (st === 'pending') {
                         statusClass = "bg-yellow-500 text-black";
-                        cancelButton = `<button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-montserrat mt-2 cursor-pointer">Batalkan</button>`;
+                        actionButtons = `
+                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-montserrat mt-2 w-full hover:bg-neutral-800 transition-colors cursor-pointer">Bayar Sekarang</button>
+                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-montserrat mt-2 w-full text-center cursor-pointer">Batalkan</button>
+                        `;
                     } else if (st === 'cancelled') {
                         statusClass = "bg-red-600 text-white";
                     }
@@ -2184,7 +2226,9 @@
                             </div>
                             <div class="flex flex-col items-end">
                                 <span class="px-2.5 py-1 ${statusClass} font-bold rounded text-[10px] tracking-wider uppercase font-montserrat">${order.status}</span>
-                                ${cancelButton}
+                                <div class="mt-2 w-full flex flex-col gap-1">
+                                    ${actionButtons}
+                                </div>
                             </div>
                         </div>
                         ${itemsHtml}
@@ -2205,12 +2249,59 @@
                 });
                 if (response.ok) {
                     showToast("Pesanan berhasil dibatalkan.");
-                    fetchOrderHistory();
+                    setTimeout(() => window.location.reload(), 1000);
                 } else {
                     showToast("Gagal membatalkan pesanan.");
                 }
             } catch (e) {
                 console.error(e);
+                showToast("Terjadi kesalahan sistem.");
+            }
+        }
+
+        async function payOrder(id) {
+            try {
+                const response = await fetch(`/my-orders/${id}/pay`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.snap_token) {
+                    snap.pay(data.snap_token, {
+                        onSuccess: async function(result) {
+                            showToast("Payment success!");
+                            await fetch('/midtrans/local-success', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ order_id: result.order_id })
+                            });
+                            fetchOrderHistory();
+                        },
+                        onPending: async function(result) {
+                            showToast("Waiting your payment...");
+                            await fetch('/midtrans/local-success', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ order_id: result.order_id })
+                            });
+                            fetchOrderHistory();
+                            showToast("Payment success (Simulated)!");
+                        },
+                        onError: function(result) {
+                            showToast("Payment failed!");
+                        },
+                        onClose: function() {
+                            showToast('You closed the popup without finishing the payment');
+                        }
+                    });
+                } else {
+                    showToast(data.error || "Gagal memproses pembayaran");
+                }
+            } catch (err) {
+                console.error(err);
                 showToast("Terjadi kesalahan sistem.");
             }
         }
@@ -2222,6 +2313,9 @@
             localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
             document.getElementById('user-display-email').innerText = loggedInUser.email;
             document.getElementById('user-display-name').innerText = loggedInUser.name;
+            if (document.getElementById('user-display-address')) {
+                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'Belum ada alamat pengiriman.';
+            }
             showToast('Berhasil Login!');
             showPage('view-account-profile');
             fetchOrderHistory();
@@ -2232,17 +2326,27 @@
             isAuthenticated = true;
             localStorage.setItem('notisse_auth', 'true');
             localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
+            document.getElementById('user-display-email').innerText = loggedInUser.email;
+            document.getElementById('user-display-name').innerText = loggedInUser.name;
+            if (document.getElementById('user-display-address')) {
+                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'Belum ada alamat pengiriman.';
+            }
             showToast('Akun Berhasil Dibuat!');
             showPage('view-account-profile');
             fetchOrderHistory();
         }
 
-        function handleLogout() {
+        async function handleLogout() {
+            try {
+                await fetch('/logout', { method: 'POST' });
+            } catch (e) {
+                console.error(e);
+            }
             isAuthenticated = false;
+            loggedInUser = null;
             localStorage.removeItem('notisse_auth');
             localStorage.removeItem('notisse_user');
-            showToast('Anda telah logout.');
-            showPage('view-shop');
+            window.location.reload();
         }
 
         function openMenu() {
@@ -2377,6 +2481,10 @@
                 cartDrawerContent.classList.remove('translate-x-full');
             }, 10);
             document.body.style.overflow = 'hidden';
+            
+            if (loggedInUser && loggedInUser.area_id && cartState.length > 0) {
+                fetchShippingRates(loggedInUser.area_id);
+            }
         }
 
         function closeCart() {
@@ -2392,15 +2500,78 @@
         cartTrigger.addEventListener('click', openCart);
         cartClose.addEventListener('click', closeCart);
 
-        function openProductDetail(title, price, image) {
-            if (title) {
-                const titleEl = document.getElementById('pdetail-title');
-                if (titleEl) titleEl.innerText = title;
+        function openProductDetail(productIdOrName, price, image) {
+            let product = null;
+            if (typeof productIdOrName === 'number') {
+                product = productsData ? productsData.find(p => p.id === productIdOrName) : null;
+            } else if (typeof productIdOrName === 'string') {
+                product = productsData ? productsData.find(p => p.name === productIdOrName || String(p.id) === productIdOrName) : null;
             }
+
+            if (product) {
+                currentProduct = product;
+            } else {
+                currentProduct = {
+                    id: typeof productIdOrName === 'number' ? productIdOrName : 1,
+                    name: productIdOrName || 'Product',
+                    price: price ? (typeof price === 'string' ? parseFloat(price.replace(/[^0-9]/g, '')) : price) : 250000,
+                    stocks: [
+                        { size: 'S', stock: 5 },
+                        { size: 'M', stock: 10 },
+                        { size: 'L', stock: 5 },
+                        { size: 'XL', stock: 2 }
+                    ]
+                };
+            }
+
+            const titleEl = document.getElementById('pdetail-title');
+            if (titleEl) titleEl.innerText = currentProduct.name;
+
+            const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(currentProduct.price);
+            const priceEl = document.getElementById('pdetail-price');
+            if (priceEl) priceEl.innerText = formattedPrice;
+
             if (image) {
                 const imgEl = document.getElementById('pdetail-image');
                 if (imgEl) imgEl.src = image;
+            } else if (currentProduct.image) {
+                const imgEl = document.getElementById('pdetail-image');
+                if (imgEl) {
+                    const imgSrc = currentProduct.image.startsWith('http') || currentProduct.image.startsWith('/') 
+                        ? currentProduct.image 
+                        : '/' + currentProduct.image;
+                    imgEl.src = imgSrc;
+                }
             }
+
+            const sizeMenu = document.getElementById('size-dropdown-menu');
+            if (sizeMenu) {
+                sizeMenu.innerHTML = '';
+                if (currentProduct.stocks && currentProduct.stocks.length > 0) {
+                    currentProduct.stocks.forEach(stock => {
+                        if (stock.stock > 0) {
+                            sizeMenu.innerHTML += `
+                                <div onclick="selectSize('${stock.size}')"
+                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-montserrat">
+                                    <span>${stock.size} <span class="lowercase tracking-normal font-normal opacity-60 ml-2">(Sisa: ${stock.stock})</span></span><span class="text-xs opacity-50">${stock.size}</span>
+                                </div>
+                            `;
+                        } else {
+                            sizeMenu.innerHTML += `
+                                <div class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b border-gray-100 flex justify-between items-center font-montserrat text-gray-300 cursor-not-allowed">
+                                    <span>${stock.size} (Habis)</span><span class="text-xs opacity-50">${stock.size}</span>
+                                </div>
+                            `;
+                        }
+                    });
+                } else {
+                    sizeMenu.innerHTML = '<div class="px-4 py-2.5 text-xs">Stock Tidak Tersedia</div>';
+                }
+            }
+
+            const sizeLabel = document.getElementById('selected-size-label');
+            if (sizeLabel) sizeLabel.innerText = 'Select size: ';
+            currentSelectedSize = null;
             showPage('view-product-detail');
         }
 
@@ -2812,8 +2983,18 @@
 
         function updateCartQty(index, change) {
             if (cartState[index]) {
-                cartState[index].qty += change;
-                if (cartState[index].qty <= 0) cartState.splice(index, 1);
+                const item = cartState[index];
+                if (change > 0) {
+                    const product = productsData.find(p => p.id === item.id);
+                    const stockObj = product ? product.stocks.find(s => s.size === item.size) : null;
+                    const limit = stockObj ? stockObj.stock : 0;
+                    if (item.qty + change > limit) {
+                        showToast('Stock maksimal tercapai!');
+                        return;
+                    }
+                }
+                item.qty += change;
+                if (item.qty <= 0) cartState.splice(index, 1);
             }
             triggerBadgePop();
             renderCartItems();
@@ -2841,14 +3022,42 @@
         }
 
         function addSelectedToCart() {
-            cartState.push({
-                id: Date.now(),
-                name: 'RAJA DIAMUK MASSA TEE V1',
-                size: currentSelectedSize || 'M',
-                unitPrice: 250000,
-                qty: 1
-            });
+            if (!currentProduct) {
+                currentProduct = productsData && productsData.length > 0 ? productsData[0] : null;
+            }
+            if (!currentProduct) return;
+            if (!currentSelectedSize) {
+                showToast('Please select a size!');
+                return;
+            }
+
+            const productStock = currentProduct.stocks ? currentProduct.stocks.find(s => s.size === currentSelectedSize) : null;
+            const stockLimit = productStock ? productStock.stock : 99;
+            const existing = cartState.find(c => c.id === currentProduct.id && c.size === currentSelectedSize);
+            
+            if (existing) {
+                if (existing.qty < stockLimit) {
+                    existing.qty++;
+                } else {
+                    showToast('Stock habis!');
+                    return;
+                }
+            } else {
+                if (stockLimit >= 1) {
+                    cartState.push({
+                        id: currentProduct.id,
+                        name: currentProduct.name,
+                        size: currentSelectedSize,
+                        unitPrice: parseFloat(currentProduct.price),
+                        qty: 1
+                    });
+                } else {
+                    showToast('Stock habis!');
+                    return;
+                }
+            }
             triggerBadgePop();
+            renderCartItems();
             openCart();
             showToast('Added to cart!');
         }
@@ -2952,13 +3161,11 @@
                 return;
             }
 
-            const address = document.getElementById('full-address')?.value || '';
-            const areaId = document.getElementById('selected-area-id')?.value || '';
-            
-            if(!areaId || !address) {
-                showToast("Mohon lengkapi alamat pengiriman!");
+            if (!loggedInUser || !loggedInUser.area_id) {
+                window.location.href = '/auth/checkout';
                 return;
             }
+
             if(!selectedCourierName) {
                 showToast("Mohon pilih layanan kurir terlebih dahulu!");
                 return;
@@ -2980,11 +3187,11 @@
             }));
 
             const payload = {
-                customer_name: loggedInUser.name || "Guest User",
-                customer_email: loggedInUser.email || "guest@example.com",
-                customer_phone: "08123456789",
-                shipping_address: address,
-                destination_area_id: areaId,
+                customer_name: loggedInUser.name,
+                customer_email: loggedInUser.email,
+                customer_phone: loggedInUser.phone,
+                shipping_address: loggedInUser.address, 
+                destination_area_id: loggedInUser.area_id,
                 items: items,
                 shipping_cost: selectedShippingCost,
                 courier_name: selectedCourierName,
@@ -3003,7 +3210,26 @@
 
                 const data = await response.json();
                 
+                if (response.status === 403 && data.pending_order) {
+                    showToast(data.error);
+                    closeCart();
+                    showPage('view-account-profile');
+                    fetchOrderHistory();
+                    return;
+                }
+                
                 if (data.snap_token) {
+                    // Update local stock data consistency
+                    cartState.forEach(item => {
+                        const product = productsData.find(p => p.id === item.id);
+                        if (product) {
+                            const stockObj = product.stocks.find(s => s.size === item.size);
+                            if (stockObj && stockObj.stock >= item.qty) {
+                                stockObj.stock -= item.qty;
+                            }
+                        }
+                    });
+
                     snap.pay(data.snap_token, {
                         onSuccess: async function(result) {
                             showToast("Payment success!");
@@ -3050,7 +3276,7 @@
                         }
                     });
                 } else {
-                    showToast("Failed to create transaction.");
+                    showToast(data.error || "Failed to create transaction.");
                 }
             } catch (error) {
                 console.error(error);
@@ -3064,15 +3290,149 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            
             const lastPage = sessionStorage.getItem('current_page') || 'view-shop';
             showPage(lastPage);
-            if(lastPage === 'view-account-profile' && isAuthenticated) {
+            
+            if(lastPage === 'view-account-profile' && loggedInUser) {
                 fetchOrderHistory();
             }
             updateHeaderState();
             renderCartItems();
             startAutoSlide();
+            
+            if (urlParams.get('open_checkout') === 'true') {
+                openCart();
+            }
         });
+        // ====== EDIT PROFILE LOGIC ======
+        let editAreaSearchTimeout = null;
+        const editAreaSearchInput = document.getElementById('edit-area-search');
+        const editAreaResultsBox = document.getElementById('edit-area-results');
+
+        function showEditProfile() {
+            if (!loggedInUser) return;
+            document.getElementById('edit-name').value = loggedInUser.name || '';
+            document.getElementById('edit-phone').value = loggedInUser.phone || '';
+            document.getElementById('edit-address').value = loggedInUser.address || '';
+            document.getElementById('edit-area-id').value = loggedInUser.area_id || '';
+            
+            document.getElementById('edit-profile-error').classList.add('hidden');
+            document.getElementById('edit-profile-success').classList.add('hidden');
+            
+            showPage('view-edit-profile');
+        }
+
+        if (editAreaSearchInput) {
+            editAreaSearchInput.addEventListener('input', function(e) {
+                clearTimeout(editAreaSearchTimeout);
+                const keyword = e.target.value;
+                
+                if (keyword.length < 3) {
+                    editAreaResultsBox.classList.add('hidden');
+                    return;
+                }
+
+                editAreaSearchTimeout = setTimeout(() => {
+                    fetch(`/shipping-areas?keyword=${keyword}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            editAreaResultsBox.innerHTML = '';
+                            if (data.areas && data.areas.length > 0) {
+                                data.areas.forEach(area => {
+                                    const li = document.createElement('li');
+                                    li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-roboto border-b border-gray-100';
+                                    li.innerText = area.name;
+                                    li.onclick = () => {
+                                        editAreaSearchInput.value = area.name;
+                                        document.getElementById('edit-area-id').value = area.id;
+                                        editAreaResultsBox.classList.add('hidden');
+                                    };
+                                    editAreaResultsBox.appendChild(li);
+                                });
+                                editAreaResultsBox.classList.remove('hidden');
+                            } else {
+                                editAreaResultsBox.classList.add('hidden');
+                            }
+                        });
+                }, 500);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!editAreaSearchInput.contains(e.target) && !editAreaResultsBox.contains(e.target)) {
+                    editAreaResultsBox.classList.add('hidden');
+                }
+            });
+        }
+
+        async function handleEditProfileSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('edit-profile-btn');
+            const errorBox = document.getElementById('edit-profile-error');
+            const successBox = document.getElementById('edit-profile-success');
+            const originalText = btn.innerText;
+
+            errorBox.classList.add('hidden');
+            successBox.classList.add('hidden');
+
+            const payload = {
+                name: document.getElementById('edit-name').value,
+                phone: document.getElementById('edit-phone').value,
+                address: document.getElementById('edit-address').value,
+                area_id: document.getElementById('edit-area-id').value,
+            };
+
+            if (!payload.area_id) {
+                errorBox.innerText = 'Pilih kecamatan dari daftar pencarian terlebih dahulu.';
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            btn.innerText = 'MENYIMPAN...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    successBox.innerText = 'Profil berhasil diperbarui.';
+                    successBox.classList.remove('hidden');
+                    
+                    // Update frontend state
+                    loggedInUser.name = payload.name;
+                    loggedInUser.phone = payload.phone;
+                    loggedInUser.address = payload.address;
+                    loggedInUser.area_id = payload.area_id;
+                    
+                    localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
+                    document.getElementById('user-display-name').innerText = loggedInUser.name;
+                    document.getElementById('user-display-address').innerText = loggedInUser.address;
+                    
+                    setTimeout(() => {
+                        showPage('view-account-profile');
+                    }, 1500);
+                } else {
+                    errorBox.innerText = data.message || 'Gagal menyimpan perubahan.';
+                    errorBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorBox.innerText = 'Terjadi kesalahan jaringan.';
+                errorBox.classList.remove('hidden');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
     </script>
 </body>
 

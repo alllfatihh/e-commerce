@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class ProductStock extends Model
 {
     protected $guarded = [];
 
-    public function stocks()
+    public function product()
     {
-        return $this->hasMany(ProductStock::class);
+        return $this->belongsTo(Product::class);
     }
 }
