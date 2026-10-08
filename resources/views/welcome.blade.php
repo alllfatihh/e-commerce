@@ -954,7 +954,7 @@
 
                 <!-- OVERLAY MENU PADA CAROUSEL (A24 STYLE) -->
                 <div class="absolute bottom-10 left-12 md:bottom-16 md:left-24 z-20 flex flex-col pointer-events-none">
-                    <a href="javascript:void(0)" onclick="navigateTo('view-shop')"
+                    <a href="javascript:void(0)" onclick="document.getElementById('shop-catalog').scrollIntoView({behavior: 'smooth'})"
                         class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Shop</span>
@@ -989,7 +989,7 @@
 
 
             <!-- PRODUCT CATALOG GRID -->
-            <div class="w-full">
+            <div id="shop-catalog" class="w-full">
                 <div class="grid grid-cols-2 lg:grid-cols-4 bg-black gap-[1px] border-b border-black">
                     @foreach($products as $product)
                         <div onclick="openProductDetail({{ $product->id }})"
