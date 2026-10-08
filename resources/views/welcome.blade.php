@@ -355,7 +355,7 @@
         .header__link--cart {
             display: block;
             position: fixed;
-            top: 28px;
+            top: 27px; /* Fine-tuned vertical alignment with SEARCH */
             right: 28px;
             width: 72px;
             height: 38px;
@@ -372,9 +372,16 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        @media (max-width: 768px) {
+            .header__link--cart {
+                top: 23px; /* Fine-tuned vertical alignment with SEARCH */
+                right: 20px;
+            }
+        }
+        
         @media (max-width: 640px) {
             .header__link--cart {
-                top: 20px;
+                top: 19px; /* Fine-tuned vertical alignment with SEARCH */
                 right: 18px;
             }
         }
