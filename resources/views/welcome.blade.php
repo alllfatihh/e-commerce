@@ -355,7 +355,7 @@
         .header__link--cart {
             display: block;
             position: fixed;
-            top: 18px;
+            top: 28px;
             right: 28px;
             width: 72px;
             height: 38px;
@@ -374,7 +374,7 @@
 
         @media (max-width: 640px) {
             .header__link--cart {
-                top: 14px;
+                top: 20px;
                 right: 18px;
             }
         }
