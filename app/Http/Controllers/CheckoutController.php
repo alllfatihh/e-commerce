@@ -189,37 +189,64 @@ class CheckoutController extends Controller
 
     public function getShippingRates(Request $request)
     {
-        $validated = $request->validate([
-            'destination_area_id' => 'required|string',
-            'items' => 'required|array'
-        ]);
+        try {
+            $validated = $request->validate([
+                'destination_area_id' => 'required|string',
+                'items' => 'required|array'
+            ]);
 
-        $biteshipItems = array_map(function($item) {
-            return [
-                "name" => $item['name'],
-                "description" => $item['name'] ?? "Apparel Notisse",
-                "value" => $item['price'],
-                "length" => 20,
-                "width" => 20,
-                "height" => 5,
-                "weight" => 200, // asumsikan 200gram per baju
-                "quantity" => $item['quantity']
-            ];
-        }, $validated['items']);
+            $biteshipItems = array_map(function($item) {
+                return [
+                    "name" => $item['name'] ?? "Item",
+                    "description" => $item['name'] ?? "Apparel Notisse",
+                    "value" => $item['price'] ?? 100000,
+                    "length" => 20,
+                    "width" => 20,
+                    "height" => 5,
+                    "weight" => 200, // asumsikan 200gram per baju
+                    "quantity" => $item['quantity'] ?? 1
+                ];
+            }, $validated['items']);
 
-        $response = Http::withHeaders([
-            'Authorization' => env('BITESHIP_API_KEY')
-        ])->post('https://api.biteship.com/v1/rates/couriers', [
-            "origin_area_id" => env('STORE_ORIGIN_AREA_ID', "IDNP9IDNC22IDND2044IDZ40353"),
-            "destination_area_id" => $validated['destination_area_id'],
-            "couriers" => "jne,sicepat,jnt,anteraja",
-            "items" => $biteshipItems
-        ]);
+            $response = Http::withHeaders([
+                'Authorization' => env('BITESHIP_API_KEY')
+            ])->post('https://api.biteship.com/v1/rates/couriers', [
+                "origin_area_id" => env('STORE_ORIGIN_AREA_ID', "IDNP9IDNC22IDND2044IDZ40353"),
+                "destination_area_id" => $validated['destination_area_id'],
+                "couriers" => "jne,sicepat,jnt,anteraja",
+                "items" => $biteshipItems
+            ]);
 
-        $data = $response->json();
+            $data = $response->json();
 
-        // Fallback Simulasi jika Biteship error (karena kurang saldo di akun)
-        if (isset($data['success']) && $data['success'] === false) {
+            // Fallback Simulasi jika Biteship error (karena kurang saldo di akun, timeout, dll)
+            if ($response->failed() || (isset($data['success']) && $data['success'] === false) || empty($data['pricing'])) {
+                return response()->json([
+                    'success' => true,
+                    'pricing' => [
+                        [
+                            'courier_name' => 'JNE',
+                            'courier_service_name' => 'REG',
+                            'price' => 15000
+                        ],
+                        [
+                            'courier_name' => 'SiCepat',
+                            'courier_service_name' => 'HALU',
+                            'price' => 12000
+                        ],
+                        [
+                            'courier_name' => 'J&T',
+                            'courier_service_name' => 'EZ',
+                            'price' => 17000
+                        ]
+                    ]
+                ]);
+            }
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('getShippingRates error: ' . $e->getMessage());
+            // Berikan fallback jika terjadi exception server
             return response()->json([
                 'success' => true,
                 'pricing' => [
@@ -241,8 +268,6 @@ class CheckoutController extends Controller
                 ]
             ]);
         }
-
-        return response()->json($data);
     }
 
     public function webhook(Request $request)
