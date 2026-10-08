@@ -2940,15 +2940,17 @@
             input.value = new Intl.NumberFormat('id-ID').format(val);
         }
 
-        function handleArtworkOfferingSubmit(e) {
+        async function handleArtworkOfferingSubmit(e) {
             e.preventDefault();
-            const price = document.getElementById('offering-buyer-price').value.trim();
+            const priceStr = document.getElementById('offering-buyer-price').value.trim();
             const message = document.getElementById('offering-buyer-message').value.trim();
 
-            if (!price) {
+            if (!priceStr) {
                 showToast("Harap masukkan nominal tawaran");
                 return;
             }
+
+            const rawPrice = priceStr.replace(/\D/g, '');
 
             let activeUser = loggedInUser;
             try {
@@ -2956,44 +2958,60 @@
                 if (storedUser) activeUser = JSON.parse(storedUser);
             } catch (err) {}
 
-            const refId = '#NTS-ART-' + Math.floor(100000 + Math.random() * 900000);
+            if (!activeUser) {
+                showToast("Silakan login atau daftar terlebih dahulu.");
+                return;
+            }
 
-            // Save inquiry locally in system records for the user's account
+            const btn = document.querySelector('#artwork-offering-form-body button[type="submit"]');
+            const origText = btn.innerText;
+            btn.innerText = "MENGIRIM...";
+            btn.disabled = true;
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
             try {
-                const storedOffers = JSON.parse(localStorage.getItem('notisse_artwork_offers') || '[]');
-                storedOffers.push({
-                    refId: refId,
-                    date: new Date().toISOString(),
-                    artwork: currentActiveArtwork,
-                    buyer: {
-                        name: activeUser.name,
-                        email: activeUser.email
+                const response = await fetch('/api/artwork-offerings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
                     },
-                    offerPrice: price,
-                    message: message || '',
-                    status: 'Under Review'
+                    body: JSON.stringify({
+                        artwork_id: currentActiveArtwork.id,
+                        offering_price: rawPrice
+                    })
                 });
-                localStorage.setItem('notisse_artwork_offers', JSON.stringify(storedOffers));
-            } catch (err) {}
 
-            // Populate success screen details
-            const succRef = document.getElementById('success-offering-ref');
-            const succArtist = document.getElementById('success-artist-name');
-            const succTitle = document.getElementById('success-artwork-title');
-            const succPrice = document.getElementById('success-artwork-price');
-            const succBuyer = document.getElementById('success-buyer-name');
+                const data = await response.json();
 
-            if (succRef) succRef.innerText = refId;
-            if (succArtist) succArtist.innerText = currentActiveArtwork.artist;
-            if (succTitle) succTitle.innerText = currentActiveArtwork.title;
-            if (succPrice) succPrice.innerText = "Rp " + price + " IDR";
-            if (succBuyer) succBuyer.innerText = `${activeUser.name} (${activeUser.email})`;
+                if (response.ok && data.success) {
+                    const succRef = document.getElementById('success-offering-ref');
+                    const succArtist = document.getElementById('success-artist-name');
+                    const succTitle = document.getElementById('success-artwork-title');
+                    const succPrice = document.getElementById('success-artwork-price');
+                    const succBuyer = document.getElementById('success-buyer-name');
 
-            // Switch to success body
-            document.getElementById('artwork-offering-form-body').classList.add('hidden');
-            document.getElementById('artwork-offering-success-body').classList.remove('hidden');
+                    if (succRef) succRef.innerText = data.data.reference_number;
+                    if (succArtist) succArtist.innerText = data.data.artist_name;
+                    if (succTitle) succTitle.innerText = data.data.artwork_title;
+                    if (succPrice) succPrice.innerText = "Rp " + new Intl.NumberFormat('id-ID').format(data.data.offering_price) + " IDR";
+                    if (succBuyer) succBuyer.innerText = `${data.data.buyer_name} (${data.data.buyer_email})`;
 
-            showToast("Offering diajukan! Penawaran tercatat di sistem.");
+                    document.getElementById('artwork-offering-form-body').classList.add('hidden');
+                    document.getElementById('artwork-offering-success-body').classList.remove('hidden');
+
+                    showToast("Offering diajukan! Penawaran tercatat di sistem.");
+                } else {
+                    showToast(data.message || "Gagal mengajukan penawaran.");
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("Terjadi kesalahan sistem saat mengirim penawaran.");
+            } finally {
+                btn.innerText = origText;
+                btn.disabled = false;
+            }
         }
 
         /* LIGHTBOX IMAGE VIEWER LOGIC (SIZE CHART & ARTWORK) */
