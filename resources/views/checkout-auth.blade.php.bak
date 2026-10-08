@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOTISSE — Express Checkout</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -251,19 +250,6 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 3: SHIPPING OPTIONS -->
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between border-b border-gray-100 pb-2">
-                            <h2 class="text-sm font-bold font-montserrat uppercase tracking-[0.15em] text-black">3. Pilihan Pengiriman</h2>
-                        </div>
-                        <div id="shipping-options-container" class="space-y-3 mt-4">
-                            <div id="shipping-loading" class="text-xs text-gray-500 font-roboto hidden">Memuat estimasi pengiriman...</div>
-                            <div id="shipping-options" class="flex flex-col space-y-2 text-sm font-montserrat">
-                                <span class="text-xs text-gray-400 font-roboto">Pilih kecamatan tujuan terlebih dahulu untuk melihat opsi pengiriman.</span>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Hidden Fields -->
                     <input type="hidden" id="area_id" value="{{ auth()->user()->area_id ?? '' }}" required>
                     <input type="hidden" id="area_name">
@@ -358,9 +344,6 @@
         const summaryContainer = document.getElementById('checkout-summary-items');
         let subtotal = 0;
         let totalCount = 0;
-        let selectedShippingCost = 0;
-        let selectedCourierName = "";
-        let isFetchingShipping = false;
 
         // Render Cart Items in Summary
         if (cart.length === 0) {
@@ -405,100 +388,10 @@
             });
 
             document.getElementById('summary-item-count').innerText = `${totalCount} Produk`;
-            updateTotalDisplay();
+            const formattedTotalStr = 'Rp ' + subtotal.toLocaleString('id-ID');
+            document.getElementById('checkout-subtotal').innerText = formattedTotalStr;
+            document.getElementById('checkout-total').innerText = formattedTotalStr;
         }
-
-        function updateTotalDisplay() {
-            const formattedSubtotal = 'Rp ' + subtotal.toLocaleString('id-ID');
-            const grandTotal = subtotal + selectedShippingCost;
-            const formattedTotal = 'Rp ' + grandTotal.toLocaleString('id-ID');
-
-            document.getElementById('checkout-subtotal').innerText = formattedSubtotal;
-            document.getElementById('checkout-total').innerText = formattedTotal;
-        }
-
-        async function fetchShippingRates(areaId) {
-            if (isFetchingShipping) return;
-            isFetchingShipping = true;
-
-            const shippingOptions = document.getElementById('shipping-options');
-            const loadingIndicator = document.getElementById('shipping-loading');
-            
-            shippingOptions.innerHTML = '';
-            loadingIndicator.classList.remove('hidden');
-
-            const items = cart.map(item => ({
-                id: item.id,
-                name: item.name,
-                price: item.unitPrice || item.price,
-                quantity: item.qty || 1,
-                size: item.size
-            }));
-
-            try {
-                const res = await fetch('/shipping-rates', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({
-                        destination_area_id: areaId,
-                        items: items
-                    })
-                });
-
-                const data = await res.json();
-                loadingIndicator.classList.add('hidden');
-
-                if (data.pricing && data.pricing.length > 0) {
-                    data.pricing.forEach((rate, index) => {
-                        const name = rate.courier_name + ' ' + rate.courier_service_name;
-                        const cost = rate.price;
-
-                        const id = `courier-${index}`;
-                        const div = document.createElement('div');
-                        div.className = 'flex items-center justify-between p-3 border border-gray-200 cursor-pointer hover:bg-neutral-50 transition-colors';
-                        
-                        div.innerHTML = `
-                            <div class="flex items-center space-x-3">
-                                <input type="radio" name="shipping_courier" id="${id}" value="${cost}" 
-                                       class="w-4 h-4 text-black focus:ring-black border-gray-300"
-                                       onchange="selectShipping('${name}', ${cost})">
-                                <label for="${id}" class="cursor-pointer">
-                                    <span class="block font-bold text-xs uppercase text-black">${name}</span>
-                                </label>
-                            </div>
-                            <span class="font-bold text-xs">Rp ${cost.toLocaleString('id-ID')}</span>
-                        `;
-                        
-                        // Click on div to select radio
-                        div.addEventListener('click', (e) => {
-                            if (e.target.tagName !== 'INPUT') {
-                                const radio = div.querySelector('input');
-                                radio.checked = true;
-                                selectShipping(name, cost);
-                            }
-                        });
-
-                        shippingOptions.appendChild(div);
-                    });
-                } else {
-                    shippingOptions.innerHTML = '<span class="text-xs text-red-500">Kurir tidak tersedia untuk lokasi ini.</span>';
-                }
-            } catch (err) {
-                loadingIndicator.classList.add('hidden');
-                shippingOptions.innerHTML = '<span class="text-xs text-red-500">Gagal mengambil tarif pengiriman.</span>';
-            }
-
-            isFetchingShipping = false;
-        }
-
-        window.selectShipping = function(name, cost) {
-            selectedCourierName = name;
-            selectedShippingCost = parseInt(cost);
-            updateTotalDisplay();
-        };
 
         // Biteship Area Autocomplete Logic
         const areaSearchInput = document.getElementById('area-search');
@@ -513,7 +406,6 @@
         if (existingAreaId) {
             confirmedBadge.classList.remove('hidden');
             confirmedText.innerText = 'Kecamatan Terdaftar (ID: ' + existingAreaId + ')';
-            fetchShippingRates(existingAreaId);
         }
 
         areaSearchInput.addEventListener('input', function(e) {
@@ -550,9 +442,6 @@
                                     
                                     confirmedBadge.classList.remove('hidden');
                                     confirmedText.innerText = area.name;
-                                    
-                                    // Fetch shipping rates for the new area
-                                    fetchShippingRates(area.id);
                                 };
                                 areaResultsBox.appendChild(li);
                             });
@@ -614,19 +503,13 @@
                 return;
             }
 
-            if (!selectedCourierName) {
-                errorBox.innerHTML = '<strong>Pilih Pengiriman:</strong> Silakan pilih salah satu opsi kurir yang tersedia.';
-                errorBox.classList.remove('hidden');
-                return;
-            }
-
             const btn = document.getElementById('submit-btn');
             const originalText = document.getElementById('btn-text').innerText;
             document.getElementById('btn-text').innerText = 'MEMPROSES VERIFIKASI...';
             btn.disabled = true;
             btn.classList.add('opacity-75');
 
-            const authPayload = {
+            const payload = {
                 name: document.getElementById('name').value,
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value,
@@ -637,110 +520,32 @@
             };
 
             try {
-                // 1. Authenticate or Register Seamlessly
-                const authResponse = await fetch('/auth/seamless', {
+                const response = await fetch('/auth/seamless', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify(authPayload)
+                    body: JSON.stringify(payload)
                 });
 
-                const authData = await authResponse.json();
+                const data = await response.json();
 
-                if (authResponse.ok && authData.success) {
-                    if (authData.user) {
-                        localStorage.setItem('notisse_user', JSON.stringify(authData.user));
+                if (response.ok && data.success) {
+                    if (data.user) {
+                        localStorage.setItem('notisse_user', JSON.stringify(data.user));
                     }
-                    
-                    // 2. Process Midtrans Checkout
-                    document.getElementById('btn-text').innerText = 'MEMBUAT PESANAN...';
-                    
-                    const items = cart.map(item => ({
-                        id: item.id,
-                        name: item.name,
-                        price: item.unitPrice || item.price,
-                        quantity: item.qty || 1,
-                        size: item.size
-                    }));
-
-                    const checkoutPayload = {
-                        customer_name: authPayload.name,
-                        customer_email: authPayload.email,
-                        customer_phone: authPayload.phone,
-                        shipping_address: authPayload.address, 
-                        destination_area_id: authPayload.area_id,
-                        items: items,
-                        shipping_cost: selectedShippingCost,
-                        courier_name: selectedCourierName,
-                        _token: csrfToken
-                    };
-
-                    const checkoutResponse = await fetch('/checkout', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken
-                        },
-                        body: JSON.stringify(checkoutPayload)
-                    });
-
-                    const checkoutData = await checkoutResponse.json();
-
-                    if (checkoutResponse.status === 403 && checkoutData.pending_order) {
-                        alert(checkoutData.error);
-                        window.location.href = '/';
-                        return;
-                    }
-
-                    if (checkoutData.snap_token) {
-                        snap.pay(checkoutData.snap_token, {
-                            onSuccess: async function(result) {
-                                await fetch('/midtrans/local-success', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ order_id: result.order_id })
-                                });
-                                await fetch('/api/cart/clear', { method: 'POST' });
-                                localStorage.removeItem('notisse_cart');
-                                window.location.href = '/?order_success=true';
-                            },
-                            onPending: async function(result) {
-                                await fetch('/midtrans/local-success', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ order_id: result.order_id })
-                                });
-                                await fetch('/api/cart/clear', { method: 'POST' });
-                                localStorage.removeItem('notisse_cart');
-                                window.location.href = '/?order_pending=true';
-                            },
-                            onError: function(result) {
-                                alert("Payment failed!");
-                                document.getElementById('btn-text').innerText = originalText;
-                                btn.disabled = false;
-                                btn.classList.remove('opacity-75');
-                            },
-                            onClose: function() {
-                                document.getElementById('btn-text').innerText = originalText;
-                                btn.disabled = false;
-                                btn.classList.remove('opacity-75');
-                            }
-                        });
-                    } else {
-                        throw new Error(checkoutData.error || 'Gagal mengambil token Midtrans');
-                    }
-
+                    // Redirect back to welcome blade to trigger open checkout drawer with rates calculated
+                    window.location.href = '/?open_checkout=true';
                 } else {
-                    errorBox.innerText = authData.message || 'Terjadi kesalahan sistem. Periksa kembali format isian Anda.';
+                    errorBox.innerText = data.message || 'Terjadi kesalahan sistem. Periksa kembali format isian Anda.';
                     errorBox.classList.remove('hidden');
                     document.getElementById('btn-text').innerText = originalText;
                     btn.disabled = false;
                     btn.classList.remove('opacity-75');
                 }
             } catch (err) {
-                errorBox.innerText = 'Koneksi ke server gagal. ' + err.message;
+                errorBox.innerText = 'Koneksi ke server gagal. Pastikan jaringan internet Anda aktif.';
                 errorBox.classList.remove('hidden');
                 document.getElementById('btn-text').innerText = originalText;
                 btn.disabled = false;

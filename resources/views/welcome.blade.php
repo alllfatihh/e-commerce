@@ -760,32 +760,14 @@
 
             <div id="cart-items-container" class="space-y-6 flex-grow"></div>
 
-            <!-- BITESHIP SHIPPING & ADDRESS DETAILS -->
-            <div id="checkout-details" class="mt-6 border-t border-gray-200 pt-6 space-y-4">
-                @if(auth()->check() && auth()->user()->area_id)
-                <div class="text-sm font-montserrat p-3 bg-gray-50 border border-gray-200">
-                    <p class="font-bold mb-1">{{ auth()->user()->name }} ({{ auth()->user()->phone }})</p>
-                    <p class="text-gray-600">{{ auth()->user()->address }}</p>
-                </div>
-                <div id="shipping-options-container" class="space-y-2 mt-4">
-                    <span class="text-sm font-medium font-montserrat block">Pilih Pengiriman:</span>
-                    <div id="shipping-options" class="flex flex-col space-y-2 text-sm font-montserrat"></div>
-                </div>
-                @else
-                <div class="text-sm text-gray-500 font-montserrat">
-                    Anda akan diminta mengisi data pengiriman pada langkah selanjutnya.
-                </div>
-                @endif
-            </div>
-
             <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
                 <div class="flex items-baseline space-x-6">
-                    <span class="text-base md:text-lg font-medium text-gray-900 font-montserrat">Estimated total</span>
+                    <span class="text-base md:text-lg font-medium text-gray-900 font-montserrat">Subtotal</span>
                     <span id="cart-total-price" class="text-xl md:text-xl font-regular font-montserrat">Rp 0,00 IDR</span>
                 </div>
-                <p class="text-xs text-gray-400 font-montserrat">taxes and shipping calculated.</p>
+                <p class="text-xs text-gray-400 font-montserrat">Shipping will be calculated at checkout.</p>
                 <div class="pt-4 w-full text-right">
-                    <button onclick="processCheckout()"
+                    <button onclick="window.location.href='/auth/checkout'"
                         class="btn-brush text-sm md:text-base cursor-pointer font-montserrat" id="checkout-btn">
                         CHECKOUT
                     </button>
@@ -3442,141 +3424,12 @@
             renderCartItems(); // trigger recalc total in cart
         };
 
-        async function processCheckout() {
+        function processCheckout() {
             if (cartState.length === 0) {
                 showToast("Cart is empty!");
                 return;
             }
-
-            if (!loggedInUser || !loggedInUser.area_id) {
-                window.location.href = '/auth/checkout';
-                return;
-            }
-
-            if(!selectedCourierName) {
-                showToast("Mohon pilih layanan kurir terlebih dahulu!");
-                return;
-            }
-
-            const btn = document.getElementById('checkout-btn');
-            if (btn) {
-                btn.innerText = "PROCESSING...";
-                btn.disabled = true;
-            }
-
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-
-            const items = cartState.map(item => ({
-                id: item.id,
-                name: item.name,
-                price: item.unitPrice,
-                quantity: item.qty,
-                size: item.size
-            }));
-
-            const payload = {
-                customer_name: loggedInUser.name,
-                customer_email: loggedInUser.email,
-                customer_phone: loggedInUser.phone,
-                shipping_address: loggedInUser.address, 
-                destination_area_id: loggedInUser.area_id,
-                items: items,
-                shipping_cost: selectedShippingCost,
-                courier_name: selectedCourierName,
-                _token: csrfToken
-            };
-
-            try {
-                const response = await fetch('/checkout', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await response.json();
-                
-                if (response.status === 403 && data.pending_order) {
-                    showToast(data.error);
-                    closeCart();
-                    showPage('view-account-profile');
-                    fetchOrderHistory();
-                    return;
-                }
-                
-                if (data.snap_token) {
-                    // Update local stock data consistency
-                    cartState.forEach(item => {
-                        const product = productsData.find(p => p.id === item.id);
-                        if (product) {
-                            const stockObj = product.stocks.find(s => s.size === item.size);
-                            if (stockObj && stockObj.stock >= item.qty) {
-                                stockObj.stock -= item.qty;
-                            }
-                        }
-                    });
-
-                    snap.pay(data.snap_token, {
-                        onSuccess: async function(result) {
-                            showToast("Payment success!");
-                            
-                            // Hit API simulasi webhook untuk localhost
-                            await fetch('/midtrans/local-success', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ order_id: result.order_id })
-                            });
-                            
-                            await fetch('/api/cart/clear', { method: 'POST' });
-                            cartState = [];
-                            selectedShippingCost = 0;
-                            selectedCourierName = "";
-                            renderCartItems();
-                            closeCart();
-                            showPage('view-account-profile');
-                            fetchOrderHistory();
-                        },
-                        onPending: async function(result) {
-                            showToast("Waiting your payment...");
-                            
-                            // Hit API simulasi webhook untuk localhost (bypass lunas otomatis)
-                            await fetch('/midtrans/local-success', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ order_id: result.order_id })
-                            });
-                            
-                            await fetch('/api/cart/clear', { method: 'POST' });
-                            cartState = [];
-                            selectedShippingCost = 0;
-                            selectedCourierName = "";
-                            renderCartItems();
-                            showToast("Payment success (Simulated)!");
-                            closeCart();
-                            showPage('view-account-profile');
-                            fetchOrderHistory();
-                        },
-                        onError: function(result) {
-                            showToast("Payment failed!");
-                        },
-                        onClose: function() {
-                            showToast('You closed the popup without finishing the payment');
-                        }
-                    });
-                } else {
-                    showToast(data.error || "Failed to create transaction.");
-                }
-            } catch (error) {
-                console.error(error);
-                showToast("Error processing checkout.");
-            } finally {
-                if (btn) {
-                    btn.innerText = "CHECKOUT";
-                    btn.disabled = false;
-                }
-            }
+            window.location.href = '/auth/checkout';
         }
 
         window.addEventListener('DOMContentLoaded', () => {
