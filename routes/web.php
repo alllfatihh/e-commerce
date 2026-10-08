@@ -44,6 +44,14 @@ Route::delete('/admin/editorials/{id}', [AdminController::class, 'deleteEditoria
 Route::post('/admin/artists', [AdminController::class, 'storeArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::match(['post', 'put'], '/admin/artists/{id}', [AdminController::class, 'updateArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::delete('/admin/artists/{id}', [AdminController::class, 'deleteArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+// Cart Routes
+use App\Http\Controllers\CartController;
+Route::get('/api/cart', [CartController::class, 'index'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/api/cart', [CartController::class, 'add'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/api/cart/clear', [CartController::class, 'clear'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::put('/api/cart/{id}', [CartController::class, 'updateItem'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::delete('/api/cart/{id}', [CartController::class, 'remove'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 

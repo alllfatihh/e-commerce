@@ -2073,21 +2073,21 @@
         let artistsData = @json($artists ?? []);
         let currentProduct = null;
         let cartState = [];
-        try {
-            const savedCart = localStorage.getItem('notisse_cart');
-            if (savedCart) {
-                cartState = JSON.parse(savedCart);
+        
+        async function fetchCart() {
+            try {
+                const response = await fetch('/api/cart', { headers: { 'Accept': 'application/json' }});
+                cartState = await response.json();
+                renderCartItems();
+            } catch (e) {
+                console.error("Gagal memuat keranjang:", e);
             }
-        } catch (e) {
-            console.error("Gagal memuat keranjang dari localStorage:", e);
         }
+        
+        document.addEventListener('DOMContentLoaded', fetchCart);
 
         function saveCartState() {
-            try {
-                localStorage.setItem('notisse_cart', JSON.stringify(cartState));
-            } catch (e) {
-                console.error("Gagal menyimpan keranjang ke localStorage:", e);
-            }
+            // No-op, managed by backend now
         }
 
         const overlayMenuBackdrop = document.getElementById('overlay-menu-backdrop');
@@ -3266,52 +3266,53 @@
             }
         }
 
-        function updateCartQty(index, change) {
+        async function updateCartQty(index, change) {
             if (cartState[index]) {
                 const item = cartState[index];
-                if (change > 0) {
-                    const product = productsData.find(p => p.id === item.id);
-                    const stockObj = product ? product.stocks.find(s => s.size === item.size) : null;
-                    const limit = stockObj ? stockObj.stock : 99;
-                    if (item.qty + change > limit) {
-                        showToast('Stock maksimal tercapai!');
-                        return;
-                    }
+                const newQty = item.qty + change;
+                if (newQty <= 0) {
+                    await removeCartItem(index);
+                } else {
+                    try {
+                        const response = await fetch(`/api/cart/${item.cart_item_id}`, {
+                            method: 'PUT',
+                            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+                            body: JSON.stringify({ quantity: newQty })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            cartState = data.items;
+                            renderCartItems();
+                            triggerBadgePop();
+                        }
+                    } catch (e) { console.error(e); }
                 }
-                item.qty += change;
-                if (item.qty <= 0) cartState.splice(index, 1);
             }
-            saveCartState();
-            triggerBadgePop();
-            renderCartItems();
         }
 
-        function removeCartItem(index) {
+        async function removeCartItem(index) {
             if (cartState[index]) {
-                cartState.splice(index, 1);
-                saveCartState();
-                triggerBadgePop();
-                renderCartItems();
+                const item = cartState[index];
+                try {
+                    const response = await fetch(`/api/cart/${item.cart_item_id}`, {
+                        method: 'DELETE',
+                        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        cartState = data.items;
+                        renderCartItems();
+                        triggerBadgePop();
+                    }
+                } catch (e) { console.error(e); }
             }
         }
 
         function addCrossSellItem() {
-            cartState.push({
-                id: 99999,
-                name: 'NOTISSE CANVAS TOTE',
-                size: 'ALL SIZE',
-                unitPrice: 150000,
-                price: 150000,
-                image: 'footage-baju.jpg',
-                qty: 1
-            });
-            saveCartState();
-            triggerBadgePop();
-            renderCartItems();
-            showToast("Added Canvas Tote to cart");
+            showToast("Fitur Cross Sell sedang dalam perbaikan");
         }
 
-        function addSelectedToCart() {
+        async function addSelectedToCart() {
             if (!currentProduct) {
                 currentProduct = productsData && productsData.length > 0 ? productsData[0] : null;
             }
@@ -3321,39 +3322,30 @@
                 return;
             }
 
-            const productStock = currentProduct.stocks ? currentProduct.stocks.find(s => s.size === currentSelectedSize) : null;
-            const stockLimit = productStock ? productStock.stock : 99;
-            const existing = cartState.find(c => c.id === currentProduct.id && c.size === currentSelectedSize);
-            
-            if (existing) {
-                if (existing.qty < stockLimit) {
-                    existing.qty++;
-                } else {
-                    showToast('Stock habis!');
-                    return;
-                }
-            } else {
-                if (stockLimit >= 1) {
-                    const pPrice = parseFloat(currentProduct.price) || 250000;
-                    cartState.push({
-                        id: currentProduct.id,
-                        name: currentProduct.name,
+            try {
+                const response = await fetch('/api/cart', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+                    body: JSON.stringify({
+                        product_id: currentProduct.id,
                         size: currentSelectedSize,
-                        unitPrice: pPrice,
-                        price: pPrice,
-                        image: currentProduct.image || '',
-                        qty: 1
-                    });
+                        quantity: 1
+                    })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    cartState = data.items;
+                    renderCartItems();
+                    triggerBadgePop();
+                    openCart();
+                    showToast('Added to cart!');
                 } else {
-                    showToast('Stock habis!');
-                    return;
+                    showToast(data.message || 'Gagal menambahkan ke keranjang');
                 }
+            } catch(e) {
+                console.error(e);
+                showToast('Terjadi kesalahan sistem.');
             }
-            saveCartState();
-            triggerBadgePop();
-            renderCartItems();
-            openCart();
-            showToast('Added to cart!');
         }
 
         async function searchAreaBiteship(keyword) {
@@ -3535,6 +3527,7 @@
                                 body: JSON.stringify({ order_id: result.order_id })
                             });
                             
+                            await fetch('/api/cart/clear', { method: 'POST' });
                             cartState = [];
                             selectedShippingCost = 0;
                             selectedCourierName = "";
@@ -3553,6 +3546,7 @@
                                 body: JSON.stringify({ order_id: result.order_id })
                             });
                             
+                            await fetch('/api/cart/clear', { method: 'POST' });
                             cartState = [];
                             selectedShippingCost = 0;
                             selectedCourierName = "";
