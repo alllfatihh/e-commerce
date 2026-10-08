@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notisse - Fashion & Art Brand</title>
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('logowebkecil.png') }}" type="image/png">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Midtrans Snap JS -->
@@ -100,13 +102,13 @@
         }
 
         .animate-marquee {
-            animation: marquee 18s linear infinite;
+            animation: marquee 30s linear infinite;
             will-change: transform;
         }
 
         @media (max-width: 640px) {
             .animate-marquee {
-                animation: marquee 14s linear infinite;
+                animation: marquee 24s linear infinite;
             }
         }
 
@@ -453,7 +455,7 @@
         /* 4. MONOSPACE COUNTER */
         .header__link--cart__counter {
             position: absolute;
-            right: -4px;
+            right: 0px;
             top: 25px;
             width: 14px;
             text-align: center;
@@ -625,7 +627,7 @@
 
         <!-- Right: SEARCH -->
         <div id="header-right-menu"
-            class="flex items-center text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3 pr-20 sm:pr-24">
+            class="flex items-center text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3">
             <button id="search-trigger" aria-label="Search"
                 class="font-montserrat font-medium hover:opacity-50 hover:scale-105 active:scale-95 transition-all focus:outline-none py-1 px-1 cursor-pointer">
                 SEARCH
@@ -993,19 +995,6 @@
                     </a>
                 </div>
 
-                <button onclick="prevSlide()" aria-label="Previous Slide"
-                    class="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 text-white/75 hover:text-white p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-115 active:scale-90 cursor-pointer z-20 focus:outline-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
-                    <svg class="w-6 h-6 md:w-8 md:h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <button onclick="nextSlide()" aria-label="Next Slide"
-                    class="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 text-white/75 hover:text-white p-2 transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-115 active:scale-90 cursor-pointer z-20 focus:outline-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
-                    <svg class="w-6 h-6 md:w-8 md:h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-
                 <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
                     <button onclick="goToSlide(0)"
                         class="hero-dot w-2.5 h-2.5 rounded-full bg-white opacity-100 transition-opacity cursor-pointer"></button>
@@ -1223,26 +1212,25 @@
                 <h2 class="text-xl md:text-2xl font-bold mb-6 tracking-wide text-black font-montserrat">Newcomer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
-                        onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
-                        <img src="https://placehold.co/800x500/222222/ffffff?text=Mustafa+Portrait"
-                            alt="Mustafa Portrait"
+                        onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')">
+                        <img src="{{ asset($newcomer->portrait_image ?? 'masmus.jpeg') }}"
+                            alt="{{ $newcomer->name ?? 'Mustafa Portrait' }}"
                             class="w-full h-full object-cover grayscale group-hover:scale-105 transition-all duration-500">
                     </div>
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
-                        onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
-                        <img src="https://placehold.co/800x500/3d5a45/ffffff?text=Mustafa+Artwork" alt="Mustafa Artwork"
+                        onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')">
+                        <img src="{{ asset($newcomer->artwork_image ?? 'home.jpg') }}" alt="{{ $newcomer->name ?? 'Mustafa Artwork' }}"
                             class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
                     </div>
                 </div>
 
                 <div class="max-w-3xl mx-auto text-center my-8 px-2 space-y-4">
-                    <h3 class="text-lg md:text-xl font-bold text-black font-roboto">About Mustafa</h3>
+                    <h3 class="text-lg md:text-xl font-bold text-black font-roboto">About {{ explode(' ', $newcomer->name ?? 'Mustafa')[0] }}</h3>
                     <p class="text-gray-700 text-xs md:text-sm leading-relaxed font-regular font-roboto">
-                        Mustafa Alatas is a contemporary visual artist based in Temanggung whose distinct brush strokes
-                        and visceral storytelling bring deep cultural narratives into modern street apparel.
+                        {{ $newcomer->bio ?? 'Mustafa Alatas is a contemporary visual artist based in Temanggung whose distinct brush strokes and visceral storytelling bring deep cultural narratives into modern street apparel.' }}
                     </p>
                     <div class="pt-2">
-                        <button onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')"
+                        <button onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')"
                             class="btn-brush text-xs py-2 px-6 cursor-pointer font-montserrat">Read More</button>
                     </div>
                 </div>
@@ -1923,11 +1911,11 @@
         class="fixed bottom-0 left-0 z-30 w-full border-t border-black overflow-hidden flex whitespace-nowrap py-2 md:py-2.5 bg-black shadow-lg">
         <div
             class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
-            NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
+            {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
         <div
             class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
-            NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span> NOTISSE WORLDWIDE SHIPPING <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
+            {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
     </div>
     <!-- TOAST NOTIFICATION -->

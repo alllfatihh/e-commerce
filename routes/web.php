@@ -10,7 +10,10 @@ Route::get('/', function () {
     $products = Product::with('stocks')->get();
     $fotoshoots = Fotoshoot::all();
     $artists = \App\Models\Artist::with(['artworks', 'editorials'])->get();
-    return view('welcome', compact('products', 'fotoshoots', 'artists'));
+    $settings = \App\Models\SiteSetting::pluck('value', 'key')->toArray();
+    $newcomer = \App\Models\Artist::where('is_newcomer', true)->first();
+    
+    return view('welcome', compact('products', 'fotoshoots', 'artists', 'settings', 'newcomer'));
 });
 
 // Seamless Auth & Google Login
