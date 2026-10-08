@@ -634,7 +634,7 @@
 
         <!-- Right: SEARCH -->
         <div id="header-right-menu"
-            class="flex items-center text-[11px] sm:text-xs font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3 pr-20 md:pr-24">
+            class="flex items-center text-[11px] font-semibold tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3 pr-20 md:pr-24">
             <button id="search-trigger" aria-label="Search"
                 class="font-montserrat font-medium hover:opacity-50 hover:scale-105 active:scale-95 transition-all focus:outline-none py-1 px-1 cursor-pointer">
                 SEARCH
