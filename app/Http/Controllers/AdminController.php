@@ -7,6 +7,10 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\Order;
 use App\Models\SiteMedia;
+use App\Models\Fotoshoot;
+use App\Models\Artist;
+use App\Models\Artwork;
+use App\Models\Editorial;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -16,29 +20,55 @@ class AdminController extends Controller
     public function index()
     {
         $products = Product::with('stocks')->orderBy('id', 'desc')->get();
-        $orders = Order::orderBy('id', 'desc')->take(20)->get();
+        $orders = Order::with('items')->orderBy('id', 'desc')->take(30)->get();
         $carousels = SiteMedia::where('section', 'carousel')->orderBy('order')->get();
         $footages = SiteMedia::where('section', 'footage')->orderBy('order')->get();
+        $artists = Artist::with(['artworks', 'editorials'])->orderBy('id', 'desc')->get();
+        $artworks = Artwork::with('artist')->orderBy('id', 'desc')->get();
+        $editorials = Editorial::with('artist')->orderBy('id', 'desc')->get();
 
-        return view('admin', compact('products', 'orders', 'carousels', 'footages'));
+        $stats = [
+            'total_products'   => $products->count(),
+            'total_stock'      => ProductStock::sum('stock'),
+            'total_orders'     => Order::count(),
+            'total_artists'    => $artists->count(),
+            'total_artworks'   => $artworks->count(),
+            'total_editorials' => $editorials->count(),
+            'paid_revenue'     => Order::where('status', 'paid')->sum('total_amount'),
+        ];
+
+        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'stats'));
     }
 
     // ─── Products ─────────────────────────────────────────────
     public function storeProduct(Request $request)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'price'       => 'required|numeric',
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|max:4096',
-            'stocks'      => 'array'
+            'name'             => 'required|string|max:255',
+            'price'            => 'required|numeric',
+            'description'      => 'nullable|string',
+            'specs'            => 'nullable|string',
+            'artist'           => 'nullable|string|max:255',
+            'image'            => 'nullable|image|max:8192',
+            'back_image'       => 'nullable|image|max:8192',
+            'footage_image'    => 'nullable|image|max:8192',
+            'size_chart_image' => 'nullable|image|max:8192',
+            'stocks'           => 'nullable|array'
         ]);
 
-        $data = $request->only('name', 'price', 'description');
+        $data = $request->only('name', 'price', 'description', 'specs', 'artist');
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $data['image'] = $path;
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+        if ($request->hasFile('back_image')) {
+            $data['back_image'] = $request->file('back_image')->store('products', 'public');
+        }
+        if ($request->hasFile('footage_image')) {
+            $data['footage_image'] = $request->file('footage_image')->store('products', 'public');
+        }
+        if ($request->hasFile('size_chart_image')) {
+            $data['size_chart_image'] = $request->file('size_chart_image')->store('products', 'public');
         }
 
         $product = Product::create($data);
@@ -49,7 +79,7 @@ class AdminController extends Controller
                     ProductStock::create([
                         'product_id' => $product->id,
                         'size'       => $size,
-                        'stock'      => $qty
+                        'stock'      => (int) $qty
                     ]);
                 }
             }
@@ -63,18 +93,31 @@ class AdminController extends Controller
         $product = Product::findOrFail($id);
 
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'price'       => 'required|numeric',
-            'description' => 'nullable|string',
-            'image'       => 'nullable|image|max:4096',
-            'stocks'      => 'array'
+            'name'             => 'required|string|max:255',
+            'price'            => 'required|numeric',
+            'description'      => 'nullable|string',
+            'specs'            => 'nullable|string',
+            'artist'           => 'nullable|string|max:255',
+            'image'            => 'nullable|image|max:8192',
+            'back_image'       => 'nullable|image|max:8192',
+            'footage_image'    => 'nullable|image|max:8192',
+            'size_chart_image' => 'nullable|image|max:8192',
+            'stocks'           => 'nullable|array'
         ]);
 
-        $data = $request->only('name', 'price', 'description');
+        $data = $request->only('name', 'price', 'description', 'specs', 'artist');
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
-            $data['image'] = $path;
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+        if ($request->hasFile('back_image')) {
+            $data['back_image'] = $request->file('back_image')->store('products', 'public');
+        }
+        if ($request->hasFile('footage_image')) {
+            $data['footage_image'] = $request->file('footage_image')->store('products', 'public');
+        }
+        if ($request->hasFile('size_chart_image')) {
+            $data['size_chart_image'] = $request->file('size_chart_image')->store('products', 'public');
         }
 
         $product->update($data);
@@ -86,7 +129,7 @@ class AdminController extends Controller
                         'product_id' => $product->id,
                         'size'       => $size
                     ]);
-                    $stock->stock = $qty;
+                    $stock->stock = (int) $qty;
                     $stock->save();
                 }
             }
@@ -102,6 +145,189 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Produk berhasil dihapus.');
     }
 
+    // ─── Artists (Seniman Kolaborator) ────────────────────────
+    public function storeArtist(Request $request)
+    {
+        $request->validate([
+            'name'            => 'required|string|max:255',
+            'city'            => 'nullable|string|max:255',
+            'bio'             => 'nullable|string',
+            'photo'           => 'nullable|image|max:8192',
+            'artwork_preview' => 'nullable|image|max:8192',
+        ]);
+
+        $data = $request->only('name', 'city', 'bio');
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('artists', 'public');
+        }
+        if ($request->hasFile('artwork_preview')) {
+            $data['artwork_preview'] = $request->file('artwork_preview')->store('artists', 'public');
+        }
+
+        Artist::create($data);
+
+        return redirect()->back()->with('success', 'Seniman kolaborator berhasil ditambahkan.');
+    }
+
+    public function updateArtist(Request $request, $id)
+    {
+        $artist = Artist::findOrFail($id);
+
+        $request->validate([
+            'name'            => 'required|string|max:255',
+            'city'            => 'nullable|string|max:255',
+            'bio'             => 'nullable|string',
+            'photo'           => 'nullable|image|max:8192',
+            'artwork_preview' => 'nullable|image|max:8192',
+        ]);
+
+        $data = $request->only('name', 'city', 'bio');
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $request->file('photo')->store('artists', 'public');
+        }
+        if ($request->hasFile('artwork_preview')) {
+            $data['artwork_preview'] = $request->file('artwork_preview')->store('artists', 'public');
+        }
+
+        $artist->update($data);
+
+        return redirect()->back()->with('success', 'Data seniman kolaborator berhasil diperbarui.');
+    }
+
+    public function deleteArtist($id)
+    {
+        $artist = Artist::findOrFail($id);
+        $artist->delete();
+
+        return redirect()->back()->with('success', 'Seniman berhasil dihapus.');
+    }
+
+    // ─── Artworks (Karya Seni Fisik per Seniman) ──────────────
+    public function storeArtwork(Request $request)
+    {
+        $request->validate([
+            'artist_id'   => 'required|exists:artists,id',
+            'title'       => 'required|string|max:255',
+            'medium'      => 'nullable|string|max:255',
+            'dimensions'  => 'nullable|string|max:100',
+            'year'        => 'nullable|string|max:20',
+            'status'      => 'nullable|string|max:100',
+            'price'       => 'nullable|numeric',
+            'description' => 'nullable|string',
+            'image'       => 'nullable|image|max:8192',
+        ]);
+
+        $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('artworks', 'public');
+            $data['image'] = $path;
+        } else {
+            $data['image'] = 'https://placehold.co/600x800/d9d9d9/555555?text=New+Artwork';
+        }
+
+        Artwork::create($data);
+
+        return redirect()->back()->with('success', 'Karya seni (Artwork) berhasil ditambahkan untuk seniman terkait.');
+    }
+
+    public function updateArtwork(Request $request, $id)
+    {
+        $artwork = Artwork::findOrFail($id);
+
+        $request->validate([
+            'artist_id'   => 'required|exists:artists,id',
+            'title'       => 'required|string|max:255',
+            'medium'      => 'nullable|string|max:255',
+            'dimensions'  => 'nullable|string|max:100',
+            'year'        => 'nullable|string|max:20',
+            'status'      => 'nullable|string|max:100',
+            'price'       => 'nullable|numeric',
+            'description' => 'nullable|string',
+            'image'       => 'nullable|image|max:8192',
+        ]);
+
+        $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('artworks', 'public');
+            $data['image'] = $path;
+        }
+
+        $artwork->update($data);
+
+        return redirect()->back()->with('success', 'Karya seni (Artwork) berhasil diperbarui.');
+    }
+
+    public function deleteArtwork($id)
+    {
+        $artwork = Artwork::findOrFail($id);
+        $artwork->delete();
+        return redirect()->back()->with('success', 'Karya seni (Artwork) berhasil dihapus.');
+    }
+
+    // ─── Editorial Articles (Artikel per Seniman) ─────────────
+    public function storeEditorial(Request $request)
+    {
+        $request->validate([
+            'artist_id'  => 'required|exists:artists,id',
+            'title'      => 'required|string|max:255',
+            'author'     => 'nullable|string|max:255',
+            'excerpt'    => 'nullable|string',
+            'content'    => 'nullable|string',
+            'video_url'  => 'nullable|string|max:500',
+            'image'      => 'nullable|image|max:8192',
+        ]);
+
+        $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('editorials', 'public');
+            $data['image'] = $path;
+        } else {
+            $data['image'] = 'https://placehold.co/600x600/d9d9d9/555555?text=Editorial+Article';
+        }
+
+        Editorial::create($data);
+
+        return redirect()->back()->with('success', 'Artikel editorial berhasil ditambahkan untuk seniman terkait.');
+    }
+
+    public function updateEditorial(Request $request, $id)
+    {
+        $editorial = Editorial::findOrFail($id);
+
+        $request->validate([
+            'artist_id'  => 'required|exists:artists,id',
+            'title'      => 'required|string|max:255',
+            'author'     => 'nullable|string|max:255',
+            'excerpt'    => 'nullable|string',
+            'content'    => 'nullable|string',
+            'video_url'  => 'nullable|string|max:500',
+            'image'      => 'nullable|image|max:8192',
+        ]);
+
+        $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('editorials', 'public');
+            $data['image'] = $path;
+        }
+
+        $editorial->update($data);
+
+        return redirect()->back()->with('success', 'Artikel editorial berhasil diperbarui.');
+    }
+
+    public function deleteEditorial($id)
+    {
+        $editorial = Editorial::findOrFail($id);
+        $editorial->delete();
+        return redirect()->back()->with('success', 'Artikel editorial berhasil dihapus.');
+    }
+
     // ─── Site Media (Carousel & Footage) ─────────────────────
     public function updateMedia(Request $request, $id)
     {
@@ -110,6 +336,7 @@ class AdminController extends Controller
         $request->validate([
             'title'       => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'product_id'  => 'nullable|integer',
             'image'       => 'nullable|image|max:8192',
         ]);
 
@@ -120,16 +347,18 @@ class AdminController extends Controller
         if ($request->filled('description')) {
             $data['description'] = $request->description;
         }
+        if ($request->filled('product_id')) {
+            $data['product_id'] = $request->product_id;
+        }
 
         if ($request->hasFile('image')) {
-            // Simpan ke storage/app/public/site-media/
             $path = $request->file('image')->store('site-media', 'public');
             $data['image'] = $path;
         }
 
         $media->update($data);
 
-        return redirect()->back()->with('success', 'Gambar berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Gambar media berhasil diperbarui.');
     }
 
     // ─── Biteship Sync ───────────────────────────────────────
