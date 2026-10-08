@@ -81,7 +81,6 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
             <a href="/" class="flex items-center space-x-2">
                 <img src="{{ asset('logo.png') }}" alt="Notisse Logo" class="h-6 sm:h-7 object-contain">
-                <span class="text-[9px] font-montserrat font-bold uppercase tracking-widest bg-black text-white px-1.5 py-0.5 hidden sm:inline-block">CHECKOUT</span>
             </a>
 
             <!-- Step Indicator -->
