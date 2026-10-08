@@ -372,6 +372,16 @@
                 cart = [];
             }
             renderCart();
+
+            // Pre-fill existing user area if already saved
+            const existingAreaId = document.getElementById('area_id').value;
+            if (existingAreaId && cart.length > 0) {
+                const confirmedBadge = document.getElementById('confirmed-area-badge');
+                const confirmedText = document.getElementById('confirmed-area-text');
+                confirmedBadge.classList.remove('hidden');
+                confirmedText.innerText = 'Kecamatan Terdaftar (ID: ' + existingAreaId + ')';
+                fetchShippingRates(existingAreaId);
+            }
         }
 
         function renderCart() {
@@ -532,7 +542,7 @@
         if (existingAreaId) {
             confirmedBadge.classList.remove('hidden');
             confirmedText.innerText = 'Kecamatan Terdaftar (ID: ' + existingAreaId + ')';
-            fetchShippingRates(existingAreaId);
+            // fetchShippingRates is now called in initCart after cart items are loaded
         }
 
         areaSearchInput.addEventListener('input', function(e) {

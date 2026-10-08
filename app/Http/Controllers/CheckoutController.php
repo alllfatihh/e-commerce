@@ -231,7 +231,7 @@ class CheckoutController extends Controller
                         ],
                         [
                             'courier_name' => 'SiCepat',
-                            'courier_service_name' => 'HALU',
+                            'courier_service_name' => 'REG',
                             'price' => 12000
                         ],
                         [
@@ -257,7 +257,7 @@ class CheckoutController extends Controller
                     ],
                     [
                         'courier_name' => 'SiCepat',
-                        'courier_service_name' => 'HALU',
+                        'courier_service_name' => 'REG',
                         'price' => 12000
                     ],
                     [
