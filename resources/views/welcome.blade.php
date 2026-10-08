@@ -3395,6 +3395,7 @@
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             const items = cartState.map(item => ({
+                id: item.id,
                 name: item.name,
                 price: item.unitPrice,
                 quantity: item.qty
@@ -3466,6 +3467,7 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
             const items = cartState.map(item => ({
+                id: item.id,
                 name: item.name,
                 price: item.unitPrice,
                 quantity: item.qty,

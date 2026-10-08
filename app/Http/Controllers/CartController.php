@@ -29,10 +29,10 @@ class CartController extends Controller
 
     private function getFormattedItems($cart)
     {
-        return $cart->items()->with('product.media')->get()->map(function($item) {
+        return $cart->items()->with('product')->get()->map(function($item) {
             $imageUrl = asset('cart-placeholder.jpg'); // fallback
-            if ($item->product && $item->product->media->count() > 0) {
-                $imageUrl = asset($item->product->media->first()->file_path);
+            if ($item->product && $item->product->image) {
+                $imageUrl = asset($item->product->image);
             }
 
             return [
