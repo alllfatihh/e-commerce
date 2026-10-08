@@ -354,7 +354,7 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        const cart = JSON.parse(localStorage.getItem('notisse_cart')) || [];
+        let cart = [];
         const summaryContainer = document.getElementById('checkout-summary-items');
         let subtotal = 0;
         let totalCount = 0;
@@ -362,50 +362,69 @@
         let selectedCourierName = "";
         let isFetchingShipping = false;
 
-        // Render Cart Items in Summary
-        if (cart.length === 0) {
-            summaryContainer.innerHTML = `
-                <div class="p-6 bg-white border border-dashed border-gray-300 text-center space-y-3">
-                    <p class="text-xs text-gray-500 font-roboto">Keranjang Anda masih kosong.</p>
-                    <a href="/?open_checkout=true" class="inline-block text-xs font-montserrat font-bold uppercase underline tracking-wider text-black">
-                        Pilih Produk di Toko
-                    </a>
-                </div>
-            `;
-            document.getElementById('checkout-subtotal').innerText = 'Rp 0';
-            document.getElementById('checkout-total').innerText = 'Rp 0';
-        } else {
-            summaryContainer.innerHTML = '';
-            cart.forEach(item => {
-                const itemPrice = parseInt(item.price || item.unitPrice || 0);
-                const itemQty = parseInt(item.qty || 1);
-                subtotal += (itemPrice * itemQty);
-                totalCount += itemQty;
+        async function initCart() {
+            try {
+                const res = await fetch('/api/cart');
+                const data = await res.json();
+                cart = data || [];
+            } catch(e) {
+                console.error("Gagal mengambil cart dari backend", e);
+                cart = [];
+            }
+            renderCart();
+        }
 
-                let imgUrl = item.image || '';
-                if (imgUrl && !imgUrl.startsWith('http') && !imgUrl.startsWith('/')) {
-                    imgUrl = '/' + imgUrl;
-                }
-
-                const formattedPrice = 'Rp ' + (itemPrice * itemQty).toLocaleString('id-ID');
-
-                summaryContainer.innerHTML += `
-                    <div class="flex items-center space-x-3.5 bg-white p-3 border border-gray-200">
-                        <div class="relative w-14 h-16 bg-neutral-100 border border-gray-200 shrink-0 overflow-hidden">
-                            <img src="${imgUrl || '/footage-baju.jpg'}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='/footage-baju.jpg'">
-                            <span class="absolute top-0 right-0 bg-black text-white text-[9px] font-bold font-montserrat px-1.5 py-0.5 leading-none">x${itemQty}</span>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-montserrat font-bold text-xs uppercase text-black truncate">${item.name}</h4>
-                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Size: <strong class="text-black font-montserrat">${item.size}</strong></p>
-                            <p class="text-xs font-montserrat font-bold text-black mt-1">${formattedPrice}</p>
-                        </div>
+        function renderCart() {
+            subtotal = 0;
+            totalCount = 0;
+            
+            // Render Cart Items in Summary
+            if (cart.length === 0) {
+                summaryContainer.innerHTML = `
+                    <div class="p-6 bg-white border border-dashed border-gray-300 text-center space-y-3">
+                        <p class="text-xs text-gray-500 font-roboto">Keranjang Anda masih kosong.</p>
+                        <a href="/?open_checkout=true" class="inline-block text-xs font-montserrat font-bold uppercase underline tracking-wider text-black">
+                            Pilih Produk di Toko
+                        </a>
                     </div>
                 `;
-            });
+                document.getElementById('checkout-subtotal').innerText = 'Rp 0';
+                document.getElementById('checkout-total').innerText = 'Rp 0';
+            } else {
+                summaryContainer.innerHTML = '';
+                cart.forEach(item => {
+                    const itemPrice = parseInt(item.price || item.unitPrice || 0);
+                    const itemQty = parseInt(item.quantity || item.qty || 1);
+                    subtotal += (itemPrice * itemQty);
+                    totalCount += itemQty;
 
-            document.getElementById('summary-item-count').innerText = `${totalCount} Produk`;
-            updateTotalDisplay();
+                    let imgUrl = item.product?.image || item.image || '';
+                    if (imgUrl && !imgUrl.startsWith('http') && !imgUrl.startsWith('/')) {
+                        imgUrl = '/' + imgUrl;
+                    }
+
+                    const formattedPrice = 'Rp ' + (itemPrice * itemQty).toLocaleString('id-ID');
+                    const itemName = item.product?.name || item.name || 'Produk';
+                    const itemSize = item.size || 'All Size';
+
+                    summaryContainer.innerHTML += `
+                        <div class="flex items-center space-x-3.5 bg-white p-3 border border-gray-200">
+                            <div class="relative w-14 h-16 bg-neutral-100 border border-gray-200 shrink-0 overflow-hidden">
+                                <img src="${imgUrl || '/footage-baju.jpg'}" alt="${itemName}" class="w-full h-full object-cover" onerror="this.src='/footage-baju.jpg'">
+                                <span class="absolute top-0 right-0 bg-black text-white text-[9px] font-bold font-montserrat px-1.5 py-0.5 leading-none">x${itemQty}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-montserrat font-bold text-xs uppercase text-black truncate">${itemName}</h4>
+                                <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Size: <strong class="text-black font-montserrat">${itemSize}</strong></p>
+                                <p class="text-xs font-montserrat font-bold text-black mt-1">${formattedPrice}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('summary-item-count').innerText = `${totalCount} Produk`;
+                updateTotalDisplay();
+            }
         }
 
         function updateTotalDisplay() {
@@ -428,11 +447,11 @@
             loadingIndicator.classList.remove('hidden');
 
             const items = cart.map(item => ({
-                id: item.id,
-                name: item.name,
-                price: item.unitPrice || item.price,
-                quantity: item.qty || 1,
-                size: item.size
+                id: item.product_id || item.id,
+                name: item.product?.name || item.name || 'Produk',
+                price: item.price || item.unitPrice,
+                quantity: item.quantity || item.qty || 1,
+                size: item.size || 'All Size'
             }));
 
             try {
@@ -658,11 +677,11 @@
                     document.getElementById('btn-text').innerText = 'MEMBUAT PESANAN...';
                     
                     const items = cart.map(item => ({
-                        id: item.id,
-                        name: item.name,
-                        price: item.unitPrice || item.price,
-                        quantity: item.qty || 1,
-                        size: item.size
+                        id: item.product_id || item.id,
+                        name: item.product?.name || item.name || 'Produk',
+                        price: item.price || item.unitPrice,
+                        quantity: item.quantity || item.qty || 1,
+                        size: item.size || 'All Size'
                     }));
 
                     const checkoutPayload = {
@@ -747,6 +766,9 @@
                 btn.classList.remove('opacity-75');
             }
         });
+
+        // Initialize cart on page load
+        document.addEventListener('DOMContentLoaded', initCart);
     </script>
 </body>
 </html>
