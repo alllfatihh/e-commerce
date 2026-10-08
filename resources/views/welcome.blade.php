@@ -462,7 +462,7 @@
         /* 4. MONOSPACE COUNTER */
         .header__link--cart__counter {
             position: absolute;
-            right: 0px;
+            right: -7px; /* Shift by half width (14px/2) so the text centers directly under the right: 0 line */
             top: 25px;
             width: 14px;
             text-align: center;
