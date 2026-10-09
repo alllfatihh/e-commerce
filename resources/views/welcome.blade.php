@@ -1090,7 +1090,7 @@
                             </button>
                             <div id="acc-content-size" class="accordion-content">
                                 <div class="accordion-inner pb-4 pt-2">
-                                    <div class="border border-gray-200 bg-neutral-50 p-2.5 text-center group cursor-zoom-in rounded-sm"
+                                    <div class="bg-neutral-50 p-2.5 text-center group cursor-zoom-in rounded-sm"
                                         onclick="openLightbox('{{ asset('size chart 1.png') }}', 'NOTISSE APPAREL SIZE CHART')">
                                         <img src="{{ asset('size chart 1.png') }}" alt="Notisse Size Chart"
                                             class="w-full max-w-sm mx-auto h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02] shadow-sm">
@@ -1179,15 +1179,15 @@
                 </div>
 
                 <div class="w-full space-y-6">
-                    <div class="w-full border border-black aspect-[3/4] bg-white overflow-hidden shadow-sm">
+                    <div class="w-full aspect-[3/4] bg-white overflow-hidden shadow-sm">
                         <img id="pdetail-image" src="{{ asset('footage-baju.jpg') }}" alt="Front View"
                             class="w-full h-full object-cover">
                     </div>
-                    <div class="w-full border border-black aspect-[3/4] bg-white overflow-hidden shadow-sm">
+                    <div class="w-full aspect-[3/4] bg-white overflow-hidden shadow-sm">
                         <img id="pdetail-back-image" src="{{ asset('footage-baju-belakang.jpg') }}" alt="Back Graphic"
                             class="w-full h-full object-cover">
                     </div>
-                    <div class="w-full border border-black aspect-[3/4] bg-white overflow-hidden shadow-sm">
+                    <div class="w-full aspect-[3/4] bg-white overflow-hidden shadow-sm">
                         <img id="pdetail-footage-image" src="{{ asset('footagebaju2.jpg') }}"
                             alt="Detail Close up" class="w-full h-full object-cover">
                     </div>
@@ -1808,10 +1808,19 @@
 
                 <div class="border border-gray-200 p-6 md:p-8 bg-white space-y-4">
                     <div class="flex justify-between items-start border-b border-gray-100 pb-4">
-                        <div>
-                            <span class="text-[10px] font-bold font-montserrat tracking-widest uppercase bg-neutral-100 text-neutral-600 px-2 py-0.5 inline-block mb-1.5">Alamat Terpilih</span>
-                            <h3 class="font-bold text-black text-base font-montserrat" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</h3>
-                            <p class="text-xs text-gray-500 font-roboto mt-0.5" id="user-display-phone">{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : 'No. HP belum diatur' }}</p>
+                        <div class="flex items-center gap-4">
+                            @if(auth()->check() && auth()->user()->avatar)
+                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="w-12 h-12 rounded-full object-cover border border-gray-200">
+                            @else
+                                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                </div>
+                            @endif
+                            <div>
+                                <span class="text-[10px] font-bold font-montserrat tracking-widest uppercase bg-neutral-100 text-neutral-600 px-2 py-0.5 inline-block mb-1.5">Profil Pengguna</span>
+                                <h3 class="font-bold text-black text-base font-montserrat" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</h3>
+                                <p class="text-xs text-gray-500 font-roboto mt-0.5" id="user-display-phone">{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : 'No. HP belum diatur' }}</p>
+                            </div>
                         </div>
                         <button onclick="showEditProfile()" class="text-xs font-semibold uppercase tracking-wider text-black hover:underline font-montserrat">
                             Edit
@@ -1857,6 +1866,11 @@
             <div id="edit-profile-success" class="hidden bg-green-100 text-green-700 p-3 text-sm border border-green-200"></div>
 
             <form onsubmit="handleEditProfileSubmit(event)" class="space-y-6 bg-white border border-gray-200 p-6 md:p-8">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Foto Profil</label>
+                    <input type="file" id="edit-avatar" accept="image/*" class="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:border-black font-roboto bg-gray-50">
+                    <p class="text-[10px] text-gray-500 mt-1 uppercase">Opsional. Maks 4MB.</p>
+                </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Nama Lengkap *</label>
                     <input type="text" id="edit-name" required class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-roboto">
@@ -3544,14 +3558,18 @@
             errorBox.classList.add('hidden');
             successBox.classList.add('hidden');
 
-            const payload = {
-                name: document.getElementById('edit-name').value,
-                phone: document.getElementById('edit-phone').value,
-                address: document.getElementById('edit-address').value,
-                area_id: document.getElementById('edit-area-id').value,
-            };
+            const formData = new FormData();
+            formData.append('name', document.getElementById('edit-name').value);
+            formData.append('phone', document.getElementById('edit-phone').value);
+            formData.append('address', document.getElementById('edit-address').value);
+            formData.append('area_id', document.getElementById('edit-area-id').value);
 
-            if (!payload.area_id) {
+            const avatarFile = document.getElementById('edit-avatar').files[0];
+            if (avatarFile) {
+                formData.append('avatar', avatarFile);
+            }
+
+            if (!formData.get('area_id')) {
                 errorBox.innerText = 'Pilih kecamatan dari daftar pencarian terlebih dahulu.';
                 errorBox.classList.remove('hidden');
                 return;
@@ -3564,10 +3582,9 @@
                 const response = await fetch('/update-profile', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Accept': 'application/json',
                     },
-                    body: JSON.stringify(payload)
+                    body: formData
                 });
                 
                 const data = await response.json();
@@ -3586,7 +3603,7 @@
                     document.getElementById('user-display-address').innerText = loggedInUser.address;
                     
                     setTimeout(() => {
-                        showPage('view-account-profile');
+                        window.location.reload();
                     }, 1500);
                 } else {
                     errorBox.innerText = data.message || 'Gagal menyimpan perubahan.';

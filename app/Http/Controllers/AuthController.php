@@ -119,15 +119,23 @@ class AuthController extends Controller
             'phone' => 'required|string',
             'address' => 'required|string',
             'area_id' => 'required|string',
+            'avatar' => 'nullable|image|max:4096'
         ]);
 
         $user = Auth::user();
-        $user->update([
+        $data = [
             'name' => $request->name,
             'phone' => $request->phone,
             'address' => $request->address,
             'area_id' => $request->area_id,
-        ]);
+        ];
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $path;
+        }
+
+        $user->update($data);
 
         return response()->json(['success' => true]);
     }
