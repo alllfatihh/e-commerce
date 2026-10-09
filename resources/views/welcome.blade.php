@@ -1732,9 +1732,13 @@
             <!-- Profile Hero Header Banner -->
             <div class="border border-black bg-white p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
                 <div class="flex items-center space-x-5">
-                    <div class="w-16 h-16 bg-black text-white flex items-center justify-center font-bold text-xl font-montserrat tracking-wider border border-black shrink-0">
-                        {{ auth()->check() ? strtoupper(substr(auth()->user()->name ?? 'N', 0, 2)) : 'NT' }}
-                    </div>
+                    @if(auth()->check() && auth()->user()->avatar)
+                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="w-16 h-16 object-cover border border-black shrink-0">
+                    @else
+                        <div class="w-16 h-16 bg-black text-white flex items-center justify-center font-bold text-xl font-montserrat tracking-wider border border-black shrink-0">
+                            {{ auth()->check() ? strtoupper(substr(auth()->user()->name ?? 'N', 0, 2)) : 'NT' }}
+                        </div>
+                    @endif
                     <div class="space-y-1">
                         <div class="flex items-center gap-2 flex-wrap">
                             <h1 class="text-xl md:text-2xl font-bold font-montserrat uppercase tracking-tight text-black" id="account-header-name">
