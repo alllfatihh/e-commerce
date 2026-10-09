@@ -3593,10 +3593,10 @@
                     successBox.classList.remove('hidden');
                     
                     // Update frontend state
-                    loggedInUser.name = payload.name;
-                    loggedInUser.phone = payload.phone;
-                    loggedInUser.address = payload.address;
-                    loggedInUser.area_id = payload.area_id;
+                    loggedInUser.name = formData.get('name');
+                    loggedInUser.phone = formData.get('phone');
+                    loggedInUser.address = formData.get('address');
+                    loggedInUser.area_id = formData.get('area_id');
                     
                     localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
                     document.getElementById('user-display-name').innerText = loggedInUser.name;
