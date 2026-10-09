@@ -434,12 +434,29 @@
                             </td>
                             <td class="px-5 py-4 text-right whitespace-nowrap">
                                 <div class="flex items-center justify-end gap-3 font-montserrat">
-                                    <button onclick="openEditProductModal({{ $product->id }}, '{{ addslashes($product->name) }}', '{{ $product->price }}', '{{ addslashes($product->description ?? '') }}', '{{ addslashes($product->specs ?? '') }}', '{{ addslashes($product->artist ?? '') }}', {{ json_encode($product->stocks->pluck('stock','size')) }}, '{{ $product->image ? asset($product->image) : '' }}', '{{ $product->back_image ? asset($product->back_image) : '' }}', '{{ $product->footage_image ? asset($product->footage_image) : '' }}', '{{ $product->size_chart_image ? asset($product->size_chart_image) : '' }}')"
+                                    @php
+                                        $productData = [
+                                            'id'               => $product->id,
+                                            'name'             => $product->name,
+                                            'price'            => $product->price,
+                                            'desc'             => $product->description ?? '',
+                                            'specs'            => $product->specs ?? '',
+                                            'artist'           => $product->artist ?? '',
+                                            'stocks'           => $product->stocks->pluck('stock','size'),
+                                            'frontImg'         => $product->image ? asset($product->image) : '',
+                                            'backImg'          => $product->back_image ? asset($product->back_image) : '',
+                                            'footageImg'       => $product->footage_image ? asset($product->footage_image) : '',
+                                            'sizechartImg'     => $product->size_chart_image ? asset($product->size_chart_image) : '',
+                                        ];
+                                    @endphp
+                                    <button type="button"
+                                        onclick="openEditProductFromBtn(this)"
+                                        data-product="{{ json_encode($productData) }}"
                                         class="text-xs font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
                                         Edit
                                     </button>
                                     <form action="/admin/products/{{ $product->id }}" method="POST" class="inline"
-                                          onsubmit="return confirm('Yakin hapus produk {{ addslashes($product->name) }}?')">
+                                          onsubmit="return confirm({{ json_encode('Yakin hapus produk ' . $product->name . '?') }})">
                                         @method('DELETE') @csrf
                                         <button type="submit"
                                             class="text-xs font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer">
@@ -524,12 +541,24 @@
                                 <button type="button" onclick="openAddEditorialModal({{ $art->id }})" class="text-brandRed hover:underline font-bold uppercase cursor-pointer">+ Editorial</button>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button onclick="openEditArtistModal({{ $art->id }}, '{{ addslashes($art->name) }}', '{{ addslashes($art->city ?? '') }}', '{{ addslashes($art->bio ?? '') }}', '{{ $art->photo ? asset($art->photo) : '' }}', '{{ $art->artwork_preview ? asset($art->artwork_preview) : '' }}')"
+                                @php
+                                    $artistData = [
+                                        'id'               => $art->id,
+                                        'name'             => $art->name,
+                                        'city'             => $art->city ?? '',
+                                        'bio'              => $art->bio ?? '',
+                                        'photoUrl'         => $art->photo ? asset($art->photo) : '',
+                                        'artUrl'           => $art->artwork_preview ? asset($art->artwork_preview) : '',
+                                    ];
+                                @endphp
+                                <button type="button"
+                                    onclick="openEditArtistFromBtn(this)"
+                                    data-artist="{{ json_encode($artistData) }}"
                                     class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer text-[11px]">
                                     Edit
                                 </button>
                                 <form action="/admin/artists/{{ $art->id }}" method="POST" class="inline"
-                                      onsubmit="return confirm('Hapus seniman {{ addslashes($art->name) }} beserta seluruh karya & editorialnya?')">
+                                      onsubmit="return confirm({{ json_encode('Hapus seniman ' . $art->name . ' beserta seluruh karya & editorialnya?') }})">
                                     @method('DELETE') @csrf
                                     <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer text-[11px]">
                                         Delete
@@ -668,12 +697,27 @@
                     <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-montserrat text-xs">
                         <span class="text-[10px] font-mono text-gray-400 uppercase">#ARTW-{{ $art->id }}</span>
                         <div class="flex items-center gap-3">
-                            <button onclick="openEditArtworkModal({{ $art->id }}, {{ $art->artist_id }}, '{{ addslashes($art->title) }}', '{{ addslashes($art->medium ?? '') }}', '{{ addslashes($art->dimensions ?? '') }}', '{{ addslashes($art->year ?? '') }}', '{{ addslashes($art->status ?? '') }}', '{{ $art->price ?? '' }}', '{{ addslashes($art->description ?? '') }}')"
+                            @php
+                                $artworkData = [
+                                    'id'         => $art->id,
+                                    'artist_id'  => $art->artist_id,
+                                    'title'      => $art->title,
+                                    'medium'     => $art->medium ?? '',
+                                    'dimensions' => $art->dimensions ?? '',
+                                    'year'       => $art->year ?? '',
+                                    'status'     => $art->status ?? '',
+                                    'price'      => $art->price ?? '',
+                                    'desc'       => $art->description ?? '',
+                                ];
+                            @endphp
+                            <button type="button"
+                                onclick="openEditArtworkFromBtn(this)"
+                                data-artwork="{{ json_encode($artworkData) }}"
                                 class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
                                 Edit
                             </button>
                             <form action="/admin/artworks/{{ $art->id }}" method="POST" class="inline"
-                                  onsubmit="return confirm('Hapus karya seni {{ addslashes($art->title) }}?')">
+                                  onsubmit="return confirm({{ json_encode('Hapus karya seni ' . $art->title . '?') }})">
                                 @method('DELETE') @csrf
                                 <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer">
                                     Delete
@@ -746,12 +790,25 @@
                     <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-montserrat text-xs">
                         <span class="text-[10px] font-mono text-gray-400 uppercase">#EDIT-{{ $edit->id }}</span>
                         <div class="flex items-center gap-3">
-                            <button onclick="openEditEditorialModal({{ $edit->id }}, {{ $edit->artist_id }}, '{{ addslashes($edit->title) }}', '{{ addslashes($edit->author ?? '') }}', '{{ addslashes($edit->excerpt ?? '') }}', '{{ addslashes($edit->video_url ?? '') }}', '{{ addslashes($edit->content ?? '') }}')"
+                            @php
+                                $editorialData = [
+                                    'id'        => $edit->id,
+                                    'artist_id' => $edit->artist_id,
+                                    'title'     => $edit->title,
+                                    'author'    => $edit->author ?? '',
+                                    'excerpt'   => $edit->excerpt ?? '',
+                                    'video_url' => $edit->video_url ?? '',
+                                    'content'   => $edit->content ?? '',
+                                ];
+                            @endphp
+                            <button type="button"
+                                onclick="openEditEditorialFromBtn(this)"
+                                data-editorial="{{ json_encode($editorialData) }}"
                                 class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
                                 Edit
                             </button>
                             <form action="/admin/editorials/{{ $edit->id }}" method="POST" class="inline"
-                                  onsubmit="return confirm('Hapus artikel editorial {{ addslashes($edit->title) }}?')">
+                                  onsubmit="return confirm({{ json_encode('Hapus artikel editorial ' . $edit->title . '?') }})">
                                 @method('DELETE') @csrf
                                 <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer">
                                     Delete
@@ -1902,6 +1959,15 @@
         document.getElementById('modal-product').classList.add('open');
     }
 
+    function openEditProductFromBtn(btn) {
+        try {
+            const p = JSON.parse(btn.getAttribute('data-product'));
+            openEditProductModal(p.id, p.name, p.price, p.desc, p.specs, p.artist, p.stocks, p.frontImg, p.backImg, p.footageImg, p.sizechartImg);
+        } catch(e) {
+            console.error("Gagal membuka modal edit produk:", e);
+        }
+    }
+
     function setPreviewImage(id, url) {
         const el = document.getElementById(id);
         if (!el) return;
@@ -1943,6 +2009,15 @@
         setPreviewImage('artist-art-preview', artUrl);
 
         document.getElementById('modal-artist').classList.add('open');
+    }
+
+    function openEditArtistFromBtn(btn) {
+        try {
+            const a = JSON.parse(btn.getAttribute('data-artist'));
+            openEditArtistModal(a.id, a.name, a.city, a.bio, a.photoUrl, a.artUrl);
+        } catch(e) {
+            console.error("Gagal membuka modal edit seniman:", e);
+        }
     }
 
     function closeArtistModal() {
@@ -2025,6 +2100,15 @@
         document.getElementById('modal-artwork').classList.add('open');
     }
 
+    function openEditArtworkFromBtn(btn) {
+        try {
+            const art = JSON.parse(btn.getAttribute('data-artwork'));
+            openEditArtworkModal(art.id, art.artist_id, art.title, art.medium, art.dimensions, art.year, art.status, art.price, art.desc);
+        } catch(e) {
+            console.error("Gagal membuka modal edit artwork:", e);
+        }
+    }
+
     function closeArtworkModal() {
         document.getElementById('modal-artwork').classList.remove('open');
     }
@@ -2059,6 +2143,15 @@
         document.getElementById('editorial-img-preview').classList.add('hidden');
 
         document.getElementById('modal-editorial').classList.add('open');
+    }
+
+    function openEditEditorialFromBtn(btn) {
+        try {
+            const ed = JSON.parse(btn.getAttribute('data-editorial'));
+            openEditEditorialModal(ed.id, ed.artist_id, ed.title, ed.author, ed.excerpt, ed.video_url, ed.content);
+        } catch(e) {
+            console.error("Gagal membuka modal edit editorial:", e);
+        }
     }
 
     function closeEditorialModal() {
