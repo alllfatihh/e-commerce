@@ -8,6 +8,7 @@ use App\Models\ProductStock;
 use App\Models\Order;
 use App\Models\SiteMedia;
 use App\Models\Fotoshoot;
+use App\Models\Lookbook;
 use App\Models\Artist;
 use App\Models\Artwork;
 use App\Models\Editorial;
@@ -28,6 +29,7 @@ class AdminController extends Controller
         $artworks = Artwork::with('artist')->orderBy('id', 'desc')->get();
         $editorials = Editorial::with('artist')->orderBy('id', 'desc')->get();
         $offerings = ArtworkOffering::with(['user', 'artwork.artist'])->orderBy('id', 'desc')->get();
+        $lookbooks = Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
 
         $stats = [
             'total_products'   => $products->count(),
@@ -37,10 +39,11 @@ class AdminController extends Controller
             'total_artworks'   => $artworks->count(),
             'total_editorials' => $editorials->count(),
             'total_offerings'  => $offerings->count(),
+            'total_lookbooks'  => $lookbooks->count(),
             'paid_revenue'     => Order::where('status', 'paid')->sum('total_amount'),
         ];
 
-        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'stats'));
+        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'lookbooks', 'stats'));
     }
 
     // ─── Products ─────────────────────────────────────────────
@@ -385,5 +388,113 @@ class AdminController extends Controller
         ]);
 
         return redirect('/admin')->with('success', 'Status penawaran karya berhasil diperbarui!');
+    }
+
+    // ─── Lookbooks Management ───────────────────────────────
+    public function storeLookbook(Request $request)
+    {
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'year'        => 'nullable|string|max:20',
+            'description' => 'nullable|string',
+            'video'       => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
+            'video_url'   => 'nullable|string',
+            'cover_image' => 'nullable|image|max:8192',
+        ]);
+
+        $data = [
+            'title'       => $request->title,
+            'year'        => $request->year ?: date('Y'),
+            'description' => $request->description,
+        ];
+
+        if ($request->hasFile('video')) {
+            $data['video_url'] = $request->file('video')->store('lookbooks/videos', 'public');
+        } elseif ($request->filled('video_url')) {
+            $data['video_url'] = $request->video_url;
+        }
+
+        if ($request->hasFile('cover_image')) {
+            $data['cover_image'] = $request->file('cover_image')->store('lookbooks/covers', 'public');
+        }
+
+        $lookbook = Lookbook::create($data);
+
+        return redirect('/admin')->with('success', 'Lookbook album "' . $lookbook->title . '" berhasil dibuat.');
+    }
+
+    public function updateLookbook(Request $request, $id)
+    {
+        $lookbook = Lookbook::findOrFail($id);
+
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'year'        => 'nullable|string|max:20',
+            'description' => 'nullable|string',
+            'video'       => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
+            'video_url'   => 'nullable|string',
+            'cover_image' => 'nullable|image|max:8192',
+        ]);
+
+        $lookbook->title = $request->title;
+        if ($request->filled('year')) {
+            $lookbook->year = $request->year;
+        }
+        $lookbook->description = $request->description;
+
+        if ($request->hasFile('video')) {
+            $lookbook->video_url = $request->file('video')->store('lookbooks/videos', 'public');
+        } elseif ($request->filled('video_url')) {
+            $lookbook->video_url = $request->video_url;
+        }
+
+        if ($request->hasFile('cover_image')) {
+            $lookbook->cover_image = $request->file('cover_image')->store('lookbooks/covers', 'public');
+        }
+
+        $lookbook->save();
+
+        return redirect('/admin')->with('success', 'Lookbook "' . $lookbook->title . '" berhasil diperbarui.');
+    }
+
+    public function deleteLookbook($id)
+    {
+        $lookbook = Lookbook::findOrFail($id);
+        $title = $lookbook->title;
+        $lookbook->delete();
+        return redirect('/admin')->with('success', 'Lookbook "' . $title . '" beserta foto-fotonya berhasil dihapus.');
+    }
+
+    public function storeLookbookPhoto(Request $request, $id)
+    {
+        $lookbook = Lookbook::findOrFail($id);
+
+        $request->validate([
+            'title'       => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'image'       => 'required|image|max:8192',
+        ]);
+
+        $path = $request->file('image')->store('lookbooks/photos', 'public');
+
+        Fotoshoot::create([
+            'lookbook_id' => $lookbook->id,
+            'title'       => $request->title ?: $lookbook->title,
+            'description' => $request->description,
+            'image'       => $path,
+        ]);
+
+        if (empty($lookbook->cover_image)) {
+            $lookbook->update(['cover_image' => $path]);
+        }
+
+        return redirect('/admin')->with('success', 'Foto berhasil ditambahkan ke lookbook "' . $lookbook->title . '".');
+    }
+
+    public function deleteLookbookPhoto($id)
+    {
+        $photo = Fotoshoot::findOrFail($id);
+        $photo->delete();
+        return redirect('/admin')->with('success', 'Foto lookbook berhasil dihapus.');
     }
 }

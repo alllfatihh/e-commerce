@@ -670,6 +670,8 @@
                 <a href="javascript:void(0)" onclick="navigateTo('view-artist-collab')"
                     class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">ARTIST
                     COLLAB</a>
+                <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
+                    class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">EDITORIAL</a>
                 <a href="javascript:void(0)" onclick="navigateTo('view-lookbook-list')"
                     class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">LOOKBOOK</a>
                 <a href="javascript:void(0)" onclick="navigateTo('view-about')"
@@ -793,7 +795,7 @@
             <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white sticky top-0 z-10">
                 <div>
-                    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block">NOTISSE ART GALLERY ACQUISITION</span>
+                    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block">NOTISSE</span>
                     <h3 class="text-base sm:text-lg font-bold font-montserrat text-black tracking-tight">Artwork Offering / Buy Inquiry</h3>
                 </div>
                 <button onclick="closeArtworkOfferingModal()" aria-label="Close Modal"
@@ -837,17 +839,11 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
-                            Nominal Tawaran (IDR) <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-500 font-montserrat">Rp</span>
-                            <input type="text" id="offering-buyer-price" required placeholder="Misal: 7.500.000"
-                                oninput="formatOfferingPriceInput(this)"
-                                class="w-full border border-gray-300 pl-10 pr-3.5 py-2.5 text-sm font-roboto focus:outline-none focus:border-black transition-colors font-medium">
-                        </div>
-                        <p class="text-[10px] text-gray-400 font-roboto mt-1">Masukkan nominal penawaran yang diajukan untuk karya seni asli.</p>
+                    <!-- Acquisition Price Display -->
+                    <div class="p-3.5 bg-neutral-50 border border-gray-200 rounded-sm">
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-gray-400 font-montserrat block mb-1">Harga Karya</span>
+                        <p id="offering-fixed-price-display" class="font-montserrat font-bold text-lg text-black">Rp 7.500.000</p>
+                        <input type="hidden" id="offering-buyer-price" value="">
                     </div>
 
                     <div>
@@ -861,7 +857,7 @@
                     <div class="pt-2">
                         <button type="submit" id="offering-submit-btn"
                             class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-3.5 px-6 font-montserrat text-xs sm:text-sm font-bold tracking-[0.2em] uppercase cursor-pointer flex items-center justify-center space-x-2">
-                            <span>AJUKAN PENAWARAN (SUBMIT OFFER)</span>
+                            <span>KONFIRMASI AKUISISI KARYA (BUY ARTWORK)</span>
                             <span>&rarr;</span>
                         </button>
                     </div>
@@ -972,6 +968,11 @@
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Artist
                             Collab</span>
                     </a>
+                    <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
+                        class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
+                        <span
+                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Editorial</span>
+                    </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-lookbook-list')"
                         class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
                         <span
@@ -1044,7 +1045,7 @@
                             RP 250.000,00
                         </p>
                         <p class="text-xs md:text-sm text-gray-600 mt-2 font-montserrat">
-                            by <span onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')"
+                            by <span id="pdetail-artist" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')"
                                 class="underline hover:text-black cursor-pointer font-medium transition-colors font-montserrat">Mustafa
                                 Alatas</span>
                         </p>
@@ -1065,7 +1066,8 @@
                             </button>
                             <div id="acc-content-desc" class="accordion-content">
                                 <div
-                                    class="accordion-inner pb-4 pt-1 text-[11px] md:text-xs text-gray-500 font-neue-montreal">
+                                    class="accordion-inner pb-4 pt-1 text-[11px] md:text-xs text-gray-500 font-neue-montreal"
+                                    id="pdetail-desc-content">
                                     <ul class="list-disc pl-5 space-y-1.5 leading-relaxed font-neue-montreal">
                                         <li>Heavyweight 24s Cotton Combed construction</li>
                                         <li>High-density screenprinted artwork on back and chest</li>
@@ -1388,6 +1390,11 @@
                         <p id="artwork-dimensions">Dimensions: 60x60cm</p>
                     </div>
 
+                    <div class="py-2 border-y border-gray-100 my-2">
+                        <span class="text-[10px] font-bold tracking-widest uppercase text-gray-400 font-montserrat block mb-0.5">Harga</span>
+                        <p id="artwork-price-display" class="font-montserrat font-bold text-xl md:text-2xl text-black">Rp 7.500.000</p>
+                    </div>
+
                     <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto pt-2">
                         Karya seni asli (original physical artwork) yang diciptakan eksklusif oleh seniman. Setiap karya disertai dengan sertifikat autentisitas bertanda tangan kuratorial Notisse.
                     </p>
@@ -1397,10 +1404,10 @@
                         <div class="p-3 bg-neutral-50 border border-gray-200 text-xs font-roboto text-gray-600 space-y-1">
                             <div class="flex items-center justify-between font-montserrat">
                                 <span class="font-semibold uppercase tracking-wider text-black text-[11px]">Metode Pembelian:</span>
-                                <span class="text-emerald-700 font-bold uppercase tracking-wider text-[11px]">Offering / Inquiry</span>
+                                <span class="text-emerald-700 font-bold uppercase tracking-wider text-[11px]">Direct Acquisition / Inquiry</span>
                             </div>
                             <p class="text-[11px] text-gray-500 leading-relaxed pt-1">
-                                Pembelian artwork berbeda dengan produk pakaian di cart. Sistem offering akan menghubungkan penawaran Anda langsung ke seniman dan kurator Notisse.
+                                Pembelian artwork berbeda dengan produk pakaian di cart. Sistem akuisisi akan menghubungkan pesanan Anda langsung ke seniman dan kurator Notisse sesuai harga yang telah ditetapkan.
                             </p>
                         </div>
 
@@ -1409,7 +1416,7 @@
                             <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m-6-6h12"/>
                             </svg>
-                            <span>OFFERING / BUY ARTWORK</span>
+                            <span>AJUKAN AKUISISI / BELI ARTWORK</span>
                         </button>
 
                         <p class="text-[11px] text-gray-400 font-roboto text-center leading-relaxed">
@@ -1420,42 +1427,104 @@
             </div>
         </section>
 
-        <!-- VIEW 3D: EDITORIAL ARTICLE DETAIL PAGE -->
-        <section id="view-artist-editorial-detail" class="view-page px-6 md:px-12 pt-24 pb-10 max-w-7xl mx-auto">
+        <!-- VIEW 3C: ALL EDITORIALS ARCHIVE PAGE -->
+        <section id="view-editorials-all" class="view-page px-6 md:px-12 pt-24 pb-16 max-w-7xl mx-auto">
             <div class="mb-6">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK TO EDITORIALS</span>
+                    <span>BACK</span>
+                </button>
+            </div>
+            <div class="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
+                <div>
+                    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-1">NOTISSE ARCHIVE</span>
+                    <h1 class="text-2xl md:text-3xl font-bold font-montserrat text-black uppercase tracking-wider">Editorials</h1>
+                </div>
+                <p class="text-xs text-gray-500 font-roboto max-w-md">
+                    Wacana, catatan kuratorial, dan refleksi artistik di balik karya seniman kolaborator Notisse.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @forelse($editorials as $ed)
+                    @php
+                        $edImg = $ed->image ? (Str::startsWith($ed->image, 'http') ? $ed->image : (file_exists(public_path('storage/' . $ed->image)) ? asset('storage/' . $ed->image) : asset($ed->image))) : 'https://placehold.co/600x600/222/fff?text=Editorial';
+                    @endphp
+                    <div onclick="openArtistEditorialDetailById({{ $ed->id }})" class="group cursor-pointer flex flex-col justify-between border border-gray-200 bg-white hover:border-black transition-colors duration-300">
+                        <div class="relative w-full aspect-[16/10] bg-neutral-100 overflow-hidden">
+                            <img src="{{ $edImg }}" alt="{{ $ed->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            @if($ed->video_url)
+                                <span class="absolute top-3 right-3 bg-black/80 text-white text-[9px] font-montserrat uppercase px-2 py-0.5 tracking-wider">Video</span>
+                            @endif
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow space-y-3">
+                            <div>
+                                <span class="text-[9px] font-bold tracking-widest uppercase text-gray-400 font-montserrat block mb-1">
+                                    {{ $ed->artist ? $ed->artist->name : 'Notisse Editorial' }}
+                                </span>
+                                <h3 class="font-montserrat font-bold text-sm md:text-base text-black group-hover:underline line-clamp-2">
+                                    {{ $ed->title }}
+                                </h3>
+                                @if($ed->excerpt)
+                                    <p class="text-xs text-gray-600 font-roboto mt-2 line-clamp-2">
+                                        {{ $ed->excerpt }}
+                                    </p>
+                                @endif
+                            </div>
+                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-montserrat font-semibold text-black uppercase">
+                                <span>Read Essay</span>
+                                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full py-16 text-center text-gray-400 font-roboto">
+                        Belum ada artikel editorial yang dipublikasikan.
+                    </div>
+                @endforelse
+            </div>
+        </section>
+
+        <!-- VIEW 3D: EDITORIAL ARTICLE DETAIL PAGE -->
+        <section id="view-artist-editorial-detail" class="view-page px-6 md:px-12 pt-24 pb-16 max-w-7xl mx-auto">
+            <!-- Navigation -->
+            <div class="mb-8 border-b border-gray-200 pb-4">
+                <button onclick="goBack()"
+                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
+                    <span>BACK</span>
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-14 items-start">
                 <!-- Left Column: Article Text & Captioned Images -->
                 <div class="md:col-span-6 space-y-6">
                     <div>
-                        <h1 id="editorial-detail-title" class="text-xl md:text-2xl font-bold font-montserrat text-black leading-snug">
+                        <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-1">NOTISSE CURATORIAL ESSAY</span>
+                        <h1 id="editorial-detail-title" class="text-2xl md:text-3xl lg:text-4xl font-bold font-montserrat text-black leading-tight">
                             Mustafa Alatas Menafsir Kuasa dan Sosial dalam Lukisan Figuratif dan Simbolisme
                         </h1>
-                        <p id="editorial-detail-author" class="text-xs text-gray-500 font-roboto mt-2">Laksa Dawantara</p>
+                        <p id="editorial-detail-author" class="text-xs text-gray-500 font-roboto mt-2 font-medium">Laksa Dawantara</p>
                     </div>
 
-                    <div id="editorial-detail-content" class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto space-y-4">
+                    <div id="editorial-detail-content" class="text-sm md:text-base text-gray-700 leading-relaxed font-roboto space-y-4">
                         <p>
                             Dokumentasi wacana dan catatan proses berkarya seniman bersama Notisse.
                         </p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 my-6">
+                    <!-- 2 FOTO DI SEBELAH KIRI (PORTRAIT & ARTWORK) -->
+                    <div class="grid grid-cols-2 gap-4 my-6 pt-4 border-t border-gray-100">
                         <div>
-                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5">
+                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5 shadow-sm">
                                 <img id="editorial-detail-portrait" src="https://placehold.co/400x500/222/fff?text=Portrait" alt="Portrait"
                                     class="w-full h-full object-cover">
                             </div>
                             <p class="text-[10px] text-gray-400 font-roboto">Dokumentasi kuratorial seniman Notisse.</p>
                         </div>
                         <div>
-                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5">
+                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5 shadow-sm">
                                 <img id="editorial-detail-artwork" src="https://placehold.co/400x500/444/fff?text=Artwork" alt="Artwork"
                                     class="w-full h-full object-cover">
                             </div>
@@ -1464,25 +1533,25 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Full Featured Editorial Video -->
-                <div id="editorial-video-container" class="md:col-span-6 aspect-[4/5] bg-black overflow-hidden relative group shadow-lg">
+                <!-- Right Column: Full Featured Editorial Video (DIPERBESAR DAN PROMINEN) -->
+                <div id="editorial-video-container" class="md:col-span-6 aspect-[4/5] min-h-[480px] lg:min-h-[580px] bg-black overflow-hidden relative group shadow-2xl sticky top-24">
                     <video id="editorial-video-player"
                         class="w-full h-full object-cover"
                         autoplay loop muted playsinline controls
                         poster="{{ asset('home.jpg') }}">
                         <source id="editorial-video-source" src="{{ asset('video/editorial.mp4') }}" type="video/mp4">
-                        <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <!-- Editorial Video Watermark Badge -->
-                    <div class="absolute top-4 right-4 pointer-events-none bg-black/60 backdrop-blur-md text-white text-[10px] font-montserrat uppercase px-2.5 py-1 tracking-widest border border-white/20">
-                        Editorial Video
+                    <!-- Editorial Video Badge -->
+                    <div class="absolute top-3 right-3 pointer-events-none bg-black/75 backdrop-blur-md text-white text-[9px] font-montserrat uppercase px-2.5 py-1 tracking-widest border border-white/20 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                        <span>Editorial Film</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- VIEW 4: LOOKBOOK INDEX PAGE (MINIMALIST TIMELINE DESAIN SESUAI REFERENSI) -->
+        <!-- VIEW 4: LOOKBOOK INDEX PAGE (MINIMALIST TIMELINE) -->
         <section id="view-lookbook-list"
             class="view-page min-h-[75vh] px-8 sm:px-16 md:px-24 py-16 md:py-24 max-w-5xl mx-auto flex flex-col justify-center">
             <div class="relative pl-8 md:pl-12 my-auto">
@@ -1491,55 +1560,34 @@
 
                 <!-- Timeline Entries -->
                 <div class="space-y-12 md:space-y-16">
-                    <!-- Timeline Item 1: 2025 LOOKBOOK -->
-                    <div onclick="showPage('view-lookbook-detail')"
+                    @forelse($lookbooks as $index => $lb)
+                    <div onclick="openLookbookDetail({{ $lb->id }})"
                         class="group relative flex items-center cursor-pointer select-none">
-                        <!-- Round Dot Node sitting directly on the line -->
+                        <!-- Round Dot Node -->
                         <div
-                            class="absolute -left-[32px] md:-left-[48px] w-3.5 h-3.5 md:w-4 md:h-4 rounded-full bg-gray-400 border-2 border-white group-hover:bg-black group-hover:scale-150 transition-all duration-300 shadow-sm">
+                            class="absolute -left-[32px] md:-left-[48px] w-3.5 h-3.5 md:w-4 md:h-4 rounded-full {{ $index === 0 ? 'bg-gray-400 group-hover:bg-black' : 'bg-gray-300 group-hover:bg-black' }} border-2 border-white group-hover:scale-150 transition-all duration-300 shadow-sm">
                         </div>
 
                         <!-- Lookbook Text -->
                         <span
-                            class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] text-black uppercase font-montserrat group-hover:translate-x-4 transition-all duration-300">
+                            class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] {{ $index === 0 ? 'text-black' : 'text-gray-400 group-hover:text-black' }} uppercase font-montserrat group-hover:translate-x-4 transition-all duration-300">
+                            {{ $lb->title ?: ($lb->year . ' LOOKBOOK') }}
+                        </span>
+                    </div>
+                    @empty
+                    <div onclick="openLookbookDetail(null)"
+                        class="group relative flex items-center cursor-pointer select-none">
+                        <div class="absolute -left-[32px] md:-left-[48px] w-3.5 h-3.5 md:w-4 md:h-4 rounded-full bg-gray-400 border-2 border-white group-hover:bg-black group-hover:scale-150 transition-all duration-300 shadow-sm"></div>
+                        <span class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] text-black uppercase font-montserrat group-hover:translate-x-4 transition-all duration-300">
                             2025 LOOKBOOK
                         </span>
                     </div>
-
-                    <!-- Timeline Item 2: 2024 LOOKBOOK -->
-                    <div onclick="showPage('view-lookbook-detail')"
-                        class="group relative flex items-center cursor-pointer select-none">
-                        <!-- Round Dot Node -->
-                        <div
-                            class="absolute -left-[32px] md:-left-[48px] w-3.5 h-3.5 md:w-4 md:h-4 rounded-full bg-gray-300 border-2 border-white group-hover:bg-black group-hover:scale-150 transition-all duration-300 shadow-sm">
-                        </div>
-
-                        <!-- Lookbook Text -->
-                        <span
-                            class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] text-gray-400 uppercase font-montserrat group-hover:text-black group-hover:translate-x-4 transition-all duration-300">
-                            2024 LOOKBOOK
-                        </span>
-                    </div>
-
-                    <!-- Timeline Item 3: 2023 LOOKBOOK -->
-                    <div onclick="showPage('view-lookbook-detail')"
-                        class="group relative flex items-center cursor-pointer select-none">
-                        <!-- Round Dot Node -->
-                        <div
-                            class="absolute -left-[32px] md:-left-[48px] w-3.5 h-3.5 md:w-4 md:h-4 rounded-full bg-gray-300 border-2 border-white group-hover:bg-black group-hover:scale-150 transition-all duration-300 shadow-sm">
-                        </div>
-
-                        <!-- Lookbook Text -->
-                        <span
-                            class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] text-gray-400 uppercase font-montserrat group-hover:text-black group-hover:translate-x-4 transition-all duration-300">
-                            2023 LOOKBOOK
-                        </span>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </section>
 
-        <!-- VIEW 5: LOOKBOOK 2025 DETAIL PAGE -->
+        <!-- VIEW 5: LOOKBOOK DETAIL PAGE WITH WIDE VIDEO AT TOP -->
         <section id="view-lookbook-detail" class="view-page min-h-screen pt-24 pb-20">
             <div class="max-w-7xl mx-auto px-6 md:px-12 pt-6 pb-4">
                 <button onclick="goBack()"
@@ -1549,17 +1597,33 @@
                 </button>
             </div>
 
-            <div class="w-full bg-[#A29892] py-16 md:py-24 mb-12 flex items-center justify-center shadow-inner">
-                <h2 class="text-xl md:text-2xl font-normal tracking-[0.25em] text-black uppercase font-montserrat">2025
-                    LOOKBOOK</h2>
+            <!-- WIDE CINEMATIC LOOKBOOK CAMPAIGN VIDEO (MELEBAR DI ATAS) -->
+            <div id="lookbook-video-wrapper" class="w-full bg-black mb-12 relative overflow-hidden shadow-2xl">
+                <div class="w-full aspect-[21/9] min-h-[300px] max-h-[580px] relative bg-black">
+                    <video id="lookbook-video-player"
+                        class="w-full h-full object-cover"
+                        autoplay loop muted playsinline controls
+                        poster="{{ asset('home.jpg') }}">
+                        <source id="lookbook-video-source" src="{{ asset('video/editorial.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <!-- Overlaid Title Bar -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none flex flex-col justify-end p-6 sm:p-12">
+                        <span class="text-[10px] sm:text-xs font-montserrat font-bold uppercase tracking-[0.25em] text-white/70">NOTISSE CAMPAIGN FILM</span>
+                        <h2 id="lookbook-detail-title" class="text-2xl sm:text-3xl md:text-4xl font-normal tracking-[0.25em] text-white uppercase font-montserrat mt-1">2025 LOOKBOOK</h2>
+                    </div>
+                </div>
             </div>
 
             <div class="px-6 md:px-10 max-w-7xl mx-auto">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
+                <div id="lookbook-photos-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
                     @foreach($fotoshoots as $foto)
-                        <div class="w-full group cursor-pointer">
+                        <div class="w-full group cursor-pointer" onclick="openLightbox('{{ Str::startsWith($foto->image, 'http') ? $foto->image : (file_exists(public_path('storage/' . $foto->image)) ? asset('storage/' . $foto->image) : asset($foto->image)) }}', '{{ addslashes($foto->title ?? '') }}')">
                             <div class="overflow-hidden bg-[#d9d9d9] relative">
-                                <img src="{{ asset($foto->image) }}" alt="{{ $foto->title }}"
+                                @php
+                                    $lbUrl = Str::startsWith($foto->image, 'http') ? $foto->image : (file_exists(public_path('storage/' . $foto->image)) ? asset('storage/' . $foto->image) : asset($foto->image));
+                                @endphp
+                                <img src="{{ $lbUrl }}" alt="{{ $foto->title }}"
                                     class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                                 @if($foto->title)
                                     <div
@@ -1803,7 +1867,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Alamat Pengiriman Utama</h2>
-                        <p class="text-xs text-gray-400 font-roboto mt-0.5">Alamat ini digunakan untuk kalkulasi ongkos kirim Biteship saat checkout.</p>
+                        <p class="text-xs text-gray-400 font-roboto mt-0.5">Alamat ini digunakan untuk kalkulasi ongkos kirim saat checkout.</p>
                     </div>
                     <button onclick="showEditProfile()" class="text-xs font-montserrat font-bold uppercase tracking-wider text-black underline">
                         Ubah Alamat
@@ -1885,7 +1949,7 @@
                 </div>
                 
                 <div class="relative">
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Cari Kecamatan / Kota (Biteship) *</label>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Cari Kecamatan / Kota *</label>
                     <input type="text" id="edit-area-search" class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-roboto" placeholder="Ketik nama kecamatan..." autocomplete="off">
                     <ul id="edit-area-results" class="absolute z-20 w-full bg-white border border-gray-300 shadow-xl mt-1 hidden max-h-48 overflow-y-auto"></ul>
                 </div>
@@ -1918,11 +1982,11 @@
         class="fixed bottom-0 left-0 z-30 w-full border-t border-black overflow-hidden flex whitespace-nowrap py-2 md:py-2.5 bg-black shadow-lg">
         <div
             class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
-            {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
+            {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
         <div
             class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
-            {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
+            {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
     </div>
     <!-- TOAST NOTIFICATION -->
@@ -2078,6 +2142,8 @@
 
         let productsData = @json($products);
         let artistsData = @json($artists ?? []);
+        let editorialsData = @json($editorials ?? []);
+        let lookbooksData = @json($lookbooks ?? []);
         let currentProduct = null;
         let cartState = [];
         
@@ -2663,17 +2729,10 @@
                                 <strong>FABRIC & FIT SPECS:</strong> ${currentProduct.specs}
                              </div>`;
                 }
-                if (currentProduct.description) {
-                    html += `<p class="leading-relaxed text-[11px] md:text-xs text-gray-600 mb-2">${currentProduct.description}</p>`;
-                }
-                if (!html) {
-                    html = `<ul class="list-disc pl-5 space-y-1.5 leading-relaxed font-neue-montreal text-gray-500">
-                                <li>Heavyweight 24s Cotton Combed construction</li>
-                                <li>High-density screenprinted artwork on back and chest</li>
-                                <li>Boxy relaxed fit with reinforced ribbed collar</li>
-                                <li>Crafted & printed in Bandung, Indonesia</li>
-                            </ul>`;
-                }
+                const descText = currentProduct.description || "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting";
+                html += `<div class="leading-relaxed text-[11px] md:text-xs text-gray-700 font-mono space-y-1 mb-2 bg-neutral-50 p-3 border border-gray-100">
+                            ${descText.split('\n').filter(Boolean).map(line => `<div>&bull; ${line}</div>`).join('')}
+                         </div>`;
                 descContent.innerHTML = html;
             }
 
@@ -2752,6 +2811,13 @@
                                 ${ed.title}
                             </h4>
                             <p class="text-[11px] text-gray-500 font-roboto mt-1">${ed.author || 'Editorial Notisse'}</p>
+                            <div class="mt-2.5 flex items-center justify-between text-[11px] font-montserrat">
+                                <span class="text-black font-semibold hover:underline" onclick="event.stopPropagation(); openArtistEditorialDetailById(${ed.id})">Baca Preview &rarr;</span>
+                                <span onclick="event.stopPropagation(); navigateTo('view-editorials-all')" class="text-brandRed hover:underline font-bold inline-flex items-center gap-1 cursor-pointer">
+                                    <span>Halaman Terpisah</span>
+                                    <span>&nearr;</span>
+                                </span>
+                            </div>
                         `;
                         edGrid.appendChild(card);
                     });
@@ -2774,7 +2840,8 @@
                         const artImg = artw.image ? (artw.image.startsWith('http') || artw.image.startsWith('/') ? artw.image : '/' + artw.image) : 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork';
                         const card = document.createElement('div');
                         card.className = 'group cursor-pointer';
-                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg);
+                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price);
+                        const priceFormatted = artw.price ? 'Rp ' + Number(artw.price).toLocaleString('id-ID') : 'Price on Inquiry';
                         card.innerHTML = `
                             <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
                                 <img src="${artImg}" alt="${artw.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -2786,6 +2853,7 @@
                                 ${artw.title}
                             </h4>
                             <p class="text-[11px] text-gray-500 font-roboto mt-0.5">${artw.medium || 'Artwork'} ${artw.dimensions ? '&bull; ' + artw.dimensions : ''}</p>
+                            <p class="text-xs font-montserrat font-extrabold text-black mt-1">${priceFormatted}</p>
                         `;
                         artGrid.appendChild(card);
                     });
@@ -2846,13 +2914,14 @@
             image: "https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View"
         };
 
-        function openArtistArtworkDetail(title, artist, medium, dimensions, image) {
+        function openArtistArtworkDetail(title, artist, medium, dimensions, image, price) {
             currentActiveArtwork = {
                 title: title || 'Artwork',
                 artist: artist || 'Mustafa Alatas',
                 medium: medium || 'Oil on canvas',
                 dimensions: dimensions || '60x60cm',
-                image: image || 'https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View'
+                image: image || 'https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View',
+                price: price || 0
             };
 
             const titleEl = document.getElementById('artwork-title');
@@ -2870,17 +2939,24 @@
             const imgEl = document.getElementById('artwork-detail-image');
             if (imgEl && currentActiveArtwork.image) imgEl.src = currentActiveArtwork.image;
 
+            const priceEl = document.getElementById('artwork-price-display');
+            if (priceEl) {
+                const pVal = Number(currentActiveArtwork.price || 0);
+                priceEl.innerText = pVal > 0 ? 'Rp ' + pVal.toLocaleString('id-ID') : 'Price on Inquiry';
+            }
+
             showPage('view-artist-artwork-detail');
         }
 
         /* ARTWORK OFFERING MODAL LOGIC */
-        function triggerArtworkOffering(title, artist, medium, dimensions, image) {
+        function triggerArtworkOffering(title, artist, medium, dimensions, image, price) {
             currentActiveArtwork = {
                 title: title || 'Artwork',
                 artist: artist || 'Mustafa Alatas',
                 medium: medium || 'Oil on canvas',
                 dimensions: dimensions || '60x60cm',
-                image: image || 'https://placehold.co/400x500/222/fff?text=Artwork'
+                image: image || 'https://placehold.co/400x500/222/fff?text=Artwork',
+                price: price || 0
             };
             openArtworkOfferingModal();
         }
@@ -2900,10 +2976,11 @@
             const prevArtist = document.getElementById('offering-artwork-artist');
             const prevSpecs = document.getElementById('offering-artwork-specs');
 
-            if (prevImg) prevImg.src = currentActiveArtwork.image || 'https://placehold.co/400x500/222/fff?text=Artwork';
-            if (prevTitle) prevTitle.innerText = currentActiveArtwork.title;
-            if (prevArtist) prevArtist.innerText = currentActiveArtwork.artist;
-            if (prevSpecs) prevSpecs.innerText = `${currentActiveArtwork.medium} • ${currentActiveArtwork.dimensions}`;
+            const curArt = currentActiveArtwork || {};
+            if (prevImg) prevImg.src = curArt.image || 'https://placehold.co/400x500/222/fff?text=Artwork';
+            if (prevTitle) prevTitle.innerText = curArt.title || 'Artwork';
+            if (prevArtist) prevArtist.innerText = curArt.artist || 'Mustafa Alatas';
+            if (prevSpecs) prevSpecs.innerText = `${curArt.medium || 'Oil on canvas'} • ${curArt.dimensions || '60x60cm'}`;
 
             // Populate User Account Info from logged-in session / storage
             let activeUser = loggedInUser;
@@ -2912,21 +2989,28 @@
                 if (storedUser) activeUser = JSON.parse(storedUser);
             } catch (e) {}
 
+            const userName = (activeUser && activeUser.name) ? activeUser.name : 'Collector / Guest';
+            const userEmail = (activeUser && activeUser.email) ? activeUser.email : 'guest@notisse.com';
+
             const userNameEl = document.getElementById('offering-user-name');
             const userEmailEl = document.getElementById('offering-user-email');
             const userAvatarEl = document.getElementById('offering-user-avatar');
 
-            if (userNameEl) userNameEl.innerText = activeUser.name || 'John Doe';
-            if (userEmailEl) userEmailEl.innerText = activeUser.email || 'john.doe@notisse.com';
+            if (userNameEl) userNameEl.innerText = userName;
+            if (userEmailEl) userEmailEl.innerText = userEmail;
             if (userAvatarEl) {
-                const initials = (activeUser.name || 'John Doe').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const initials = userName.split(' ').filter(Boolean).map(n => n[0]).join('').substring(0, 2).toUpperCase();
                 userAvatarEl.innerText = initials || 'NT';
             }
 
-            // Reset form fields
+            // Populate price
+            const fixedPriceDisplay = document.getElementById('offering-fixed-price-display');
             const priceInput = document.getElementById('offering-buyer-price');
             const messageInput = document.getElementById('offering-buyer-message');
-            if (priceInput) priceInput.value = '';
+            const pVal = Number(curArt.price || 0);
+            const formatted = pVal > 0 ? 'Rp ' + pVal.toLocaleString('id-ID') : 'Rp 0';
+            if (fixedPriceDisplay) fixedPriceDisplay.innerText = formatted;
+            if (priceInput) priceInput.value = pVal > 0 ? pVal : '0';
             if (messageInput) messageInput.value = '';
 
             // Reset view state
@@ -3077,7 +3161,15 @@
         function openArtistEditorialDetailById(id) {
             let foundEd = null;
             let foundArtist = null;
-            if (typeof artistsData !== 'undefined' && artistsData) {
+
+            if (typeof editorialsData !== 'undefined' && editorialsData && editorialsData.length > 0) {
+                foundEd = editorialsData.find(e => e.id == id);
+                if (foundEd && foundEd.artist) {
+                    foundArtist = foundEd.artist;
+                }
+            }
+
+            if (!foundEd && typeof artistsData !== 'undefined' && artistsData) {
                 for (const a of artistsData) {
                     if (a.editorials) {
                         const ed = a.editorials.find(e => e.id == id);
@@ -3123,16 +3215,76 @@
 
                 const videoPlayer = document.getElementById('editorial-video-player');
                 const videoSource = document.getElementById('editorial-video-source');
-                const videoContainer = document.getElementById('editorial-video-container');
-                if (foundEd.video_url && videoPlayer && videoSource) {
-                    if (videoContainer) videoContainer.classList.remove('hidden');
-                    const vSrc = foundEd.video_url.startsWith('http') || foundEd.video_url.startsWith('/') ? foundEd.video_url : '/' + foundEd.video_url;
+                if (videoPlayer && videoSource) {
+                    let vSrc = foundEd.video_url 
+                        ? (foundEd.video_url.startsWith('http') || foundEd.video_url.startsWith('/') ? foundEd.video_url : '/' + foundEd.video_url)
+                        : "{{ asset('video/editorial.mp4') }}";
                     videoSource.src = vSrc;
                     videoPlayer.load();
+                    videoPlayer.play().catch(() => {});
                 }
             }
 
             showPage('view-artist-editorial-detail');
+        }
+
+        /* LOOKBOOK DYNAMIC LOADER & DETAIL */
+        function openLookbookDetail(id) {
+            let lb = null;
+            if (typeof lookbooksData !== 'undefined' && lookbooksData && lookbooksData.length > 0) {
+                if (id) {
+                    lb = lookbooksData.find(l => l.id == id) || lookbooksData[0];
+                } else {
+                    lb = lookbooksData[0];
+                }
+            }
+
+            const titleEl = document.getElementById('lookbook-detail-title');
+            if (titleEl) {
+                titleEl.innerText = lb ? (lb.title || (lb.year + ' LOOKBOOK')) : '2025 LOOKBOOK';
+            }
+
+            const videoPlayer = document.getElementById('lookbook-video-player');
+            const videoSource = document.getElementById('lookbook-video-source');
+            if (videoPlayer && videoSource) {
+                let vSrc = (lb && lb.video_url) ? lb.video_url : "{{ asset('video/editorial.mp4') }}";
+                if (!vSrc.startsWith('http') && !vSrc.startsWith('/')) {
+                    vSrc = vSrc.startsWith('video/') ? '/' + vSrc : '/storage/' + vSrc;
+                }
+                videoSource.src = vSrc;
+                videoPlayer.load();
+                videoPlayer.play().catch(() => {});
+            }
+
+            const grid = document.getElementById('lookbook-photos-grid');
+            if (grid && lb && lb.fotoshoots) {
+                grid.innerHTML = '';
+                if (lb.fotoshoots.length > 0) {
+                    lb.fotoshoots.forEach(f => {
+                        const imgUrl = f.image.startsWith('http') || f.image.startsWith('/') 
+                            ? f.image 
+                            : (f.image.startsWith('lookbooks') ? '/storage/' + f.image : '/' + f.image);
+                        const escapedTitle = (f.title || '').replace(/'/g, "\\'");
+                        grid.innerHTML += `
+                            <div class="w-full group cursor-pointer" onclick="openLightbox('${imgUrl}', '${escapedTitle}')">
+                                <div class="overflow-hidden bg-[#d9d9d9] relative">
+                                    <img src="${imgUrl}" alt="${f.title || ''}"
+                                        class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
+                                    ${f.title ? `
+                                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                            <span class="text-white font-montserrat tracking-[0.2em] uppercase text-sm md:text-base">${f.title}</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    grid.innerHTML = '<div class="col-span-2 py-16 text-center text-gray-400 font-roboto">Belum ada foto yang diunggah untuk album lookbook ini.</div>';
+                }
+            }
+
+            showPage('view-lookbook-detail');
         }
 
         function showToast(message) {

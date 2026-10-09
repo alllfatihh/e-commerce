@@ -200,8 +200,8 @@
     <!-- Logo -->
     <div class="px-7 py-6 border-b border-white/15">
         <a href="/" class="block group">
-            <p class="font-montserrat font-extrabold text-xl tracking-[0.3em] uppercase text-white">NOTISSE</p>
-            <p class="font-roboto text-[10px] text-white/70 tracking-widest mt-0.5 uppercase">Atelier Admin Panel</p>
+            <img src="{{ asset('logo.png') }}" alt="Notisse" class="h-6 w-auto object-contain brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity">
+            <p class="font-roboto text-[10px] text-white/70 tracking-widest mt-1.5 uppercase">Atelier Admin Panel</p>
         </a>
     </div>
 
@@ -384,9 +384,15 @@
                                     </div>
                                     <div>
                                         <p class="font-montserrat font-bold text-sm text-gray-900 uppercase">{{ $product->name }}</p>
-                                        <span class="inline-block text-[10px] font-montserrat font-semibold uppercase tracking-wider bg-gray-100 text-gray-600 px-2 py-0.5 mt-1 border border-gray-200">
-                                            {{ $product->artist ?: 'In-House Atelier' }}
-                                        </span>
+                                        @if(empty($product->artist) || $product->artist === 'Notisse Original')
+                                            <span class="inline-block text-[10px] font-montserrat font-bold uppercase tracking-wider bg-black text-white px-2 py-0.5 mt-1">
+                                                Notisse Original
+                                            </span>
+                                        @else
+                                            <span class="inline-block text-[10px] font-montserrat font-bold uppercase tracking-wider bg-[#E2FF00] text-black px-2 py-0.5 mt-1 border border-black/10">
+                                                Collab: {{ $product->artist }}
+                                            </span>
+                                        @endif
                                         @if($product->specs)
                                         <p class="text-[10px] text-gray-400 font-mono mt-0.5 line-clamp-1 max-w-xs">{{ $product->specs }}</p>
                                         @endif
@@ -768,9 +774,9 @@
         ───────────────────────────────────────────────────────── --}}
         <section id="section-media" class="section-card hidden">
             <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] mb-2 text-brandDark">Site Media & Lookbook Footage</h2>
-            <p class="text-xs text-gray-500 font-roboto mb-6">Kelola Hero Carousel slides dan Footage Photoshoot yang tampil di beranda toko. Admin juga bisa menautkan gambar footage ke produk tertentu.</p>
+            <p class="text-xs text-gray-500 font-roboto mb-6">Kelola Hero Carousel slides, Footage On-Model, dan Galeri Foto Lookbook Photoshoot toko Notisse.</p>
 
-            <!-- TAB: Carousel vs Footage -->
+            <!-- TAB: Carousel vs Footage vs Lookbook -->
             <div class="flex gap-0 border-b border-gray-200 mb-6">
                 <button onclick="switchMediaTab('carousel')" id="tab-carousel"
                     class="tab-btn active px-5 py-2.5 text-xs font-montserrat uppercase tracking-widest text-gray-500 cursor-pointer">
@@ -778,7 +784,11 @@
                 </button>
                 <button onclick="switchMediaTab('footage')" id="tab-footage"
                     class="tab-btn px-5 py-2.5 text-xs font-montserrat uppercase tracking-widest text-gray-500 cursor-pointer">
-                    Footage / Lookbook Media
+                    Footage / Product Media
+                </button>
+                <button onclick="switchMediaTab('lookbook')" id="tab-lookbook"
+                    class="tab-btn px-5 py-2.5 text-xs font-montserrat uppercase tracking-widest text-gray-500 cursor-pointer">
+                    Lookbook Photoshoot ({{ $lookbooks->count() }})
                 </button>
             </div>
 
@@ -845,6 +855,97 @@
                     </div>
                 </div>
                 @endforeach
+            </div>
+
+            <!-- Lookbook Collections Cards -->
+            <div id="media-tab-lookbook" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white border border-gray-200 shadow-sm">
+                    <div>
+                        <h3 class="font-montserrat font-bold text-sm uppercase tracking-wider text-black">Lookbook Collections & Campaigns</h3>
+                        <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola album Lookbook. Klik salah satu card Lookbook untuk mengunggah video kampanye dan foto-foto editorialnya.</p>
+                    </div>
+                    <button type="button" onclick="openCreateLookbookModal()" class="btn-primary flex items-center gap-2 shrink-0 cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span>+ Tambah Album Lookbook</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @forelse($lookbooks as $lb)
+                    @php
+                        $coverUrl = $lb->cover_image ? (Str::startsWith($lb->cover_image, 'http') ? $lb->cover_image : (file_exists(public_path('storage/' . $lb->cover_image)) ? asset('storage/' . $lb->cover_image) : asset($lb->cover_image))) : ($lb->fotoshoots->first() ? (Str::startsWith($lb->fotoshoots->first()->image, 'http') ? $lb->fotoshoots->first()->image : (file_exists(public_path('storage/' . $lb->fotoshoots->first()->image)) ? asset('storage/' . $lb->fotoshoots->first()->image) : asset($lb->fotoshoots->first()->image))) : 'https://placehold.co/600x400/222/fff?text=' . urlencode($lb->title));
+                    @endphp
+                    <div class="bg-white border border-gray-200 overflow-hidden group shadow-sm flex flex-col justify-between hover:border-black transition-colors">
+                        <div>
+                            <!-- Card Preview Container -->
+                            <div class="relative w-full aspect-[16/9] bg-neutral-900 overflow-hidden cursor-pointer" onclick="openManageLookbook({{ $lb->id }})">
+                                <img src="{{ $coverUrl }}" alt="{{ $lb->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                
+                                <!-- Top Badges -->
+                                <div class="absolute top-3 left-3 flex items-center gap-2">
+                                    <span class="bg-black/80 backdrop-blur-md text-white text-[10px] font-montserrat font-bold uppercase tracking-wider px-2.5 py-0.5 border border-white/20">
+                                        {{ $lb->year ?: '2025' }}
+                                    </span>
+                                </div>
+                                <div class="absolute top-3 right-3">
+                                    @if($lb->video_url)
+                                        <span class="bg-emerald-600/90 text-white text-[10px] font-montserrat font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm flex items-center gap-1 shadow">
+                                            <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                            <span>Video Aktif</span>
+                                        </span>
+                                    @else
+                                        <span class="bg-neutral-800/80 text-gray-300 text-[10px] font-montserrat uppercase tracking-wider px-2 py-0.5">
+                                            Tanpa Video
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <!-- Bottom Info Overlay -->
+                                <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
+                                    <div>
+                                        <h4 class="font-montserrat font-bold text-sm uppercase tracking-wider line-clamp-1">{{ $lb->title }}</h4>
+                                        <p class="text-[11px] text-gray-300 font-roboto mt-0.5">{{ $lb->fotoshoots->count() }} Foto Photoshoot</p>
+                                    </div>
+                                    <span class="text-xs bg-white text-black px-2.5 py-1 font-montserrat font-bold uppercase tracking-wider shrink-0 shadow">
+                                        Buka &rarr;
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="p-4">
+                                @if($lb->description)
+                                    <p class="text-xs text-gray-600 font-roboto line-clamp-2 mb-3">{{ $lb->description }}</p>
+                                @endif
+                                <div class="flex items-center gap-2 text-[11px] font-mono text-gray-500">
+                                    <span>Tahun: {{ $lb->year }}</span>
+                                    <span>&bull;</span>
+                                    <span>{{ $lb->fotoshoots->count() }} foto photoshoot</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Action Footer -->
+                        <div class="p-4 pt-3 border-t border-gray-100 flex items-center justify-between bg-neutral-50">
+                            <button type="button" onclick="openManageLookbook({{ $lb->id }})" class="text-xs font-montserrat font-bold uppercase tracking-wider text-black hover:text-[#d52c2b] transition-colors cursor-pointer flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <span>Kelola Isi & Video</span>
+                            </button>
+                            <form action="/admin/lookbooks/{{ $lb->id }}" method="POST" onsubmit="return confirm('Hapus album Lookbook ini beserta seluruh fotonya?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs font-montserrat font-bold uppercase tracking-wider text-red-500 hover:text-red-700 transition-colors cursor-pointer">
+                                    Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="col-span-full py-16 text-center text-gray-400 text-sm font-roboto bg-white border border-gray-200">
+                        Belum ada album Lookbook. Klik tombol "+ Tambah Album Lookbook" untuk membuat lookbook baru.
+                    </div>
+                    @endforelse
+                </div>
             </div>
         </section>
 
@@ -992,22 +1093,47 @@
 
             <!-- SECTION A: Basic Info -->
             <div class="space-y-4">
-                <h4 class="text-xs font-bold font-montserrat uppercase tracking-wider text-black border-b border-gray-100 pb-1">1. Informasi Pokok Produk</h4>
+                <h4 class="text-xs font-bold font-montserrat uppercase tracking-wider text-black border-b border-gray-100 pb-1">1. Informasi Pokok & Kepemilikan Produk</h4>
+                
+                <!-- Opsi Pemilik Produk: Notisse Original vs Artist Collab -->
+                <div>
+                    <label class="block text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-800 mb-1.5">
+                        Pemilik / Asal Produk (Product Ownership) *
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
+                        <label class="flex items-center gap-3 p-3 border border-gray-300 rounded cursor-pointer hover:border-black transition-colors bg-gray-50" id="label-origin-notisse">
+                            <input type="radio" name="product_origin_type" value="notisse" id="origin-type-notisse" onchange="toggleProductOriginType('notisse')" checked class="text-black focus:ring-black">
+                            <div>
+                                <span class="font-montserrat font-bold text-xs uppercase block text-black">Notisse Original</span>
+                                <span class="text-[10px] text-gray-500 font-roboto block">Produk asli in-house label Notisse</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 border border-gray-300 rounded cursor-pointer hover:border-black transition-colors bg-gray-50" id="label-origin-collab">
+                            <input type="radio" name="product_origin_type" value="collab" id="origin-type-collab" onchange="toggleProductOriginType('collab')" class="text-black focus:ring-black">
+                            <div>
+                                <span class="font-montserrat font-bold text-xs uppercase block text-black">Artist Collaboration</span>
+                                <span class="text-[10px] text-gray-500 font-roboto block">Karya rilis kolaborasi seniman</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Nama Produk *</label>
                         <input type="text" name="name" id="p-name" required placeholder="Contoh: Raja Diamuk Massa Tee V1" class="admin-input">
                     </div>
-                    <div>
+                    <div id="p-artist-container" class="opacity-50 pointer-events-none transition-opacity">
                         <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Seniman / Kolaborator</label>
                         <div class="relative">
-                            <input list="artists-datalist" name="artist" id="p-artist" placeholder="Pilih atau ketik nama seniman..." class="admin-input">
+                            <input list="artists-datalist" name="artist" id="p-artist" value="Notisse Original" placeholder="Pilih atau ketik nama seniman..." class="admin-input">
                             <datalist id="artists-datalist">
                                 @foreach($artists as $art)
                                     <option value="{{ $art->name }}">
                                 @endforeach
                             </datalist>
                         </div>
+                        <p class="text-[10px] text-gray-400 font-roboto mt-1" id="p-artist-hint">Produk in-house label resmi Notisse.</p>
                     </div>
                 </div>
 
@@ -1023,8 +1149,14 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Deskripsi Editorial Produk</label>
-                    <textarea name="description" id="p-desc" rows="3" placeholder="Tuliskan narasi filosofi, konsep desain, dan cerita editorial produk..." class="admin-input resize-none leading-relaxed"></textarea>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600">Deskripsi Editorial Produk</label>
+                        <button type="button" onclick="setDefaultProductDescription()" class="text-[10px] font-montserrat font-bold uppercase text-brandRed hover:underline cursor-pointer">
+                            + Gunakan Default Notisse Spec
+                        </button>
+                    </div>
+                    <textarea name="description" id="p-desc" rows="4" placeholder="Cotton Combed 16s&#10;Raster Plastisol Screen Printing&#10;Digitized Painting" class="admin-input resize-none leading-relaxed font-mono text-xs"></textarea>
+                    <p class="text-[10px] text-gray-400 font-roboto mt-1">Format default 3 baris: Cotton Combed 16s, Raster Plastisol Screen Printing, Digitized Painting.</p>
                 </div>
             </div>
 
@@ -1365,9 +1497,184 @@
 </div>
 
 {{-- ══════════════════════════════════════════════════════════════
+     MODAL 6: CREATE & MANAGE LOOKBOOKS
+══════════════════════════════════════════════════════════════ --}}
+<!-- Modal Create Lookbook -->
+<div id="modal-create-lookbook" class="modal-backdrop" onclick="closeCreateLookbookModal()">
+    <div class="modal-box max-w-lg" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+            <div>
+                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block">Lookbook Collections</span>
+                <h3 class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Buat Album Lookbook Baru</h3>
+            </div>
+            <button onclick="closeCreateLookbookModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
+        </div>
+
+        <form action="/admin/lookbooks" method="POST" enctype="multipart/form-data" class="space-y-4">
+            @csrf
+            <div>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Lookbook *</label>
+                <input type="text" name="title" required placeholder="Contoh: 2025 LOOKBOOK atau SUMMER 2025" class="admin-input">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Tahun Kampanye</label>
+                    <input type="text" name="year" value="{{ date('Y') }}" placeholder="2025" class="admin-input">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Cover Image (Opsional)</label>
+                    <input type="file" name="cover_image" accept="image/*" class="admin-input py-1.5 text-xs bg-gray-50 cursor-pointer">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Deskripsi / Konsep Kampanye</label>
+                <textarea name="description" rows="2" placeholder="Konsep visual, inspirasi koleksi lookbook..." class="admin-input resize-none"></textarea>
+            </div>
+
+            <!-- Upload Video Kampanye Section -->
+            <div class="p-3.5 bg-neutral-50 border border-gray-200 rounded-sm space-y-3">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                    <span class="text-xs font-montserrat font-bold uppercase tracking-wider text-black">Video Kampanye Lookbook (Wide Header)</span>
+                </div>
+                <p class="text-[11px] text-gray-500 font-roboto">Video ini akan tampil sebagai video player melebar di paling atas halaman Lookbook pengunjung.</p>
+                <div>
+                    <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Upload File Video (.mp4 / .mov)</label>
+                    <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Atau Path / Link Video</label>
+                    <input type="text" name="video_url" placeholder="Contoh: video/editorial.mp4" class="admin-input text-xs">
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                <button type="button" onclick="closeCreateLookbookModal()" class="btn-outline cursor-pointer">Batal</button>
+                <button type="submit" class="btn-primary cursor-pointer">Buat Album Lookbook</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Manage Lookbook (Per-Album Content & Video) -->
+<div id="modal-manage-lookbook" class="modal-backdrop" onclick="closeManageLookbook()">
+    <div class="modal-box max-w-4xl" onclick="event.stopPropagation()">
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-100">
+            <div>
+                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block" id="manage-lb-year-badge">2025 LOOKBOOK</span>
+                <h3 class="font-montserrat font-extrabold text-xl sm:text-2xl uppercase tracking-[0.12em] text-gray-900" id="manage-lb-title">Lookbook Manager</h3>
+            </div>
+            <button onclick="closeManageLookbook()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
+        </div>
+
+        <div class="space-y-8 max-h-[75vh] overflow-y-auto pr-1">
+            <!-- 1. VIDEO KAMPANYE SECTION -->
+            <div class="border border-gray-200 bg-white p-5 rounded-sm shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
+                    <div>
+                        <h4 class="font-montserrat font-bold text-sm uppercase tracking-wider text-black flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                            <span>Video Kampanye Lookbook (Tampil di Bagian Atas Melebar)</span>
+                        </h4>
+                        <p class="text-xs text-gray-500 font-roboto mt-0.5">Video kampanye yang berputar di banner atas halaman Lookbook ini.</p>
+                    </div>
+                    <span id="manage-lb-video-status" class="text-[10px] font-montserrat font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-gray-100 text-gray-600 self-start sm:self-auto">
+                        Status Video
+                    </span>
+                </div>
+
+                <!-- Video Player Preview -->
+                <div id="manage-lb-video-preview-box" class="w-full aspect-[21/9] bg-black overflow-hidden relative shadow-inner">
+                    <video id="manage-lb-video-player" class="w-full h-full object-cover" controls playsinline>
+                        <source id="manage-lb-video-source" src="" type="video/mp4">
+                        Browser tidak mendukung video player.
+                    </video>
+                </div>
+
+                <!-- Form Ganti / Upload Video -->
+                <form id="manage-lb-video-form" action="" method="POST" enctype="multipart/form-data" class="space-y-3 pt-2">
+                    @csrf
+                    <input type="hidden" name="title" id="manage-lb-input-title" value="">
+                    <input type="hidden" name="year" id="manage-lb-input-year" value="">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Upload File Video Baru (.mp4)</label>
+                            <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" class="admin-input py-1.5 text-xs bg-gray-50 cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Atau Masukkan Path / URL Video</label>
+                            <input type="text" name="video_url" id="manage-lb-input-videourl" placeholder="video/editorial.mp4" class="admin-input text-xs">
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="btn-primary text-xs py-2 px-4 cursor-pointer">
+                            Simpan Perubahan Video
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 2. UPLOAD & LIST FOTO PHOTOSHOOT UNTUK LOOKBOOK INI -->
+            <div class="border border-gray-200 bg-white p-5 rounded-sm shadow-sm space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3">
+                    <div>
+                        <h4 class="font-montserrat font-bold text-sm uppercase tracking-wider text-black flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+                            <span>Foto-Foto Photoshoot di Album Ini</span>
+                        </h4>
+                        <p class="text-xs text-gray-500 font-roboto mt-0.5">Unggah foto-foto photoshoot eksklusif yang menjadi isi dari album Lookbook ini.</p>
+                    </div>
+                </div>
+
+                <!-- Form Upload Foto Baru ke Lookbook ini -->
+                <form id="manage-lb-photo-form" action="" method="POST" enctype="multipart/form-data" class="p-4 bg-neutral-50 border border-gray-200 space-y-3">
+                    @csrf
+                    <span class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-black block">+ Upload Foto Photoshoot ke Lookbook Ini</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                        <div>
+                            <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Pilih File Foto *</label>
+                            <input type="file" name="image" required accept="image/*" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Judul / Tema Foto (Opsional)</label>
+                            <input type="text" name="title" placeholder="Contoh: Look 01 - Leather Jacket" class="admin-input text-xs">
+                        </div>
+                    </div>
+                    <div class="flex justify-end pt-2">
+                        <button type="submit" class="btn-primary text-xs py-2 px-5 cursor-pointer">
+                            Upload Foto ke Album Ini
+                        </button>
+                    </div>
+                </form>
+
+                <!-- List Foto yang sudah ada di Lookbook ini -->
+                <div>
+                    <h5 class="text-xs font-montserrat font-bold uppercase tracking-wider text-gray-600 mb-3">
+                        Daftar Foto Terunggah (<span id="manage-lb-photo-count">0</span> foto):
+                    </h5>
+                    <div id="manage-lb-photos-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-4 mt-4 border-t border-gray-100 flex justify-end">
+            <button type="button" onclick="closeManageLookbook()" class="btn-outline cursor-pointer">Tutup</button>
+        </div>
+    </div>
+</div>
+
+{{-- ══════════════════════════════════════════════════════════════
      JAVASCRIPT
 ══════════════════════════════════════════════════════════════ --}}
 <script>
+    const adminLookbooksData = @json($lookbooks);
+
     // ── Section switcher ────────────────────────────────────────
     function showSection(name) {
         const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings'];
@@ -1395,12 +1702,141 @@
 
     // ── Media tab switcher ──────────────────────────────────────
     function switchMediaTab(tab) {
-        ['carousel','footage'].forEach(t => {
+        ['carousel','footage','lookbook'].forEach(t => {
             const pane = document.getElementById('media-tab-' + t);
             const btn  = document.getElementById('tab-' + t);
             if (pane) pane.classList.toggle('hidden', t !== tab);
             if (btn)  btn.classList.toggle('active', t === tab);
         });
+    }
+
+    // ── Lookbook modal helpers ──────────────────────────────────
+    function openCreateLookbookModal() {
+        document.getElementById('modal-create-lookbook').classList.add('open');
+    }
+
+    function closeCreateLookbookModal() {
+        document.getElementById('modal-create-lookbook').classList.remove('open');
+    }
+
+    function openManageLookbook(id) {
+        const lb = (adminLookbooksData || []).find(l => l.id == id);
+        if (!lb) return;
+
+        // Populate basic headers
+        document.getElementById('manage-lb-title').innerText = lb.title;
+        document.getElementById('manage-lb-year-badge').innerText = (lb.year || '2025') + ' LOOKBOOK';
+        document.getElementById('manage-lb-input-title').value = lb.title;
+        document.getElementById('manage-lb-input-year').value = lb.year || '2025';
+        document.getElementById('manage-lb-input-videourl').value = lb.video_url || '';
+
+        // Form actions
+        document.getElementById('manage-lb-video-form').action = '/admin/lookbooks/' + lb.id;
+        document.getElementById('manage-lb-photo-form').action = '/admin/lookbooks/' + lb.id + '/photos';
+
+        // Video Player
+        const videoPlayer = document.getElementById('manage-lb-video-player');
+        const videoSource = document.getElementById('manage-lb-video-source');
+        const statusBadge = document.getElementById('manage-lb-video-status');
+
+        if (lb.video_url) {
+            statusBadge.innerText = 'Video Aktif';
+            statusBadge.className = 'text-[10px] font-montserrat font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-emerald-100 text-emerald-800';
+            let vSrc = lb.video_url;
+            if (!vSrc.startsWith('http') && !vSrc.startsWith('/')) {
+                vSrc = vSrc.startsWith('video/') ? '/' + vSrc : '/storage/' + vSrc;
+            }
+            videoSource.src = vSrc;
+            videoPlayer.load();
+        } else {
+            statusBadge.innerText = 'Belum Ada Video';
+            statusBadge.className = 'text-[10px] font-montserrat font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-gray-100 text-gray-600';
+            videoSource.src = '';
+            videoPlayer.load();
+        }
+
+        // Photos Grid
+        const grid = document.getElementById('manage-lb-photos-grid');
+        const countEl = document.getElementById('manage-lb-photo-count');
+        const photos = lb.fotoshoots || [];
+        countEl.innerText = photos.length;
+
+        grid.innerHTML = '';
+        if (photos.length === 0) {
+            grid.innerHTML = '<div class="col-span-full py-8 text-center text-xs text-gray-400 font-roboto bg-gray-50 border border-gray-100">Belum ada foto yang diunggah di album ini.</div>';
+        } else {
+            photos.forEach(p => {
+                const pSrc = p.image.startsWith('http') || p.image.startsWith('/') ? p.image : (p.image.startsWith('lookbooks') ? '/storage/' + p.image : '/' + p.image);
+                grid.innerHTML += `
+                    <div class="bg-neutral-50 border border-gray-200 overflow-hidden flex flex-col justify-between group">
+                        <div class="aspect-[3/4] bg-neutral-200 overflow-hidden relative">
+                            <img src="${pSrc}" alt="${p.title || ''}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
+                                <span class="text-white text-[10px] font-montserrat font-bold uppercase tracking-wider">${p.title || 'Photoshoot'}</span>
+                            </div>
+                        </div>
+                        <div class="p-2 border-t border-gray-200 flex items-center justify-between bg-white">
+                            <span class="text-[9px] text-gray-400 font-mono truncate max-w-[80px]">${p.title || '#'+p.id}</span>
+                            <form action="/admin/lookbooks/photos/${p.id}" method="POST" onsubmit="return confirm('Hapus foto ini dari album?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-[10px] text-red-600 hover:text-red-800 font-montserrat font-bold uppercase tracking-wider cursor-pointer">
+                                    Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('modal-manage-lookbook').classList.add('open');
+    }
+
+    function closeManageLookbook() {
+        const videoPlayer = document.getElementById('manage-lb-video-player');
+        if (videoPlayer) videoPlayer.pause();
+        document.getElementById('modal-manage-lookbook').classList.remove('open');
+    }
+
+    // ── Product Origin Switcher (Notisse Original vs Artist Collab) ─
+    function toggleProductOriginType(type) {
+        const isCollab = (type === 'collab');
+        const container = document.getElementById('p-artist-container');
+        const artistInput = document.getElementById('p-artist');
+        const hint = document.getElementById('p-artist-hint');
+        const radNotisse = document.getElementById('origin-type-notisse');
+        const radCollab = document.getElementById('origin-type-collab');
+
+        if (radNotisse) radNotisse.checked = !isCollab;
+        if (radCollab) radCollab.checked = isCollab;
+
+        if (isCollab) {
+            if (container) {
+                container.classList.remove('opacity-50', 'pointer-events-none');
+            }
+            if (artistInput) {
+                if (artistInput.value === 'Notisse Original') artistInput.value = '';
+                artistInput.placeholder = 'Pilih atau ketik nama seniman kolaborator...';
+                artistInput.focus();
+            }
+            if (hint) hint.innerText = 'Pilih dari seniman yang terdaftar atau ketik nama baru.';
+        } else {
+            if (container) {
+                container.classList.add('opacity-50', 'pointer-events-none');
+            }
+            if (artistInput) {
+                artistInput.value = 'Notisse Original';
+            }
+            if (hint) hint.innerText = 'Produk in-house label resmi Notisse.';
+        }
+    }
+
+    function setDefaultProductDescription() {
+        const descEl = document.getElementById('p-desc');
+        if (descEl) {
+            descEl.value = "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting";
+        }
     }
 
     // ── Image preview ───────────────────────────────────────────
@@ -1423,6 +1859,9 @@
         document.getElementById('product-form').reset();
         document.getElementById('form-method').disabled = true;
 
+        toggleProductOriginType('notisse');
+        setDefaultProductDescription();
+
         ['preview-front','preview-back','preview-footage','preview-sizechart'].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.classList.add('hidden'); el.src = ''; }
@@ -1439,9 +1878,15 @@
 
         document.getElementById('p-name').value   = name;
         document.getElementById('p-price').value  = price;
-        document.getElementById('p-desc').value   = desc || '';
+        document.getElementById('p-desc').value   = desc || "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting";
         document.getElementById('p-specs').value  = specs || '';
-        document.getElementById('p-artist').value = artist || '';
+
+        if (!artist || artist === 'Notisse Original') {
+            toggleProductOriginType('notisse');
+        } else {
+            toggleProductOriginType('collab');
+            document.getElementById('p-artist').value = artist;
+        }
 
         // Pre-fill Image Previews if exist
         setPreviewImage('preview-front', frontImg);
@@ -1646,6 +2091,7 @@
             closeArtworkModal();
             closeEditorialModal();
             closeMediaModal();
+            closeLookbookModal();
         }
     });
 </script>

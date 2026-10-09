@@ -208,7 +208,7 @@
                     <!-- SECTION 2: SHIPPING DESTINATION -->
                     <div class="space-y-4">
                         <div class="flex items-center justify-between border-b border-gray-100 pb-2">
-                            <h2 class="text-sm font-bold font-montserrat uppercase tracking-[0.15em] text-black">2. Alamat Pengiriman (Biteship)</h2>
+                            <h2 class="text-sm font-bold font-montserrat uppercase tracking-[0.15em] text-black">2. Alamat Pengiriman</h2>
                             <span class="text-[11px] text-emerald-600 font-montserrat font-bold uppercase tracking-wider">Ekspedisi Terintegrasi</span>
                         </div>
 
@@ -310,8 +310,8 @@
                     </div>
                     <div class="flex justify-between text-gray-600">
                         <div class="space-y-0.5">
-                            <span>Ongkos Kirim (Biteship)</span>
-                            <p class="text-[10px] text-gray-400">JNE, J&T, SiCepat, Anteraja, GoSend</p>
+                            <span>Ongkos Kirim</span>
+                            <p class="text-[10px] text-gray-400">JNE, J&T, SiCepat, Anteraja</p>
                         </div>
                         <span class="text-[11px] font-montserrat uppercase tracking-wider text-gray-500 italic">Dihitung Otomatis</span>
                     </div>
