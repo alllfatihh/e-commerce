@@ -243,10 +243,17 @@
         </a>
 
         <a href="#section-offerings" onclick="showSection('offerings')"
-           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
+           class="nav-link flex items-center justify-between px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
            id="nav-offerings">
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            <span>Artwork Offerings</span>
+            <span class="flex items-center gap-3">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <span>Artwork Offerings</span>
+            </span>
+            @if(($stats['total_offerings'] ?? 0) > 0)
+                <span class="bg-accentYellow text-black font-extrabold text-[10px] px-2 py-0.5 rounded-full font-montserrat">
+                    {{ $stats['total_offerings'] }}
+                </span>
+            @endif
         </a>
     </nav>
 
@@ -295,7 +302,7 @@
     </header>
 
     <!-- ── STAT CARDS ───────────────────────────────────────────── -->
-    <div class="px-8 pt-8 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+    <div class="px-8 pt-8 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         <div class="bg-white border border-gray-200 p-5 section-card shadow-sm">
             <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Total Products</p>
             <p class="font-montserrat font-extrabold text-2xl text-brandDark">{{ $stats['total_products'] ?? $products->count() }}</p>
@@ -317,6 +324,11 @@
             <span class="text-[10px] text-gray-400 font-roboto mt-0.5 block">Karya seni galeri</span>
         </div>
         <div class="bg-white border border-gray-200 p-5 section-card shadow-sm" style="animation-delay:0.2s">
+            <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Artwork Offers</p>
+            <p class="font-montserrat font-extrabold text-2xl text-brandDark">{{ $stats['total_offerings'] ?? $offerings->count() }}</p>
+            <span class="text-[10px] text-gray-400 font-roboto mt-0.5 block">Penawaran kolektor</span>
+        </div>
+        <div class="bg-white border border-gray-200 p-5 section-card shadow-sm" style="animation-delay:0.25s">
             <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Revenue (IDR)</p>
             <p class="font-montserrat font-extrabold text-xl text-brandDark">
                 Rp {{ number_format($stats['paid_revenue'] ?? $orders->where('status','paid')->sum('total_amount'), 0, ',', '.') }}
@@ -887,74 +899,76 @@
         </section>
 
         <!-- ==============================
-             SECTION: OFFERINGS
+             SECTION 6: OFFERINGS
         =============================== -->
-        <div id="section-offerings" class="section-content hidden">
-            <div class="mb-8">
-                <h1 class="text-3xl font-montserrat font-extrabold uppercase tracking-tight text-brandDark mb-2">Artwork Offerings</h1>
-                <p class="text-sm font-roboto text-gray-500">Kelola dan tinjau semua penawaran karya seni dari pelanggan kolaborator.</p>
+        <section id="section-offerings" class="section-card hidden">
+            <div class="flex justify-between items-center mb-5">
+                <div>
+                    <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Artwork Offerings</h2>
+                    <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola dan tinjau semua penawaran karya seni fisik dari kolektor dan pelanggan.</p>
+                </div>
             </div>
 
-            <div class="table-container">
-                <table class="w-full text-left text-sm font-roboto">
-                    <thead>
-                        <tr>
-                            <th class="w-16 text-center">ID</th>
-                            <th>Reference / Tanggal</th>
-                            <th>User (Pembeli)</th>
-                            <th>Karya & Artis</th>
-                            <th>Harga Tawaran</th>
-                            <th>Status</th>
-                            <th class="text-right">Aksi</th>
+            <div class="bg-white border border-gray-200 overflow-x-auto shadow-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead class="border-b border-gray-200 bg-gray-50">
+                        <tr class="text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-500">
+                            <th class="px-5 py-3.5 w-16 text-center">ID</th>
+                            <th class="px-5 py-3.5">Reference / Tanggal</th>
+                            <th class="px-5 py-3.5">User (Pembeli)</th>
+                            <th class="px-5 py-3.5">Karya & Artis</th>
+                            <th class="px-5 py-3.5">Harga Tawaran</th>
+                            <th class="px-5 py-3.5">Status</th>
+                            <th class="px-5 py-3.5 text-right">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-100">
                         @forelse($offerings as $offer)
-                            <tr class="hover:bg-neutral-50 border-b border-gray-100 last:border-0 transition-colors">
-                                <td class="text-center font-bold">{{ $offer->id }}</td>
-                                <td>
-                                    <div class="font-bold text-black">{{ $offer->reference_number }}</div>
-                                    <div class="text-[10px] text-gray-400 mt-1 uppercase">{{ $offer->created_at->format('d M Y, H:i') }}</div>
+                            <tr class="hover:bg-neutral-50 transition-colors">
+                                <td class="px-5 py-4 text-center font-bold text-xs">{{ $offer->id }}</td>
+                                <td class="px-5 py-4">
+                                    <div class="font-bold text-black text-xs font-montserrat">{{ $offer->reference_number }}</div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5 uppercase font-roboto">{{ $offer->created_at->format('d M Y, H:i') }}</div>
                                 </td>
-                                <td>
-                                    <div class="font-bold">{{ $offer->user->name ?? 'Guest' }}</div>
-                                    <div class="text-xs text-gray-500">{{ $offer->user->email ?? '-' }}</div>
+                                <td class="px-5 py-4">
+                                    <div class="font-bold text-xs text-gray-900">{{ $offer->user->name ?? 'Guest' }}</div>
+                                    <div class="text-[11px] text-gray-400 font-roboto">{{ $offer->user->email ?? '-' }}</div>
                                 </td>
-                                <td>
-                                    <div class="font-bold">{{ $offer->artwork->title ?? 'Deleted Artwork' }}</div>
-                                    <div class="text-xs text-gray-500">{{ $offer->artwork->artist->name ?? '-' }}</div>
+                                <td class="px-5 py-4">
+                                    <div class="font-bold text-xs text-gray-900">{{ $offer->artwork->title ?? 'Deleted Artwork' }}</div>
+                                    <div class="text-[11px] text-gray-500 font-roboto">{{ $offer->artwork->artist->name ?? '-' }}</div>
                                 </td>
-                                <td class="font-montserrat font-bold text-brandDark">
+                                <td class="px-5 py-4 font-montserrat font-bold text-xs text-brandDark">
                                     Rp {{ number_format($offer->offering_price, 0, ',', '.') }}
                                 </td>
-                                <td>
-                                    <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider
-                                        {{ $offer->status == 'Diterima' ? 'bg-emerald-100 text-emerald-700' :
-                                           ($offer->status == 'Ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
+                                <td class="px-5 py-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider
+                                        {{ $offer->status == 'Diterima' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                                           ($offer->status == 'Ditolak' ? 'bg-red-100 text-red-800 border border-red-200' : 'bg-amber-100 text-amber-800 border border-amber-200') }}">
                                         {{ $offer->status }}
                                     </span>
                                 </td>
-                                <td class="text-right">
-                                    <form action="/admin/offerings/{{ $offer->id }}/status" method="POST" class="inline-flex items-center gap-2">
+                                <td class="px-5 py-4 text-right">
+                                    <form action="/admin/offerings/{{ $offer->id }}/status" method="POST" class="inline-flex items-center gap-2 justify-end">
                                         @csrf
                                         <select name="status" class="admin-input py-1 text-xs" style="padding-top: 0.25rem; padding-bottom: 0.25rem; width: auto;">
                                             <option value="Dalam Tinjauan Kurasi" {{ $offer->status == 'Dalam Tinjauan Kurasi' ? 'selected' : '' }}>Dalam Tinjauan</option>
                                             <option value="Diterima" {{ $offer->status == 'Diterima' ? 'selected' : '' }}>Diterima</option>
                                             <option value="Ditolak" {{ $offer->status == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
                                         </select>
-                                        <button type="submit" class="btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;">Update</button>
+                                        <button type="submit" class="btn-primary" style="padding: 0.25rem 0.6rem; font-size: 0.7rem;">Update</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-12 text-gray-400">Belum ada penawaran karya seni.</td>
+                                <td colspan="7" class="px-5 py-12 text-center text-sm text-gray-400 font-roboto">Belum ada penawaran karya seni.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
     </main>
 </div>
@@ -1356,13 +1370,14 @@
 <script>
     // ── Section switcher ────────────────────────────────────────
     function showSection(name) {
-        const sections = ['products', 'artists', 'artworks', 'media', 'orders'];
+        const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings'];
         const titles = {
-            'products': 'Products Catalog Management',
-            'artists':  'Artists & Collaborators Management',
-            'artworks': 'Artworks & Artist Editorial Management',
-            'media':    'Site Visual Media (Hero & Lookbook)',
-            'orders':   'Customer Orders & Transactions'
+            'products':  'Products Catalog Management',
+            'artists':   'Artists & Collaborators Management',
+            'artworks':  'Artworks & Artist Editorial Management',
+            'media':     'Site Visual Media (Hero & Lookbook)',
+            'orders':    'Customer Orders & Transactions',
+            'offerings': 'Artwork Offerings Management'
         };
 
         sections.forEach(s => {
