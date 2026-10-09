@@ -241,6 +241,13 @@
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17H5a2 2 0 0 0-2 2v2h14v-2a2 2 0 0 0-2-2h-4z"/><path d="M12 12V3"/><path d="M8 7l4-4 4 4"/></svg>
             <span>Orders</span>
         </a>
+
+        <a href="#section-offerings" onclick="showSection('offerings')"
+           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
+           id="nav-offerings">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span>Artwork Offerings</span>
+        </a>
     </nav>
 
     <!-- Bottom links -->
@@ -878,6 +885,76 @@
                 </table>
             </div>
         </section>
+
+        <!-- ==============================
+             SECTION: OFFERINGS
+        =============================== -->
+        <div id="section-offerings" class="section-content hidden">
+            <div class="mb-8">
+                <h1 class="text-3xl font-montserrat font-extrabold uppercase tracking-tight text-brandDark mb-2">Artwork Offerings</h1>
+                <p class="text-sm font-roboto text-gray-500">Kelola dan tinjau semua penawaran karya seni dari pelanggan kolaborator.</p>
+            </div>
+
+            <div class="table-container">
+                <table class="w-full text-left text-sm font-roboto">
+                    <thead>
+                        <tr>
+                            <th class="w-16 text-center">ID</th>
+                            <th>Reference / Tanggal</th>
+                            <th>User (Pembeli)</th>
+                            <th>Karya & Artis</th>
+                            <th>Harga Tawaran</th>
+                            <th>Status</th>
+                            <th class="text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($offerings as $offer)
+                            <tr class="hover:bg-neutral-50 border-b border-gray-100 last:border-0 transition-colors">
+                                <td class="text-center font-bold">{{ $offer->id }}</td>
+                                <td>
+                                    <div class="font-bold text-black">{{ $offer->reference_number }}</div>
+                                    <div class="text-[10px] text-gray-400 mt-1 uppercase">{{ $offer->created_at->format('d M Y, H:i') }}</div>
+                                </td>
+                                <td>
+                                    <div class="font-bold">{{ $offer->user->name ?? 'Guest' }}</div>
+                                    <div class="text-xs text-gray-500">{{ $offer->user->email ?? '-' }}</div>
+                                </td>
+                                <td>
+                                    <div class="font-bold">{{ $offer->artwork->title ?? 'Deleted Artwork' }}</div>
+                                    <div class="text-xs text-gray-500">{{ $offer->artwork->artist->name ?? '-' }}</div>
+                                </td>
+                                <td class="font-montserrat font-bold text-brandDark">
+                                    Rp {{ number_format($offer->offering_price, 0, ',', '.') }}
+                                </td>
+                                <td>
+                                    <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider
+                                        {{ $offer->status == 'Diterima' ? 'bg-emerald-100 text-emerald-700' :
+                                           ($offer->status == 'Ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
+                                        {{ $offer->status }}
+                                    </span>
+                                </td>
+                                <td class="text-right">
+                                    <form action="/admin/offerings/{{ $offer->id }}/status" method="POST" class="inline-flex items-center gap-2">
+                                        @csrf
+                                        <select name="status" class="admin-input py-1 text-xs" style="padding-top: 0.25rem; padding-bottom: 0.25rem; width: auto;">
+                                            <option value="Dalam Tinjauan Kurasi" {{ $offer->status == 'Dalam Tinjauan Kurasi' ? 'selected' : '' }}>Dalam Tinjauan</option>
+                                            <option value="Diterima" {{ $offer->status == 'Diterima' ? 'selected' : '' }}>Diterima</option>
+                                            <option value="Ditolak" {{ $offer->status == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                        </select>
+                                        <button type="submit" class="btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-12 text-gray-400">Belum ada penawaran karya seni.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </main>
 </div>

@@ -44,6 +44,7 @@ Route::delete('/admin/editorials/{id}', [AdminController::class, 'deleteEditoria
 Route::post('/admin/artists', [AdminController::class, 'storeArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::match(['post', 'put'], '/admin/artists/{id}', [AdminController::class, 'updateArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::delete('/admin/artists/{id}', [AdminController::class, 'deleteArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/admin/offerings/{id}/status', [AdminController::class, 'updateOfferingStatus'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 // Cart Routes
 use App\Http\Controllers\CartController;

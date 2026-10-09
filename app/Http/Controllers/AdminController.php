@@ -11,6 +11,7 @@ use App\Models\Fotoshoot;
 use App\Models\Artist;
 use App\Models\Artwork;
 use App\Models\Editorial;
+use App\Models\ArtworkOffering;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -26,6 +27,7 @@ class AdminController extends Controller
         $artists = Artist::with(['artworks', 'editorials'])->orderBy('id', 'desc')->get();
         $artworks = Artwork::with('artist')->orderBy('id', 'desc')->get();
         $editorials = Editorial::with('artist')->orderBy('id', 'desc')->get();
+        $offerings = ArtworkOffering::with(['user', 'artwork.artist'])->orderBy('id', 'desc')->get();
 
         $stats = [
             'total_products'   => $products->count(),
@@ -34,10 +36,11 @@ class AdminController extends Controller
             'total_artists'    => $artists->count(),
             'total_artworks'   => $artworks->count(),
             'total_editorials' => $editorials->count(),
+            'total_offerings'  => $offerings->count(),
             'paid_revenue'     => Order::where('status', 'paid')->sum('total_amount'),
         ];
 
-        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'stats'));
+        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'stats'));
     }
 
     // ─── Products ─────────────────────────────────────────────
@@ -367,5 +370,20 @@ class AdminController extends Controller
         Artisan::call('biteship:sync-products');
         $output = Artisan::output();
         return redirect()->back()->with('success', 'Sinkronisasi Biteship Selesai: ' . $output);
+    }
+
+    // ─── Artwork Offerings ─────────────────────────────────────
+    public function updateOfferingStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string'
+        ]);
+
+        $offering = ArtworkOffering::findOrFail($id);
+        $offering->update([
+            'status' => $request->status
+        ]);
+
+        return redirect('/admin')->with('success', 'Status penawaran karya berhasil diperbarui!');
     }
 }
