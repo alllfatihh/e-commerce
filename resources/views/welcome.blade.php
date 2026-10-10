@@ -3654,13 +3654,13 @@
         window.addEventListener('load', () => {
             const loader = document.getElementById('global-loader');
             if (loader) {
-                // Ensure the animation has time to play
+                // Ensure the animation has time to play (total duration is ~2.4s)
                 setTimeout(() => {
                     loader.classList.add('hidden-loader');
                     setTimeout(() => {
                         loader.style.display = 'none';
                     }, 600); // match CSS transition duration
-                }, 1500); 
+                }, 2400); 
             }
         });
 
