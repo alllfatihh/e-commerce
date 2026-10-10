@@ -10,10 +10,12 @@ Route::get('/', function () {
     $products = Product::with('stocks')->get();
     $fotoshoots = Fotoshoot::all();
     $artists = \App\Models\Artist::with(['artworks', 'editorials'])->get();
+    $editorials = \App\Models\Editorial::with('artist')->latest()->get();
+    $lookbooks = \App\Models\Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
     $settings = \App\Models\SiteSetting::pluck('value', 'key')->toArray();
     $newcomer = \App\Models\Artist::where('is_newcomer', true)->first();
     
-    return view('welcome', compact('products', 'fotoshoots', 'artists', 'settings', 'newcomer'));
+    return view('welcome', compact('products', 'fotoshoots', 'artists', 'editorials', 'lookbooks', 'settings', 'newcomer'));
 });
 
 // Seamless Auth & Google Login
@@ -45,6 +47,11 @@ Route::post('/admin/artists', [AdminController::class, 'storeArtist'])->withoutM
 Route::match(['post', 'put'], '/admin/artists/{id}', [AdminController::class, 'updateArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::delete('/admin/artists/{id}', [AdminController::class, 'deleteArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::post('/admin/offerings/{id}/status', [AdminController::class, 'updateOfferingStatus'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/admin/lookbooks', [AdminController::class, 'storeLookbook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::match(['post', 'put'], '/admin/lookbooks/{id}', [AdminController::class, 'updateLookbook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::delete('/admin/lookbooks/{id}', [AdminController::class, 'deleteLookbook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/admin/lookbooks/{id}/photos', [AdminController::class, 'storeLookbookPhoto'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::delete('/admin/lookbooks/photos/{id}', [AdminController::class, 'deleteLookbookPhoto'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 // Cart Routes
 use App\Http\Controllers\CartController;

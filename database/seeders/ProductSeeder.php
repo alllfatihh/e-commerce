@@ -21,7 +21,7 @@ class ProductSeeder extends Seeder
                 'back_image'       => 'footage-baju-belakang.jpg',
                 'footage_image'    => 'footagebaju2.jpg',
                 'size_chart_image' => 'size chart 1.png',
-                'description'      => 'Heavyweight 24s Cotton Combed construction. High-density screenprinted artwork on back and chest celebrating contemporary urban folklore.',
+                'description'      => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
                 'specs'            => '100% Heavyweight 24s Cotton Combed (220 GSM) • Boxy Drop Shoulder Fit • Plastisol High-Density Screenprint • Pre-shrunk Fabric',
                 'artist'           => 'Mustafa Alatas'
             ]
@@ -36,7 +36,7 @@ class ProductSeeder extends Seeder
                 'back_image'       => 'footage-baju-belakang.jpg',
                 'footage_image'    => 'footagebaju2.jpg',
                 'size_chart_image' => 'size chart 1.png',
-                'description'      => 'Premium muscle tank crafted for relaxed everyday layering and brutalist silhouettes.',
+                'description'      => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
                 'specs'            => 'Cotton Rib Knit • Raw Hem Cut • Tailored Armholes • Pre-washed for Soft Vintage Feel',
                 'artist'           => 'Asep Suhendar'
             ]
@@ -51,9 +51,9 @@ class ProductSeeder extends Seeder
                 'back_image'       => 'footage-baju-belakang.jpg',
                 'footage_image'    => 'footagebaju2.jpg',
                 'size_chart_image' => 'size chart 1.png',
-                'description'      => 'A relaxed, oversized fit tailored shirt made from breathable Japanese poplin cotton.',
+                'description'      => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
                 'specs'            => 'Premium Poplin Cotton • Mother of Pearl Buttons • Relaxed Drape Silhouette • Cuban Collar',
-                'artist'           => 'Raden Asepo'
+                'artist'           => 'Notisse Original'
             ]
         );
 
@@ -66,9 +66,9 @@ class ProductSeeder extends Seeder
                 'back_image'       => 'footage-baju-belakang.jpg',
                 'footage_image'    => 'footagebaju2.jpg',
                 'size_chart_image' => 'size chart 1.png',
-                'description'      => 'Sophisticated collarless leather blazer for a sleek, sculptural and modern look.',
+                'description'      => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
                 'specs'            => 'Vegan Full-Grain Leather • Cupro Satin Lining • Minimalist Hidden Magnetic Fasteners • Structured Shoulders',
-                'artist'           => 'Mustafa Alatas'
+                'artist'           => 'Notisse Original'
             ]
         );
     }
