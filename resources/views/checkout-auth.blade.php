@@ -72,9 +72,21 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #f9f9f9; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; }
+
+        #global-loader.hidden-loader {
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-white">
+
+    <!-- GLOBAL LOADING SCREEN -->
+    <div id="global-loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-700">
+        <img src="{{ asset('motion.gif') }}" alt="Loading..." class="w-24 md:w-32 h-auto opacity-90">
+    </div>
 
     <!-- TOP HEADER -->
     <header class="border-b border-gray-200 bg-white sticky top-0 z-30">
@@ -778,6 +790,20 @@
 
         // Initialize cart on page load
         document.addEventListener('DOMContentLoaded', initCart);
+
+        // Hide Global Loader after GIF animation completes
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                // Ensure the animation has time to play
+                setTimeout(() => {
+                    loader.classList.add('hidden-loader');
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                    }, 600);
+                }, 2500);
+            }
+        });
     </script>
 </body>
 </html>

@@ -603,11 +603,23 @@
         #toast-container {
             z-index: 999 !important;
         }
+        
+        #global-loader.hidden-loader {
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        }
     </style>
 </head>
 
 <body
     class="min-h-screen flex flex-col justify-between relative bg-white text-black antialiased selection:bg-black selection:text-white">
+
+    <!-- GLOBAL LOADING SCREEN -->
+    <div id="global-loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-700">
+        <img src="{{ asset('motion.gif') }}" alt="Loading..." class="w-24 md:w-32 h-auto opacity-90">
+    </div>
 
     <!-- GLOBAL PERSISTENT HEADER (A24-INSPIRED MINIMALIST LUXURY) -->
     <header id="main-header"
@@ -3635,6 +3647,20 @@
                         fetchShippingRates(loggedInUser.area_id);
                     }
                 }, 300);
+            }
+        });
+
+        // Hide Global Loader after GIF animation completes
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('global-loader');
+            if (loader) {
+                // Ensure the animation has time to play (e.g. 2.5 seconds)
+                setTimeout(() => {
+                    loader.classList.add('hidden-loader');
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                    }, 600); // match CSS transition duration
+                }, 2500); 
             }
         });
 
