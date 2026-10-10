@@ -618,7 +618,7 @@
 
     <!-- GLOBAL LOADING SCREEN -->
     <div id="global-loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-700">
-        <img src="{{ asset('motion.gif') }}" alt="Loading..." class="w-24 md:w-32 h-auto opacity-90">
+        <img src="{{ asset('motion.gif') }}" alt="Loading..." class="w-32 md:w-48 h-auto opacity-90">
     </div>
 
     <!-- GLOBAL PERSISTENT HEADER (A24-INSPIRED MINIMALIST LUXURY) -->
