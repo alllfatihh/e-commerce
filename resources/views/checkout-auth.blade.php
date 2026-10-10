@@ -801,7 +801,7 @@
                     setTimeout(() => {
                         loader.style.display = 'none';
                     }, 600);
-                }, 2500);
+                }, 1500);
             }
         });
     </script>
