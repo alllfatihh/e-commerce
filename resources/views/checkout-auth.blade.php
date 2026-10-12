@@ -73,20 +73,49 @@
         ::-webkit-scrollbar-track { background: #f9f9f9; }
         ::-webkit-scrollbar-thumb { background: #d1d5db; }
 
-        #global-loader.hidden-loader {
-            opacity: 0;
-            pointer-events: none;
-            visibility: hidden;
-            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        /* CUSTOM BRUSH BUTTON WITH ICON.PNG BACKGROUND */
+        .btn-brush {
+            font-family: 'Montserrat', sans-serif !important;
+            background-image: url('{{ asset('icon.png') }}');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: transparent;
+            color: #ffffff !important;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 14px 38px;
+            min-height: 48px;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            user-select: none;
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .btn-brush:hover {
+            transform: scale(1.03) rotate(-0.5deg);
+            opacity: 0.95;
+            color: #ffffff !important;
+        }
+
+        .btn-brush:active {
+            transform: scale(0.96) rotate(0.4deg);
+            color: #ffffff !important;
+        }
+
+        .btn-brush:disabled {
+            cursor: not-allowed;
+            transform: none !important;
+            opacity: 0.65;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col bg-white">
-
-    <!-- GLOBAL LOADING SCREEN -->
-    <div id="global-loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-700">
-        <img src="{{ asset('motion.gif') }}" alt="Loading..." class="w-32 md:w-48 h-auto opacity-90">
-    </div>
 
     <!-- TOP HEADER -->
     <header class="border-b border-gray-200 bg-white sticky top-0 z-30">
@@ -280,12 +309,14 @@
                     <input type="hidden" id="area_name">
 
                     <!-- SUBMIT BUTTON -->
-                    <div class="pt-2">
-                        <button type="submit" id="submit-btn"
-                                class="w-full bg-black text-white hover:bg-neutral-800 transition-all duration-200 py-4 px-6 font-montserrat text-xs sm:text-sm font-bold tracking-[0.2em] uppercase flex items-center justify-center space-x-3 shadow-md cursor-pointer group">
-                            <span id="btn-text">LANJUT KE PENGIRIMAN & PEMBAYARAN</span>
-                            <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                        </button>
+                    <div class="pt-4">
+                        <div class="flex justify-center">
+                            <button type="submit" id="submit-btn"
+                                    class="btn-brush w-full text-xs sm:text-sm font-bold tracking-[0.15em] uppercase cursor-pointer font-montserrat flex items-center justify-center space-x-3">
+                                <span id="btn-text">LANJUT KE PENGIRIMAN & PEMBAYARAN</span>
+                                <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
+                            </button>
+                        </div>
                         
                         <div class="mt-4 flex flex-col sm:flex-row items-center justify-between text-[11px] text-gray-400 font-roboto gap-2">
                             <span class="flex items-center space-x-1.5">
@@ -790,20 +821,6 @@
 
         // Initialize cart on page load
         document.addEventListener('DOMContentLoaded', initCart);
-
-        // Hide Global Loader after GIF animation completes
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('global-loader');
-            if (loader) {
-                // Ensure the animation has time to play (total duration is ~2.4s)
-                setTimeout(() => {
-                    loader.classList.add('hidden-loader');
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                    }, 600);
-                }, 2400);
-            }
-        });
     </script>
 </body>
 </html>

@@ -130,7 +130,7 @@
             background-repeat: no-repeat;
             background-position: center;
             background-color: transparent;
-            color: #E2FF00;
+            color: #ffffff !important;
             font-weight: 700;
             letter-spacing: 0.08em;
             padding: 14px 38px;
@@ -149,10 +149,18 @@
         .btn-brush:hover {
             transform: scale(1.05) rotate(-0.8deg);
             opacity: 0.95;
+            color: #ffffff !important;
         }
 
         .btn-brush:active {
             transform: scale(0.95) rotate(0.5deg);
+            color: #ffffff !important;
+        }
+
+        .btn-brush:disabled {
+            cursor: not-allowed;
+            transform: none !important;
+            opacity: 0.65;
         }
 
         .accordion-content {
@@ -604,11 +612,38 @@
             z-index: 999 !important;
         }
         
-        #global-loader.hidden-loader {
-            opacity: 0;
+        /* WIEMER-STYLE PULL-UP PRELOADER */
+        #global-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background-color: #d52c2b;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+            user-select: none;
+            will-change: transform;
+            transition: transform 1.05s cubic-bezier(0.65, 0.01, 0.05, 0.99);
+        }
+
+        #global-loader.pulled-up {
+            transform: translateY(-100%);
             pointer-events: none;
-            visibility: hidden;
-            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        }
+
+        .loader-fade-out {
+            opacity: 0 !important;
+            transform: translateY(-10px) scale(0.98);
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #loader-progress-bar {
+            transform-origin: left center;
+            will-change: transform;
+            transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
         }
     </style>
 </head>
@@ -616,10 +651,128 @@
 <body
     class="min-h-screen flex flex-col justify-between relative bg-white text-black antialiased selection:bg-black selection:text-white">
 
-    <!-- GLOBAL LOADING SCREEN -->
-    <div id="global-loader" class="fixed inset-0 bg-white z-[9999] flex flex-col items-center justify-center transition-opacity duration-700">
-        <img src="{{ asset('motion.gif') }}" alt="Loading..." class="w-32 md:w-48 h-auto opacity-90">
+    <!-- WIEMER-STYLE GLOBAL LOADING SCREEN -->
+    <div id="global-loader">
+        <!-- Center: Motion GIF Animation (No Background, Black Logo) -->
+        <div id="loader-center-content" class="flex-1 flex flex-col items-center justify-center transition-all duration-400 px-4">
+            <img src="{{ asset('motionnobg.gif') }}" alt="Notisse Motion" class="w-36 sm:w-48 md:w-56 h-auto opacity-95 pointer-events-none">
+        </div>
+
+        <!-- Bottom: Black Loading Bar (Flush at bottom edge) -->
+        <div class="w-full h-[3.5px] sm:h-[4px] bg-black/15 relative overflow-hidden">
+            <div id="loader-progress-bar"
+                 class="h-full bg-black"
+                 style="transform: scaleX(0);"></div>
+        </div>
     </div>
+
+    <script>
+        // Immediate Execution of Wiemer-Style Preloader Logic
+        (function initWiemerLoader() {
+            const loader = document.getElementById('global-loader');
+            if (!loader) return;
+
+            const progressBar = document.getElementById('loader-progress-bar');
+            const centerContent = document.getElementById('loader-center-content');
+
+            // Temporarily lock scroll while preloader is active
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
+
+            let isFinishing = false;
+            const duration = 4530; // Matches exact motionnobg.gif animation duration (151 frames * 30ms = 4530ms)
+            let startTimestamp = null;
+            let animationFrameId = null;
+
+            // Smooth natural ease matching the handwriting drawing tempo
+            function progressEase(t) {
+                return t < 0.5 
+                    ? 2 * t * t 
+                    : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            }
+
+            function updateUI(percent) {
+                if (progressBar) {
+                    progressBar.style.transform = `scaleX(${percent / 100})`;
+                }
+            }
+
+            updateUI(0);
+
+            function frameStep(timestamp) {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const elapsed = timestamp - startTimestamp;
+                const rawProgress = Math.min(1, elapsed / duration);
+                const eased = progressEase(rawProgress);
+                const targetPercent = Math.min(100, eased * 100);
+
+                updateUI(targetPercent);
+
+                if (rawProgress < 1) {
+                    animationFrameId = requestAnimationFrame(frameStep);
+                } else {
+                    updateUI(100);
+                    finishLoader();
+                }
+            }
+
+            animationFrameId = requestAnimationFrame(frameStep);
+
+            let finishTimeout1 = null;
+            let finishTimeout2 = null;
+            let finishTimeout3 = null;
+
+            function finishLoader() {
+                if (isFinishing) return;
+                isFinishing = true;
+
+                updateUI(100);
+
+                // Hold briefly when logo animation finishes before curtain pull-up
+                finishTimeout1 = setTimeout(() => {
+                    if (centerContent) centerContent.classList.add('loader-fade-out');
+
+                    // Signature Wiemer Curtain Pull-Up (translates up off-screen)
+                    finishTimeout2 = setTimeout(() => {
+                        loader.classList.add('pulled-up');
+
+                        // Unlock page scroll
+                        document.documentElement.style.overflow = '';
+                        document.body.style.overflow = '';
+
+                        // Remove from layout after slide-up finishes
+                        finishTimeout3 = setTimeout(() => {
+                            loader.style.display = 'none';
+                        }, 1050);
+                    }, 220);
+                }, 180);
+            }
+
+            // Expose a replay helper for testing/previewing
+            window.replayWiemerLoader = function() {
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                clearTimeout(finishTimeout1);
+                clearTimeout(finishTimeout2);
+                clearTimeout(finishTimeout3);
+                loader.style.display = 'flex';
+                loader.classList.remove('pulled-up');
+                updateUI(0);
+                if (centerContent) {
+                    centerContent.classList.remove('loader-fade-out');
+                    const img = centerContent.querySelector('img');
+                    if (img) {
+                        const baseSrc = img.src.split('?')[0];
+                        img.src = baseSrc + '?t=' + Date.now();
+                    }
+                }
+                document.documentElement.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+                isFinishing = false;
+                startTimestamp = null;
+                animationFrameId = requestAnimationFrame(frameStep);
+            };
+        })();
+    </script>
 
     <!-- GLOBAL PERSISTENT HEADER (A24-INSPIRED MINIMALIST LUXURY) -->
     <header id="main-header"
@@ -866,9 +1019,9 @@
                             class="w-full border border-gray-300 px-3.5 py-2 text-sm font-roboto focus:outline-none focus:border-black transition-colors resize-none"></textarea>
                     </div>
 
-                    <div class="pt-2">
+                    <div class="pt-2 flex justify-center">
                         <button type="submit" id="offering-submit-btn"
-                            class="w-full bg-black text-white hover:bg-neutral-800 transition-colors py-3.5 px-6 font-montserrat text-xs sm:text-sm font-bold tracking-[0.2em] uppercase cursor-pointer flex items-center justify-center space-x-2">
+                            class="btn-brush w-full text-xs sm:text-sm font-bold tracking-[0.15em] uppercase cursor-pointer font-montserrat flex items-center justify-center space-x-2">
                             <span>KONFIRMASI AKUISISI KARYA (BUY ARTWORK)</span>
                             <span>&rarr;</span>
                         </button>
@@ -919,9 +1072,9 @@
                     Hasil kurasi penawaran serta instruksi lanjutan akan dikirimkan langsung ke notifikasi akun dan email Anda.
                 </p>
 
-                <div class="pt-2">
+                <div class="pt-2 flex justify-center">
                     <button type="button" onclick="closeArtworkOfferingModal()"
-                        class="w-full bg-black text-white hover:bg-neutral-800 font-montserrat py-3 px-4 text-xs font-semibold tracking-wider uppercase transition-colors cursor-pointer">
+                        class="btn-brush w-full text-xs font-bold tracking-wider uppercase cursor-pointer font-montserrat">
                         Tutup
                     </button>
                 </div>
@@ -968,7 +1121,7 @@
                 </div>
 
                 <!-- OVERLAY MENU PADA CAROUSEL (A24 STYLE) -->
-                <div class="absolute bottom-10 left-12 md:bottom-16 md:left-24 z-20 flex flex-col pointer-events-none">
+                <div class="absolute bottom-10 left-5 sm:left-8 md:bottom-14 md:left-10 lg:left-12 z-20 flex flex-col pointer-events-none">
                     <a href="javascript:void(0)" onclick="document.getElementById('shop-catalog').scrollIntoView({behavior: 'smooth'})"
                         class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
                         <span
@@ -1037,8 +1190,8 @@
         </section>
 
         <!-- VIEW 2: PRODUCT DETAIL PAGE -->
-        <section id="view-product-detail" class="view-page px-6 md:px-12 pt-24 pb-10 max-w-7xl mx-auto">
-            <div class="mb-6">
+        <section id="view-product-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
+            <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
@@ -1046,8 +1199,8 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 items-start">
-                <div class="space-y-8 lg:sticky lg:top-24">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
+                <div class="lg:col-span-5 space-y-8 lg:sticky lg:top-24">
                     <div>
                         <h1 id="pdetail-title"
                             class="text-2xl md:text-3xl font-semibold uppercase tracking-wider text-black font-montserrat">
@@ -1192,7 +1345,7 @@
                     </div>
                 </div>
 
-                <div class="w-full space-y-6">
+                <div class="lg:col-span-7 w-full space-y-6 md:space-y-8">
                     <div class="w-full aspect-[3/4] bg-white overflow-hidden shadow-sm">
                         <img id="pdetail-image" src="{{ asset('footage-baju.jpg') }}" alt="Front View"
                             class="w-full h-full object-cover">
@@ -1210,10 +1363,10 @@
         </section>
 
         <!-- VIEW 3: ARTIST COLLAB LIST PAGE -->
-        <section id="view-artist-collab" class="view-page px-4 md:px-12 pt-20 sm:pt-24 pb-12 max-w-7xl mx-auto">
+        <section id="view-artist-collab" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 sm:pt-24 pb-16">
             <div class="mb-16">
                 <h2 class="text-xl md:text-2xl font-bold mb-6 tracking-wide text-black font-montserrat">Newcomer</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10 mb-8">
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
                         onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')">
                         <img src="{{ asset($newcomer->portrait_image ?? 'masmus.jpeg') }}"
@@ -1256,36 +1409,36 @@
                     </div>
                 </div>
 
-                <div id="artist-collab-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <div id="artist-collab-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-10">
                     @if(isset($artists) && $artists->count() > 0)
                         @foreach($artists as $artItem)
                             @php
                                 $aPhoto = $artItem->photo ? (Str::startsWith($artItem->photo, 'http') ? $artItem->photo : (file_exists(public_path('storage/' . $artItem->photo)) ? asset('storage/' . $artItem->photo) : asset($artItem->photo))) : 'https://placehold.co/500x500/181818/ffffff?text=' . urlencode($artItem->name);
                             @endphp
                             <div class="artist-card group cursor-pointer" data-artist-name="{{ $artItem->name }}" data-artist-city="{{ $artItem->city }}" onclick="openArtistProfile('{{ addslashes($artItem->name) }}', '{{ addslashes($artItem->city) }}')">
-                                <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
+                                <div class="w-full aspect-square bg-gray-200 mb-3.5 overflow-hidden">
                                     <img src="{{ $aPhoto }}"
                                         alt="{{ $artItem->name }}"
                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 </div>
-                                <h4 class="font-bold text-sm md:text-base text-black font-roboto">{{ $artItem->name }}</h4>
-                                <p class="text-xs text-gray-500 font-roboto">{{ $artItem->city ?: 'Indonesia' }}</p>
+                                <h4 class="font-bold text-base md:text-lg text-black font-roboto">{{ $artItem->name }}</h4>
+                                <p class="text-xs md:text-sm text-gray-500 font-roboto mt-0.5">{{ $artItem->city ?: 'Indonesia' }}</p>
                             </div>
                         @endforeach
                     @else
                         <div class="artist-card group cursor-pointer" data-artist-name="Mustafa Alatas" data-artist-city="Temanggung" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')">
-                            <div class="w-full aspect-square bg-gray-200 mb-3 overflow-hidden">
+                            <div class="w-full aspect-square bg-gray-200 mb-3.5 overflow-hidden">
                                 <img src="https://placehold.co/500x500/181818/ffffff?text=Mustafa+Alatas"
                                     alt="Mustafa Alatas"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             </div>
-                            <h4 class="font-bold text-sm md:text-base text-black font-roboto">Mustafa Alatas</h4>
-                            <p class="text-xs text-gray-500 font-roboto">Temanggung</p>
+                            <h4 class="font-bold text-base md:text-lg text-black font-roboto">Mustafa Alatas</h4>
+                            <p class="text-xs md:text-sm text-gray-500 font-roboto mt-0.5">Temanggung</p>
                         </div>
                     @endif
 
                     <!-- Empty State for Artist Search -->
-                    <div id="artist-no-results" class="hidden col-span-2 md:col-span-4 text-center py-12">
+                    <div id="artist-no-results" class="hidden col-span-full text-center py-12">
                         <p class="text-gray-400 text-sm font-roboto">No artist found matching your search.</p>
                     </div>
                 </div>
@@ -1293,8 +1446,8 @@
         </section>
 
         <!-- VIEW 3B: ARTIST PROFILE PAGE -->
-        <section id="view-artist-detail" class="view-page px-6 md:px-12 pt-24 pb-10 max-w-7xl mx-auto">
-            <div class="mb-6">
+        <section id="view-artist-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
+            <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
@@ -1303,13 +1456,13 @@
             </div>
 
             <!-- Artist Header Bio -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start mb-10">
-                <div class="md:col-span-4 aspect-[4/5] bg-gray-200 overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-start mb-10">
+                <div class="md:col-span-4 lg:col-span-3 aspect-[4/5] bg-gray-200 overflow-hidden">
                     <img src="https://placehold.co/600x750/333333/ffffff?text=Mustafa+Alatas" alt="Mustafa Alatas"
                         class="w-full h-full object-cover grayscale">
                 </div>
 
-                <div class="md:col-span-8 space-y-3">
+                <div class="md:col-span-8 lg:col-span-9 space-y-3">
                     <h1 id="artist-profile-name" class="text-2xl md:text-3xl font-bold font-montserrat text-black">
                         Mustafa Alatas</h1>
                     <p id="artist-profile-location" class="text-xs md:text-sm text-gray-400 font-roboto">Temanggung</p>
@@ -1341,7 +1494,7 @@
                     Articles Featuring Artist
                 </h3>
 
-                <div id="artist-editorial-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div id="artist-editorial-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     <!-- Populated dynamically via JS per artist -->
                 </div>
 
@@ -1352,7 +1505,7 @@
 
             <!-- TAB CONTENT 2: ARTWORK GALLERY -->
             <div id="artist-tab-content-artwork" class="hidden space-y-6">
-                <div id="artist-artwork-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                <div id="artist-artwork-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
                     <!-- Populated dynamically via JS per artist -->
                 </div>
 
@@ -1363,8 +1516,8 @@
         </section>
 
         <!-- VIEW 3C: ARTWORK DETAIL PAGE (WITH DIRECT OFFERING ACQUISITION PANEL) -->
-        <section id="view-artist-artwork-detail" class="view-page px-6 md:px-12 pt-24 pb-10 max-w-7xl mx-auto">
-            <div class="mb-6 flex items-center justify-between">
+        <section id="view-artist-artwork-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
+            <div class="mb-4 sm:mb-6 flex items-center justify-between">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
@@ -1376,8 +1529,8 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
-                <div class="md:col-span-7 aspect-[4/3] bg-[#d9d9d9] overflow-hidden shadow-sm relative group cursor-zoom-in"
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
+                <div class="lg:col-span-7 xl:col-span-8 aspect-[4/3] bg-[#d9d9d9] overflow-hidden shadow-sm relative group cursor-zoom-in"
                     onclick="openLightbox(document.getElementById('artwork-detail-image').src, document.getElementById('artwork-title').innerText)">
                     <img id="artwork-detail-image" src="https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View" alt="Full Artwork"
                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
@@ -1387,7 +1540,7 @@
                     </div>
                 </div>
 
-                <div class="md:col-span-5 space-y-4">
+                <div class="lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-24">
                     <div>
                         <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-1">NOTISSE ARTIST COLLABORATION</span>
                         <h2 id="artwork-artist-name" class="text-xl md:text-2xl font-bold font-montserrat text-black">
@@ -1423,13 +1576,15 @@
                             </p>
                         </div>
 
-                        <button onclick="triggerArtworkOfferingCurrent()"
-                            class="w-full bg-black text-white hover:bg-neutral-800 transition-all py-3.5 px-6 font-montserrat text-xs md:text-sm font-bold tracking-[0.2em] uppercase cursor-pointer flex items-center justify-center space-x-2 shadow-md hover:shadow-xl">
-                            <svg class="w-4 h-4 stroke-current" fill="none" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m-6-6h12"/>
-                            </svg>
-                            <span>AJUKAN AKUISISI / BELI ARTWORK</span>
-                        </button>
+                        <div class="w-full flex justify-center">
+                            <button onclick="triggerArtworkOfferingCurrent()"
+                                class="btn-brush w-full text-xs md:text-sm font-bold tracking-[0.15em] uppercase cursor-pointer font-montserrat flex items-center justify-center space-x-2">
+                                <svg class="w-4 h-4 stroke-current text-white" fill="none" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m-6-6h12"/>
+                                </svg>
+                                <span>AJUKAN AKUISISI / BELI ARTWORK</span>
+                            </button>
+                        </div>
 
                         <p class="text-[11px] text-gray-400 font-roboto text-center leading-relaxed">
                             Penawaran yang Anda submit akan dicatat ke sistem Notisse dan diverifikasi langsung oleh tim kurator dan seniman.
@@ -1440,8 +1595,8 @@
         </section>
 
         <!-- VIEW 3C: ALL EDITORIALS ARCHIVE PAGE -->
-        <section id="view-editorials-all" class="view-page px-6 md:px-12 pt-24 pb-16 max-w-7xl mx-auto">
-            <div class="mb-6">
+        <section id="view-editorials-all" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
+            <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
@@ -1458,7 +1613,7 @@
                 </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
                 @forelse($editorials as $ed)
                     @php
                         $edImg = $ed->image ? (Str::startsWith($ed->image, 'http') ? $ed->image : (file_exists(public_path('storage/' . $ed->image)) ? asset('storage/' . $ed->image) : asset($ed->image))) : 'https://placehold.co/600x600/222/fff?text=Editorial';
@@ -1466,9 +1621,6 @@
                     <div onclick="openArtistEditorialDetailById({{ $ed->id }})" class="group cursor-pointer flex flex-col justify-between border border-gray-200 bg-white hover:border-black transition-colors duration-300">
                         <div class="relative w-full aspect-[16/10] bg-neutral-100 overflow-hidden">
                             <img src="{{ $edImg }}" alt="{{ $ed->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            @if($ed->video_url)
-                                <span class="absolute top-3 right-3 bg-black/80 text-white text-[9px] font-montserrat uppercase px-2 py-0.5 tracking-wider">Video</span>
-                            @endif
                         </div>
                         <div class="p-5 flex flex-col justify-between flex-grow space-y-3">
                             <div>
@@ -1499,9 +1651,9 @@
         </section>
 
         <!-- VIEW 3D: EDITORIAL ARTICLE DETAIL PAGE -->
-        <section id="view-artist-editorial-detail" class="view-page px-6 md:px-12 pt-24 pb-16 max-w-7xl mx-auto">
+        <section id="view-artist-editorial-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <!-- Navigation -->
-            <div class="mb-8 border-b border-gray-200 pb-4">
+            <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
@@ -1509,55 +1661,59 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-10 lg:gap-14 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
                 <!-- Left Column: Article Text & Captioned Images -->
-                <div class="md:col-span-6 space-y-6">
+                <div class="lg:col-span-6 space-y-6 md:space-y-7">
                     <div>
-                        <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-1">NOTISSE CURATORIAL ESSAY</span>
-                        <h1 id="editorial-detail-title" class="text-2xl md:text-3xl lg:text-4xl font-bold font-montserrat text-black leading-tight">
+                        <span class="text-xs font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-2">NOTISSE CURATORIAL ESSAY</span>
+                        <h1 id="editorial-detail-title" class="text-2xl sm:text-3xl lg:text-4xl font-bold font-montserrat text-black leading-tight">
                             Mustafa Alatas Menafsir Kuasa dan Sosial dalam Lukisan Figuratif dan Simbolisme
                         </h1>
-                        <p id="editorial-detail-author" class="text-xs text-gray-500 font-roboto mt-2 font-medium">Laksa Dawantara</p>
+                        <p id="editorial-detail-author" class="text-xs sm:text-sm text-gray-500 font-roboto mt-2.5 font-medium">Laksa Dawantara</p>
                     </div>
 
-                    <div id="editorial-detail-content" class="text-sm md:text-base text-gray-700 leading-relaxed font-roboto space-y-4">
+                    <!-- Paragraf 1 (DI ATAS FOTO) -->
+                    <div id="editorial-detail-content-top" class="text-base sm:text-lg md:text-[1.05rem] text-gray-800 leading-relaxed font-roboto space-y-4">
                         <p>
-                            Dokumentasi wacana dan catatan proses berkarya seniman bersama Notisse.
+                            Di balik sapuan kuas yang kasar dan perpaduan pigmen mentah, Mustafa Alatas menyimpan refleksi panjang tentang dinamika kekuasaan dan identitas masyarakat kontemporer.
                         </p>
                     </div>
 
-                    <!-- 2 FOTO DI SEBELAH KIRI (PORTRAIT & ARTWORK) -->
-                    <div class="grid grid-cols-2 gap-4 my-6 pt-4 border-t border-gray-100">
-                        <div>
-                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5 shadow-sm">
-                                <img id="editorial-detail-portrait" src="https://placehold.co/400x500/222/fff?text=Portrait" alt="Portrait"
+                    <!-- 2 FOTO DI SEBELAH KIRI (1 PORTRAIT 3:4 & 1 LANDSCAPE 4:3, SEJAJAR BAWAH & DIPERBESAR) -->
+                    <div class="grid grid-cols-2 gap-5 sm:gap-6 my-7 pt-2 items-end" style="align-items: end;">
+                        <!-- Foto 1: Portrait (3:4) -->
+                        <div class="self-end" style="align-self: end;">
+                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-2.5 shadow-sm">
+                                <img id="editorial-detail-portrait" src="{{ asset('masmus.jpeg') }}" alt="Portrait"
                                     class="w-full h-full object-cover">
                             </div>
-                            <p class="text-[10px] text-gray-400 font-roboto">Dokumentasi kuratorial seniman Notisse.</p>
+                            <p class="text-xs text-gray-500 font-roboto leading-normal">Portrait of Mustafa Alatas.</p>
                         </div>
-                        <div>
-                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-1.5 shadow-sm">
-                                <img id="editorial-detail-artwork" src="https://placehold.co/400x500/444/fff?text=Artwork" alt="Artwork"
+                        <!-- Foto 2: Landscape (4:3) -->
+                        <div class="self-end" style="align-self: end;">
+                            <div class="w-full aspect-[4/3] bg-[#d9d9d9] overflow-hidden mb-2.5 shadow-sm">
+                                <img id="editorial-detail-artwork" src="{{ asset('artwork.jpeg') }}" alt="Artwork"
                                     class="w-full h-full object-cover">
                             </div>
-                            <p class="text-[10px] text-gray-400 font-roboto">Karya seni terkait dalam artikel.</p>
+                            <p class="text-xs text-gray-500 font-roboto leading-normal">Raja Diamuk Massa, 2024. Courtesy of Medium.</p>
                         </div>
+                    </div>
+
+                    <!-- Paragraf 2 (DI BAWAH FOTO) -->
+                    <div id="editorial-detail-content-bottom" class="text-base sm:text-lg md:text-[1.05rem] text-gray-800 leading-relaxed font-roboto space-y-4">
+                        <p>
+                            Dalam kolaborasi perdana bersama atelier Notisse, sang seniman asal Temanggung ini mentransformasi gestur visual dari kanvas fisik menuju medium pakaian berpotongan boxy murni katun 16s. Lukisannya tidak sekadar dipindahkan sebagai sablon, melainkan diolah ulang agar serat benang dan tekstur tinta plastisol menyatu harmonis dengan filosofi artistik Notisse.
+                        </p>
                     </div>
                 </div>
 
-                <!-- Right Column: Full Featured Editorial Video (DIPERBESAR DAN PROMINEN) -->
-                <div id="editorial-video-container" class="md:col-span-6 aspect-[4/5] min-h-[480px] lg:min-h-[580px] bg-black overflow-hidden relative group shadow-2xl sticky top-24">
-                    <video id="editorial-video-player"
-                        class="w-full h-full object-cover"
-                        autoplay loop muted playsinline controls
-                        poster="{{ asset('home.jpg') }}">
-                        <source id="editorial-video-source" src="{{ asset('video/editorial.mp4') }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <!-- Editorial Video Badge -->
-                    <div class="absolute top-3 right-3 pointer-events-none bg-black/75 backdrop-blur-md text-white text-[9px] font-montserrat uppercase px-2.5 py-1 tracking-widest border border-white/20 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-                        <span>Editorial Film</span>
+                <!-- Right Column: Full Featured Editorial Photo (Diperbesar Lebih Luas & Tetap Potret) -->
+                <div class="lg:col-span-6 sticky top-24">
+                    <div class="w-full aspect-[4/5] min-h-[580px] md:min-h-[700px] lg:min-h-[820px] max-h-[88vh] bg-[#d9d9d9] overflow-hidden shadow-2xl border border-black/5">
+                        <img id="editorial-detail-featured"
+                            src="{{ asset('home.jpg') }}"
+                            alt="Editorial Feature"
+                            class="w-full h-full object-cover">
                     </div>
                 </div>
             </div>
@@ -1600,8 +1756,8 @@
         </section>
 
         <!-- VIEW 5: LOOKBOOK DETAIL PAGE WITH WIDE VIDEO AT TOP -->
-        <section id="view-lookbook-detail" class="view-page min-h-screen pt-24 pb-20">
-            <div class="max-w-7xl mx-auto px-6 md:px-12 pt-6 pb-4">
+        <section id="view-lookbook-detail" class="view-page min-h-screen pt-20 md:pt-24 pb-20">
+            <div class="w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-2 pb-4">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
@@ -1627,7 +1783,7 @@
                 </div>
             </div>
 
-            <div class="px-6 md:px-10 max-w-7xl mx-auto">
+            <div class="w-full px-4 sm:px-6 md:px-10 lg:px-12">
                 <div id="lookbook-photos-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12">
                     @foreach($fotoshoots as $foto)
                         <div class="w-full group cursor-pointer" onclick="openLightbox('{{ Str::startsWith($foto->image, 'http') ? $foto->image : (file_exists(public_path('storage/' . $foto->image)) ? asset('storage/' . $foto->image) : asset($foto->image)) }}', '{{ addslashes($foto->title ?? '') }}')">
@@ -2815,9 +2971,8 @@
                         card.className = 'group cursor-pointer';
                         card.onclick = () => openArtistEditorialDetailById(ed.id);
                         card.innerHTML = `
-                            <div class="w-full aspect-square bg-[#d9d9d9] mb-3 overflow-hidden relative">
+                            <div class="w-full aspect-square bg-[#d9d9d9] mb-3 overflow-hidden">
                                 <img src="${edImg}" alt="${ed.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                ${ed.video_url ? '<span class="absolute top-2.5 right-2.5 bg-black/80 text-white text-[9px] font-montserrat uppercase px-2 py-0.5 tracking-wider">Video</span>' : ''}
                             </div>
                             <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline leading-snug">
                                 ${ed.title}
@@ -3201,39 +3356,72 @@
                 const authorEl = document.getElementById('editorial-detail-author');
                 if (authorEl) authorEl.innerText = (foundEd.author || 'Tim Editorial Notisse') + (foundArtist ? ' • Featuring ' + foundArtist.name : '');
 
-                const contentContainer = document.getElementById('editorial-detail-content');
-                if (contentContainer) {
-                    contentContainer.innerHTML = '';
-                    const text = foundEd.content || foundEd.excerpt || 'Dokumentasi editorial seniman Notisse.';
-                    const paragraphs = text.split('\n');
-                    paragraphs.forEach(p => {
-                        const trimmed = p.trim();
-                        if (trimmed) {
+                const topContent = document.getElementById('editorial-detail-content-top');
+                const bottomContent = document.getElementById('editorial-detail-content-bottom');
+                const rawText = foundEd.content || foundEd.excerpt || '';
+                const paragraphs = rawText.split('\n').map(p => p.trim()).filter(Boolean);
+
+                if (topContent) topContent.innerHTML = '';
+                if (bottomContent) bottomContent.innerHTML = '';
+
+                if (paragraphs.length <= 1) {
+                    if (topContent && paragraphs[0]) {
+                        const pEl = document.createElement('p');
+                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-roboto';
+                        pEl.innerText = paragraphs[0];
+                        topContent.appendChild(pEl);
+                    }
+                    if (bottomContent && foundEd.excerpt && foundEd.excerpt !== paragraphs[0]) {
+                        const pEl = document.createElement('p');
+                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-roboto';
+                        pEl.innerText = foundEd.excerpt;
+                        bottomContent.appendChild(pEl);
+                    }
+                } else {
+                    // Paragraf 1 di atas foto
+                    if (topContent) {
+                        const pEl = document.createElement('p');
+                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-roboto';
+                        pEl.innerText = paragraphs[0];
+                        topContent.appendChild(pEl);
+                    }
+                    // Paragraf 2 di bawah foto
+                    if (bottomContent) {
+                        for (let i = 1; i < paragraphs.length; i++) {
                             const pEl = document.createElement('p');
-                            pEl.className = 'leading-relaxed text-xs md:text-sm text-gray-700 font-roboto';
-                            pEl.innerText = trimmed;
-                            contentContainer.appendChild(pEl);
+                            pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-roboto';
+                            pEl.innerText = paragraphs[i];
+                            bottomContent.appendChild(pEl);
                         }
-                    });
+                    }
                 }
 
-                const edImg = foundEd.image ? (foundEd.image.startsWith('http') || foundEd.image.startsWith('/') ? foundEd.image : '/' + foundEd.image) : 'https://placehold.co/400x500/222/fff?text=Editorial';
+                const edImg = foundEd.image ? (foundEd.image.startsWith('http') || foundEd.image.startsWith('/') ? foundEd.image : '/' + foundEd.image) : '/home.jpg';
                 const portraitEl = document.getElementById('editorial-detail-portrait');
                 if (portraitEl) {
-                    portraitEl.src = (foundArtist && foundArtist.photo) ? (foundArtist.photo.startsWith('http') || foundArtist.photo.startsWith('/') ? foundArtist.photo : '/' + foundArtist.photo) : edImg;
+                    portraitEl.src = (foundArtist && foundArtist.photo) ? (foundArtist.photo.startsWith('http') || foundArtist.photo.startsWith('/') ? foundArtist.photo : '/' + foundArtist.photo) : (edImg.includes('masmus') ? edImg : '/masmus.jpeg');
+                }
+
+                let artImg = '/artwork.jpeg';
+                if (foundArtist && foundArtist.artworks && foundArtist.artworks.length > 0) {
+                    const firstArt = foundArtist.artworks[0].image;
+                    artImg = firstArt.startsWith('http') || firstArt.startsWith('/') ? firstArt : '/' + firstArt;
+                } else if (foundArtist && foundArtist.artwork_preview) {
+                    artImg = foundArtist.artwork_preview.startsWith('http') || foundArtist.artwork_preview.startsWith('/') ? foundArtist.artwork_preview : '/' + foundArtist.artwork_preview;
                 }
                 const artworkEl = document.getElementById('editorial-detail-artwork');
-                if (artworkEl) artworkEl.src = edImg;
+                if (artworkEl) artworkEl.src = artImg;
 
-                const videoPlayer = document.getElementById('editorial-video-player');
-                const videoSource = document.getElementById('editorial-video-source');
-                if (videoPlayer && videoSource) {
-                    let vSrc = foundEd.video_url 
-                        ? (foundEd.video_url.startsWith('http') || foundEd.video_url.startsWith('/') ? foundEd.video_url : '/' + foundEd.video_url)
-                        : "{{ asset('video/editorial.mp4') }}";
-                    videoSource.src = vSrc;
-                    videoPlayer.load();
-                    videoPlayer.play().catch(() => {});
+                let featuredImg = '/home.jpg';
+                if (foundEd.image && !foundEd.image.includes('masmus') && (!foundArtist || foundEd.image !== foundArtist.photo)) {
+                    featuredImg = edImg;
+                } else if (foundArtist && foundArtist.artworks && foundArtist.artworks.length > 2) {
+                    const featArt = foundArtist.artworks[2].image;
+                    featuredImg = featArt.startsWith('http') || featArt.startsWith('/') ? featArt : '/' + featArt;
+                }
+                const featuredEl = document.getElementById('editorial-detail-featured');
+                if (featuredEl) {
+                    featuredEl.src = featuredImg;
                 }
             }
 
@@ -3801,21 +3989,6 @@
                 }, 300);
             }
         });
-
-        // Hide Global Loader after GIF animation completes
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('global-loader');
-            if (loader) {
-                // Ensure the animation has time to play (total duration is ~2.4s)
-                setTimeout(() => {
-                    loader.classList.add('hidden-loader');
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                    }, 600); // match CSS transition duration
-                }, 2400); 
-            }
-        });
-
     </script>
 </body>
 
