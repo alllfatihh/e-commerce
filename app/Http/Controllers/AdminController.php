@@ -335,6 +335,33 @@ class AdminController extends Controller
     }
 
     // ─── Site Media (Carousel & Footage) ─────────────────────
+    public function storeMedia(Request $request)
+    {
+        $request->validate([
+            'section'     => 'required|string|in:carousel,footage',
+            'title'       => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'image'       => 'required|image|max:8192',
+            'order'       => 'nullable|integer',
+        ]);
+
+        $order = $request->filled('order') 
+            ? (int)$request->order 
+            : ((SiteMedia::where('section', $request->section)->max('order') ?? 0) + 1);
+
+        $path = $request->file('image')->store('site-media', 'public');
+
+        SiteMedia::create([
+            'section'     => $request->section,
+            'title'       => $request->title ?: 'Slide ' . $order,
+            'description' => $request->description,
+            'image'       => $path,
+            'order'       => $order,
+        ]);
+
+        return redirect()->back()->with('success', 'Gambar ' . ($request->section === 'carousel' ? 'Hero Carousel' : 'Footage') . ' baru berhasil ditambahkan.');
+    }
+
     public function updateMedia(Request $request, $id)
     {
         $media = SiteMedia::findOrFail($id);
@@ -344,6 +371,7 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'product_id'  => 'nullable|integer',
             'image'       => 'nullable|image|max:8192',
+            'order'       => 'nullable|integer',
         ]);
 
         $data = [];
@@ -356,6 +384,9 @@ class AdminController extends Controller
         if ($request->filled('product_id')) {
             $data['product_id'] = $request->product_id;
         }
+        if ($request->filled('order')) {
+            $data['order'] = (int)$request->order;
+        }
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('site-media', 'public');
@@ -365,6 +396,19 @@ class AdminController extends Controller
         $media->update($data);
 
         return redirect()->back()->with('success', 'Gambar media berhasil diperbarui.');
+    }
+
+    public function deleteMedia($id)
+    {
+        $media = SiteMedia::findOrFail($id);
+
+        if ($media->image && !Str::startsWith($media->image, 'http') && file_exists(storage_path('app/public/' . $media->image))) {
+            @unlink(storage_path('app/public/' . $media->image));
+        }
+
+        $media->delete();
+
+        return redirect()->back()->with('success', 'Gambar media berhasil dihapus.');
     }
 
     // ─── Biteship Sync ───────────────────────────────────────

@@ -13,16 +13,28 @@
     <!-- Google Fonts – same as welcome.blade.php -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        montserrat: ['Montserrat', 'sans-serif'],
-                        roboto:     ['Roboto', 'sans-serif'],
-                        cursive:    ['Caveat', 'cursive'],
+                        'sans': ['"Inter"', 'sans-serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        'space-grotesk': ['"Space Grotesk"', 'sans-serif'],
+                        spaceGrotesk: ['"Space Grotesk"', 'sans-serif'],
+                        'inter': ['"Inter"', 'sans-serif'],
+                        inter: ['"Inter"', 'sans-serif'],
+                        'montserrat': ['"Space Grotesk"', 'sans-serif'],
+                        montserrat: ['"Space Grotesk"', 'sans-serif'],
+                        'roboto': ['"Inter"', 'sans-serif'],
+                        roboto: ['"Inter"', 'sans-serif'],
+                        'helvetica': ['"Inter"', 'sans-serif'],
+                        helvetica: ['"Inter"', 'sans-serif'],
+                        'neue-montreal': ['"Space Grotesk"', 'sans-serif'],
+                        neueMontreal: ['"Space Grotesk"', 'sans-serif'],
+                        cursive: ['Caveat', 'cursive'],
                     },
                     colors: {
                         brandDark:    '#1c1c1c',
@@ -39,10 +51,25 @@
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             background-color: #f7f7f5;
             color: #111111;
             overflow-x: hidden;
+        }
+
+        .font-space-grotesk,
+        .font-montserrat,
+        .font-neue-montreal,
+        [class*="font-space-grotesk"],
+        [class*="font-spaceGrotesk"] {
+            font-family: 'Space Grotesk', sans-serif !important;
+        }
+
+        .font-inter,
+        .font-roboto,
+        .font-helvetica,
+        [class*="font-inter"] {
+            font-family: 'Inter', sans-serif !important;
         }
 
         /* ── Scrollbar ─────────────────────────── */
@@ -101,7 +128,7 @@
             width: 100%;
             padding: 0.65rem 0.9rem;
             font-size: 13px;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', sans-serif;
             border-radius: 2px;
         }
         .admin-input:focus {
@@ -112,8 +139,8 @@
         /* ── Modal backdrop ────────────────────── */
         .modal-backdrop {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(2px);
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(1px);
             z-index: 60;
             display: flex; align-items: center; justify-content: center;
             opacity: 0; visibility: hidden;
@@ -152,7 +179,7 @@
         /* ── Buttons ───────────────────────────── */
         .btn-primary {
             background: #111111; color: #fff;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700; letter-spacing: 0.08em; font-size: 0.78rem;
             padding: 0.7rem 1.4rem;
             text-transform: uppercase;
@@ -164,7 +191,7 @@
 
         .btn-accent {
             background: #E2FF00; color: #111111;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 700; letter-spacing: 0.08em; font-size: 0.78rem;
             padding: 0.7rem 1.4rem;
             text-transform: uppercase;
@@ -176,7 +203,7 @@
 
         .btn-outline {
             background: transparent; color: #111111;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Space Grotesk', sans-serif;
             font-weight: 600; letter-spacing: 0.06em; font-size: 0.78rem;
             padding: 0.65rem 1.2rem;
             text-transform: uppercase;
@@ -201,56 +228,56 @@
     <div class="px-7 py-6 border-b border-white/15">
         <a href="/" class="block group">
             <img src="{{ asset('logo.png') }}" alt="Notisse" class="h-6 w-auto object-contain brightness-0 invert opacity-95 group-hover:opacity-100 transition-opacity">
-            <p class="font-roboto text-[10px] text-white/70 tracking-widest mt-1.5 uppercase">Atelier Admin Panel</p>
+            <p class="font-inter text-[10px] text-white/70 tracking-widest mt-1.5 uppercase">Atelier Admin Panel</p>
         </a>
     </div>
 
     <!-- Nav -->
     <nav class="flex-1 py-6 space-y-1 overflow-y-auto">
         <a href="#section-products" onclick="showSection('products')"
-           class="nav-link active flex items-center gap-3 px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
+           class="nav-link active flex items-center gap-3 px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
            id="nav-products">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
             <span>Products</span>
         </a>
 
         <a href="#section-artists" onclick="showSection('artists')"
-           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
+           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
            id="nav-artists">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span>Artists (Seniman)</span>
         </a>
 
         <a href="#section-artworks" onclick="showSection('artworks')"
-           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
+           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
            id="nav-artworks">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
             <span>Artworks & Editorial</span>
         </a>
 
         <a href="#section-media" onclick="showSection('media')"
-           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
+           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
            id="nav-media">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             <span>Site Media</span>
         </a>
 
         <a href="#section-orders" onclick="showSection('orders')"
-           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
+           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
            id="nav-orders">
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 17H5a2 2 0 0 0-2 2v2h14v-2a2 2 0 0 0-2-2h-4z"/><path d="M12 12V3"/><path d="M8 7l4-4 4 4"/></svg>
             <span>Orders</span>
         </a>
 
         <a href="#section-offerings" onclick="showSection('offerings')"
-           class="nav-link flex items-center justify-between px-6 py-3.5 text-xs font-montserrat tracking-wider uppercase text-white/90"
+           class="nav-link flex items-center justify-between px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
            id="nav-offerings">
             <span class="flex items-center gap-3">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 <span>Artwork Offerings</span>
             </span>
             @if(($stats['total_offerings'] ?? 0) > 0)
-                <span class="bg-accentYellow text-black font-extrabold text-[10px] px-2 py-0.5 rounded-full font-montserrat">
+                <span class="bg-accentYellow text-black font-extrabold text-[10px] px-2 py-0.5 rounded-full font-space-grotesk">
                     {{ $stats['total_offerings'] }}
                 </span>
             @endif
@@ -269,7 +296,7 @@
                 <span class="text-[9px] font-mono text-black font-semibold">API</span>
             </button>
         </form>
-        <a href="/" target="_blank" class="block text-xs text-white/80 hover:text-white tracking-widest uppercase transition-colors pt-1 font-montserrat">
+        <a href="/" target="_blank" class="block text-xs text-white/80 hover:text-white tracking-widest uppercase transition-colors pt-1 font-space-grotesk">
             &larr; View Store Web
         </a>
     </div>
@@ -283,19 +310,19 @@
     <!-- Top bar -->
     <header class="sticky top-0 z-30 bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center shadow-sm">
         <div>
-            <h1 class="font-montserrat font-bold text-base uppercase tracking-[0.2em] text-brandDark" id="page-title">
+            <h1 class="font-space-grotesk font-bold text-base uppercase tracking-[0.2em] text-brandDark" id="page-title">
                 Products Catalog Management
             </h1>
-            <p class="text-xs text-gray-400 font-roboto tracking-wide mt-0.5">{{ now()->translatedFormat('l, d F Y') }}</p>
+            <p class="text-xs text-gray-400 font-inter tracking-wide mt-0.5">{{ now()->translatedFormat('l, d F Y') }}</p>
         </div>
         <div class="flex items-center gap-4">
             @if(session('success'))
-            <div id="toast-success" class="flex items-center gap-2 bg-accentYellow px-4 py-2 text-xs font-montserrat font-bold uppercase tracking-wide text-brandDark border border-black/10 shadow-sm">
+            <div id="toast-success" class="flex items-center gap-2 bg-accentYellow px-4 py-2 text-xs font-space-grotesk font-bold uppercase tracking-wide text-brandDark border border-black/10 shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 {{ session('success') }}
             </div>
             @endif
-            <a href="/" target="_blank" class="text-xs font-montserrat font-semibold tracking-wider uppercase border border-gray-300 hover:border-black px-3.5 py-1.5 transition-colors text-gray-700 hover:text-black">
+            <a href="/" target="_blank" class="text-xs font-space-grotesk font-semibold tracking-wider uppercase border border-gray-300 hover:border-black px-3.5 py-1.5 transition-colors text-gray-700 hover:text-black">
                 Lihat Toko &rarr;
             </a>
         </div>
@@ -304,36 +331,36 @@
     <!-- ── STAT CARDS ───────────────────────────────────────────── -->
     <div class="px-8 pt-8 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         <div class="bg-white border border-gray-200 p-5 section-card shadow-sm">
-            <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Total Products</p>
-            <p class="font-montserrat font-extrabold text-2xl text-brandDark">{{ $stats['total_products'] ?? $products->count() }}</p>
-            <span class="text-[10px] text-gray-400 font-roboto mt-0.5 block">Katalog item toko</span>
+            <p class="text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 mb-1">Total Products</p>
+            <p class="font-space-grotesk font-extrabold text-2xl text-brandDark">{{ $stats['total_products'] ?? $products->count() }}</p>
+            <span class="text-[10px] text-gray-400 font-inter mt-0.5 block">Katalog item toko</span>
         </div>
         <div class="bg-white border border-gray-200 p-5 section-card shadow-sm" style="animation-delay:0.05s">
-            <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Physical Stock</p>
-            <p class="font-montserrat font-extrabold text-2xl text-brandDark">{{ $stats['total_stock'] ?? 0 }}</p>
-            <span class="text-[10px] text-gray-400 font-roboto mt-0.5 block">Total size S - XL</span>
+            <p class="text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 mb-1">Physical Stock</p>
+            <p class="font-space-grotesk font-extrabold text-2xl text-brandDark">{{ $stats['total_stock'] ?? 0 }}</p>
+            <span class="text-[10px] text-gray-400 font-inter mt-0.5 block">Total size S - XL</span>
         </div>
         <div class="bg-white border border-gray-200 p-5 section-card shadow-sm" style="animation-delay:0.1s">
-            <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Artists Collab</p>
-            <p class="font-montserrat font-extrabold text-2xl text-brandDark">{{ $stats['total_artists'] ?? $artists->count() }}</p>
-            <span class="text-[10px] text-gray-400 font-roboto mt-0.5 block">Seniman kolaborator</span>
+            <p class="text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 mb-1">Artists Collab</p>
+            <p class="font-space-grotesk font-extrabold text-2xl text-brandDark">{{ $stats['total_artists'] ?? $artists->count() }}</p>
+            <span class="text-[10px] text-gray-400 font-inter mt-0.5 block">Seniman kolaborator</span>
         </div>
         <div class="bg-white border border-gray-200 p-5 section-card shadow-sm" style="animation-delay:0.15s">
-            <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Artworks & Editorial</p>
-            <p class="font-montserrat font-extrabold text-2xl text-brandDark">{{ $stats['total_artworks'] ?? $artworks->count() }}</p>
-            <span class="text-[10px] text-gray-400 font-roboto mt-0.5 block">Karya seni galeri</span>
+            <p class="text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 mb-1">Artworks & Editorial</p>
+            <p class="font-space-grotesk font-extrabold text-2xl text-brandDark">{{ $stats['total_artworks'] ?? $artworks->count() }}</p>
+            <span class="text-[10px] text-gray-400 font-inter mt-0.5 block">Karya seni galeri</span>
         </div>
         <div class="bg-white border border-gray-200 p-5 section-card shadow-sm" style="animation-delay:0.2s">
-            <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Artwork Offers</p>
-            <p class="font-montserrat font-extrabold text-2xl text-brandDark">{{ $stats['total_offerings'] ?? $offerings->count() }}</p>
-            <span class="text-[10px] text-gray-400 font-roboto mt-0.5 block">Penawaran kolektor</span>
+            <p class="text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 mb-1">Artwork Offers</p>
+            <p class="font-space-grotesk font-extrabold text-2xl text-brandDark">{{ $stats['total_offerings'] ?? $offerings->count() }}</p>
+            <span class="text-[10px] text-gray-400 font-inter mt-0.5 block">Penawaran kolektor</span>
         </div>
         <div class="bg-white border border-gray-200 p-5 section-card shadow-sm" style="animation-delay:0.25s">
-            <p class="text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-400 mb-1">Revenue (IDR)</p>
-            <p class="font-montserrat font-extrabold text-xl text-brandDark">
+            <p class="text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 mb-1">Revenue (IDR)</p>
+            <p class="font-space-grotesk font-extrabold text-xl text-brandDark">
                 Rp {{ number_format($stats['paid_revenue'] ?? $orders->where('status','paid')->sum('total_amount'), 0, ',', '.') }}
             </p>
-            <span class="text-[10px] text-gray-400 font-roboto mt-0.5 block">{{ $stats['total_orders'] ?? $orders->count() }} Pesanan</span>
+            <span class="text-[10px] text-gray-400 font-inter mt-0.5 block">{{ $stats['total_orders'] ?? $orders->count() }} Pesanan</span>
         </div>
     </div>
 
@@ -346,8 +373,8 @@
         <section id="section-products" class="section-card">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                 <div>
-                    <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Products Catalog</h2>
-                    <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola produk pakaian, deskripsi editorial, spesifikasi fabric, seniman, foto (Depan, Belakang, Footage, Size Chart), dan stok per ukuran.</p>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Products Catalog</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola produk pakaian, deskripsi editorial, spesifikasi fabric, seniman, foto (Depan, Belakang, Footage, Size Chart), dan stok per ukuran.</p>
                 </div>
                 <button onclick="openAddProductModal()" class="btn-primary flex items-center gap-2 shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -358,7 +385,7 @@
             <div class="bg-white border border-gray-200 overflow-x-auto shadow-sm">
                 <table class="w-full text-left border-collapse">
                     <thead class="border-b border-gray-200 bg-gray-50">
-                        <tr class="text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-500">
+                        <tr class="text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500">
                             <th class="px-5 py-3.5">Product & Artist</th>
                             <th class="px-5 py-3.5">Price (IDR)</th>
                             <th class="px-5 py-3.5">Stock & Sizes</th>
@@ -383,13 +410,13 @@
                                         <img src="{{ $imgUrl }}" class="w-full h-full object-cover" onerror="this.src='/footage-baju.jpg'">
                                     </div>
                                     <div>
-                                        <p class="font-montserrat font-bold text-sm text-gray-900 uppercase">{{ $product->name }}</p>
+                                        <p class="font-space-grotesk font-bold text-sm text-gray-900 uppercase">{{ $product->name }}</p>
                                         @if(empty($product->artist) || $product->artist === 'Notisse Original')
-                                            <span class="inline-block text-[10px] font-montserrat font-bold uppercase tracking-wider bg-black text-white px-2 py-0.5 mt-1">
+                                            <span class="inline-block text-[10px] font-space-grotesk font-bold uppercase tracking-wider bg-black text-white px-2 py-0.5 mt-1">
                                                 Notisse Original
                                             </span>
                                         @else
-                                            <span class="inline-block text-[10px] font-montserrat font-bold uppercase tracking-wider bg-[#E2FF00] text-black px-2 py-0.5 mt-1 border border-black/10">
+                                            <span class="inline-block text-[10px] font-space-grotesk font-bold uppercase tracking-wider bg-[#E2FF00] text-black px-2 py-0.5 mt-1 border border-black/10">
                                                 Collab: {{ $product->artist }}
                                             </span>
                                         @endif
@@ -399,13 +426,13 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-5 py-4 font-montserrat font-bold text-sm text-gray-900 whitespace-nowrap">
+                            <td class="px-5 py-4 font-space-grotesk font-bold text-sm text-gray-900 whitespace-nowrap">
                                 Rp {{ number_format($product->price, 0, ',', '.') }}
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap">
                                 <div class="flex flex-wrap gap-1.5">
                                     @foreach($product->stocks as $stock)
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 border text-[11px] font-montserrat font-semibold {{ $stock->stock < 5 ? 'border-red-200 text-red-600 bg-red-50' : 'border-gray-200 text-gray-700 bg-gray-50' }}">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 border text-[11px] font-space-grotesk font-semibold {{ $stock->stock < 5 ? 'border-red-200 text-red-600 bg-red-50' : 'border-gray-200 text-gray-700 bg-gray-50' }}">
                                         {{ $stock->size }}:
                                         <span class="font-bold">{{ $stock->stock }}</span>
                                     </span>
@@ -413,27 +440,27 @@
                                 </div>
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap">
-                                <div class="flex flex-col gap-1 text-[11px] font-roboto">
+                                <div class="flex flex-col gap-1 text-[11px] font-inter">
                                     <div class="flex items-center gap-1.5">
                                         <span class="w-2 h-2 rounded-full {{ $product->image ? 'bg-emerald-500' : 'bg-gray-300' }}"></span>
-                                        <span class="text-gray-600">Cover Depan: <strong class="font-montserrat">{{ $product->image ? 'Ada' : 'Default' }}</strong></span>
+                                        <span class="text-gray-600">Cover Depan: <strong class="font-space-grotesk">{{ $product->image ? 'Ada' : 'Default' }}</strong></span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
                                         <span class="w-2 h-2 rounded-full {{ $product->back_image ? 'bg-emerald-500' : 'bg-gray-300' }}"></span>
-                                        <span class="text-gray-600">Belakang: <strong class="font-montserrat">{{ $product->back_image ? 'Ada' : 'Default' }}</strong></span>
+                                        <span class="text-gray-600">Belakang: <strong class="font-space-grotesk">{{ $product->back_image ? 'Ada' : 'Default' }}</strong></span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
                                         <span class="w-2 h-2 rounded-full {{ $product->footage_image ? 'bg-emerald-500' : 'bg-gray-300' }}"></span>
-                                        <span class="text-gray-600">On-Model Footage: <strong class="font-montserrat">{{ $product->footage_image ? 'Ada' : 'Default' }}</strong></span>
+                                        <span class="text-gray-600">On-Model Footage: <strong class="font-space-grotesk">{{ $product->footage_image ? 'Ada' : 'Default' }}</strong></span>
                                     </div>
                                     <div class="flex items-center gap-1.5">
                                         <span class="w-2 h-2 rounded-full {{ $product->size_chart_image ? 'bg-emerald-500' : 'bg-gray-300' }}"></span>
-                                        <span class="text-gray-600">Size Chart Guide: <strong class="font-montserrat">{{ $product->size_chart_image ? 'Ada' : 'Default' }}</strong></span>
+                                        <span class="text-gray-600">Size Chart Guide: <strong class="font-space-grotesk">{{ $product->size_chart_image ? 'Ada' : 'Default' }}</strong></span>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-5 py-4 text-right whitespace-nowrap">
-                                <div class="flex items-center justify-end gap-3 font-montserrat">
+                                <div class="flex items-center justify-end gap-3 font-space-grotesk">
                                     @php
                                         $productData = [
                                             'id'               => $product->id,
@@ -468,7 +495,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="px-5 py-12 text-center text-sm text-gray-400 font-roboto">
+                            <td colspan="5" class="px-5 py-12 text-center text-sm text-gray-400 font-inter">
                                 Belum ada produk. Tambahkan produk pertama di atas.
                             </td>
                         </tr>
@@ -484,8 +511,8 @@
         <section id="section-artists" class="section-card hidden">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
                 <div>
-                    <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Artists & Collaborators (Seniman)</h2>
-                    <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola profil seniman kolaborator Notisse (seperti Mustafa Alatas, dll), kota domisili, biografi, dan karya seni yang tampil di halaman 'Artist Collab'.</p>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Artists & Collaborators (Seniman)</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola profil seniman kolaborator Notisse (seperti Mustafa Alatas, dll), kota domisili, biografi, dan karya seni yang tampil di halaman 'Artist Collab'.</p>
                 </div>
                 <button onclick="openAddArtistModal()" class="btn-primary flex items-center gap-2 shrink-0">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -505,7 +532,7 @@
                             <img src="{{ $photoUrl }}" alt="{{ $art->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             @if($art->city)
                             <div class="absolute bottom-2.5 left-2.5">
-                                <span class="text-[9px] font-bold font-montserrat tracking-widest uppercase bg-black text-white px-2 py-0.5 shadow-sm">
+                                <span class="text-[9px] font-bold font-space-grotesk tracking-widest uppercase bg-black text-white px-2 py-0.5 shadow-sm">
                                     {{ $art->city }}
                                 </span>
                             </div>
@@ -514,13 +541,13 @@
 
                         <!-- Info -->
                         <div class="p-4 space-y-2">
-                            <h3 class="font-montserrat font-bold text-base text-gray-900 uppercase">{{ $art->name }}</h3>
-                            <p class="line-clamp-2 text-xs text-gray-500 font-roboto leading-relaxed">
+                            <h3 class="font-space-grotesk font-bold text-base text-gray-900 uppercase">{{ $art->name }}</h3>
+                            <p class="line-clamp-2 text-xs text-gray-500 font-inter leading-relaxed">
                                 {{ $art->bio ?: 'Seniman kolaborator eksklusif lini tekstil dan garmen atelier Notisse.' }}
                             </p>
 
                             <!-- Linked Creations Badges -->
-                            <div class="flex items-center gap-2 pt-2 border-t border-gray-100 text-[10px] font-montserrat font-bold uppercase">
+                            <div class="flex items-center gap-2 pt-2 border-t border-gray-100 text-[10px] font-space-grotesk font-bold uppercase">
                                 <span class="px-2 py-0.5 bg-neutral-100 text-neutral-800 rounded-sm">🎨 {{ $art->artworks->count() }} Artworks</span>
                                 <span class="px-2 py-0.5 bg-red-50 text-brandRed rounded-sm">📰 {{ $art->editorials->count() }} Editorial</span>
                             </div>
@@ -528,7 +555,7 @@
                     </div>
 
                     <!-- Actions -->
-                    <div class="p-3 bg-gray-50 border-t border-gray-100 space-y-2 font-montserrat text-xs">
+                    <div class="p-3 bg-gray-50 border-t border-gray-100 space-y-2 font-space-grotesk text-xs">
                         <button type="button" onclick="viewArtistCreations({{ $art->id }})"
                                 class="w-full text-center py-1.5 px-3 bg-brandDark text-white text-[10px] font-bold uppercase tracking-wider hover:bg-black transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
                             <span>Kelola Karya & Editorial Seniman</span>
@@ -569,7 +596,7 @@
                     </div>
                 </div>
                 @empty
-                <div class="col-span-full p-12 bg-white border border-gray-200 text-center text-gray-400 font-roboto text-sm">
+                <div class="col-span-full p-12 bg-white border border-gray-200 text-center text-gray-400 font-inter text-sm">
                     Belum ada data seniman. Klik "Add Artist (Tambah Seniman)" di atas untuk menambahkan.
                 </div>
                 @endforelse
@@ -582,8 +609,8 @@
         <section id="section-artworks" class="section-card hidden">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Artworks & Artist Editorial</h2>
-                    <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola karya seni fisik orisinil (lukisan/mixed media) dan artikel editorial kuratorial yang terhubung secara spesifik per seniman.</p>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Artworks & Artist Editorial</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola karya seni fisik orisinil (lukisan/mixed media) dan artikel editorial kuratorial yang terhubung secara spesifik per seniman.</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2.5 shrink-0">
                     <button onclick="openAddArtworkModal()" class="btn-primary flex items-center gap-2 shadow-sm">
@@ -601,7 +628,7 @@
             <div class="bg-gray-50 border border-gray-200 p-4 mb-6 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
                     <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <label class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-gray-500 shrink-0">Filter Seniman:</label>
+                        <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-gray-500 shrink-0">Filter Seniman:</label>
                         <select id="creation-filter-artist" onchange="filterCreations()" class="admin-input text-xs py-1.5 bg-white max-w-[240px]">
                             <option value="all">Semua Seniman (All Artists - {{ $artists->count() }})</option>
                             @foreach($artists as $artObj)
@@ -611,7 +638,7 @@
                     </div>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <label class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-gray-500 shrink-0">Tipe:</label>
+                        <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-gray-500 shrink-0">Tipe:</label>
                         <select id="creation-filter-type" onchange="filterCreations()" class="admin-input text-xs py-1.5 bg-white">
                             <option value="all">Semua Tipe (Total: {{ $artworks->count() + $editorials->count() }})</option>
                             <option value="artwork">🎨 Hanya Artwork Fisik ({{ $artworks->count() }})</option>
@@ -620,7 +647,7 @@
                     </div>
                 </div>
 
-                <div class="text-[11px] font-montserrat font-semibold text-gray-400 shrink-0">
+                <div class="text-[11px] font-space-grotesk font-semibold text-gray-400 shrink-0">
                     Menampilkan <span id="creation-count-display" class="font-bold text-gray-900">{{ $artworks->count() + $editorials->count() }}</span> konten kurasi
                 </div>
             </div>
@@ -650,11 +677,11 @@
                                     <img src="{{ $artistOwner && $artistOwner->photo ? (Str::startsWith($artistOwner->photo, 'http') ? $artistOwner->photo : asset($artistOwner->photo)) : 'https://placehold.co/100x100/333/fff?text=A' }}"
                                          class="w-full h-full object-cover">
                                 </span>
-                                <span class="font-montserrat font-bold text-xs uppercase tracking-wide truncate max-w-[170px]">
+                                <span class="font-space-grotesk font-bold text-xs uppercase tracking-wide truncate max-w-[170px]">
                                     {{ $artistOwner ? $artistOwner->name : 'Seniman Kolaborator' }}
                                 </span>
                             </div>
-                            <span class="text-[9px] font-montserrat font-bold uppercase tracking-widest px-2 py-0.5 bg-neutral-800 text-brandAccent border border-brandAccent/30">
+                            <span class="text-[9px] font-space-grotesk font-bold uppercase tracking-widest px-2 py-0.5 bg-neutral-800 text-brandAccent border border-brandAccent/30">
                                 🎨 Artwork
                             </span>
                         </div>
@@ -663,12 +690,12 @@
                         <div class="aspect-[4/3] bg-gray-100 relative overflow-hidden border-b border-gray-200">
                             <img src="{{ $artUrl }}" alt="{{ $art->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/600x800/d9d9d9/555555?text=Artwork'">
                             <div class="absolute top-3 left-3">
-                                <span class="text-[9px] font-bold font-montserrat tracking-widest uppercase bg-black text-white px-2 py-0.5 shadow-sm">
+                                <span class="text-[9px] font-bold font-space-grotesk tracking-widest uppercase bg-black text-white px-2 py-0.5 shadow-sm">
                                     {{ $art->status ?: 'Available for Acquisition' }}
                                 </span>
                             </div>
                             @if($art->year)
-                            <div class="absolute bottom-2.5 right-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-mono px-2 py-0.5">
+                            <div class="absolute bottom-2.5 right-2.5 bg-black/75 backdrop-blur-[1px] text-white text-[9px] font-mono px-2 py-0.5">
                                 {{ $art->year }}
                             </div>
                             @endif
@@ -677,8 +704,8 @@
                         <!-- Card Body -->
                         <div class="p-4 space-y-2.5">
                             <div>
-                                <h3 class="font-montserrat font-bold text-base text-gray-900 uppercase leading-snug">{{ $art->title }}</h3>
-                                <p class="text-xs text-gray-500 font-roboto mt-0.5">
+                                <h3 class="font-space-grotesk font-bold text-base text-gray-900 uppercase leading-snug">{{ $art->title }}</h3>
+                                <p class="text-xs text-gray-500 font-inter mt-0.5">
                                     {{ $art->medium ?: 'Oil on Canvas' }} @if($art->dimensions) &bull; {{ $art->dimensions }} @endif
                                 </p>
                             </div>
@@ -687,14 +714,14 @@
                                 Est. Nilai: Rp {{ number_format($art->price, 0, ',', '.') }}
                             </p>
                             @endif
-                            <p class="line-clamp-2 text-xs text-gray-600 font-roboto leading-relaxed">
+                            <p class="line-clamp-2 text-xs text-gray-600 font-inter leading-relaxed">
                                 {{ $art->description ?: 'Karya seni fisik orisinil oleh seniman kolaborator Notisse.' }}
                             </p>
                         </div>
                     </div>
 
                     <!-- Card Actions -->
-                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-montserrat text-xs">
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-space-grotesk text-xs">
                         <span class="text-[10px] font-mono text-gray-400 uppercase">#ARTW-{{ $art->id }}</span>
                         <div class="flex items-center gap-3">
                             @php
@@ -751,11 +778,11 @@
                                     <img src="{{ $artistOwner && $artistOwner->photo ? (Str::startsWith($artistOwner->photo, 'http') ? $artistOwner->photo : asset($artistOwner->photo)) : 'https://placehold.co/100x100/333/fff?text=A' }}"
                                          class="w-full h-full object-cover">
                                 </span>
-                                <span class="font-montserrat font-bold text-xs uppercase tracking-wide truncate max-w-[170px]">
+                                <span class="font-space-grotesk font-bold text-xs uppercase tracking-wide truncate max-w-[170px]">
                                     {{ $artistOwner ? $artistOwner->name : 'Seniman Kolaborator' }}
                                 </span>
                             </div>
-                            <span class="text-[9px] font-montserrat font-bold uppercase tracking-widest px-2 py-0.5 bg-white text-brandRed font-black">
+                            <span class="text-[9px] font-space-grotesk font-bold uppercase tracking-widest px-2 py-0.5 bg-white text-brandRed font-black">
                                 📰 Editorial
                             </span>
                         </div>
@@ -764,12 +791,12 @@
                         <div class="aspect-[4/3] bg-gray-100 relative overflow-hidden border-b border-gray-200">
                             <img src="{{ $editUrl }}" alt="{{ $edit->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/600x600/d9d9d9/555555?text=Editorial'">
                             @if($edit->video_url)
-                            <div class="absolute top-3 left-3 bg-black/85 text-white text-[9px] font-montserrat uppercase px-2 py-0.5 flex items-center gap-1 font-bold">
+                            <div class="absolute top-3 left-3 bg-black/85 text-white text-[9px] font-space-grotesk uppercase px-2 py-0.5 flex items-center gap-1 font-bold">
                                 <svg class="w-3 h-3 text-brandAccent" fill="currentColor" viewBox="0 0 20 20"><polygon points="5 3 19 10 5 17 5 3"/></svg>
                                 <span>Includes Video</span>
                             </div>
                             @endif
-                            <div class="absolute bottom-2.5 right-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-roboto px-2 py-0.5">
+                            <div class="absolute bottom-2.5 right-2.5 bg-black/75 backdrop-blur-[1px] text-white text-[9px] font-inter px-2 py-0.5">
                                 {{ $edit->author ?: 'Editorial Notisse' }}
                             </div>
                         </div>
@@ -777,17 +804,17 @@
                         <!-- Card Body -->
                         <div class="p-4 space-y-2.5">
                             <div>
-                                <h3 class="font-montserrat font-bold text-base text-gray-900 uppercase leading-snug">{{ $edit->title }}</h3>
-                                <p class="text-xs text-gray-400 font-roboto mt-0.5">Penulis: {{ $edit->author ?: 'Tim Kuratorial' }}</p>
+                                <h3 class="font-space-grotesk font-bold text-base text-gray-900 uppercase leading-snug">{{ $edit->title }}</h3>
+                                <p class="text-xs text-gray-400 font-inter mt-0.5">Penulis: {{ $edit->author ?: 'Tim Kuratorial' }}</p>
                             </div>
-                            <p class="line-clamp-2 text-xs text-gray-600 font-roboto leading-relaxed">
+                            <p class="line-clamp-2 text-xs text-gray-600 font-inter leading-relaxed">
                                 {{ $edit->excerpt ?: Str::limit($edit->content, 120) }}
                             </p>
                         </div>
                     </div>
 
                     <!-- Card Actions -->
-                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-montserrat text-xs">
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between font-space-grotesk text-xs">
                         <span class="text-[10px] font-mono text-gray-400 uppercase">#EDIT-{{ $edit->id }}</span>
                         <div class="flex items-center gap-3">
                             @php
@@ -820,7 +847,7 @@
                 @endforeach
 
                 <!-- Empty state if no items or filter zero -->
-                <div id="creations-empty-state" class="hidden col-span-full p-12 bg-white border border-gray-200 text-center text-gray-400 font-roboto text-sm">
+                <div id="creations-empty-state" class="hidden col-span-full p-12 bg-white border border-gray-200 text-center text-gray-400 font-inter text-sm">
                     Tidak ada karya seni atau artikel editorial yang sesuai dengan filter yang dipilih.
                 </div>
             </div>
@@ -830,53 +857,85 @@
              SECTION 4: SITE MEDIA (CAROUSEL & FOOTAGE)
         ───────────────────────────────────────────────────────── --}}
         <section id="section-media" class="section-card hidden">
-            <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] mb-2 text-brandDark">Site Media & Lookbook Footage</h2>
-            <p class="text-xs text-gray-500 font-roboto mb-6">Kelola Hero Carousel slides, Footage On-Model, dan Galeri Foto Lookbook Photoshoot toko Notisse.</p>
+            <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] mb-2 text-brandDark">Site Media & Lookbook Footage</h2>
+            <p class="text-xs text-gray-500 font-inter mb-6">Kelola Hero Carousel slides, Footage On-Model, dan Galeri Foto Lookbook Photoshoot toko Notisse.</p>
 
             <!-- TAB: Carousel vs Footage vs Lookbook -->
             <div class="flex gap-0 border-b border-gray-200 mb-6">
                 <button onclick="switchMediaTab('carousel')" id="tab-carousel"
-                    class="tab-btn active px-5 py-2.5 text-xs font-montserrat uppercase tracking-widest text-gray-500 cursor-pointer">
+                    class="tab-btn active px-5 py-2.5 text-xs font-space-grotesk uppercase tracking-widest text-gray-500 cursor-pointer">
                     Hero Carousel
                 </button>
                 <button onclick="switchMediaTab('footage')" id="tab-footage"
-                    class="tab-btn px-5 py-2.5 text-xs font-montserrat uppercase tracking-widest text-gray-500 cursor-pointer">
+                    class="tab-btn px-5 py-2.5 text-xs font-space-grotesk uppercase tracking-widest text-gray-500 cursor-pointer">
                     Footage / Product Media
                 </button>
                 <button onclick="switchMediaTab('lookbook')" id="tab-lookbook"
-                    class="tab-btn px-5 py-2.5 text-xs font-montserrat uppercase tracking-widest text-gray-500 cursor-pointer">
+                    class="tab-btn px-5 py-2.5 text-xs font-space-grotesk uppercase tracking-widest text-gray-500 cursor-pointer">
                     Lookbook Photoshoot ({{ $lookbooks->count() }})
                 </button>
             </div>
 
-            <!-- Carousel Grid -->
-            <div id="media-tab-carousel" class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                @foreach($carousels as $media)
-                <div class="bg-white border border-gray-200 overflow-hidden group shadow-sm">
-                    <div class="media-card">
-                        @php
-                            $mUrl = Str::startsWith($media->image,'http') ? $media->image : (file_exists(public_path('storage/'.$media->image)) ? asset('storage/'.$media->image) : asset($media->image));
-                        @endphp
-                        <img src="{{ $mUrl }}" alt="{{ $media->title }}" onerror="this.style.display='none'">
-                        <div class="media-card-overlay">
-                            <button onclick="openMediaModal({{ $media->id }}, '{{ addslashes($media->title ?? '') }}', '{{ addslashes($media->description ?? '') }}', '{{ $media->product_id ?? '' }}')"
-                                class="btn-accent text-xs px-4 py-2 cursor-pointer">
-                                Ganti Gambar
+            <!-- Carousel Tab Content -->
+            <div id="media-tab-carousel">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 p-4 bg-neutral-50 border border-gray-200 rounded-sm">
+                    <div>
+                        <h3 class="font-space-grotesk font-bold text-sm uppercase tracking-wider text-black">Hero Slideshow Carousel</h3>
+                        <p class="text-xs text-gray-500 font-inter mt-0.5">Gambar utama yang berganti otomatis di bagian atas halaman depan (Shop Hero).</p>
+                    </div>
+                    <button type="button" onclick="openCreateCarouselModal()" class="btn-primary text-xs px-4 py-2.5 cursor-pointer flex items-center justify-center gap-2 self-start sm:self-auto shrink-0 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        <span>Tambah Slide Carousel</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    @forelse($carousels as $media)
+                    <div class="bg-white border border-gray-200 overflow-hidden group shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="media-card relative">
+                                @php
+                                    $mUrl = Str::startsWith($media->image,'http') ? $media->image : (file_exists(public_path('storage/'.$media->image)) ? asset('storage/'.$media->image) : asset($media->image));
+                                @endphp
+                                <img src="{{ $mUrl }}" alt="{{ $media->title }}" onerror="this.style.display='none'" class="w-full h-full object-cover">
+                                <span class="absolute top-2.5 left-2.5 bg-black/80 text-white text-[10px] font-space-grotesk font-bold px-2 py-0.5 uppercase tracking-wider z-10 backdrop-blur-[1px]">
+                                    Slide #{{ $loop->iteration }}
+                                </span>
+                                <div class="media-card-overlay">
+                                    <button type="button" onclick="openMediaModal({{ $media->id }}, '{{ addslashes($media->title ?? '') }}', '{{ addslashes($media->description ?? '') }}', '{{ $media->product_id ?? '' }}', '{{ $media->order ?? 1 }}')"
+                                        class="btn-accent text-xs px-4 py-2 cursor-pointer">
+                                        Ganti Gambar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="px-4 py-3">
+                                <p class="text-xs font-space-grotesk font-bold uppercase tracking-wide text-gray-800">{{ $media->title ?? 'Slide ' . $loop->iteration }}</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5 font-inter">Urutan: <strong>{{ $media->order }}</strong></p>
+                            </div>
+                        </div>
+                        <div class="px-4 py-2.5 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                            <button type="button" onclick="openMediaModal({{ $media->id }}, '{{ addslashes($media->title ?? '') }}', '{{ addslashes($media->description ?? '') }}', '{{ $media->product_id ?? '' }}', '{{ $media->order ?? 1 }}')"
+                                class="text-xs font-space-grotesk font-semibold uppercase tracking-wider text-black hover:underline cursor-pointer">
+                                Edit Detail
                             </button>
+                            <form action="/admin/media/{{ $media->id }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus slide carousel ini?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs font-space-grotesk font-semibold uppercase tracking-wider text-red-600 hover:underline cursor-pointer">
+                                    Hapus
+                                </button>
+                            </form>
                         </div>
                     </div>
-                    <div class="px-4 py-3 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-montserrat font-bold uppercase tracking-wide text-gray-800">{{ $media->title ?? 'Slide ' . $loop->iteration }}</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">{{ ucfirst($media->section) }} &bull; Order {{ $media->order }}</p>
-                        </div>
-                        <button onclick="openMediaModal({{ $media->id }}, '{{ addslashes($media->title ?? '') }}', '{{ addslashes($media->description ?? '') }}', '{{ $media->product_id ?? '' }}')"
-                            class="text-xs font-montserrat font-semibold uppercase tracking-wider text-blue-600 hover:underline">
-                            Edit
+                    @empty
+                    <div class="col-span-full p-12 bg-white border border-dashed border-gray-300 text-center space-y-3">
+                        <p class="text-xs text-gray-400 font-inter">Belum ada slide carousel yang ditambahkan.</p>
+                        <button type="button" onclick="openCreateCarouselModal()" class="btn-primary text-xs px-4 py-2 cursor-pointer">
+                            + Tambah Slide Pertama
                         </button>
                     </div>
+                    @endforelse
                 </div>
-                @endforeach
             </div>
 
             <!-- Footage Grid -->
@@ -897,7 +956,7 @@
                     </div>
                     <div class="px-4 py-3 flex items-center justify-between">
                         <div>
-                            <p class="text-xs font-montserrat font-bold uppercase tracking-wide text-gray-800">{{ $media->title ?? 'Footage ' . $loop->iteration }}</p>
+                            <p class="text-xs font-space-grotesk font-bold uppercase tracking-wide text-gray-800">{{ $media->title ?? 'Footage ' . $loop->iteration }}</p>
                             <p class="text-[11px] text-gray-400 mt-0.5">
                                 Order {{ $media->order }} 
                                 @if($media->product_id)
@@ -906,7 +965,7 @@
                             </p>
                         </div>
                         <button onclick="openMediaModal({{ $media->id }}, '{{ addslashes($media->title ?? '') }}', '{{ addslashes($media->description ?? '') }}', '{{ $media->product_id ?? '' }}')"
-                            class="text-xs font-montserrat font-semibold uppercase tracking-wider text-blue-600 hover:underline">
+                            class="text-xs font-space-grotesk font-semibold uppercase tracking-wider text-blue-600 hover:underline">
                             Edit
                         </button>
                     </div>
@@ -918,8 +977,8 @@
             <div id="media-tab-lookbook" class="hidden space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white border border-gray-200 shadow-sm">
                     <div>
-                        <h3 class="font-montserrat font-bold text-sm uppercase tracking-wider text-black">Lookbook Collections & Campaigns</h3>
-                        <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola album Lookbook. Klik salah satu card Lookbook untuk mengunggah video kampanye dan foto-foto editorialnya.</p>
+                        <h3 class="font-space-grotesk font-bold text-sm uppercase tracking-wider text-black">Lookbook Collections & Campaigns</h3>
+                        <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola album Lookbook. Klik salah satu card Lookbook untuk mengunggah video kampanye dan foto-foto editorialnya.</p>
                     </div>
                     <button type="button" onclick="openCreateLookbookModal()" class="btn-primary flex items-center gap-2 shrink-0 cursor-pointer">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -941,18 +1000,18 @@
                                 
                                 <!-- Top Badges -->
                                 <div class="absolute top-3 left-3 flex items-center gap-2">
-                                    <span class="bg-black/80 backdrop-blur-md text-white text-[10px] font-montserrat font-bold uppercase tracking-wider px-2.5 py-0.5 border border-white/20">
+                                    <span class="bg-black/80 backdrop-blur-[1px] text-white text-[10px] font-space-grotesk font-bold uppercase tracking-wider px-2.5 py-0.5 border border-white/20">
                                         {{ $lb->year ?: '2025' }}
                                     </span>
                                 </div>
                                 <div class="absolute top-3 right-3">
                                     @if($lb->video_url)
-                                        <span class="bg-emerald-600/90 text-white text-[10px] font-montserrat font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm flex items-center gap-1 shadow">
+                                        <span class="bg-emerald-600/90 text-white text-[10px] font-space-grotesk font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm flex items-center gap-1 shadow">
                                             <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                             <span>Video Aktif</span>
                                         </span>
                                     @else
-                                        <span class="bg-neutral-800/80 text-gray-300 text-[10px] font-montserrat uppercase tracking-wider px-2 py-0.5">
+                                        <span class="bg-neutral-800/80 text-gray-300 text-[10px] font-space-grotesk uppercase tracking-wider px-2 py-0.5">
                                             Tanpa Video
                                         </span>
                                     @endif
@@ -961,10 +1020,10 @@
                                 <!-- Bottom Info Overlay -->
                                 <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between text-white">
                                     <div>
-                                        <h4 class="font-montserrat font-bold text-sm uppercase tracking-wider line-clamp-1">{{ $lb->title }}</h4>
-                                        <p class="text-[11px] text-gray-300 font-roboto mt-0.5">{{ $lb->fotoshoots->count() }} Foto Photoshoot</p>
+                                        <h4 class="font-space-grotesk font-bold text-sm uppercase tracking-wider line-clamp-1">{{ $lb->title }}</h4>
+                                        <p class="text-[11px] text-gray-300 font-inter mt-0.5">{{ $lb->fotoshoots->count() }} Foto Photoshoot</p>
                                     </div>
-                                    <span class="text-xs bg-white text-black px-2.5 py-1 font-montserrat font-bold uppercase tracking-wider shrink-0 shadow">
+                                    <span class="text-xs bg-white text-black px-2.5 py-1 font-space-grotesk font-bold uppercase tracking-wider shrink-0 shadow">
                                         Buka &rarr;
                                     </span>
                                 </div>
@@ -972,7 +1031,7 @@
 
                             <div class="p-4">
                                 @if($lb->description)
-                                    <p class="text-xs text-gray-600 font-roboto line-clamp-2 mb-3">{{ $lb->description }}</p>
+                                    <p class="text-xs text-gray-600 font-inter line-clamp-2 mb-3">{{ $lb->description }}</p>
                                 @endif
                                 <div class="flex items-center gap-2 text-[11px] font-mono text-gray-500">
                                     <span>Tahun: {{ $lb->year }}</span>
@@ -984,21 +1043,21 @@
 
                         <!-- Card Action Footer -->
                         <div class="p-4 pt-3 border-t border-gray-100 flex items-center justify-between bg-neutral-50">
-                            <button type="button" onclick="openManageLookbook({{ $lb->id }})" class="text-xs font-montserrat font-bold uppercase tracking-wider text-black hover:text-[#d52c2b] transition-colors cursor-pointer flex items-center gap-1.5">
+                            <button type="button" onclick="openManageLookbook({{ $lb->id }})" class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-black hover:text-[#d52c2b] transition-colors cursor-pointer flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 <span>Kelola Isi & Video</span>
                             </button>
                             <form action="/admin/lookbooks/{{ $lb->id }}" method="POST" onsubmit="return confirm('Hapus album Lookbook ini beserta seluruh fotonya?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-xs font-montserrat font-bold uppercase tracking-wider text-red-500 hover:text-red-700 transition-colors cursor-pointer">
+                                <button type="submit" class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-red-500 hover:text-red-700 transition-colors cursor-pointer">
                                     Hapus
                                 </button>
                             </form>
                         </div>
                     </div>
                     @empty
-                    <div class="col-span-full py-16 text-center text-gray-400 text-sm font-roboto bg-white border border-gray-200">
+                    <div class="col-span-full py-16 text-center text-gray-400 text-sm font-inter bg-white border border-gray-200">
                         Belum ada album Lookbook. Klik tombol "+ Tambah Album Lookbook" untuk membuat lookbook baru.
                     </div>
                     @endforelse
@@ -1010,12 +1069,12 @@
              SECTION 5: ORDERS
         ───────────────────────────────────────────────────────── --}}
         <section id="section-orders" class="section-card hidden">
-            <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] mb-5 text-brandDark">Recent Orders</h2>
+            <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] mb-5 text-brandDark">Recent Orders</h2>
 
             <div class="bg-white border border-gray-200 overflow-x-auto shadow-sm">
                 <table class="w-full text-left border-collapse">
                     <thead class="border-b border-gray-200 bg-gray-50">
-                        <tr class="text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-500">
+                        <tr class="text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500">
                             <th class="px-5 py-3.5">Order ID</th>
                             <th class="px-5 py-3.5">Customer</th>
                             <th class="px-5 py-3.5">Status</th>
@@ -1029,26 +1088,26 @@
                         <tr class="admin-tr">
                             <td class="px-5 py-4 font-mono text-xs text-gray-500 font-bold">#{{ $order->id }}</td>
                             <td class="px-5 py-4">
-                                <p class="text-sm font-roboto font-medium text-gray-900">{{ $order->customer_name }}</p>
+                                <p class="text-sm font-inter font-medium text-gray-900">{{ $order->customer_name }}</p>
                                 <p class="text-xs text-gray-400 mt-0.5">{{ $order->customer_email ?? '' }}</p>
                             </td>
                             <td class="px-5 py-4">
-                                <span class="inline-block px-2.5 py-1 text-[11px] font-montserrat font-bold uppercase tracking-wide
+                                <span class="inline-block px-2.5 py-1 text-[11px] font-space-grotesk font-bold uppercase tracking-wide
                                     {{ $order->status === 'paid' ? 'badge-paid' : ($order->status === 'cancelled' ? 'badge-cancelled' : 'badge-pending') }}">
                                     {{ $order->status }}
                                 </span>
                             </td>
-                            <td class="px-5 py-4 text-sm font-roboto font-bold text-gray-900">
+                            <td class="px-5 py-4 text-sm font-inter font-bold text-gray-900">
                                 Rp {{ number_format($order->total_amount, 0, ',', '.') }}
                             </td>
                             <td class="px-5 py-4 text-xs text-gray-600">{{ $order->courier_name ?? '—' }}</td>
-                            <td class="px-5 py-4 text-xs text-gray-400 font-roboto">
+                            <td class="px-5 py-4 text-xs text-gray-400 font-inter">
                                 {{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-12 text-center text-sm text-gray-400 font-roboto">No orders yet.</td>
+                            <td colspan="6" class="px-5 py-12 text-center text-sm text-gray-400 font-inter">No orders yet.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -1062,15 +1121,15 @@
         <section id="section-offerings" class="section-card hidden">
             <div class="flex justify-between items-center mb-5">
                 <div>
-                    <h2 class="font-montserrat font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Artwork Offerings</h2>
-                    <p class="text-xs text-gray-500 font-roboto mt-0.5">Kelola dan tinjau semua penawaran karya seni fisik dari kolektor dan pelanggan.</p>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Artwork Offerings</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola dan tinjau semua penawaran karya seni fisik dari kolektor dan pelanggan.</p>
                 </div>
             </div>
 
             <div class="bg-white border border-gray-200 overflow-x-auto shadow-sm">
                 <table class="w-full text-left border-collapse">
                     <thead class="border-b border-gray-200 bg-gray-50">
-                        <tr class="text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-500">
+                        <tr class="text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500">
                             <th class="px-5 py-3.5 w-16 text-center">ID</th>
                             <th class="px-5 py-3.5">Reference / Tanggal</th>
                             <th class="px-5 py-3.5">User (Pembeli)</th>
@@ -1085,18 +1144,18 @@
                             <tr class="hover:bg-neutral-50 transition-colors">
                                 <td class="px-5 py-4 text-center font-bold text-xs">{{ $offer->id }}</td>
                                 <td class="px-5 py-4">
-                                    <div class="font-bold text-black text-xs font-montserrat">{{ $offer->reference_number }}</div>
-                                    <div class="text-[10px] text-gray-400 mt-0.5 uppercase font-roboto">{{ $offer->created_at->format('d M Y, H:i') }}</div>
+                                    <div class="font-bold text-black text-xs font-space-grotesk">{{ $offer->reference_number }}</div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5 uppercase font-inter">{{ $offer->created_at->format('d M Y, H:i') }}</div>
                                 </td>
                                 <td class="px-5 py-4">
                                     <div class="font-bold text-xs text-gray-900">{{ $offer->user->name ?? 'Guest' }}</div>
-                                    <div class="text-[11px] text-gray-400 font-roboto">{{ $offer->user->email ?? '-' }}</div>
+                                    <div class="text-[11px] text-gray-400 font-inter">{{ $offer->user->email ?? '-' }}</div>
                                 </td>
                                 <td class="px-5 py-4">
                                     <div class="font-bold text-xs text-gray-900">{{ $offer->artwork->title ?? 'Deleted Artwork' }}</div>
-                                    <div class="text-[11px] text-gray-500 font-roboto">{{ $offer->artwork->artist->name ?? '-' }}</div>
+                                    <div class="text-[11px] text-gray-500 font-inter">{{ $offer->artwork->artist->name ?? '-' }}</div>
                                 </td>
-                                <td class="px-5 py-4 font-montserrat font-bold text-xs text-brandDark">
+                                <td class="px-5 py-4 font-space-grotesk font-bold text-xs text-brandDark">
                                     Rp {{ number_format($offer->offering_price, 0, ',', '.') }}
                                 </td>
                                 <td class="px-5 py-4">
@@ -1120,7 +1179,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-5 py-12 text-center text-sm text-gray-400 font-roboto">Belum ada penawaran karya seni.</td>
+                                <td colspan="7" class="px-5 py-12 text-center text-sm text-gray-400 font-inter">Belum ada penawaran karya seni.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -1138,8 +1197,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
             <div>
-                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block">Catalog Management</span>
-                <h3 id="modal-product-title" class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Add Product</h3>
+                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 block">Catalog Management</span>
+                <h3 id="modal-product-title" class="font-space-grotesk font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Add Product</h3>
             </div>
             <button onclick="closeProductModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
         </div>
@@ -1150,26 +1209,26 @@
 
             <!-- SECTION A: Basic Info -->
             <div class="space-y-4">
-                <h4 class="text-xs font-bold font-montserrat uppercase tracking-wider text-black border-b border-gray-100 pb-1">1. Informasi Pokok & Kepemilikan Produk</h4>
+                <h4 class="text-xs font-bold font-space-grotesk uppercase tracking-wider text-black border-b border-gray-100 pb-1">1. Informasi Pokok & Kepemilikan Produk</h4>
                 
                 <!-- Opsi Pemilik Produk: Notisse Original vs Artist Collab -->
                 <div>
-                    <label class="block text-[11px] font-montserrat font-bold uppercase tracking-widest text-gray-800 mb-1.5">
+                    <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-800 mb-1.5">
                         Pemilik / Asal Produk (Product Ownership) *
                     </label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
                         <label class="flex items-center gap-3 p-3 border border-gray-300 rounded cursor-pointer hover:border-black transition-colors bg-gray-50" id="label-origin-notisse">
                             <input type="radio" name="product_origin_type" value="notisse" id="origin-type-notisse" onchange="toggleProductOriginType('notisse')" checked class="text-black focus:ring-black">
                             <div>
-                                <span class="font-montserrat font-bold text-xs uppercase block text-black">Notisse Original</span>
-                                <span class="text-[10px] text-gray-500 font-roboto block">Produk asli in-house label Notisse</span>
+                                <span class="font-space-grotesk font-bold text-xs uppercase block text-black">Notisse Original</span>
+                                <span class="text-[10px] text-gray-500 font-inter block">Produk asli in-house label Notisse</span>
                             </div>
                         </label>
                         <label class="flex items-center gap-3 p-3 border border-gray-300 rounded cursor-pointer hover:border-black transition-colors bg-gray-50" id="label-origin-collab">
                             <input type="radio" name="product_origin_type" value="collab" id="origin-type-collab" onchange="toggleProductOriginType('collab')" class="text-black focus:ring-black">
                             <div>
-                                <span class="font-montserrat font-bold text-xs uppercase block text-black">Artist Collaboration</span>
-                                <span class="text-[10px] text-gray-500 font-roboto block">Karya rilis kolaborasi seniman</span>
+                                <span class="font-space-grotesk font-bold text-xs uppercase block text-black">Artist Collaboration</span>
+                                <span class="text-[10px] text-gray-500 font-inter block">Karya rilis kolaborasi seniman</span>
                             </div>
                         </label>
                     </div>
@@ -1177,11 +1236,11 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Nama Produk *</label>
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Nama Produk *</label>
                         <input type="text" name="name" id="p-name" required placeholder="Contoh: Raja Diamuk Massa Tee V1" class="admin-input">
                     </div>
                     <div id="p-artist-container" class="opacity-50 pointer-events-none transition-opacity">
-                        <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Seniman / Kolaborator</label>
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Seniman / Kolaborator</label>
                         <div class="relative">
                             <input list="artists-datalist" name="artist" id="p-artist" value="Notisse Original" placeholder="Pilih atau ketik nama seniman..." class="admin-input">
                             <datalist id="artists-datalist">
@@ -1190,48 +1249,48 @@
                                 @endforeach
                             </datalist>
                         </div>
-                        <p class="text-[10px] text-gray-400 font-roboto mt-1" id="p-artist-hint">Produk in-house label resmi Notisse.</p>
+                        <p class="text-[10px] text-gray-400 font-inter mt-1" id="p-artist-hint">Produk in-house label resmi Notisse.</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Harga Produk (IDR) *</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Harga Produk (IDR) *</label>
                     <input type="number" name="price" id="p-price" required placeholder="Contoh: 250000" class="admin-input">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Spesifikasi Garmen & Fabric Details</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Spesifikasi Garmen & Fabric Details</label>
                     <input type="text" name="specs" id="p-specs" placeholder="Contoh: 100% Heavyweight 24s Cotton Combed (220 GSM) • Boxy Drop Shoulder Fit • High-Density Screenprint" class="admin-input">
-                    <p class="text-[10px] text-gray-400 font-roboto mt-1">Detail gramasi kain, model potongan, dan teknik sablon/jahitan.</p>
+                    <p class="text-[10px] text-gray-400 font-inter mt-1">Detail gramasi kain, model potongan, dan teknik sablon/jahitan.</p>
                 </div>
 
                 <div>
                     <div class="flex justify-between items-center mb-1.5">
-                        <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600">Deskripsi Editorial Produk</label>
-                        <button type="button" onclick="setDefaultProductDescription()" class="text-[10px] font-montserrat font-bold uppercase text-brandRed hover:underline cursor-pointer">
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600">Deskripsi Editorial Produk</label>
+                        <button type="button" onclick="setDefaultProductDescription()" class="text-[10px] font-space-grotesk font-bold uppercase text-brandRed hover:underline cursor-pointer">
                             + Gunakan Default Notisse Spec
                         </button>
                     </div>
                     <textarea name="description" id="p-desc" rows="4" placeholder="Cotton Combed 16s&#10;Raster Plastisol Screen Printing&#10;Digitized Painting" class="admin-input resize-none leading-relaxed font-mono text-xs"></textarea>
-                    <p class="text-[10px] text-gray-400 font-roboto mt-1">Format default 3 baris: Cotton Combed 16s, Raster Plastisol Screen Printing, Digitized Painting.</p>
+                    <p class="text-[10px] text-gray-400 font-inter mt-1">Format default 3 baris: Cotton Combed 16s, Raster Plastisol Screen Printing, Digitized Painting.</p>
                 </div>
             </div>
 
             <!-- SECTION B: Structured Visual Media Uploads -->
             <div class="space-y-4 pt-2">
                 <div>
-                    <h4 class="text-xs font-bold font-montserrat uppercase tracking-wider text-black">2. Pengaturan Foto & Media Produk</h4>
-                    <p class="text-[11px] text-gray-500 font-roboto mt-0.5">Admin dapat mengupload foto spesifik untuk katalog, bagian belakang, model photoshoot, dan panduan size chart agar tidak tertukar.</p>
+                    <h4 class="text-xs font-bold font-space-grotesk uppercase tracking-wider text-black">2. Pengaturan Foto & Media Produk</h4>
+                    <p class="text-[11px] text-gray-500 font-inter mt-0.5">Admin dapat mengupload foto spesifik untuk katalog, bagian belakang, model photoshoot, dan panduan size chart agar tidak tertukar.</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- 1. Foto Depan / Katalog Utama -->
                     <div class="p-3.5 bg-gray-50 border border-gray-200 rounded-sm space-y-2">
                         <div class="flex items-center justify-between">
-                            <label class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-black">Foto Depan (Katalog Utama)</label>
-                            <span class="text-[9px] font-montserrat font-bold uppercase bg-black text-white px-1.5 py-0.5">Shop Grid</span>
+                            <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-black">Foto Depan (Katalog Utama)</label>
+                            <span class="text-[9px] font-space-grotesk font-bold uppercase bg-black text-white px-1.5 py-0.5">Shop Grid</span>
                         </div>
-                        <p class="text-[10px] text-gray-500 font-roboto leading-normal">Foto tampak depan dengan latar bersih untuk cover katalog toko.</p>
+                        <p class="text-[10px] text-gray-500 font-inter leading-normal">Foto tampak depan dengan latar bersih untuk cover katalog toko.</p>
                         <input type="file" name="image" id="p-img-front" accept="image/*" onchange="previewImage(this,'preview-front')" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
                         <img id="preview-front" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Front Preview">
                     </div>
@@ -1239,10 +1298,10 @@
                     <!-- 2. Foto Belakang Produk -->
                     <div class="p-3.5 bg-gray-50 border border-gray-200 rounded-sm space-y-2">
                         <div class="flex items-center justify-between">
-                            <label class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-black">Foto Belakang (Back View)</label>
-                            <span class="text-[9px] font-montserrat font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Product Detail</span>
+                            <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-black">Foto Belakang (Back View)</label>
+                            <span class="text-[9px] font-space-grotesk font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Product Detail</span>
                         </div>
-                        <p class="text-[10px] text-gray-500 font-roboto leading-normal">Foto tampak belakang untuk memperlihatkan grafis/detail punggung.</p>
+                        <p class="text-[10px] text-gray-500 font-inter leading-normal">Foto tampak belakang untuk memperlihatkan grafis/detail punggung.</p>
                         <input type="file" name="back_image" id="p-img-back" accept="image/*" onchange="previewImage(this,'preview-back')" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
                         <img id="preview-back" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Back Preview">
                     </div>
@@ -1250,10 +1309,10 @@
                     <!-- 3. Foto On-Model Footage -->
                     <div class="p-3.5 bg-gray-50 border border-gray-200 rounded-sm space-y-2">
                         <div class="flex items-center justify-between">
-                            <label class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-black">Foto On-Model Footage</label>
-                            <span class="text-[9px] font-montserrat font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Photoshoot</span>
+                            <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-black">Foto On-Model Footage</label>
+                            <span class="text-[9px] font-space-grotesk font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Photoshoot</span>
                         </div>
-                        <p class="text-[10px] text-gray-500 font-roboto leading-normal">Foto produk saat dipakai model photoshoot / lookbook di halaman detail.</p>
+                        <p class="text-[10px] text-gray-500 font-inter leading-normal">Foto produk saat dipakai model photoshoot / lookbook di halaman detail.</p>
                         <input type="file" name="footage_image" id="p-img-footage" accept="image/*" onchange="previewImage(this,'preview-footage')" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
                         <img id="preview-footage" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Footage Preview">
                     </div>
@@ -1261,10 +1320,10 @@
                     <!-- 4. Foto Size Chart -->
                     <div class="p-3.5 bg-gray-50 border border-gray-200 rounded-sm space-y-2">
                         <div class="flex items-center justify-between">
-                            <label class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-black">Foto Panduan Size Chart</label>
-                            <span class="text-[9px] font-montserrat font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Size Guide</span>
+                            <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-black">Foto Panduan Size Chart</label>
+                            <span class="text-[9px] font-space-grotesk font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Size Guide</span>
                         </div>
-                        <p class="text-[10px] text-gray-500 font-roboto leading-normal">Tabel ukuran spesifik garmen ini yang tampil saat popup Size Guide diklik.</p>
+                        <p class="text-[10px] text-gray-500 font-inter leading-normal">Tabel ukuran spesifik garmen ini yang tampil saat popup Size Guide diklik.</p>
                         <input type="file" name="size_chart_image" id="p-img-sizechart" accept="image/*" onchange="previewImage(this,'preview-sizechart')" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
                         <img id="preview-sizechart" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Size Chart Preview">
                     </div>
@@ -1273,11 +1332,11 @@
 
             <!-- SECTION C: Stock per Size -->
             <div class="space-y-3 pt-2">
-                <h4 class="text-xs font-bold font-montserrat uppercase tracking-wider text-black border-b border-gray-100 pb-1">3. Jumlah Stok Fisik per Ukuran</h4>
+                <h4 class="text-xs font-bold font-space-grotesk uppercase tracking-wider text-black border-b border-gray-100 pb-1">3. Jumlah Stok Fisik per Ukuran</h4>
                 <div class="grid grid-cols-4 gap-3">
                     @foreach(['S','M','L','XL'] as $sz)
                     <div class="bg-gray-50 border border-gray-200 p-2 text-center rounded-sm">
-                        <span class="block text-[11px] font-montserrat font-bold text-gray-500 mb-1 text-center">{{ $sz }}</span>
+                        <span class="block text-[11px] font-space-grotesk font-bold text-gray-500 mb-1 text-center">{{ $sz }}</span>
                         <input type="number" name="stocks[{{ $sz }}]" id="p-stock-{{ $sz }}" min="0"
                             class="admin-input text-center font-bold" placeholder="0">
                     </div>
@@ -1300,8 +1359,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
             <div>
-                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block">Artist Collaborations</span>
-                <h3 id="modal-artist-title" class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Add Artist</h3>
+                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 block">Artist Collaborations</span>
+                <h3 id="modal-artist-title" class="font-space-grotesk font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Add Artist</h3>
             </div>
             <button onclick="closeArtistModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
         </div>
@@ -1312,30 +1371,30 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Nama Seniman *</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Nama Seniman *</label>
                     <input type="text" name="name" id="artist-name" required placeholder="Contoh: Mustafa Alatas" class="admin-input">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Kota Asal / Domisili</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Kota Asal / Domisili</label>
                     <input type="text" name="city" id="artist-city" placeholder="Contoh: Temanggung" class="admin-input">
                 </div>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Biografi & Profil Cerita Seniman</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Biografi & Profil Cerita Seniman</label>
                 <textarea name="bio" id="artist-bio" rows="4" placeholder="Tuliskan latar belakang artistik, gaya melukis, dan narasi kolaborasi dengan Notisse..." class="admin-input resize-none leading-relaxed"></textarea>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Profil / Portrait Seniman</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Profil / Portrait Seniman</label>
                     <input type="file" name="photo" id="artist-photo-input" accept="image/*"
                         onchange="previewImage(this,'artist-photo-preview')"
                         class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
                     <img id="artist-photo-preview" class="mt-3 w-32 h-32 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Karya Seni Unggulan (Preview)</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Karya Seni Unggulan (Preview)</label>
                     <input type="file" name="artwork_preview" id="artist-art-input" accept="image/*"
                         onchange="previewImage(this,'artist-art-preview')"
                         class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
@@ -1358,8 +1417,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
             <div>
-                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block">Karya Seni Fisik Seniman</span>
-                <h3 id="modal-artwork-title" class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Artwork Fisik</h3>
+                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 block">Karya Seni Fisik Seniman</span>
+                <h3 id="modal-artwork-title" class="font-space-grotesk font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Artwork Fisik</h3>
             </div>
             <button onclick="closeArtworkModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
         </div>
@@ -1370,7 +1429,7 @@
 
             <!-- PILIH SENIMAN (WAJIB & JELAS) -->
             <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-sm">
-                <label class="block text-[11px] font-montserrat font-bold uppercase tracking-widest text-black mb-1.5">
+                <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-black mb-1.5">
                     Seniman Pemilik Karya *
                 </label>
                 <select name="artist_id" id="art-artist-id" required class="admin-input bg-white font-medium">
@@ -1379,47 +1438,47 @@
                         <option value="{{ $artObj->id }}">{{ $artObj->name }} &bull; {{ $artObj->city ?: 'Indonesia' }}</option>
                     @endforeach
                 </select>
-                <p class="text-[10px] text-gray-500 font-roboto mt-1">Karya ini akan langsung terhubung ke profil seniman yang Anda pilih dan tampil di galeri storefront.</p>
+                <p class="text-[10px] text-gray-500 font-inter mt-1">Karya ini akan langsung terhubung ke profil seniman yang Anda pilih dan tampil di galeri storefront.</p>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Karya Seni (Title) *</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Karya Seni (Title) *</label>
                 <input type="text" name="title" id="art-title" required placeholder="Contoh: Mereka Ulang Ungkapan Indah Leila" class="admin-input">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Medium / Teknik</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Medium / Teknik</label>
                     <input type="text" name="medium" id="art-medium" placeholder="Contoh: Oil on canvas" class="admin-input">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Dimensi (Ukuran Kanvas)</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Dimensi (Ukuran Kanvas)</label>
                     <input type="text" name="dimensions" id="art-dimensions" placeholder="Contoh: 60x60cm" class="admin-input">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Tahun Pembuatan</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Tahun Pembuatan</label>
                     <input type="text" name="year" id="art-year" placeholder="Contoh: 2024" class="admin-input">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Status Ketersediaan</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Status Ketersediaan</label>
                     <input type="text" name="status" id="art-status" placeholder="Contoh: Available for Direct Offering" class="admin-input">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Est. Nilai / Harga (IDR)</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Est. Nilai / Harga (IDR)</label>
                     <input type="number" name="price" id="art-price" placeholder="Contoh: 15000000" class="admin-input">
                 </div>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Catatan Kuratorial & Deskripsi</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Catatan Kuratorial & Deskripsi</label>
                 <textarea name="description" id="art-desc" rows="3" placeholder="Tuliskan latar belakang karya seni, narasi visual, dan pesan filosofis seniman..." class="admin-input resize-none leading-relaxed"></textarea>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Karya Seni High-Res (Physical Artwork)</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Karya Seni High-Res (Physical Artwork)</label>
                 <input type="file" name="image" id="artwork-img-input" accept="image/*"
                     onchange="previewImage(this,'artwork-img-preview')"
                     class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
@@ -1441,8 +1500,8 @@
     <div class="modal-box max-w-2xl" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
             <div>
-                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-brandRed block">Editorial & Curatorial Writing</span>
-                <h3 id="modal-editorial-title" class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Artikel Editorial</h3>
+                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest text-brandRed block">Editorial & Curatorial Writing</span>
+                <h3 id="modal-editorial-title" class="font-space-grotesk font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Artikel Editorial</h3>
             </div>
             <button onclick="closeEditorialModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
         </div>
@@ -1453,7 +1512,7 @@
 
             <!-- PILIH SENIMAN (WAJIB & JELAS) -->
             <div class="p-3 bg-red-50 border border-red-200 rounded-sm">
-                <label class="block text-[11px] font-montserrat font-bold uppercase tracking-widest text-brandRed mb-1.5">
+                <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-brandRed mb-1.5">
                     Seniman Terkait Artikel Ini *
                 </label>
                 <select name="artist_id" id="edit-artist-id" required class="admin-input bg-white font-medium">
@@ -1462,37 +1521,37 @@
                         <option value="{{ $artObj->id }}">{{ $artObj->name }} &bull; {{ $artObj->city ?: 'Indonesia' }}</option>
                     @endforeach
                 </select>
-                <p class="text-[10px] text-gray-500 font-roboto mt-1">Artikel editorial ini akan muncul di tab "Editorial" pada profil seniman yang dipilih.</p>
+                <p class="text-[10px] text-gray-500 font-inter mt-1">Artikel editorial ini akan muncul di tab "Editorial" pada profil seniman yang dipilih.</p>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Artikel Editorial *</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Artikel Editorial *</label>
                 <input type="text" name="title" id="edit-title" required placeholder="Contoh: Menafsir Kuasa dan Sosial dalam Lukisan Figuratif" class="admin-input">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Penulis / Kurator</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Penulis / Kurator</label>
                     <input type="text" name="author" id="edit-author" placeholder="Contoh: Laksa Dawantara / Tim Notisse" class="admin-input">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Video File / URL (Opsional)</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Video File / URL (Opsional)</label>
                     <input type="text" name="video_url" id="edit-video" placeholder="Contoh: video/editorial.mp4 atau URL video" class="admin-input">
                 </div>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Ringkasan / Excerpt Singkat</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Ringkasan / Excerpt Singkat</label>
                 <textarea name="excerpt" id="edit-excerpt" rows="2" placeholder="Ringkasan 1-2 kalimat pengantar artikel untuk preview kartu..." class="admin-input resize-none leading-relaxed"></textarea>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Isi Lengkap Tulisan Editorial</label>
-                <textarea name="content" id="edit-content" rows="6" placeholder="Tuliskan esai lengkap, kutipan wawancara seniman, dan refleksi karya seni..." class="admin-input resize-none leading-relaxed font-roboto"></textarea>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Isi Lengkap Tulisan Editorial</label>
+                <textarea name="content" id="edit-content" rows="6" placeholder="Tuliskan esai lengkap, kutipan wawancara seniman, dan refleksi karya seni..." class="admin-input resize-none leading-relaxed font-inter"></textarea>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Sampul / Featured Article Image</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Sampul / Featured Article Image</label>
                 <input type="file" name="image" id="editorial-img-input" accept="image/*"
                     onchange="previewImage(this,'editorial-img-preview')"
                     class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
@@ -1513,7 +1572,7 @@
 <div id="modal-media" class="modal-backdrop" onclick="closeMediaModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
-            <h3 class="font-montserrat font-bold text-xl uppercase tracking-[0.15em] text-gray-900">Ganti Gambar</h3>
+            <h3 class="font-space-grotesk font-bold text-xl uppercase tracking-[0.15em] text-gray-900">Ganti Gambar</h3>
             <button onclick="closeMediaModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
         </div>
 
@@ -1521,28 +1580,33 @@
             @csrf
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Title / Keterangan</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Title / Keterangan</label>
                 <input type="text" name="title" id="m-title" class="admin-input">
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Tautkan ke Produk (Opsional)</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Tautkan ke Produk (Opsional)</label>
                 <select name="product_id" id="m-product-id" class="admin-input">
                     <option value="">-- Tidak Terhubung ke Produk --</option>
                     @foreach($products as $prod)
                         <option value="{{ $prod->id }}">{{ $prod->name }} (#{{ $prod->id }})</option>
                     @endforeach
                 </select>
-                <p class="text-[10px] text-gray-400 mt-1 font-roboto">Pilih produk jika foto footage ini merupakan foto katalog garmen tertentu.</p>
+                <p class="text-[10px] text-gray-400 mt-1 font-inter">Pilih produk jika foto footage ini merupakan foto katalog garmen tertentu.</p>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Upload Gambar Baru</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Urutan Tampil (Order)</label>
+                <input type="number" name="order" id="m-order" min="1" class="admin-input">
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Upload Gambar Baru</label>
                 <input type="file" name="image" id="media-img-input" accept="image/*"
                     onchange="previewImage(this,'media-img-preview')"
                     class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
                 <img id="media-img-preview" class="mt-3 w-full max-h-48 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
-                <p class="text-[11px] text-gray-400 mt-1.5 font-roboto">Biarkan kosong jika tidak ingin mengganti gambar.</p>
+                <p class="text-[11px] text-gray-400 mt-1.5 font-inter">Biarkan kosong jika tidak ingin mengganti gambar.</p>
             </div>
 
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
@@ -1554,6 +1618,53 @@
 </div>
 
 {{-- ══════════════════════════════════════════════════════════════
+     MODAL: TAMBAH SLIDE HERO CAROUSEL
+══════════════════════════════════════════════════════════════ --}}
+<div id="modal-create-carousel" class="modal-backdrop" onclick="closeCreateCarouselModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+            <div>
+                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 block">Site Media &bull; Hero Carousel</span>
+                <h3 class="font-space-grotesk font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Slide Carousel Baru</h3>
+            </div>
+            <button onclick="closeCreateCarouselModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
+        </div>
+
+        <form action="/admin/media" method="POST" enctype="multipart/form-data" class="space-y-4">
+            @csrf
+            <input type="hidden" name="section" value="carousel">
+
+            <div>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Pilih File Gambar Slide *</label>
+                <input type="file" name="image" required accept="image/*"
+                    onchange="previewImage(this,'create-carousel-img-preview')"
+                    class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
+                <img id="create-carousel-img-preview" class="mt-3 w-full max-h-48 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                <p class="text-[11px] text-gray-400 mt-1.5 font-inter">Disarankan gambar beresolusi tinggi (rasio 16:9 atau landscape, misal 1920x1080 px).</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Judul / Keterangan (Opsional)</label>
+                    <input type="text" name="title" placeholder="Contoh: Winter Campaign 2026" class="admin-input">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Urutan Tampil (Order)</label>
+                    <input type="number" name="order" value="{{ ($carousels->max('order') ?? 0) + 1 }}" min="1" class="admin-input">
+                    <p class="text-[10px] text-gray-400 mt-1 font-inter">Nomor urutan rotasi slideshow.</p>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                <button type="button" onclick="closeCreateCarouselModal()" class="btn-outline cursor-pointer">Batal</button>
+                <button type="submit" class="btn-primary cursor-pointer">Simpan Slide</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{{-- ══════════════════════════════════════════════════════════════
      MODAL 6: CREATE & MANAGE LOOKBOOKS
 ══════════════════════════════════════════════════════════════ --}}
 <!-- Modal Create Lookbook -->
@@ -1561,8 +1672,8 @@
     <div class="modal-box max-w-lg" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
             <div>
-                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block">Lookbook Collections</span>
-                <h3 class="font-montserrat font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Buat Album Lookbook Baru</h3>
+                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 block">Lookbook Collections</span>
+                <h3 class="font-space-grotesk font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Buat Album Lookbook Baru</h3>
             </div>
             <button onclick="closeCreateLookbookModal()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
         </div>
@@ -1570,23 +1681,23 @@
         <form action="/admin/lookbooks" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Lookbook *</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Judul Lookbook *</label>
                 <input type="text" name="title" required placeholder="Contoh: 2025 LOOKBOOK atau SUMMER 2025" class="admin-input">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Tahun Kampanye</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Tahun Kampanye</label>
                     <input type="text" name="year" value="{{ date('Y') }}" placeholder="2025" class="admin-input">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Cover Image (Opsional)</label>
+                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Cover Image (Opsional)</label>
                     <input type="file" name="cover_image" accept="image/*" class="admin-input py-1.5 text-xs bg-gray-50 cursor-pointer">
                 </div>
             </div>
 
             <div>
-                <label class="block text-[11px] font-montserrat font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Deskripsi / Konsep Kampanye</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Deskripsi / Konsep Kampanye</label>
                 <textarea name="description" rows="2" placeholder="Konsep visual, inspirasi koleksi lookbook..." class="admin-input resize-none"></textarea>
             </div>
 
@@ -1594,15 +1705,15 @@
             <div class="p-3.5 bg-neutral-50 border border-gray-200 rounded-sm space-y-3">
                 <div class="flex items-center gap-2">
                     <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                    <span class="text-xs font-montserrat font-bold uppercase tracking-wider text-black">Video Kampanye Lookbook (Wide Header)</span>
+                    <span class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-black">Video Kampanye Lookbook (Wide Header)</span>
                 </div>
-                <p class="text-[11px] text-gray-500 font-roboto">Video ini akan tampil sebagai video player melebar di paling atas halaman Lookbook pengunjung.</p>
+                <p class="text-[11px] text-gray-500 font-inter">Video ini akan tampil sebagai video player melebar di paling atas halaman Lookbook pengunjung.</p>
                 <div>
-                    <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Upload File Video (.mp4 / .mov)</label>
+                    <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Upload File Video (.mp4 / .mov)</label>
                     <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Atau Path / Link Video</label>
+                    <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Atau Path / Link Video</label>
                     <input type="text" name="video_url" placeholder="Contoh: video/editorial.mp4" class="admin-input text-xs">
                 </div>
             </div>
@@ -1621,8 +1732,8 @@
         <!-- Header -->
         <div class="flex justify-between items-start mb-6 pb-4 border-b border-gray-100">
             <div>
-                <span class="text-[10px] font-montserrat font-bold uppercase tracking-widest text-gray-400 block" id="manage-lb-year-badge">2025 LOOKBOOK</span>
-                <h3 class="font-montserrat font-extrabold text-xl sm:text-2xl uppercase tracking-[0.12em] text-gray-900" id="manage-lb-title">Lookbook Manager</h3>
+                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest text-gray-400 block" id="manage-lb-year-badge">2025 LOOKBOOK</span>
+                <h3 class="font-space-grotesk font-extrabold text-xl sm:text-2xl uppercase tracking-[0.12em] text-gray-900" id="manage-lb-title">Lookbook Manager</h3>
             </div>
             <button onclick="closeManageLookbook()" class="text-2xl leading-none text-gray-400 hover:text-black transition-colors cursor-pointer">&times;</button>
         </div>
@@ -1632,13 +1743,13 @@
             <div class="border border-gray-200 bg-white p-5 rounded-sm shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-100 pb-3">
                     <div>
-                        <h4 class="font-montserrat font-bold text-sm uppercase tracking-wider text-black flex items-center gap-2">
+                        <h4 class="font-space-grotesk font-bold text-sm uppercase tracking-wider text-black flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
                             <span>Video Kampanye Lookbook (Tampil di Bagian Atas Melebar)</span>
                         </h4>
-                        <p class="text-xs text-gray-500 font-roboto mt-0.5">Video kampanye yang berputar di banner atas halaman Lookbook ini.</p>
+                        <p class="text-xs text-gray-500 font-inter mt-0.5">Video kampanye yang berputar di banner atas halaman Lookbook ini.</p>
                     </div>
-                    <span id="manage-lb-video-status" class="text-[10px] font-montserrat font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-gray-100 text-gray-600 self-start sm:self-auto">
+                    <span id="manage-lb-video-status" class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-gray-100 text-gray-600 self-start sm:self-auto">
                         Status Video
                     </span>
                 </div>
@@ -1659,11 +1770,11 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Upload File Video Baru (.mp4)</label>
+                            <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Upload File Video Baru (.mp4)</label>
                             <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" class="admin-input py-1.5 text-xs bg-gray-50 cursor-pointer">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Atau Masukkan Path / URL Video</label>
+                            <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Atau Masukkan Path / URL Video</label>
                             <input type="text" name="video_url" id="manage-lb-input-videourl" placeholder="video/editorial.mp4" class="admin-input text-xs">
                         </div>
                     </div>
@@ -1679,25 +1790,25 @@
             <div class="border border-gray-200 bg-white p-5 rounded-sm shadow-sm space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3">
                     <div>
-                        <h4 class="font-montserrat font-bold text-sm uppercase tracking-wider text-black flex items-center gap-2">
+                        <h4 class="font-space-grotesk font-bold text-sm uppercase tracking-wider text-black flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
                             <span>Foto-Foto Photoshoot di Album Ini</span>
                         </h4>
-                        <p class="text-xs text-gray-500 font-roboto mt-0.5">Unggah foto-foto photoshoot eksklusif yang menjadi isi dari album Lookbook ini.</p>
+                        <p class="text-xs text-gray-500 font-inter mt-0.5">Unggah foto-foto photoshoot eksklusif yang menjadi isi dari album Lookbook ini.</p>
                     </div>
                 </div>
 
                 <!-- Form Upload Foto Baru ke Lookbook ini -->
                 <form id="manage-lb-photo-form" action="" method="POST" enctype="multipart/form-data" class="p-4 bg-neutral-50 border border-gray-200 space-y-3">
                     @csrf
-                    <span class="text-[11px] font-montserrat font-bold uppercase tracking-wider text-black block">+ Upload Foto Photoshoot ke Lookbook Ini</span>
+                    <span class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-black block">+ Upload Foto Photoshoot ke Lookbook Ini</span>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                         <div>
-                            <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Pilih File Foto *</label>
+                            <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Pilih File Foto *</label>
                             <input type="file" name="image" required accept="image/*" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-montserrat font-semibold uppercase tracking-wider text-gray-600 mb-1">Judul / Tema Foto (Opsional)</label>
+                            <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Judul / Tema Foto (Opsional)</label>
                             <input type="text" name="title" placeholder="Contoh: Look 01 - Leather Jacket" class="admin-input text-xs">
                         </div>
                     </div>
@@ -1710,7 +1821,7 @@
 
                 <!-- List Foto yang sudah ada di Lookbook ini -->
                 <div>
-                    <h5 class="text-xs font-montserrat font-bold uppercase tracking-wider text-gray-600 mb-3">
+                    <h5 class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-gray-600 mb-3">
                         Daftar Foto Terunggah (<span id="manage-lb-photo-count">0</span> foto):
                     </h5>
                     <div id="manage-lb-photos-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -1798,7 +1909,7 @@
 
         if (lb.video_url) {
             statusBadge.innerText = 'Video Aktif';
-            statusBadge.className = 'text-[10px] font-montserrat font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-emerald-100 text-emerald-800';
+            statusBadge.className = 'text-[10px] font-space-grotesk font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-emerald-100 text-emerald-800';
             let vSrc = lb.video_url;
             if (!vSrc.startsWith('http') && !vSrc.startsWith('/')) {
                 vSrc = vSrc.startsWith('video/') ? '/' + vSrc : '/storage/' + vSrc;
@@ -1807,7 +1918,7 @@
             videoPlayer.load();
         } else {
             statusBadge.innerText = 'Belum Ada Video';
-            statusBadge.className = 'text-[10px] font-montserrat font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-gray-100 text-gray-600';
+            statusBadge.className = 'text-[10px] font-space-grotesk font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-gray-100 text-gray-600';
             videoSource.src = '';
             videoPlayer.load();
         }
@@ -1820,7 +1931,7 @@
 
         grid.innerHTML = '';
         if (photos.length === 0) {
-            grid.innerHTML = '<div class="col-span-full py-8 text-center text-xs text-gray-400 font-roboto bg-gray-50 border border-gray-100">Belum ada foto yang diunggah di album ini.</div>';
+            grid.innerHTML = '<div class="col-span-full py-8 text-center text-xs text-gray-400 font-inter bg-gray-50 border border-gray-100">Belum ada foto yang diunggah di album ini.</div>';
         } else {
             photos.forEach(p => {
                 const pSrc = p.image.startsWith('http') || p.image.startsWith('/') ? p.image : (p.image.startsWith('lookbooks') ? '/storage/' + p.image : '/' + p.image);
@@ -1829,7 +1940,7 @@
                         <div class="aspect-[3/4] bg-neutral-200 overflow-hidden relative">
                             <img src="${pSrc}" alt="${p.title || ''}" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2 text-center">
-                                <span class="text-white text-[10px] font-montserrat font-bold uppercase tracking-wider">${p.title || 'Photoshoot'}</span>
+                                <span class="text-white text-[10px] font-space-grotesk font-bold uppercase tracking-wider">${p.title || 'Photoshoot'}</span>
                             </div>
                         </div>
                         <div class="p-2 border-t border-gray-200 flex items-center justify-between bg-white">
@@ -1837,7 +1948,7 @@
                             <form action="/admin/lookbooks/photos/${p.id}" method="POST" onsubmit="return confirm('Hapus foto ini dari album?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-[10px] text-red-600 hover:text-red-800 font-montserrat font-bold uppercase tracking-wider cursor-pointer">
+                                <button type="submit" class="text-[10px] text-red-600 hover:text-red-800 font-space-grotesk font-bold uppercase tracking-wider cursor-pointer">
                                     Hapus
                                 </button>
                             </form>
@@ -2159,10 +2270,13 @@
     }
 
     // ── Media modal ─────────────────────────────────────────────
-    function openMediaModal(id, title, desc, productId) {
+    function openMediaModal(id, title, desc, productId, order) {
         document.getElementById('media-form').action = '/admin/media/' + id;
         document.getElementById('m-title').value     = title || '';
         document.getElementById('m-product-id').value = productId || '';
+        if (document.getElementById('m-order')) {
+            document.getElementById('m-order').value = order || 1;
+        }
         document.getElementById('media-img-preview').classList.add('hidden');
         document.getElementById('media-img-input').value = '';
         document.getElementById('modal-media').classList.add('open');
@@ -2170,6 +2284,20 @@
 
     function closeMediaModal() {
         document.getElementById('modal-media').classList.remove('open');
+    }
+
+    // ── Create Carousel Modal ───────────────────────────────────
+    function openCreateCarouselModal() {
+        const preview = document.getElementById('create-carousel-img-preview');
+        if (preview) {
+            preview.classList.add('hidden');
+            preview.src = '';
+        }
+        document.getElementById('modal-create-carousel').classList.add('open');
+    }
+
+    function closeCreateCarouselModal() {
+        document.getElementById('modal-create-carousel').classList.remove('open');
     }
 
     // ── Auto-dismiss toast ───────────────────────────────────────
@@ -2184,6 +2312,7 @@
             closeArtworkModal();
             closeEditorialModal();
             closeMediaModal();
+            closeCreateCarouselModal();
             closeLookbookModal();
         }
     });

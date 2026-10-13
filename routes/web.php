@@ -14,8 +14,9 @@ Route::get('/', function () {
     $lookbooks = \App\Models\Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
     $settings = \App\Models\SiteSetting::pluck('value', 'key')->toArray();
     $newcomer = \App\Models\Artist::where('is_newcomer', true)->first();
+    $carousels = \App\Models\SiteMedia::where('section', 'carousel')->orderBy('order')->get();
     
-    return view('welcome', compact('products', 'fotoshoots', 'artists', 'editorials', 'lookbooks', 'settings', 'newcomer'));
+    return view('welcome', compact('products', 'fotoshoots', 'artists', 'editorials', 'lookbooks', 'settings', 'newcomer', 'carousels'));
 });
 
 // Seamless Auth & Google Login
@@ -36,7 +37,9 @@ Route::get('/admin', [AdminController::class, 'index']);
 Route::post('/admin/products', [AdminController::class, 'storeProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::match(['post', 'put'], '/admin/products/{id}', [AdminController::class, 'updateProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::delete('/admin/products/{id}', [AdminController::class, 'deleteProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/admin/media', [AdminController::class, 'storeMedia'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::match(['post', 'put'], '/admin/media/{id}', [AdminController::class, 'updateMedia'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::delete('/admin/media/{id}', [AdminController::class, 'deleteMedia'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::post('/admin/artworks', [AdminController::class, 'storeArtwork'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::match(['post', 'put'], '/admin/artworks/{id}', [AdminController::class, 'updateArtwork'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::delete('/admin/artworks/{id}', [AdminController::class, 'deleteArtwork'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);

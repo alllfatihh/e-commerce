@@ -117,6 +117,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string',
             'phone' => 'required|string',
+            'birthdate' => 'nullable|date',
             'address' => 'required|string',
             'area_id' => 'required|string',
             'avatar' => 'nullable|image|max:4096'
@@ -126,6 +127,7 @@ class AuthController extends Controller
         $data = [
             'name' => $request->name,
             'phone' => $request->phone,
+            'birthdate' => $request->birthdate,
             'address' => $request->address,
             'area_id' => $request->area_id,
         ];
@@ -137,6 +139,6 @@ class AuthController extends Controller
 
         $user->update($data);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'user' => $user]);
     }
 }

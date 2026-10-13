@@ -15,11 +15,11 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts Preconnect & Imports (Montserrat, Roboto, Caveat) -->
+    <!-- Google Fonts Preconnect & Imports (Space Grotesk, Inter, Caveat) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
 
     <script>
@@ -27,10 +27,20 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        montserrat: ['Montserrat', 'sans-serif'],
-                        roboto: ['Roboto', 'sans-serif'],
-                        helvetica: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
-                        neueMontreal: ['"Neue Montreal"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+                        'sans': ['"Inter"', 'sans-serif'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        'space-grotesk': ['"Space Grotesk"', 'sans-serif'],
+                        spaceGrotesk: ['"Space Grotesk"', 'sans-serif'],
+                        'inter': ['"Inter"', 'sans-serif'],
+                        inter: ['"Inter"', 'sans-serif'],
+                        'montserrat': ['"Space Grotesk"', 'sans-serif'],
+                        montserrat: ['"Space Grotesk"', 'sans-serif'],
+                        'roboto': ['"Inter"', 'sans-serif'],
+                        roboto: ['"Inter"', 'sans-serif'],
+                        'helvetica': ['"Inter"', 'sans-serif'],
+                        helvetica: ['"Inter"', 'sans-serif'],
+                        'neue-montreal': ['"Space Grotesk"', 'sans-serif'],
+                        neueMontreal: ['"Space Grotesk"', 'sans-serif'],
                         cursive: ['Caveat', 'cursive'],
                     },
                     colors: {
@@ -47,32 +57,31 @@
     <style>
         @font-face {
             font-family: 'Neue Montreal';
-            src: local('Neue Montreal'), local('Helvetica Neue'), local('Arial');
+            src: local('Space Grotesk'), local('Helvetica Neue'), local('Arial');
             font-weight: normal;
             font-style: normal;
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             background-color: #ffffff;
             color: #111111;
             overflow-x: hidden;
         }
 
-        .font-montserrat {
-            font-family: 'Montserrat', sans-serif !important;
+        .font-space-grotesk,
+        .font-montserrat,
+        .font-neue-montreal,
+        [class*="font-space-grotesk"],
+        [class*="font-spaceGrotesk"] {
+            font-family: 'Space Grotesk', sans-serif !important;
         }
 
-        .font-roboto {
-            font-family: 'Roboto', sans-serif !important;
-        }
-
-        .font-helvetica {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
-        }
-
-        .font-neue-montreal {
-            font-family: 'Neue Montreal', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+        .font-inter,
+        .font-roboto,
+        .font-helvetica,
+        [class*="font-inter"] {
+            font-family: 'Inter', sans-serif !important;
         }
 
         .font-cursive {
@@ -122,9 +131,21 @@
             animation: fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
+        .no-scrollbar::-webkit-scrollbar,
+        .custom-scrollbar::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        .no-scrollbar,
+        .custom-scrollbar {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+
         /* CUSTOM BRUSH BUTTON WITH ICON.PNG BACKGROUND */
         .btn-brush {
-            font-family: 'Montserrat', sans-serif !important;
+            font-family: 'Space Grotesk', sans-serif !important;
             background-image: url('{{ asset('icon.png') }}');
             background-size: 100% 100%;
             background-repeat: no-repeat;
@@ -213,9 +234,10 @@
             transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        #overlay-menu-backdrop,
         #overlay-cart {
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(1px);
+            -webkit-backdrop-filter: blur(1px);
         }
 
         #cart-drawer-content {
@@ -267,16 +289,16 @@
         }
         /* A24 INSPIRED DUAL LOGO MORPH ON SCROLL */
         .header-logo-large {
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+            transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
                         filter 0.35s ease;
             will-change: opacity, transform;
             transform-origin: center center;
         }
 
         .header-logo-small {
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+            transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
                         filter 0.35s ease;
             will-change: opacity, transform;
             transform-origin: center center;
@@ -290,7 +312,7 @@
         }
         .logo-state-large .header-logo-small {
             opacity: 0;
-            transform: scale(0.65) rotate(-6deg);
+            transform: scale(0.75);
             pointer-events: none;
         }
 
@@ -302,25 +324,8 @@
         }
         .logo-state-small .header-logo-small {
             opacity: 1;
-            transform: scale(1) rotate(0deg);
+            transform: scale(1);
             pointer-events: auto;
-            animation: smallLogoPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes smallLogoPop {
-            0% {
-                opacity: 0;
-                transform: scale(0.65) translateY(3px);
-                filter: brightness(1.2) drop-shadow(0 4px 10px rgba(0,0,0,0.15));
-            }
-            60% {
-                transform: scale(1.08) translateY(-1px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-                filter: brightness(1) drop-shadow(0 2px 5px rgba(0,0,0,0.06));
-            }
         }
 
         .header-logo-container:hover .header-logo-large {
@@ -329,44 +334,52 @@
         }
 
         .header-logo-container:hover .header-logo-small {
-            transform: scale(1.1) rotate(2deg);
+            transform: scale(1.08);
             filter: brightness(1.15) drop-shadow(0 3px 8px rgba(0,0,0,0.12));
         }
 
-        /* A24 SMART HIDE / REVEAL HEADER ON SCROLL */
+        /* HEADER TRANSITIONS & TRANSPARENCY */
         #main-header {
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                        background-color 0.35s ease,
-                        border-color 0.35s ease,
-                        box-shadow 0.35s ease;
+            background-color: transparent !important;
+            border-bottom: none !important;
+            box-shadow: none !important;
+        }
+
+        #header-logo-container,
+        #header-right-menu,
+        #search-trigger,
+        #menu-trigger {
+            transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity;
+        }
+
+        #overlay-search {
+            transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1) !important;
             will-change: transform;
         }
 
-        #main-header.header-hidden {
-            transform: translateY(-100%) !important;
+        .header-fade-hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
         }
 
-        #main-header.header-visible {
-            transform: translateY(0) !important;
+        .header-fade-visible {
+            opacity: 1 !important;
+            pointer-events: auto !important;
         }
 
-        #menu-trigger,
-        #header-right-menu {
-            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: opacity, transform;
+        #search-trigger {
+            margin-right: 32px !important;
         }
 
         /* ========================================================== */
         /* EXACT A24 MORPHING CART BUTTON WITH MOVING CONNECTING LINE */
         /* ========================================================== */
         .header__link--cart {
-            display: block;
-            position: fixed;
-            top: 27px; /* Fine-tuned vertical alignment with SEARCH */
-            right: 28px;
-            width: 72px;
-            height: 38px;
+            display: inline-block;
+            position: relative;
+            width: 88px;
+            height: 16px;
             z-index: 55;
             background: transparent !important;
             border: none !important;
@@ -374,178 +387,143 @@
             margin: 0 !important;
             cursor: pointer;
             color: #000000;
-            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                        width 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-                        height 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: visible;
+            vertical-align: middle;
+            transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
             -webkit-tap-highlight-color: transparent;
-        }
-
-        @media (max-width: 768px) {
-            .header__link--cart {
-                top: 23px; /* Fine-tuned vertical alignment with SEARCH */
-                right: 20px;
-            }
-        }
-        
-        @media (max-width: 640px) {
-            .header__link--cart {
-                top: 19px; /* Fine-tuned vertical alignment with SEARCH */
-                right: 18px;
-            }
         }
 
         .header__link--cart:hover {
             opacity: 0.65;
         }
 
-        /* 1. THE MOVING / MORPHING CONNECTING LINE (L-SHAPE THAT SHRINKS & STRETCHES) */
+        /* 1. CONNECTING LINE: L-SHAPE WITH 9PX BALANCED GAPS & SMOOTH MORPH */
         .header__link--cart::before {
             content: "";
             position: absolute;
             right: 0px;
             top: 7px;
-            width: 22px;
-            height: 16px;
-            border-top: 1.2px solid currentColor;
-            border-right: 1.2px solid currentColor;
+            width: 35px; /* From left: 53px to right: 0px (left: 88px) -> 9px gap from 44px CART text */
+            height: 16px; /* From top: 7px to top: 23px -> 9px gap to top: 32px counter */
+            border-top: 1.4px solid currentColor;
+            border-right: 1.4px solid currentColor;
             border-bottom: none;
             border-left: none;
             box-sizing: border-box;
             pointer-events: none;
-            /* When returning (scrolling UP): vertical shrinks first (0s), horizontal opens after delay (0.12s) */
-            transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
-                        height 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        left 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        right 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
-            will-change: width, height, top, left, right, transform;
+            transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.08s,
+                        height 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        top 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+            will-change: width, height, top;
         }
 
-        /* On hover in default horizontal state: line actively moves/stretches */
+        /* On hover in horizontal state: line actively moves/stretches */
         .header__link--cart:not(.state-minimal):hover::before {
-            width: 28px;
-            transition-delay: 0s;
+            width: 40px;
         }
 
         /* 2. DEFAULT HORIZONTAL LABEL */
         .header__link--cart__default-label {
             position: absolute;
-            left: 0;
+            right: 44px; /* Anchored to right edge so it DOES NOT slide when width shrinks! */
             top: 0;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 11px;
+            width: 44px;
+            height: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
             font-weight: 500;
             letter-spacing: 0.16em;
             line-height: 16px;
             text-transform: uppercase;
             opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s,
-                        transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+            transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity;
         }
 
-        /* 3. VERTICAL LABEL (APPEARS ON SCROLL) */
-        /* Reads top to bottom naturally with generous breathing room */
+        /* 3. VERTICAL LABEL (APPEARS ON SCROLL - EXACT A24 NATURAL VERTICAL-RL) */
         .header__link--cart__vertical-label {
             position: absolute;
+            right: -7px;
             top: 0px;
-            left: 50%;
-            transform: translateX(-50%) translateY(6px);
-            width: auto;
-            font-family: 'Montserrat', sans-serif;
+            width: 14px;
+            text-align: center;
+            writing-mode: vertical-rl;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 11px;
             font-weight: 500;
-            letter-spacing: 0.18em;
+            letter-spacing: 0.16em;
             line-height: 1;
             text-transform: uppercase;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+            transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity;
         }
 
         /* 4. MONOSPACE COUNTER */
         .header__link--cart__counter {
             position: absolute;
-            right: -7px; /* Shift by half width (14px/2) so the text centers directly under the right: 0 line */
-            top: 25px;
+            right: -7px; /* Center-aligned with right-edge border at right: 0px */
+            top: 32px; /* 9px gap below line height of 23px */
             width: 14px;
             text-align: center;
             font-family: 'Courier New', Courier, Monaco, monospace;
-            font-size: 11.5px;
+            font-size: 13px;
             font-weight: 600;
             line-height: 1;
-            transition: top 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        left 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        right 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+            transition: top 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0s;
+            will-change: top;
         }
 
         /* ============================================================== */
-        /* SCROLLED MINIMAL STATE (.state-minimal): MOVING LINE ANIMATION */
+        /* SCROLLED MINIMAL STATE (.state-minimal): EXACT A24 VERTICAL MORPH */
         /* ============================================================== */
         .header__link--cart.state-minimal {
-            width: 24px;
-            height: 118px;
+            width: 88px;
+            height: 16px;
         }
 
-        /* Horizontal segment collapses to 0 immediately (0s); Vertical segment stretches down with generous spacing (0.12s) */
-        /* Spacing: "CART" ends around top:44px, line starts at top:56px (12px gap!), height:32px (ends at 88px), counter at 98px (10px gap!) */
+        /* Horizontal segment collapses to 0; Vertical segment stretches down smoothly */
         .header__link--cart.state-minimal::before {
             width: 0px !important;
             height: 32px !important;
-            top: 56px !important;
-            left: 50% !important;
-            right: auto !important;
-            transform: translateX(-50%) !important;
+            top: 45px !important;
+            right: 0px !important;
             border-top: none !important;
-            border-right: 1.2px solid currentColor !important;
-            transition: width 0.18s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        height 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
-                        top 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
+            border-right: 1.4px solid currentColor !important;
+            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0s,
+                        height 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.08s,
+                        top 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.08s !important;
         }
 
-        /* On hover in vertical state: vertical line stretches down smoothly */
+        /* On hover in minimal state: vertical line stretches down smoothly */
         .header__link--cart.state-minimal:hover::before {
             height: 42px !important;
-            transition: height 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
+            transition: height 0.28s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
         }
 
         .header__link--cart.state-minimal .header__link--cart__counter {
-            top: 98px !important;
-            left: 50% !important;
-            right: auto !important;
-            transform: translateX(-50%) !important;
-            width: auto !important;
-            text-align: center !important;
-            transition: top 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
+            top: 86px !important;
+            right: -7px !important;
+            transition: top 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.08s !important;
         }
 
         .header__link--cart.state-minimal:hover .header__link--cart__counter {
-            top: 108px !important;
-            transition: top 0.22s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
+            top: 96px !important;
+            transition: top 0.28s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
         }
 
+        /* Pure FADE animations for CART label transition */
         .header__link--cart.state-minimal .header__link--cart__default-label {
             opacity: 0 !important;
             pointer-events: none !important;
-            transform: translateY(-6px) !important;
-            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s,
-                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0s !important;
+            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         .header__link--cart.state-minimal .header__link--cart__vertical-label {
             opacity: 1 !important;
             pointer-events: auto !important;
-            top: 0px !important;
-            left: 50% !important;
-            right: auto !important;
-            transform: translateX(-50%) translateY(0) !important;
-            transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s,
-                        transform 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.12s !important;
+            transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.08s !important;
         }
 
         /* Animated moving shimmer line in cart drawer */
@@ -598,6 +576,8 @@
 
         #overlay-search {
             z-index: 950 !important;
+            transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            will-change: transform;
         }
 
         #modal-artwork-offering {
@@ -779,7 +759,7 @@
         class="fixed top-0 left-0 w-full z-50 bg-transparent px-5 sm:px-8 py-3.5 flex items-center justify-between transition-all duration-400 ease-[cubic-bezier(0.16,1,0.3,1)]">
         <!-- Left: Hamburger Icon -->
         <button id="menu-trigger" aria-label="Open Navigation Menu"
-            class="p-2 -ml-2 text-black hover:opacity-60 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none flex items-center justify-center opacity-0 pointer-events-none -translate-x-3">
+            class="p-2 -ml-2 text-black hover:opacity-60 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer focus:outline-none flex items-center justify-center opacity-100 pointer-events-auto translate-x-0">
             <svg class="w-6 h-6 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
             </svg>
@@ -787,7 +767,7 @@
 
         <!-- Center: Dual Animated Logo (Switches to Small Logo on Scroll) -->
         <div id="header-logo-container"
-            class="header-logo-container logo-state-large absolute left-1/2 transform -translate-x-1/2 cursor-pointer flex items-center justify-center select-none py-1 h-7 sm:h-8"
+            class="header-logo-container logo-state-large header-fade-visible absolute left-1/2 transform -translate-x-1/2 cursor-pointer flex items-center justify-center select-none py-1 h-7 sm:h-8"
             onclick="showPage('view-shop')" title="Back to Shop">
             <!-- Large Brand Wordmark -->
             <img id="header-logo-large" src="{{ asset('logo.png') }}" alt="Notisse Logo"
@@ -797,57 +777,56 @@
                 class="header-logo-small absolute h-5 sm:h-5.5 md:h-6 w-auto object-contain select-none">
         </div>
 
-        <!-- Right: SEARCH -->
+        <!-- Right: SEARCH & CART (PERFECTLY SEJAJAR IN SAME FLEX ROW) -->
         <div id="header-right-menu"
-            class="flex items-center text-[11px] font-medium tracking-[0.16em] uppercase transition-all duration-300 opacity-0 pointer-events-none translate-x-3 pr-20 md:pr-24">
+            class="flex items-center opacity-100 pointer-events-auto">
             <button id="search-trigger" aria-label="Search"
-                class="font-montserrat hover:opacity-50 hover:scale-105 active:scale-95 transition-all focus:outline-none py-1 px-1 cursor-pointer">
+                class="header-fade-visible font-space-grotesk font-medium text-xs sm:text-[13px] tracking-[0.16em] uppercase text-black hover:opacity-50 transition-all focus:outline-none cursor-pointer p-0 m-0 h-[16px] leading-[16px] inline-flex items-center">
                 SEARCH
+            </button>
+
+            <!-- EXACT A24 UNIFIED MORPHING CART TRIGGER -->
+            <button id="cart-trigger" aria-label="Cart" onclick="openCart()"
+                class="header__link--cart focus:outline-none select-none cursor-pointer opacity-100 pointer-events-auto">
+                <span class="header__link--cart__default-label">CART</span>
+                <span class="header__link--cart__vertical-label">CART</span>
+                <span id="header-cart-badge" class="header__link--cart__counter font-bold">2</span>
             </button>
         </div>
     </header>
-
-    <!-- EXACT A24 UNIFIED MORPHING CART TRIGGER (WITH VISIBLE MOVING LINE ANIMATION) -->
-    <button id="cart-trigger" aria-label="Cart" onclick="openCart()"
-        class="header__link--cart focus:outline-none select-none cursor-pointer">
-        <span class="header__link--cart__default-label">CART</span>
-        <span class="header__link--cart__vertical-label">CART</span>
-        <span id="header-cart-badge" class="header__link--cart__counter font-bold">2</span>
-    </button>
 
     <!-- OVERLAY 1: 1/4 SCREEN WIDTH NAVIGATION SIDEBAR -->
     <div id="overlay-menu-backdrop"
         class="fixed inset-0 bg-black/50 z-[60] hidden opacity-0 overlay-backdrop transition-opacity duration-300"
         onclick="closeMenu()">
         <div id="overlay-menu-sidebar"
-            class="absolute left-0 top-0 bottom-0 w-full sm:w-80 md:w-1/4 bg-[#d52c2b] text-white p-6 md:p-10 transform -translate-x-full overlay-slide flex flex-col justify-between shadow-2xl"
+            class="absolute left-0 top-0 bottom-0 w-full sm:w-88 md:w-96 lg:w-[28%] min-w-[280px] sm:min-w-[340px] bg-[#d52c2b] text-white p-7 md:p-12 transform -translate-x-full overlay-slide flex flex-col justify-between shadow-2xl"
             onclick="event.stopPropagation()">
             <div class="flex justify-end">
                 <button id="menu-close" aria-label="Close Menu"
-                    class="text-2xl font-light hover:rotate-90 hover:text-gray-300 transition-transform duration-300 focus:outline-none cursor-pointer">
+                    class="text-2xl sm:text-3xl font-light hover:rotate-90 hover:text-gray-200 transition-transform duration-300 focus:outline-none cursor-pointer">
                     &#10005;
                 </button>
             </div>
 
-            <nav class="flex flex-col space-y-6 md:space-y-8 my-auto font-roboto">
+            <nav class="flex flex-col space-y-6 md:space-y-8 my-auto font-space-grotesk">
                 <a href="javascript:void(0)" onclick="navigateTo('view-shop')"
-                    class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">SHOP</a>
+                    class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">SHOP</a>
                 <a href="javascript:void(0)" onclick="navigateTo('view-artist-collab')"
-                    class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">ARTIST
-                    COLLAB</a>
-                <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
-                    class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">EDITORIAL</a>
+                    class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">ARTIST COLLAB</a>
                 <a href="javascript:void(0)" onclick="navigateTo('view-lookbook-list')"
-                    class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">LOOKBOOK</a>
+                    class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">LOOKBOOK</a>
+                <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
+                    class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">EDITORIAL</a>
                 <a href="javascript:void(0)" onclick="navigateTo('view-about')"
-                    class="font-roboto text-xl md:text-2xl font-normal tracking-wider hover:translate-x-2 hover:text-gray-300 transition-all duration-300 w-fit">ABOUT</a>
+                    class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">ABOUT</a>
             </nav>
 
-            <div class="flex items-center space-x-6 sm:space-x-8 font-roboto mb-2">
+            <div class="flex items-center space-x-6 sm:space-x-8 font-space-grotesk mb-2">
                 <a href="javascript:void(0)" onclick="closeMenu(); handleAccountButtonClick();"
-                    class="text-sm md:text-base font-normal tracking-widest text-gray-400 hover:text-white transition-all duration-300 w-fit">ACCOUNT</a>
+                    class="text-base md:text-lg font-medium tracking-widest text-white/80 hover:text-white transition-all duration-300 w-fit">ACCOUNT</a>
                 <a href="javascript:void(0)" onclick="navigateTo('view-contact')"
-                    class="text-sm md:text-base font-normal tracking-widest text-gray-400 hover:text-white transition-all duration-300 w-fit">CONTACT</a>
+                    class="text-base md:text-lg font-medium tracking-widest text-white/80 hover:text-white transition-all duration-300 w-fit">CONTACT</a>
             </div>
 
         </div>
@@ -855,18 +834,12 @@
 
     <!-- OVERLAY 2: FULL-SCREEN EDITORIAL LIVE SEARCH -->
     <div id="overlay-search"
-        class="fixed inset-0 w-full h-full bg-white z-[90] transform -translate-y-full overlay-slide flex flex-col transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto">
+        class="fixed inset-0 w-full h-full bg-white z-[90] transform -translate-y-full flex flex-col overflow-y-auto">
         <!-- Search Sticky Top Bar -->
-        <div class="sticky top-0 bg-white/95 backdrop-blur-md z-30 px-6 sm:px-10 py-4 sm:py-5 border-b border-gray-100 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="text-[11px] sm:text-xs font-bold tracking-[0.22em] uppercase font-montserrat text-black">SEARCH</span>
-                <span class="text-gray-300 text-xs select-none">/</span>
-                <span class="text-[11px] text-gray-400 tracking-wider font-roboto uppercase hidden sm:inline">NOTISSE ARCHIVE</span>
-            </div>
+        <div class="sticky top-0 bg-white/95 backdrop-blur-[1px] z-30 px-6 sm:px-10 py-4 sm:py-5 border-b border-gray-100 flex items-center justify-end">
             <button id="search-close" aria-label="Close Search"
-                class="group text-xs sm:text-sm font-semibold tracking-widest uppercase hover:text-gray-500 transition-colors flex items-center space-x-2 cursor-pointer focus:outline-none py-1">
-                <span>CLOSE</span>
-                <span class="text-base sm:text-lg group-hover:rotate-90 transition-transform duration-300 leading-none">&#10005;</span>
+                class="group text-lg sm:text-xl text-black hover:text-gray-500 transition-colors cursor-pointer focus:outline-none py-1 px-1">
+                <span class="inline-block group-hover:rotate-90 transition-transform duration-300 leading-none">&#10005;</span>
             </button>
         </div>
 
@@ -878,7 +851,7 @@
                     <input type="text" id="search-input" oninput="handleLiveSearch(this.value)"
                         placeholder="Search collection, product name, or artist..."
                         autocomplete="off"
-                        class="w-full text-xl sm:text-3xl md:text-4xl bg-transparent focus:outline-none placeholder:text-gray-300 font-light font-roboto py-1 text-black">
+                        class="w-full text-xl sm:text-3xl md:text-4xl bg-transparent focus:outline-none placeholder:text-gray-300 font-light font-inter py-1 text-black">
                     <button onclick="handleLiveSearch(document.getElementById('search-input').value)" aria-label="Submit Search"
                         class="ml-3 text-2xl md:text-3xl text-black hover:translate-x-1.5 transition-transform focus:outline-none cursor-pointer">
                         &rarr;
@@ -887,18 +860,18 @@
 
                 <!-- Quick Filter Suggestion Chips -->
                 <div class="flex flex-wrap items-center gap-2 pt-4">
-                    <span class="text-[11px] uppercase tracking-wider text-gray-400 font-montserrat mr-1 font-medium">Popular:</span>
-                    <button onclick="applySearchQuery('Tee')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Tee</button>
-                    <button onclick="applySearchQuery('Raja Diamuk')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Raja Diamuk</button>
-                    <button onclick="applySearchQuery('Tank')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Tank</button>
-                    <button onclick="applySearchQuery('Shirt')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Shirt</button>
-                    <button onclick="applySearchQuery('Blazer')" class="text-[11px] font-montserrat uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Blazer</button>
+                    <span class="text-[11px] uppercase tracking-wider text-gray-400 font-space-grotesk mr-1 font-medium">Popular:</span>
+                    <button onclick="applySearchQuery('Tee')" class="text-[11px] font-space-grotesk uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Tee</button>
+                    <button onclick="applySearchQuery('Raja Diamuk')" class="text-[11px] font-space-grotesk uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Raja Diamuk</button>
+                    <button onclick="applySearchQuery('Tank')" class="text-[11px] font-space-grotesk uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Tank</button>
+                    <button onclick="applySearchQuery('Shirt')" class="text-[11px] font-space-grotesk uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Shirt</button>
+                    <button onclick="applySearchQuery('Blazer')" class="text-[11px] font-space-grotesk uppercase px-3 py-1 border border-gray-200 hover:border-black rounded-full hover:bg-black hover:text-white transition-colors cursor-pointer">Blazer</button>
                 </div>
             </div>
 
             <!-- Dynamic Search Result Header -->
             <div id="search-results-meta"
-                class="text-xs uppercase tracking-widest text-gray-400 font-montserrat font-semibold mb-6 hidden">
+                class="text-xs uppercase tracking-widest text-gray-400 font-space-grotesk font-semibold mb-6 hidden">
                 PRODUCTS (<span id="search-results-count">0</span>)
             </div>
 
@@ -917,7 +890,7 @@
             class="absolute right-0 top-0 bottom-0 w-full max-w-4xl bg-white p-6 md:p-10 transform translate-x-full overlay-slide flex flex-col overflow-y-auto shadow-2xl"
             onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-gray-200 pb-3 mb-6">
-                <h2 class="text-2xl md:text-3xl font-semibold tracking-tight font-montserrat">My cart</h2>
+                <h2 class="text-2xl md:text-3xl font-semibold tracking-tight font-space-grotesk">My cart</h2>
                 <button id="cart-close" aria-label="Close Cart"
                     class="text-3xl font-light hover:rotate-90 transition-transform duration-300 focus:outline-none cursor-pointer">
                     &#10005;
@@ -925,7 +898,7 @@
             </div>
 
             <div
-                class="grid grid-cols-12 text-xs text-gray-500 font-regular pb-2 border-b border-gray-200 mb-6 font-neue-montreal">
+                class="grid grid-cols-12 text-xs text-gray-500 font-regular pb-2 border-b border-gray-200 mb-6 font-space-grotesk">
                 <div class="col-span-6 md:col-span-5">Product</div>
                 <div class="col-span-3 md:col-span-3 text-center">Quantity</div>
                 <div class="hidden md:block md:col-span-2 text-right">Price</div>
@@ -936,13 +909,13 @@
 
             <div class="mt-6 pt-6 border-t border-gray-200 flex flex-col items-end space-y-1">
                 <div class="flex items-baseline space-x-6">
-                    <span class="text-base md:text-lg font-medium text-gray-900 font-montserrat">Subtotal</span>
-                    <span id="cart-total-price" class="text-xl md:text-xl font-regular font-montserrat">Rp 0,00 IDR</span>
+                    <span class="text-base md:text-lg font-medium text-gray-900 font-space-grotesk">Subtotal</span>
+                    <span id="cart-total-price" class="text-xl md:text-xl font-regular font-space-grotesk">Rp 0,00 IDR</span>
                 </div>
-                <p class="text-xs text-gray-400 font-montserrat">Shipping will be calculated at checkout.</p>
+                <p class="text-xs text-gray-400 font-space-grotesk">Shipping will be calculated at checkout.</p>
                 <div class="pt-4 w-full text-right">
                     <button onclick="window.location.href='/auth/checkout'"
-                        class="btn-brush text-sm md:text-base cursor-pointer font-montserrat" id="checkout-btn">
+                        class="btn-brush text-sm md:text-base cursor-pointer font-space-grotesk" id="checkout-btn">
                         CHECKOUT
                     </button>
                 </div>
@@ -952,7 +925,7 @@
 
     <!-- OVERLAY 4: ARTWORK OFFERING MODAL (ACQUISITION INQUIRY) -->
     <div id="modal-artwork-offering"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 sm:p-6"
+        class="fixed inset-0 bg-black/40 backdrop-blur-[1px] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4 sm:p-6"
         onclick="closeArtworkOfferingModal()">
         <div class="bg-white w-full max-w-lg shadow-2xl border border-gray-200 transform scale-95 transition-transform duration-300 flex flex-col max-h-[92vh] overflow-hidden"
             onclick="event.stopPropagation()">
@@ -960,8 +933,8 @@
             <!-- Modal Header -->
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-white sticky top-0 z-10">
                 <div>
-                    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block">NOTISSE</span>
-                    <h3 class="text-base sm:text-lg font-bold font-montserrat text-black tracking-tight">Artwork Offering / Buy Inquiry</h3>
+                    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-space-grotesk block">NOTISSE</span>
+                    <h3 class="text-base sm:text-lg font-bold font-space-grotesk text-black tracking-tight">Artwork Offering / Buy Inquiry</h3>
                 </div>
                 <button onclick="closeArtworkOfferingModal()" aria-label="Close Modal"
                     class="text-2xl font-light hover:rotate-90 text-gray-500 hover:text-black transition-transform duration-300 focus:outline-none cursor-pointer">
@@ -976,10 +949,10 @@
                     <img id="offering-artwork-img" src="https://placehold.co/400x500/222/fff?text=Artwork" alt="Artwork"
                         class="w-16 h-20 object-cover bg-gray-200 border border-gray-300 flex-shrink-0">
                     <div class="space-y-0.5 min-w-0">
-                        <span class="text-[9px] font-semibold tracking-widest uppercase bg-black text-white px-1.5 py-0.5 inline-block font-montserrat mb-1">Original Piece</span>
-                        <p id="offering-artwork-title" class="font-bold text-xs sm:text-sm text-black font-montserrat truncate">Mereka Ulang Ungkapan Indah Leila</p>
-                        <p class="text-xs text-gray-600 font-roboto">Artist: <span id="offering-artwork-artist" class="font-semibold text-black">Mustafa Alatas</span></p>
-                        <p id="offering-artwork-specs" class="text-[11px] text-gray-500 font-roboto">Oil on canvas &bull; 60x60cm</p>
+                        <span class="text-[9px] font-semibold tracking-widest uppercase bg-black text-white px-1.5 py-0.5 inline-block font-space-grotesk mb-1">Original Piece</span>
+                        <p id="offering-artwork-title" class="font-bold text-xs sm:text-sm text-black font-space-grotesk truncate">Mereka Ulang Ungkapan Indah Leila</p>
+                        <p class="text-xs text-gray-600 font-inter">Artist: <span id="offering-artwork-artist" class="font-semibold text-black">Mustafa Alatas</span></p>
+                        <p id="offering-artwork-specs" class="text-[11px] text-gray-500 font-inter">Oil on canvas &bull; 60x60cm</p>
                     </div>
                 </div>
 
@@ -987,49 +960,49 @@
                 <form id="artwork-offering-form" onsubmit="handleArtworkOfferingSubmit(event)" class="space-y-4">
                     <!-- Account Identity Card (Logged in User) -->
                     <div class="p-3.5 bg-neutral-50 border border-gray-200 rounded-sm">
-                        <span class="text-[10px] font-bold tracking-wider uppercase text-gray-400 font-montserrat block mb-1.5">Akun Penawar (Tercatat di Sistem)</span>
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-gray-400 font-space-grotesk block mb-1.5">Collector Account (Registered in System)</span>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-3 min-w-0">
-                                <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-xs font-montserrat flex-shrink-0" id="offering-user-avatar">
+                                <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold text-xs font-space-grotesk flex-shrink-0" id="offering-user-avatar">
                                     JD
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="font-bold text-xs sm:text-sm text-black font-montserrat truncate" id="offering-user-name">John Doe</p>
-                                    <p class="text-[11px] text-gray-500 font-roboto truncate" id="offering-user-email">john.doe@notisse.com</p>
+                                    <p class="font-bold text-xs sm:text-sm text-black font-space-grotesk truncate" id="offering-user-name">John Doe</p>
+                                    <p class="text-[11px] text-gray-500 font-inter truncate" id="offering-user-email">john.doe@notisse.com</p>
                                 </div>
                             </div>
-                            <span class="text-[9px] font-semibold tracking-wider uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-montserrat flex-shrink-0">
-                                Akun Terverifikasi
+                            <span class="text-[9px] font-semibold tracking-wider uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-space-grotesk flex-shrink-0">
+                                Verified Account
                             </span>
                         </div>
                     </div>
 
                     <!-- Acquisition Price Display -->
                     <div class="p-3.5 bg-neutral-50 border border-gray-200 rounded-sm">
-                        <span class="text-[10px] font-bold tracking-wider uppercase text-gray-400 font-montserrat block mb-1">Harga Karya</span>
-                        <p id="offering-fixed-price-display" class="font-montserrat font-bold text-lg text-black">Rp 7.500.000</p>
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-gray-400 font-space-grotesk block mb-1">Artwork Price</span>
+                        <p id="offering-fixed-price-display" class="font-space-grotesk font-bold text-lg text-black">Rp 7.500.000</p>
                         <input type="hidden" id="offering-buyer-price" value="">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold tracking-wider uppercase font-montserrat text-black mb-1">
-                            Catatan / Pesan Pembelian (Opsional)
+                        <label class="block text-xs font-semibold tracking-wider uppercase font-space-grotesk text-black mb-1">
+                            Acquisition Notes (Optional)
                         </label>
-                        <textarea id="offering-buyer-message" rows="3" placeholder="Tuliskan catatan tambahan atau rencana penempatan karya untuk kurator & seniman..."
-                            class="w-full border border-gray-300 px-3.5 py-2 text-sm font-roboto focus:outline-none focus:border-black transition-colors resize-none"></textarea>
+                        <textarea id="offering-buyer-message" rows="3" placeholder="Write additional notes or placement intent for our curatorial team and artist..."
+                            class="w-full border border-gray-300 px-3.5 py-2 text-sm font-inter focus:outline-none focus:border-black transition-colors resize-none"></textarea>
                     </div>
 
                     <div class="pt-2 flex justify-center">
                         <button type="submit" id="offering-submit-btn"
-                            class="btn-brush w-full text-xs sm:text-sm font-bold tracking-[0.15em] uppercase cursor-pointer font-montserrat flex items-center justify-center space-x-2">
-                            <span>KONFIRMASI AKUISISI KARYA (BUY ARTWORK)</span>
+                            class="btn-brush w-full text-xs sm:text-sm font-bold tracking-[0.15em] uppercase cursor-pointer font-space-grotesk flex items-center justify-center space-x-2">
+                            <span>CONFIRM ARTWORK ACQUISITION</span>
                             <span>&rarr;</span>
                         </button>
                     </div>
                 </form>
 
-                <p class="text-[11px] text-gray-400 text-center font-roboto">
-                    Pengajuan offering tersimpan otomatis di akun Anda dan diteruskan ke kurasi internal Notisse & seniman pemilik karya.
+                <p class="text-[11px] text-gray-400 text-center font-inter">
+                    Inquiry is recorded in your account registry and forwarded to Notisse curators and the artist.
                 </p>
             </div>
 
@@ -1039,43 +1012,43 @@
                     &#10003;
                 </div>
                 <div>
-                    <h4 class="text-lg sm:text-xl font-bold font-montserrat text-black">Offering Berhasil Diajukan!</h4>
-                    <p class="text-xs text-gray-600 font-roboto mt-2 max-w-sm mx-auto leading-relaxed">
-                        Penawaran telah tercatat secara resmi di sistem Notisse. Tim kurasi Notisse dan pemilik karya (<strong class="text-black" id="success-artist-name">Mustafa Alatas</strong>) akan mereview penawaran ini.
+                    <h4 class="text-lg sm:text-xl font-bold font-space-grotesk text-black">Inquiry Successfully Submitted!</h4>
+                    <p class="text-xs text-gray-600 font-inter mt-2 max-w-sm mx-auto leading-relaxed">
+                        Your inquiry is officially registered in Notisse system. The curatorial team and artist (<strong class="text-black" id="success-artist-name">Mustafa Alatas</strong>) will review your acquisition request.
                     </p>
                 </div>
 
-                <div class="p-4 bg-neutral-50 border border-gray-200 text-left space-y-2 text-xs font-roboto">
+                <div class="p-4 bg-neutral-50 border border-gray-200 text-left space-y-2 text-xs font-inter">
                     <div class="flex justify-between border-b border-gray-200 pb-1.5">
-                        <span class="text-gray-500 font-montserrat text-[11px] uppercase">Ref. Offering:</span>
+                        <span class="text-gray-500 font-space-grotesk text-[11px] uppercase">Inquiry Ref:</span>
                         <span class="font-mono font-bold text-black" id="success-offering-ref">#NTS-ART-9281</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Akun Pembeli:</span>
+                        <span class="text-gray-500">Collector:</span>
                         <span class="font-medium text-black" id="success-buyer-name">John Doe (john.doe@notisse.com)</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Karya Seni:</span>
+                        <span class="text-gray-500">Artwork:</span>
                         <span class="font-medium text-black truncate ml-2" id="success-artwork-title">Mereka Ulang Ungkapan Indah Leila</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Nominal Tawaran:</span>
-                        <span class="font-bold text-emerald-700 font-montserrat" id="success-artwork-price">Rp 12.500.000 IDR</span>
+                        <span class="text-gray-500">Acquisition Value:</span>
+                        <span class="font-bold text-emerald-700 font-space-grotesk" id="success-artwork-price">Rp 12.500.000 IDR</span>
                     </div>
                     <div class="flex justify-between items-center pt-1">
-                        <span class="text-gray-500">Status Penawaran:</span>
-                        <span class="font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-[10px] uppercase font-montserrat">Dalam Tinjauan Kurasi</span>
+                        <span class="text-gray-500">Status:</span>
+                        <span class="font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-[10px] uppercase font-space-grotesk">Under Curatorial Review</span>
                     </div>
                 </div>
 
-                <p class="text-[11px] text-gray-400 font-roboto leading-relaxed">
-                    Hasil kurasi penawaran serta instruksi lanjutan akan dikirimkan langsung ke notifikasi akun dan email Anda.
+                <p class="text-[11px] text-gray-400 font-inter leading-relaxed">
+                    Curatorial review outcome and instructions will be notified directly to your account and email.
                 </p>
 
                 <div class="pt-2 flex justify-center">
                     <button type="button" onclick="closeArtworkOfferingModal()"
-                        class="btn-brush w-full text-xs font-bold tracking-wider uppercase cursor-pointer font-montserrat">
-                        Tutup
+                        class="btn-brush w-full text-xs font-bold tracking-wider uppercase cursor-pointer font-space-grotesk">
+                        Close
                     </button>
                 </div>
             </div>
@@ -1085,10 +1058,10 @@
 
     <!-- OVERLAY 5: FULL-SCREEN IMAGE LIGHTBOX MODAL (ZOOM SIZE CHART & ARTWORKS) -->
     <div id="modal-image-lightbox"
-        class="fixed inset-0 bg-white/95 backdrop-blur-md hidden opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center p-4 sm:p-8"
+        class="fixed inset-0 bg-white/95 backdrop-blur-[1px] hidden opacity-0 transition-opacity duration-300 flex flex-col items-center justify-center p-4 sm:p-8"
         onclick="closeLightbox()">
         <div class="absolute top-4 right-6 flex items-center space-x-4 z-20">
-            <span id="lightbox-caption" class="text-xs text-gray-500 uppercase font-montserrat tracking-widest hidden sm:inline"></span>
+            <span id="lightbox-caption" class="text-xs text-gray-500 uppercase font-space-grotesk tracking-widest hidden sm:inline"></span>
             <button onclick="closeLightbox()" aria-label="Close Lightbox"
                 class="text-3xl text-black hover:text-gray-600 hover:rotate-90 transition-transform duration-300 focus:outline-none cursor-pointer">
                 &#10005;
@@ -1108,55 +1081,56 @@
         <!-- VIEW 1: SHOP CATALOG WITH AUTO-SLIDING HERO CAROUSEL -->
         <section id="view-shop" class="view-page active-view pb-16">
             <div class="relative w-full h-screen overflow-hidden bg-black group">
-                <div id="hero-carousel-slides" class="w-full h-full flex transition-transform duration-700 ease-in-out">
-                    <div class="w-full h-full flex-shrink-0 relative">
-                        <img src="{{ asset('home.jpg') }}" alt="Slide 1" class="w-full h-full object-cover">
-                    </div>
-                    <div class="w-full h-full flex-shrink-0 relative">
-                        <img src="{{ asset('home1.jpg') }}" alt="Slide 2" class="w-full h-full object-cover">
-                    </div>
-                    <div class="w-full h-full flex-shrink-0 relative">
-                        <img src="{{ asset('home2.png') }}" alt="Slide 3" class="w-full h-full object-cover">
-                    </div>
+                <div id="hero-carousel-slides" class="relative w-full h-full">
+                    @if(isset($carousels) && $carousels->count() > 0)
+                        @foreach($carousels as $index => $cSlide)
+                            @php
+                                $cImg = Str::startsWith($cSlide->image, 'http') ? $cSlide->image : (file_exists(public_path('storage/' . $cSlide->image)) ? asset('storage/' . $cSlide->image) : asset($cSlide->image));
+                            @endphp
+                            <div class="hero-carousel-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out {{ $index === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}">
+                                <img src="{{ $cImg }}" alt="{{ $cSlide->title ?? 'Slide ' . ($index + 1) }}" class="w-full h-full object-cover">
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="hero-carousel-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out opacity-100">
+                            <img src="{{ asset('home.jpg') }}" alt="Slide 1" class="w-full h-full object-cover">
+                        </div>
+                        <div class="hero-carousel-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out opacity-0 pointer-events-none">
+                            <img src="{{ asset('home1.jpg') }}" alt="Slide 2" class="w-full h-full object-cover">
+                        </div>
+                        <div class="hero-carousel-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out opacity-0 pointer-events-none">
+                            <img src="{{ asset('home2.png') }}" alt="Slide 3" class="w-full h-full object-cover">
+                        </div>
+                    @endif
                 </div>
 
                 <!-- OVERLAY MENU PADA CAROUSEL (A24 STYLE) -->
-                <div class="absolute bottom-10 left-5 sm:left-8 md:bottom-14 md:left-10 lg:left-12 z-20 flex flex-col pointer-events-none">
+                <div class="absolute bottom-8 left-5 sm:left-8 md:bottom-12 md:left-10 lg:left-12 z-20 flex flex-col pointer-events-none select-none">
                     <a href="javascript:void(0)" onclick="document.getElementById('shop-catalog').scrollIntoView({behavior: 'smooth'})"
-                        class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
+                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Shop</span>
+                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Shop</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-artist-collab')"
-                        class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
+                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Artist
-                            Collab</span>
-                    </a>
-                    <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
-                        class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
-                        <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Editorial</span>
+                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Artist Collab</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-lookbook-list')"
-                        class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
+                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">Lookbook</span>
+                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Lookbook</span>
+                    </a>
+                    <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
+                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
+                        <span
+                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Editorial</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-about')"
-                        class="group flex items-start pointer-events-auto cursor-pointer mb-1 md:mb-2 transition-colors duration-300 text-white/70 hover:text-white">
+                        class="group flex items-start pointer-events-auto cursor-pointer transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tighter leading-[0.85] font-sans">About</span>
+                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">About</span>
                     </a>
-                </div>
-
-                <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-                    <button onclick="goToSlide(0)"
-                        class="hero-dot w-2.5 h-2.5 rounded-full bg-white opacity-100 transition-opacity cursor-pointer"></button>
-                    <button onclick="goToSlide(1)"
-                        class="hero-dot w-2.5 h-2.5 rounded-full bg-white opacity-40 transition-opacity cursor-pointer"></button>
-                    <button onclick="goToSlide(2)"
-                        class="hero-dot w-2.5 h-2.5 rounded-full bg-white opacity-40 transition-opacity cursor-pointer"></button>
                 </div>
             </div>
 
@@ -1177,7 +1151,7 @@
 
                             <div class="p-3 md:p-4 flex flex-col justify-between flex-grow border-t border-black">
                                 <div
-                                    class="flex flex-col xl:flex-row xl:justify-between items-start xl:items-center text-[10px] md:text-xs font-montserrat uppercase font-semibold text-black gap-1">
+                                    class="flex flex-col xl:flex-row xl:justify-between items-start xl:items-center text-[10px] md:text-xs font-space-grotesk uppercase font-semibold text-black gap-1">
                                     <span>{{ $product->name }}</span>
                                     <span class="whitespace-nowrap">RP
                                         {{ number_format($product->price, 2, ',', '.') }}</span>
@@ -1193,25 +1167,25 @@
         <section id="view-product-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK</span>
                 </button>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
-                <div class="lg:col-span-5 space-y-8 lg:sticky lg:top-24">
+                <div id="pdetail-left-col" class="lg:col-span-5 space-y-8 lg:sticky lg:top-24 lg:max-h-[calc(100vh-9.5rem)] lg:overflow-y-hidden pr-2 pb-56 lg:pb-64 no-scrollbar">
                     <div>
                         <h1 id="pdetail-title"
-                            class="text-2xl md:text-3xl font-semibold uppercase tracking-wider text-black font-montserrat">
+                            class="text-2xl md:text-3xl font-semibold uppercase tracking-wider text-black font-space-grotesk">
                             RAJA DIAMUK MASSA TEE V1
                         </h1>
-                        <p id="pdetail-price" class="text-lg md:text-xl font-medium mt-1 font-montserrat text-black">
+                        <p id="pdetail-price" class="text-lg md:text-xl font-medium mt-1 font-space-grotesk text-black">
                             RP 250.000,00
                         </p>
-                        <p class="text-xs md:text-sm text-gray-600 mt-2 font-montserrat">
+                        <p class="text-xs md:text-sm text-gray-600 mt-2 font-inter">
                             by <span id="pdetail-artist" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')"
-                                class="underline hover:text-black cursor-pointer font-medium transition-colors font-montserrat">Mustafa
+                                class="underline hover:text-black cursor-pointer font-medium transition-colors font-inter">Mustafa
                                 Alatas</span>
                         </p>
                     </div>
@@ -1221,7 +1195,7 @@
                             <button onclick="toggleAccordion('desc')"
                                 class="w-full flex justify-between items-center text-left py-3 focus:outline-none cursor-pointer group">
                                 <span
-                                    class="text-base md:text-lg font-medium text-gray-500 group-hover:text-black transition-colors font-neue-montreal">Product
+                                    class="text-base md:text-lg font-medium text-gray-500 group-hover:text-black transition-colors font-space-grotesk">Product
                                     Description</span>
                                 <svg id="acc-icon-desc" class="w-4 h-4 chevron-icon stroke-current text-gray-600"
                                     fill="none" viewBox="0 0 24 24">
@@ -1231,9 +1205,9 @@
                             </button>
                             <div id="acc-content-desc" class="accordion-content">
                                 <div
-                                    class="accordion-inner pb-4 pt-1 text-[11px] md:text-xs text-gray-500 font-neue-montreal"
+                                    class="accordion-inner pb-4 pt-1 text-xs sm:text-[13px] md:text-sm text-gray-500 font-inter"
                                     id="pdetail-desc-content">
-                                    <ul class="list-disc pl-5 space-y-1.5 leading-relaxed font-neue-montreal">
+                                    <ul class="list-disc pl-5 space-y-2 leading-relaxed font-inter">
                                         <li>Heavyweight 24s Cotton Combed construction</li>
                                         <li>High-density screenprinted artwork on back and chest</li>
                                         <li>Boxy relaxed fit with reinforced ribbed collar</li>
@@ -1247,7 +1221,7 @@
                             <button onclick="toggleAccordion('size')"
                                 class="w-full flex justify-between items-center text-left py-3 focus:outline-none cursor-pointer group">
                                 <span
-                                    class="text-base md:text-lg font-medium text-gray-500 group-hover:text-black transition-colors font-neue-montreal">Size
+                                    class="text-base md:text-lg font-medium text-gray-500 group-hover:text-black transition-colors font-space-grotesk">Size
                                     Guide</span>
                                 <svg id="acc-icon-size" class="w-4 h-4 chevron-icon stroke-current text-gray-600"
                                     fill="none" viewBox="0 0 24 24">
@@ -1261,9 +1235,9 @@
                                         onclick="openLightbox('{{ asset('size chart 1.png') }}', 'NOTISSE APPAREL SIZE CHART')">
                                         <img src="{{ asset('size chart 1.png') }}" alt="Notisse Size Chart"
                                             class="w-full max-w-sm mx-auto h-auto object-contain transition-transform duration-300 group-hover:scale-[1.02] shadow-sm">
-                                        <p class="text-[10px] text-gray-500 font-montserrat uppercase tracking-wider mt-2.5 flex items-center justify-center space-x-1 font-medium">
+                                        <p class="text-[10px] text-gray-500 font-inter uppercase tracking-wider mt-2.5 flex items-center justify-center space-x-1 font-medium">
                                             <svg class="w-3.5 h-3.5 stroke-current inline" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
-                                            <span>Klik gambar untuk memperbesar</span>
+                                            <span>Click image to enlarge</span>
                                         </p>
                                     </div>
                                 </div>
@@ -1274,7 +1248,7 @@
                             <button onclick="toggleAccordion('terms')"
                                 class="w-full flex justify-between items-center text-left py-3 focus:outline-none cursor-pointer group">
                                 <span
-                                    class="text-base md:text-lg font-medium text-gray-500 group-hover:text-black transition-colors font-neue-montreal">Terms
+                                    class="text-base md:text-lg font-medium text-gray-500 group-hover:text-black transition-colors font-space-grotesk">Terms
                                     and Condition</span>
                                 <svg id="acc-icon-terms" class="w-4 h-4 chevron-icon stroke-current text-gray-600"
                                     fill="none" viewBox="0 0 24 24">
@@ -1284,8 +1258,8 @@
                             </button>
                             <div id="acc-content-terms" class="accordion-content">
                                 <div
-                                    class="accordion-inner pb-4 pt-1 text-[11px] md:text-xs text-gray-500 font-neue-montreal">
-                                    <ul class="list-disc pl-5 space-y-1.5 leading-relaxed font-neue-montreal">
+                                    class="accordion-inner pb-4 pt-1 text-xs sm:text-[13px] md:text-sm text-gray-500 font-inter">
+                                    <ul class="list-disc pl-5 space-y-2 leading-relaxed font-inter">
                                         <li>All sales are final once order is confirmed.</li>
                                         <li>Exchanges strictly allowed for manufacturing defects within 3 days.</li>
                                         <li>Shipping fee calculated dynamically upon checkout.</li>
@@ -1296,20 +1270,20 @@
                     </div>
 
                     <!-- MODEL FIT & MEASUREMENTS (TB, BB, SIZE) -->
-                    <div class="pt-1 flex items-center space-x-2 text-xs text-gray-600 font-roboto">
+                    <div class="pt-1 flex items-center space-x-2 text-xs sm:text-[13px] md:text-sm text-gray-600 font-inter">
                         <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         <p class="tracking-wide">
-                            <span class="text-black font-semibold uppercase font-montserrat text-[11px]">Model:</span> TB 178 cm / BB 68 kg — wearing size <span class="font-bold text-black font-montserrat">L</span>
+                            <span class="text-black font-semibold uppercase font-space-grotesk text-xs sm:text-[13px]">Model:</span> Height 178 cm / Weight 68 kg — wearing size <span class="font-bold text-black font-space-grotesk">L</span>
                         </p>
                     </div>
 
                     <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6">
-                        <div class="relative w-full sm:w-52 font-montserrat" id="custom-size-dropdown">
+                        <div class="relative w-full sm:w-52 font-space-grotesk" id="custom-size-dropdown">
                             <button id="size-dropdown-trigger" onclick="toggleSizeDropdown(event)" type="button"
-                                class="w-full border border-black py-2.5 px-3.5 text-xs md:text-sm font-medium uppercase tracking-wider bg-white text-black flex justify-between items-center cursor-pointer hover:bg-black hover:text-white transition-colors duration-200 font-montserrat">
-                                <span id="selected-size-label" class="font-montserrat">Select size: </span>
+                                class="w-full border border-black py-2.5 px-3.5 text-xs md:text-sm font-medium uppercase tracking-wider bg-white text-black flex justify-between items-center cursor-pointer hover:bg-black hover:text-white transition-colors duration-200 font-space-grotesk">
+                                <span id="selected-size-label" class="font-space-grotesk">Select size: </span>
                                 <svg id="size-dropdown-chevron"
                                     class="w-4 h-4 chevron-icon stroke-current ml-2 flex-shrink-0" fill="none"
                                     viewBox="0 0 24 24">
@@ -1318,28 +1292,28 @@
                                 </svg>
                             </button>
                             <div id="size-dropdown-menu"
-                                class="custom-dropdown-menu absolute left-0 right-0 top-full mt-1.5 bg-white border border-black z-20 shadow-xl overflow-hidden font-montserrat">
+                                class="custom-dropdown-menu absolute left-0 right-0 top-full mt-1.5 bg-white border border-black z-30 shadow-xl overflow-hidden font-space-grotesk">
                                 <div onclick="selectSize('S')"
-                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-montserrat">
-                                    <span>Small (S)</span><span class="text-xs opacity-50">S</span>
+                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-space-grotesk">
+                                    <span>Small</span><span class="text-xs opacity-50">S</span>
                                 </div>
                                 <div onclick="selectSize('M')"
-                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center bg-gray-50 font-montserrat">
-                                    <span>Medium (M)</span><span class="text-xs opacity-50">M</span>
+                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center bg-gray-50 font-space-grotesk">
+                                    <span>Medium</span><span class="text-xs opacity-50">M</span>
                                 </div>
                                 <div onclick="selectSize('L')"
-                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-montserrat">
-                                    <span>Large (L)</span><span class="text-xs opacity-50">L</span>
+                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-space-grotesk">
+                                    <span>Large</span><span class="text-xs opacity-50">L</span>
                                 </div>
                                 <div onclick="selectSize('XL')"
-                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors flex justify-between items-center font-montserrat">
-                                    <span>Extra Large (XL)</span><span class="text-xs opacity-50">XL</span>
+                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors flex justify-between items-center font-space-grotesk">
+                                    <span>Extra Large</span><span class="text-xs opacity-50">XL</span>
                                 </div>
                             </div>
                         </div>
 
                         <button onclick="addSelectedToCart()"
-                            class="btn-brush text-xs md:text-sm uppercase cursor-pointer font-montserrat">
+                            class="btn-brush text-xs md:text-sm uppercase cursor-pointer font-space-grotesk">
                             ADD TO CART
                         </button>
                     </div>
@@ -1365,7 +1339,7 @@
         <!-- VIEW 3: ARTIST COLLAB LIST PAGE -->
         <section id="view-artist-collab" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 sm:pt-24 pb-16">
             <div class="mb-16">
-                <h2 class="text-xl md:text-2xl font-bold mb-6 tracking-wide text-black font-montserrat">Newcomer</h2>
+                <h2 class="text-xl md:text-2xl font-bold mb-6 tracking-wide text-black font-space-grotesk">Newcomer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10 mb-8">
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
                         onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')">
@@ -1381,13 +1355,13 @@
                 </div>
 
                 <div class="max-w-3xl mx-auto text-center my-8 px-2 space-y-4">
-                    <h3 class="text-lg md:text-xl font-bold text-black font-roboto">About {{ explode(' ', $newcomer->name ?? 'Mustafa')[0] }}</h3>
-                    <p class="text-gray-700 text-xs md:text-sm leading-relaxed font-regular font-roboto">
+                    <h3 class="text-2xl md:text-3xl font-bold text-black font-space-grotesk">About {{ explode(' ', $newcomer->name ?? 'Mustafa')[0] }}</h3>
+                    <p class="text-gray-700 text-sm md:text-base leading-relaxed font-regular font-inter">
                         {{ $newcomer->bio ?? 'Mustafa Alatas is a contemporary visual artist based in Temanggung whose distinct brush strokes and visceral storytelling bring deep cultural narratives into modern street apparel.' }}
                     </p>
                     <div class="pt-2">
                         <button onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')"
-                            class="btn-brush text-xs py-2 px-6 cursor-pointer font-montserrat">Read More</button>
+                            class="btn-brush text-xs md:text-sm py-2 px-6 cursor-pointer font-space-grotesk">Read More</button>
                     </div>
                 </div>
             </div>
@@ -1395,14 +1369,14 @@
             <!-- ARTIST COLLABORATOR SECTION -->
             <div class="pt-8 border-t border-gray-200">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                    <h2 class="text-xl md:text-2xl font-bold tracking-wide text-black font-montserrat uppercase">
+                    <h2 class="text-xl md:text-2xl font-bold tracking-wide text-black font-space-grotesk uppercase">
                         Artist Collaborator
                     </h2>
                     <!-- Search Bar Sejajar dengan Tulisan Artist Collaborator -->
                     <div class="relative w-full sm:w-72 md:w-80">
                         <input type="text" id="artist-search-input" oninput="filterArtists(this.value)"
                             placeholder="Search artist or city..."
-                            class="w-full bg-transparent border-b border-black py-1.5 pl-7 pr-3 text-xs md:text-sm font-roboto tracking-wide focus:outline-none focus:border-[#d52c2b] placeholder-gray-400 transition-colors">
+                            class="w-full bg-transparent border-b border-black py-1.5 pl-7 pr-3 text-xs md:text-sm font-inter tracking-wide focus:outline-none focus:border-[#d52c2b] placeholder-gray-400 transition-colors">
                         <svg class="w-4 h-4 text-black absolute left-0 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-4.35z" />
                         </svg>
@@ -1421,8 +1395,8 @@
                                         alt="{{ $artItem->name }}"
                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 </div>
-                                <h4 class="font-bold text-base md:text-lg text-black font-roboto">{{ $artItem->name }}</h4>
-                                <p class="text-xs md:text-sm text-gray-500 font-roboto mt-0.5">{{ $artItem->city ?: 'Indonesia' }}</p>
+                                <h4 class="font-bold text-base md:text-lg text-black font-space-grotesk">{{ $artItem->name }}</h4>
+                                <p class="text-xs md:text-sm text-gray-500 font-inter mt-0.5">{{ $artItem->city ?: 'Indonesia' }}</p>
                             </div>
                         @endforeach
                     @else
@@ -1432,14 +1406,14 @@
                                     alt="Mustafa Alatas"
                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             </div>
-                            <h4 class="font-bold text-base md:text-lg text-black font-roboto">Mustafa Alatas</h4>
-                            <p class="text-xs md:text-sm text-gray-500 font-roboto mt-0.5">Temanggung</p>
+                            <h4 class="font-bold text-base md:text-lg text-black font-space-grotesk">Mustafa Alatas</h4>
+                            <p class="text-xs md:text-sm text-gray-500 font-inter mt-0.5">Temanggung</p>
                         </div>
                     @endif
 
                     <!-- Empty State for Artist Search -->
                     <div id="artist-no-results" class="hidden col-span-full text-center py-12">
-                        <p class="text-gray-400 text-sm font-roboto">No artist found matching your search.</p>
+                        <p class="text-gray-400 text-sm font-inter">No artist found matching your search.</p>
                     </div>
                 </div>
             </div>
@@ -1449,7 +1423,7 @@
         <section id="view-artist-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK TO ARTISTS</span>
                 </button>
@@ -1462,11 +1436,11 @@
                         class="w-full h-full object-cover grayscale">
                 </div>
 
-                <div class="md:col-span-8 lg:col-span-9 space-y-3">
-                    <h1 id="artist-profile-name" class="text-2xl md:text-3xl font-bold font-montserrat text-black">
+                <div class="md:col-span-8 lg:col-span-9 space-y-4">
+                    <h1 id="artist-profile-name" class="text-3xl sm:text-4xl md:text-5xl font-bold font-space-grotesk text-black tracking-tight">
                         Mustafa Alatas</h1>
-                    <p id="artist-profile-location" class="text-xs md:text-sm text-gray-400 font-roboto">Temanggung</p>
-                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto pt-2">
+                    <p id="artist-profile-location" class="text-lg sm:text-xl md:text-2xl text-gray-500 font-inter font-medium tracking-normal">Temanggung</p>
+                    <p id="artist-profile-bio" class="text-base sm:text-lg md:text-xl lg:text-[1.2rem] text-gray-800 leading-relaxed font-inter pt-3 font-normal">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
                         labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
                         laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
@@ -1477,20 +1451,20 @@
             </div>
 
             <!-- Tab Switcher (Artwork vs Editorial) -->
-            <div class="border-b border-gray-200 mb-8 flex space-x-6 text-xs md:text-sm">
+            <div class="border-b border-gray-200 mb-8 flex space-x-8 sm:space-x-10 text-sm sm:text-base md:text-lg">
                 <button id="tab-btn-artwork" onclick="switchArtistTab('artwork')"
-                    class="pb-2 font-regular text-gray-400 hover:text-black transition-colors focus:outline-none cursor-pointer font-roboto">
+                    class="pb-3 font-medium text-gray-400 hover:text-black transition-colors focus:outline-none cursor-pointer font-space-grotesk">
                     Artwork
                 </button>
                 <button id="tab-btn-editorial" onclick="switchArtistTab('editorial')"
-                    class="pb-2 font-regular text-black border-b border-black transition-colors focus:outline-none cursor-pointer font-roboto">
+                    class="pb-3 font-medium text-black border-b-2 border-black transition-colors focus:outline-none cursor-pointer font-space-grotesk">
                     Editorial
                 </button>
             </div>
 
             <!-- TAB CONTENT 1: EDITORIAL ARTICLES -->
             <div id="artist-tab-content-editorial" class="space-y-6">
-                <h3 class="text-sm md:text-base font-bold font-montserrat text-black mb-6" id="editorial-section-title">
+                <h3 class="text-sm md:text-base font-bold font-space-grotesk text-black mb-6" id="editorial-section-title">
                     Articles Featuring Artist
                 </h3>
 
@@ -1498,19 +1472,19 @@
                     <!-- Populated dynamically via JS per artist -->
                 </div>
 
-                <div id="artist-editorial-empty" class="hidden text-center py-12 bg-gray-50 border border-gray-100 text-gray-400 font-roboto text-sm">
-                    Belum ada artikel editorial yang dipublikasikan untuk seniman ini.
+                <div id="artist-editorial-empty" class="hidden text-center py-12 bg-gray-50 border border-gray-100 text-gray-400 font-inter text-sm">
+                    No editorial articles published for this artist yet.
                 </div>
             </div>
 
             <!-- TAB CONTENT 2: ARTWORK GALLERY -->
             <div id="artist-tab-content-artwork" class="hidden space-y-6">
-                <div id="artist-artwork-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+                <div id="artist-artwork-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
                     <!-- Populated dynamically via JS per artist -->
                 </div>
 
-                <div id="artist-artwork-empty" class="hidden text-center py-12 bg-gray-50 border border-gray-100 text-gray-400 font-roboto text-sm">
-                    Belum ada karya seni fisik yang dipublikasikan untuk seniman ini.
+                <div id="artist-artwork-empty" class="hidden text-center py-12 bg-gray-50 border border-gray-100 text-gray-400 font-inter text-sm">
+                    No physical artworks published for this artist yet.
                 </div>
             </div>
         </section>
@@ -1519,14 +1493,10 @@
         <section id="view-artist-artwork-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6 flex items-center justify-between">
                 <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK TO ARTIST PROFILE</span>
                 </button>
-                <div class="flex items-center space-x-2 text-xs font-montserrat">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-gray-600 font-medium tracking-wider uppercase text-[11px]">Available for Direct Offering</span>
-                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
@@ -1534,7 +1504,7 @@
                     onclick="openLightbox(document.getElementById('artwork-detail-image').src, document.getElementById('artwork-title').innerText)">
                     <img id="artwork-detail-image" src="https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View" alt="Full Artwork"
                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
-                    <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white text-[10px] font-montserrat uppercase px-2.5 py-1 tracking-wider flex items-center space-x-1">
+                    <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-[1px] text-white text-[10px] font-space-grotesk uppercase px-2.5 py-1 tracking-wider flex items-center space-x-1">
                         <svg class="w-3 h-3 stroke-current inline" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
                         <span>Click to Enlarge</span>
                     </div>
@@ -1542,52 +1512,51 @@
 
                 <div class="lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-24">
                     <div>
-                        <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-1">NOTISSE ARTIST COLLABORATION</span>
-                        <h2 id="artwork-artist-name" class="text-xl md:text-2xl font-bold font-montserrat text-black">
+                        <h2 id="artwork-artist-name" class="text-xl md:text-2xl font-bold font-space-grotesk text-black">
                             Mustafa Alatas</h2>
                     </div>
 
-                    <h3 id="artwork-title" class="text-base md:text-lg italic font-roboto text-black">Mereka Ulang
+                    <h3 id="artwork-title" class="text-base md:text-lg italic font-space-grotesk text-black">Mereka Ulang
                         Ungkapan Indah Leila</h3>
 
-                    <div class="text-xs md:text-sm text-gray-700 font-roboto space-y-1 py-1 border-y border-gray-100">
+                    <div class="text-xs md:text-sm text-gray-700 font-inter space-y-1 py-1 border-y border-gray-100">
                         <p id="artwork-medium">Medium: Oil on canvas</p>
                         <p id="artwork-dimensions">Dimensions: 60x60cm</p>
                     </div>
 
                     <div class="py-2 border-y border-gray-100 my-2">
-                        <span class="text-[10px] font-bold tracking-widest uppercase text-gray-400 font-montserrat block mb-0.5">Harga</span>
-                        <p id="artwork-price-display" class="font-montserrat font-bold text-xl md:text-2xl text-black">Rp 7.500.000</p>
+                        <span class="text-[10px] font-bold tracking-widest uppercase text-gray-400 font-space-grotesk block mb-0.5">Price</span>
+                        <p id="artwork-price-display" class="font-space-grotesk font-bold text-xl md:text-2xl text-black">Rp 7.500.000</p>
                     </div>
 
-                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-roboto pt-2">
-                        Karya seni asli (original physical artwork) yang diciptakan eksklusif oleh seniman. Setiap karya disertai dengan sertifikat autentisitas bertanda tangan kuratorial Notisse.
+                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-inter pt-2">
+                        Original physical artwork created exclusively by the artist. Accompanied by a certificate of authenticity signed by Notisse curatorial team.
                     </p>
 
                     <!-- DIRECT OFFERING ACQUISITION PANEL -->
                     <div class="pt-6 border-t border-gray-200 space-y-3.5">
-                        <div class="p-3 bg-neutral-50 border border-gray-200 text-xs font-roboto text-gray-600 space-y-1">
-                            <div class="flex items-center justify-between font-montserrat">
-                                <span class="font-semibold uppercase tracking-wider text-black text-[11px]">Metode Pembelian:</span>
+                        <div class="p-3 bg-neutral-50 border border-gray-200 text-xs font-inter text-gray-600 space-y-1">
+                            <div class="flex items-center justify-between font-space-grotesk">
+                                <span class="font-semibold uppercase tracking-wider text-black text-[11px]">Acquisition Method:</span>
                                 <span class="text-emerald-700 font-bold uppercase tracking-wider text-[11px]">Direct Acquisition / Inquiry</span>
                             </div>
                             <p class="text-[11px] text-gray-500 leading-relaxed pt-1">
-                                Pembelian artwork berbeda dengan produk pakaian di cart. Sistem akuisisi akan menghubungkan pesanan Anda langsung ke seniman dan kurator Notisse sesuai harga yang telah ditetapkan.
+                                Artwork acquisition differs from standard apparel checkout. Submitting an inquiry connects your acquisition directly to the artist and Notisse curatorial atelier at the designated value.
                             </p>
                         </div>
 
                         <div class="w-full flex justify-center">
                             <button onclick="triggerArtworkOfferingCurrent()"
-                                class="btn-brush w-full text-xs md:text-sm font-bold tracking-[0.15em] uppercase cursor-pointer font-montserrat flex items-center justify-center space-x-2">
+                                class="btn-brush w-full text-xs md:text-sm font-bold tracking-[0.15em] uppercase cursor-pointer font-space-grotesk flex items-center justify-center space-x-2">
                                 <svg class="w-4 h-4 stroke-current text-white" fill="none" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v12m-6-6h12"/>
                                 </svg>
-                                <span>AJUKAN AKUISISI / BELI ARTWORK</span>
+                                <span>INQUIRE ACQUISITION / ACQUIRE ARTWORK</span>
                             </button>
                         </div>
 
-                        <p class="text-[11px] text-gray-400 font-roboto text-center leading-relaxed">
-                            Penawaran yang Anda submit akan dicatat ke sistem Notisse dan diverifikasi langsung oleh tim kurator dan seniman.
+                        <p class="text-[11px] text-gray-400 font-inter text-center leading-relaxed">
+                            Your submitted acquisition inquiry will be recorded in the Notisse registry and verified directly with the curatorial team and artist.
                         </p>
                     </div>
                 </div>
@@ -1598,19 +1567,13 @@
         <section id="view-editorials-all" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK</span>
                 </button>
             </div>
-            <div class="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-5">
-                <div>
-                    <span class="text-[10px] font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-1">NOTISSE ARCHIVE</span>
-                    <h1 class="text-2xl md:text-3xl font-bold font-montserrat text-black uppercase tracking-wider">Editorials</h1>
-                </div>
-                <p class="text-xs text-gray-500 font-roboto max-w-md">
-                    Wacana, catatan kuratorial, dan refleksi artistik di balik karya seniman kolaborator Notisse.
-                </p>
+            <div class="mb-10 border-b border-gray-200 pb-5">
+                <h1 class="text-2xl md:text-3xl font-bold font-space-grotesk text-black uppercase tracking-wider">Editorials</h1>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
@@ -1624,27 +1587,27 @@
                         </div>
                         <div class="p-5 flex flex-col justify-between flex-grow space-y-3">
                             <div>
-                                <span class="text-[9px] font-bold tracking-widest uppercase text-gray-400 font-montserrat block mb-1">
+                                <span class="text-[9px] font-bold tracking-widest uppercase text-gray-400 font-space-grotesk block mb-1">
                                     {{ $ed->artist ? $ed->artist->name : 'Notisse Editorial' }}
                                 </span>
-                                <h3 class="font-montserrat font-bold text-sm md:text-base text-black group-hover:underline line-clamp-2">
+                                <h3 class="font-space-grotesk font-bold text-sm md:text-base text-black group-hover:underline line-clamp-2">
                                     {{ $ed->title }}
                                 </h3>
                                 @if($ed->excerpt)
-                                    <p class="text-xs text-gray-600 font-roboto mt-2 line-clamp-2">
+                                    <p class="text-xs text-gray-600 font-inter mt-2 line-clamp-2">
                                         {{ $ed->excerpt }}
                                     </p>
                                 @endif
                             </div>
-                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-montserrat font-semibold text-black uppercase">
+                            <div class="pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-space-grotesk font-semibold text-black uppercase">
                                 <span>Read Essay</span>
                                 <span class="group-hover:translate-x-1 transition-transform">&rarr;</span>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full py-16 text-center text-gray-400 font-roboto">
-                        Belum ada artikel editorial yang dipublikasikan.
+                    <div class="col-span-full py-16 text-center text-gray-400 font-inter">
+                        No editorial articles published yet.
                     </div>
                 @endforelse
             </div>
@@ -1655,74 +1618,66 @@
             <!-- Navigation -->
             <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK</span>
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-start">
-                <!-- Left Column: Article Text & Captioned Images -->
-                <div class="lg:col-span-6 space-y-6 md:space-y-7">
-                    <div>
-                        <span class="text-xs font-bold tracking-[0.25em] uppercase text-gray-400 font-montserrat block mb-2">NOTISSE CURATORIAL ESSAY</span>
-                        <h1 id="editorial-detail-title" class="text-2xl sm:text-3xl lg:text-4xl font-bold font-montserrat text-black leading-tight">
-                            Mustafa Alatas Menafsir Kuasa dan Sosial dalam Lukisan Figuratif dan Simbolisme
-                        </h1>
-                        <p id="editorial-detail-author" class="text-xs sm:text-sm text-gray-500 font-roboto mt-2.5 font-medium">Laksa Dawantara</p>
+            <!-- Fullscreen / Full-width Editorial Article Layout -->
+            <article class="w-full space-y-8 md:space-y-10">
+                <header class="space-y-3 pb-6 border-b border-gray-100">
+                    <h1 id="editorial-detail-title" class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold font-space-grotesk text-black leading-[1.14] tracking-tight">
+                        Mustafa Alatas Menafsir Kuasa dan Sosial dalam Lukisan Figuratif dan Simbolisme
+                    </h1>
+                    <div class="flex items-center space-x-3 text-xs sm:text-sm text-gray-500 font-inter pt-1">
+                        <span id="editorial-detail-author" class="font-medium text-black">Laksa Dawantara</span>
                     </div>
+                </header>
 
-                    <!-- Paragraf 1 (DI ATAS FOTO) -->
-                    <div id="editorial-detail-content-top" class="text-base sm:text-lg md:text-[1.05rem] text-gray-800 leading-relaxed font-roboto space-y-4">
-                        <p>
-                            Di balik sapuan kuas yang kasar dan perpaduan pigmen mentah, Mustafa Alatas menyimpan refleksi panjang tentang dinamika kekuasaan dan identitas masyarakat kontemporer.
-                        </p>
-                    </div>
+                <!-- Paragraf 1 (DI ATAS FOTO) -->
+                <div id="editorial-detail-content-top" class="text-lg sm:text-xl md:text-2xl text-gray-900 leading-relaxed font-inter space-y-4 font-normal">
+                    <p>
+                        Di balik sapuan kuas yang kasar dan perpaduan pigmen mentah, Mustafa Alatas menyimpan refleksi panjang tentang dinamika kekuasaan dan identitas masyarakat kontemporer.
+                    </p>
+                </div>
 
-                    <!-- 2 FOTO DI SEBELAH KIRI (1 PORTRAIT 3:4 & 1 LANDSCAPE 4:3, SEJAJAR BAWAH & DIPERBESAR) -->
-                    <div class="grid grid-cols-2 gap-5 sm:gap-6 my-7 pt-2 items-end" style="align-items: end;">
-                        <!-- Foto 1: Portrait (3:4) -->
-                        <div class="self-end" style="align-self: end;">
-                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-2.5 shadow-sm">
-                                <img id="editorial-detail-portrait" src="{{ asset('masmus.jpeg') }}" alt="Portrait"
-                                    class="w-full h-full object-cover">
-                            </div>
-                            <p class="text-xs text-gray-500 font-roboto leading-normal">Portrait of Mustafa Alatas.</p>
+                <!-- 2 FOTO (1 PORTRAIT 3:4 & 1 LANDSCAPE 4:3, SEJAJAR BAWAH & DIPERBESAR) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 my-8 pt-2 items-end">
+                    <!-- Foto 1: Portrait (3:4) -->
+                    <div class="self-end">
+                        <div class="w-full aspect-[3/4] bg-[#d9d9d9] overflow-hidden mb-2.5 shadow-sm">
+                            <img id="editorial-detail-portrait" src="{{ asset('masmus.jpeg') }}" alt="Portrait"
+                                class="w-full h-full object-cover">
                         </div>
-                        <!-- Foto 2: Landscape (4:3) -->
-                        <div class="self-end" style="align-self: end;">
-                            <div class="w-full aspect-[4/3] bg-[#d9d9d9] overflow-hidden mb-2.5 shadow-sm">
-                                <img id="editorial-detail-artwork" src="{{ asset('artwork.jpeg') }}" alt="Artwork"
-                                    class="w-full h-full object-cover">
-                            </div>
-                            <p class="text-xs text-gray-500 font-roboto leading-normal">Raja Diamuk Massa, 2024. Courtesy of Medium.</p>
-                        </div>
+                        <p class="text-xs text-gray-500 font-inter leading-normal">Portrait of Mustafa Alatas.</p>
                     </div>
-
-                    <!-- Paragraf 2 (DI BAWAH FOTO) -->
-                    <div id="editorial-detail-content-bottom" class="text-base sm:text-lg md:text-[1.05rem] text-gray-800 leading-relaxed font-roboto space-y-4">
-                        <p>
-                            Dalam kolaborasi perdana bersama atelier Notisse, sang seniman asal Temanggung ini mentransformasi gestur visual dari kanvas fisik menuju medium pakaian berpotongan boxy murni katun 16s. Lukisannya tidak sekadar dipindahkan sebagai sablon, melainkan diolah ulang agar serat benang dan tekstur tinta plastisol menyatu harmonis dengan filosofi artistik Notisse.
-                        </p>
+                    <!-- Foto 2: Landscape (4:3) -->
+                    <div class="self-end">
+                        <div class="w-full aspect-[4/3] bg-[#d9d9d9] overflow-hidden mb-2.5 shadow-sm">
+                            <img id="editorial-detail-artwork" src="{{ asset('artwork.jpeg') }}" alt="Artwork"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-xs text-gray-500 font-inter leading-normal">Raja Diamuk Massa, 2024. Courtesy of Medium.</p>
                     </div>
                 </div>
 
-                <!-- Right Column: Full Featured Editorial Photo (Diperbesar Lebih Luas & Tetap Potret) -->
-                <div class="lg:col-span-6 sticky top-24">
-                    <div class="w-full aspect-[4/5] min-h-[580px] md:min-h-[700px] lg:min-h-[820px] max-h-[88vh] bg-[#d9d9d9] overflow-hidden shadow-2xl border border-black/5">
-                        <img id="editorial-detail-featured"
-                            src="{{ asset('home.jpg') }}"
-                            alt="Editorial Feature"
-                            class="w-full h-full object-cover">
-                    </div>
+                <!-- Paragraf 2 (DI BAWAH FOTO) -->
+                <div id="editorial-detail-content-bottom" class="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed font-inter space-y-6 pt-2">
+                    <p>
+                        Dalam kolaborasi perdana bersama atelier Notisse, sang seniman asal Temanggung ini mentransformasi gestur visual dari kanvas fisik menuju medium pakaian berpotongan boxy murni katun 16s. Lukisannya tidak sekadar dipindahkan sebagai sablon, melainkan diolah ulang agar serat benang dan tekstur tinta plastisol menyatu harmonis dengan filosofi artistik Notisse.
+                    </p>
                 </div>
-            </div>
+
+                <!-- Hidden element kept for JS references if any -->
+                <img id="editorial-detail-featured" src="{{ asset('home.jpg') }}" alt="Editorial Feature" class="hidden">
+            </article>
         </section>
 
-        <!-- VIEW 4: LOOKBOOK INDEX PAGE (MINIMALIST TIMELINE) -->
+        <!-- VIEW 4: LOOKBOOK INDEX PAGE (LEFT-ALIGNED MINIMALIST TIMELINE) -->
         <section id="view-lookbook-list"
-            class="view-page min-h-[75vh] px-8 sm:px-16 md:px-24 py-16 md:py-24 max-w-5xl mx-auto flex flex-col justify-center">
-            <div class="relative pl-8 md:pl-12 my-auto">
+            class="view-page min-h-[75vh] w-full px-6 sm:px-10 md:px-16 lg:px-20 py-16 md:py-24 flex flex-col justify-center items-start">
+            <div class="relative pl-8 md:pl-12 my-auto text-left">
                 <!-- Vertical Timeline Line -->
                 <div class="absolute left-0 top-3 bottom-3 w-[1.5px] bg-gray-300"></div>
 
@@ -1738,7 +1693,7 @@
 
                         <!-- Lookbook Text -->
                         <span
-                            class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] {{ $index === 0 ? 'text-black' : 'text-gray-400 group-hover:text-black' }} uppercase font-montserrat group-hover:translate-x-4 transition-all duration-300">
+                            class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] {{ $index === 0 ? 'text-black' : 'text-gray-400 group-hover:text-black' }} uppercase font-space-grotesk group-hover:translate-x-4 transition-all duration-300">
                             {{ $lb->title ?: ($lb->year . ' LOOKBOOK') }}
                         </span>
                     </div>
@@ -1746,7 +1701,7 @@
                     <div onclick="openLookbookDetail(null)"
                         class="group relative flex items-center cursor-pointer select-none">
                         <div class="absolute -left-[32px] md:-left-[48px] w-3.5 h-3.5 md:w-4 md:h-4 rounded-full bg-gray-400 border-2 border-white group-hover:bg-black group-hover:scale-150 transition-all duration-300 shadow-sm"></div>
-                        <span class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] text-black uppercase font-montserrat group-hover:translate-x-4 transition-all duration-300">
+                        <span class="text-xl sm:text-2xl md:text-3xl font-light tracking-[0.2em] text-black uppercase font-space-grotesk group-hover:translate-x-4 transition-all duration-300">
                             2025 LOOKBOOK
                         </span>
                     </div>
@@ -1759,15 +1714,15 @@
         <section id="view-lookbook-detail" class="view-page min-h-screen pt-20 md:pt-24 pb-20">
             <div class="w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-2 pb-4">
                 <button onclick="goBack()"
-                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK TO LOOKBOOKS</span>
                 </button>
             </div>
 
             <!-- WIDE CINEMATIC LOOKBOOK CAMPAIGN VIDEO (MELEBAR DI ATAS) -->
-            <div id="lookbook-video-wrapper" class="w-full bg-black mb-12 relative overflow-hidden shadow-2xl">
-                <div class="w-full aspect-[21/9] min-h-[300px] max-h-[580px] relative bg-black">
+            <div id="lookbook-video-wrapper" class="w-full bg-black mb-10 relative overflow-hidden shadow-2xl">
+                <div class="w-full aspect-[21/8] min-h-[220px] max-h-[380px] md:max-h-[420px] relative bg-black">
                     <video id="lookbook-video-player"
                         class="w-full h-full object-cover"
                         autoplay loop muted playsinline controls
@@ -1775,10 +1730,13 @@
                         <source id="lookbook-video-source" src="{{ asset('video/editorial.mp4') }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <!-- Overlaid Title Bar -->
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none flex flex-col justify-end p-6 sm:p-12">
-                        <span class="text-[10px] sm:text-xs font-montserrat font-bold uppercase tracking-[0.25em] text-white/70">NOTISSE CAMPAIGN FILM</span>
-                        <h2 id="lookbook-detail-title" class="text-2xl sm:text-3xl md:text-4xl font-normal tracking-[0.25em] text-white uppercase font-montserrat mt-1">2025 LOOKBOOK</h2>
+                    <!-- Overlaid Thin Blur Glass Tint & Centered Title -->
+                    <div class="absolute inset-0 bg-black/15 pointer-events-none flex items-center justify-center p-4 sm:p-8"
+                        style="backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);">
+                        <h2 id="lookbook-detail-title"
+                            class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium tracking-[0.22em] text-white uppercase font-space-grotesk text-center drop-shadow-[0_2px_15px_rgba(0,0,0,0.5)] select-none">
+                            2025 LOOKBOOK
+                        </h2>
                     </div>
                 </div>
             </div>
@@ -1797,7 +1755,7 @@
                                     <div
                                         class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                                         <span
-                                            class="text-white font-montserrat tracking-[0.2em] uppercase text-sm md:text-base">{{ $foto->title }}</span>
+                                            class="text-white font-space-grotesk tracking-[0.2em] uppercase text-sm md:text-base">{{ $foto->title }}</span>
                                     </div>
                                 @endif
                             </div>
@@ -1812,36 +1770,36 @@
             class="view-page min-h-[calc(100vh-80px)] flex flex-col justify-center items-start px-6 sm:px-12 md:px-16 lg:px-20 xl:px-24 py-16 md:py-24 pb-28 md:pb-32 max-w-full">
             <div class="w-full text-left space-y-7 sm:space-y-9 md:space-y-12 lg:space-y-15">
                 <p
-                    class="text-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-[5.5vw] font-bold leading-[1.18] sm:leading-[1.18] tracking-tight font-roboto">
-                    NOTISSE IS AN ALTERNATIVE MOVEMENT IN ART EXHIBITION.WOVEN INTO THE FABRIC OF EVERYDAY LIFE.SO ART BECOMES PART OF DAILY ACTIVITY NOT A SEPARATE OCCASION.
+                    class="text-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-[5.5vw] font-bold leading-[1.18] sm:leading-[1.18] tracking-tight font-space-grotesk">
+                    NOTISSE IS AN ALTERNATIVE MOVEMENT IN ART EXHIBITION. WOVEN INTO THE FABRIC OF EVERYDAY LIFE. SO ART BECOMES PART OF DAILY ACTIVITY NOT A SEPARATE OCCASION.
                 </p>
             </div>
         </section>
 
         <!-- VIEW 6B: CONTACT PAGE -->
         <section id="view-contact"
-            class="view-page px-8 sm:px-16 md:px-24 py-16 md:py-24 max-w-5xl mx-auto min-h-[calc(100vh-80px)] flex flex-col justify-center">
-            <div class="space-y-12 text-left font-roboto">
+            class="view-page px-6 sm:px-12 md:px-16 lg:px-20 xl:px-24 py-20 md:py-28 min-h-[calc(100vh-80px)] flex flex-col justify-center items-start w-full">
+            <div class="space-y-10 sm:space-y-12 text-left max-w-3xl">
                 <!-- Workshop Section -->
                 <div class="space-y-2">
-                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-light text-black tracking-tight">Workshop :</h3>
-                    <p class="text-gray-700 text-sm sm:text-base md:text-lg font-light tracking-wide">
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-normal text-black tracking-tight font-space-grotesk">Workshop :</h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg font-light tracking-wide font-inter">
                         Jl Mangga Dua, Desa Sukapura, DayeuhKolot, Bandung.
                     </p>
                 </div>
 
                 <!-- Email Section -->
                 <div class="space-y-2">
-                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-light text-black tracking-tight">Email :</h3>
-                    <p class="text-gray-700 text-sm sm:text-base md:text-lg font-light tracking-wide">
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-normal text-black tracking-tight font-space-grotesk">Email :</h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg font-light tracking-wide font-inter">
                         notissebrand@gmail.com
                     </p>
                 </div>
 
                 <!-- Whatsapp Section -->
                 <div class="space-y-2">
-                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-light text-black tracking-tight">Whatsapp :</h3>
-                    <p class="text-gray-700 text-sm sm:text-base md:text-lg font-light tracking-wide">
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-normal text-black tracking-tight font-space-grotesk">Whatsapp :</h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg font-light tracking-wide font-inter">
                         +62 856 0771 4704
                     </p>
                 </div>
@@ -1854,45 +1812,45 @@
                 <div class="flex justify-center mb-4">
                     <img src="{{ asset('logowebkecil.png') }}" alt="Notisse Logo" class="h-12 w-auto object-contain">
                 </div>
-                <h2 class="text-2xl font-bold font-montserrat uppercase tracking-wider text-black">Login Account</h2>
-                <p class="text-xs text-gray-500 font-roboto mt-1">Masuk untuk mengakses koleksi dan pesanan Anda.</p>
+                <h2 class="text-2xl font-bold font-space-grotesk uppercase tracking-wider text-black">Login Account</h2>
+                <p class="text-xs text-gray-500 font-inter mt-1">Sign in to access your collection and orders.</p>
             </div>
 
             <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
                 <div>
                     <label
-                        class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1 font-montserrat">Email</label>
-                    <input type="email" required placeholder="nama@email.com"
-                        class="w-full border border-black rounded-lg p-3 text-sm focus:outline-none font-roboto">
+                        class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1 font-space-grotesk">Email</label>
+                    <input type="email" required placeholder="name@email.com"
+                        class="w-full border border-black rounded-lg p-3 text-sm focus:outline-none font-inter">
                 </div>
 
                 <div>
                     <label
-                        class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1 font-montserrat">Password</label>
+                        class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1 font-space-grotesk">Password</label>
                     <input type="password" required placeholder="••••••••"
-                        class="w-full border border-black rounded-lg p-3 text-sm focus:outline-none font-roboto">
+                        class="w-full border border-black rounded-lg p-3 text-sm focus:outline-none font-inter">
                 </div>
 
-                <div class="flex items-center justify-between text-xs font-roboto pt-1">
+                <div class="flex items-center justify-between text-xs font-inter pt-1">
                     <label class="flex items-center space-x-2 cursor-pointer">
                         <input type="checkbox" class="accent-black">
-                        <span class="text-gray-600">Ingat saya</span>
+                        <span class="text-gray-600">Remember me</span>
                     </label>
-                    <a href="javascript:void(0)" onclick="showToast('Link reset password telah dikirim ke email.')"
-                        class="underline text-gray-500 hover:text-black">Lupa password?</a>
+                    <a href="javascript:void(0)" onclick="showToast('Password reset instructions sent to your email.')"
+                        class="underline text-gray-500 hover:text-black">Forgot password?</a>
                 </div>
 
                 <div class="pt-4 flex justify-center">
-                    <button type="submit" class="btn-brush w-full text-sm uppercase cursor-pointer font-montserrat">
+                    <button type="submit" class="btn-brush w-full text-sm uppercase cursor-pointer font-space-grotesk">
                         LOG IN
                     </button>
                 </div>
 
                 <div class="text-center pt-4">
-                    <p class="text-xs text-gray-500 font-roboto">
-                        Belum memiliki akun?
+                    <p class="text-xs text-gray-500 font-inter">
+                        Don't have an account yet?
                         <a href="javascript:void(0)" onclick="showPage('view-register')"
-                            class="font-bold underline text-black">Daftar sekarang</a>
+                            class="font-bold underline text-black">Register now</a>
                     </p>
                 </div>
             </form>
@@ -1907,59 +1865,62 @@
                 </div>
 
                 <!-- Headline Tagline -->
-                <h2 class="text-center font-montserrat text-lg sm:text-xl font-medium text-black leading-snug px-2">
-                    Daftar untuk terlibat dalam proses kreatif para seniman
+                <h2 class="text-center font-space-grotesk text-lg sm:text-xl font-medium text-black leading-snug px-2">
+                    Join and engage with the creative journey of our artists
                 </h2>
 
                 <!-- Registration Form -->
                 <form onsubmit="handleRegisterSubmit(event)" class="space-y-4 pt-2">
                     <div>
-                        <input type="text" required placeholder="Nama Lengkap"
-                            class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-roboto placeholder-gray-400">
+                        <input type="text" required placeholder="Full Name"
+                            class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-inter placeholder-gray-400">
                     </div>
 
                     <div>
-                        <input type="email" required placeholder="Email"
-                            class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-roboto placeholder-gray-400">
+                        <input type="email" required placeholder="Email Address"
+                            class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-inter placeholder-gray-400">
                     </div>
 
                     <div>
                         <input type="password" required placeholder="Password"
-                            class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-roboto placeholder-gray-400">
+                            class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-inter placeholder-gray-400">
                     </div>
 
                     <div>
-                        <input type="password" required placeholder="Konfirmasi Password"
-                            class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-roboto placeholder-gray-400">
+                        <input type="password" required placeholder="Confirm Password"
+                            class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-inter placeholder-gray-400">
                     </div>
 
                     <div class="pt-4 flex justify-center">
-                        <button type="submit" class="btn-brush w-full text-sm uppercase cursor-pointer font-montserrat">
-                            Daftar
+                        <button type="submit" class="btn-brush w-full text-sm uppercase cursor-pointer font-space-grotesk">
+                            CREATE ACCOUNT
                         </button>
                     </div>
                 </form>
 
                 <div class="text-center pt-2 border-t border-gray-100">
-                    <p class="text-xs text-gray-500 font-roboto">
-                        Sudah punya akun?
+                    <p class="text-xs text-gray-500 font-inter">
+                        Already have an account?
                         <a href="javascript:void(0)" onclick="showPage('view-login')"
-                            class="font-bold underline text-black">Masuk di sini</a>
+                            class="font-bold underline text-black">Log in here</a>
                     </p>
                 </div>
             </div>
         </section>
 
         <!-- VIEW 9: LOGGED-IN ACCOUNT DASHBOARD -->
-        <section id="view-account-profile" class="view-page px-4 sm:px-6 md:px-12 pt-32 md:pt-40 pb-28 max-w-5xl mx-auto space-y-10">
-            <!-- Back to Shop -->
-            <div>
+        <section id="view-account-profile" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
+            <!-- Back to Shop (Top Left) -->
+            <div class="mb-6">
                 <button onclick="showPage('view-shop')"
-                    class="group inline-flex items-center space-x-2 text-xs font-semibold tracking-widest text-neutral-400 hover:text-black uppercase transition-colors font-montserrat focus:outline-none cursor-pointer">
+                    class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>Kembali ke Toko</span>
+                    <span>BACK TO SHOP</span>
                 </button>
             </div>
+
+            <!-- Profile Content Container (Full Width / Full Screen) -->
+            <div class="w-full space-y-6">
 
             <!-- Profile Hero Header Banner -->
             <div class="border border-black bg-white p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
@@ -1967,29 +1928,29 @@
                     @if(auth()->check() && auth()->user()->avatar)
                         <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="w-16 h-16 object-cover border border-black shrink-0">
                     @else
-                        <div class="w-16 h-16 bg-black text-white flex items-center justify-center font-bold text-xl font-montserrat tracking-wider border border-black shrink-0">
+                        <div class="w-16 h-16 bg-black text-white flex items-center justify-center font-bold text-xl font-space-grotesk tracking-wider border border-black shrink-0">
                             {{ auth()->check() ? strtoupper(substr(auth()->user()->name ?? 'N', 0, 2)) : 'NT' }}
                         </div>
                     @endif
                     <div class="space-y-1">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <h1 class="text-xl md:text-2xl font-bold font-montserrat uppercase tracking-tight text-black" id="account-header-name">
-                                {{ auth()->check() ? auth()->user()->name : 'Member Notisse' }}
+                            <h1 class="text-xl md:text-2xl font-bold font-space-grotesk uppercase tracking-tight text-black" id="account-header-name">
+                                {{ auth()->check() ? auth()->user()->name : 'Notisse Member' }}
                             </h1>
-                            <span class="text-[9px] font-bold font-montserrat tracking-widest uppercase bg-black text-white px-2 py-0.5">VERIFIED CLIENT</span>
+                            <span class="text-[9px] font-bold font-space-grotesk tracking-widest uppercase bg-black text-white px-2 py-0.5">VERIFIED CLIENT</span>
                         </div>
-                        <p id="user-display-email" class="text-xs text-neutral-500 font-roboto">
+                        <p id="user-display-email" class="text-xs text-neutral-500 font-inter">
                             {{ auth()->check() ? auth()->user()->email : 'user@notisse.com' }}
                         </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 self-start md:self-auto">
                     <button onclick="showEditProfile()"
-                        class="px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider font-montserrat cursor-pointer">
-                        Edit Profil
+                        class="px-4 py-2 border border-black hover:bg-black hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider font-space-grotesk cursor-pointer">
+                        Edit Profile
                     </button>
                     <button onclick="handleLogout()"
-                        class="px-4 py-2 bg-neutral-100 hover:bg-red-600 hover:text-white text-neutral-700 transition-colors text-xs font-semibold uppercase tracking-wider font-montserrat cursor-pointer">
+                        class="px-4 py-2 bg-neutral-100 hover:bg-red-600 hover:text-white text-neutral-700 transition-colors text-xs font-semibold uppercase tracking-wider font-space-grotesk cursor-pointer">
                         Logout
                     </button>
                 </div>
@@ -1998,16 +1959,16 @@
             <!-- Profile Section Tabs -->
             <div class="flex border-b border-gray-200 gap-2 sm:gap-6 overflow-x-auto">
                 <button onclick="switchAccountTab('orders')" id="acc-tab-orders"
-                    class="acc-tab-btn active pb-3 text-xs sm:text-sm font-bold font-montserrat uppercase tracking-wider border-b-2 border-black text-black cursor-pointer whitespace-nowrap">
-                    Riwayat Pesanan
+                    class="acc-tab-btn active pb-3 text-xs sm:text-sm font-bold font-space-grotesk uppercase tracking-wider border-b-2 border-black text-black cursor-pointer whitespace-nowrap">
+                    Order History
                 </button>
                 <button onclick="switchAccountTab('address')" id="acc-tab-address"
-                    class="acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-montserrat uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap">
-                    Buku Alamat
+                    class="acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-space-grotesk uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap">
+                    Address Book
                 </button>
                 <button onclick="switchAccountTab('offers')" id="acc-tab-offers"
-                    class="acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-montserrat uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap">
-                    Penawaran Karya Seni
+                    class="acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-space-grotesk uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap">
+                    Artwork Inquiries
                 </button>
             </div>
 
@@ -2015,17 +1976,17 @@
             <div id="acc-pane-orders" class="space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Pesanan Belanja</h2>
-                        <p class="text-xs text-gray-400 font-roboto mt-0.5">Daftar transaksi produk Notisse yang terhubung ke pembayaran Midtrans.</p>
+                        <h2 class="text-base font-bold font-space-grotesk text-black uppercase tracking-wider">Orders & Purchases</h2>
+                        <p class="text-xs text-gray-400 font-inter mt-0.5">Notisse product purchases and order history.</p>
                     </div>
-                    <button onclick="fetchOrderHistory()" class="text-xs font-montserrat font-semibold uppercase tracking-wider hover:underline text-gray-500 hover:text-black">
+                    <button onclick="fetchOrderHistory()" class="text-xs font-space-grotesk font-semibold uppercase tracking-wider hover:underline text-gray-500 hover:text-black">
                         Refresh
                     </button>
                 </div>
 
                 <div id="order-history-container" class="space-y-4">
                     <div class="border border-gray-200 p-8 text-center bg-gray-50">
-                        <p class="text-gray-400 font-roboto text-sm">Memuat pesanan...</p>
+                        <p class="text-gray-400 font-inter text-sm">Loading orders...</p>
                     </div>
                 </div>
             </div>
@@ -2034,11 +1995,11 @@
             <div id="acc-pane-address" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Alamat Pengiriman Utama</h2>
-                        <p class="text-xs text-gray-400 font-roboto mt-0.5">Alamat ini digunakan untuk kalkulasi ongkos kirim saat checkout.</p>
+                        <h2 class="text-base font-bold font-space-grotesk text-black uppercase tracking-wider">Primary Shipping Address</h2>
+                        <p class="text-xs text-gray-400 font-inter mt-0.5">This address is used for shipping calculations during checkout.</p>
                     </div>
-                    <button onclick="showEditProfile()" class="text-xs font-montserrat font-bold uppercase tracking-wider text-black underline">
-                        Ubah Alamat
+                    <button onclick="showEditProfile()" class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-black underline">
+                        Change Address
                     </button>
                 </div>
 
@@ -2053,18 +2014,21 @@
                                 </div>
                             @endif
                             <div>
-                                <span class="text-[10px] font-bold font-montserrat tracking-widest uppercase bg-neutral-100 text-neutral-600 px-2 py-0.5 inline-block mb-1.5">Profil Pengguna</span>
-                                <h3 class="font-bold text-black text-base font-montserrat" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</h3>
-                                <p class="text-xs text-gray-500 font-roboto mt-0.5" id="user-display-phone">{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : 'No. HP belum diatur' }}</p>
+                                <span class="text-[10px] font-bold font-space-grotesk tracking-widest uppercase bg-neutral-100 text-neutral-600 px-2 py-0.5 inline-block mb-1.5">User Profile</span>
+                                <h3 class="font-bold text-black text-base font-space-grotesk" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</h3>
+                                <p class="text-xs text-gray-500 font-inter mt-0.5" id="user-display-phone">{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : 'No phone number set' }}</p>
+                                <p class="text-xs text-gray-500 font-inter mt-0.5" id="user-display-birthdate">
+                                    {{ auth()->check() && auth()->user()->birthdate ? 'Date of Birth: ' . \Carbon\Carbon::parse(auth()->user()->birthdate)->format('d M Y') : '' }}
+                                </p>
                             </div>
                         </div>
-                        <button onclick="showEditProfile()" class="text-xs font-semibold uppercase tracking-wider text-black hover:underline font-montserrat">
+                        <button onclick="showEditProfile()" class="text-xs font-semibold uppercase tracking-wider text-black hover:underline font-space-grotesk">
                             Edit
                         </button>
                     </div>
                     <div>
-                        <p class="text-xs font-roboto text-gray-700 leading-relaxed" id="user-display-address">
-                            {{ auth()->check() && auth()->user()->address ? auth()->user()->address : 'Belum ada alamat pengiriman. Silakan tambahkan alamat untuk kemudahan checkout.' }}
+                        <p class="text-xs font-inter text-gray-700 leading-relaxed" id="user-display-address">
+                            {{ auth()->check() && auth()->user()->address ? auth()->user()->address : 'No shipping address saved yet. Please add an address for seamless checkout.' }}
                         </p>
                     </div>
                 </div>
@@ -2073,71 +2037,171 @@
             <!-- TAB 3: ARTWORK OFFERS INQUIRIES -->
             <div id="acc-pane-offers" class="hidden space-y-6">
                 <div>
-                    <h2 class="text-base font-bold font-montserrat text-black uppercase tracking-wider">Penawaran Karya Seni (Acquisition Inquiries)</h2>
-                    <p class="text-xs text-gray-400 font-roboto mt-0.5">Daftar penawaran harga karya seni editorial Notisse yang Anda ajukan untuk kurasi.</p>
+                    <h2 class="text-base font-bold font-space-grotesk text-black uppercase tracking-wider">Artwork Acquisition Inquiries</h2>
+                    <p class="text-xs text-gray-400 font-inter mt-0.5">List of artwork acquisition offers submitted for curatorial review.</p>
                 </div>
 
                 <div id="account-art-offers-list" class="space-y-4">
                     <div class="border border-gray-200 p-8 text-center bg-gray-50">
-                        <p class="text-gray-400 font-roboto text-sm">Belum ada penawaran karya seni yang diajukan.</p>
-                        <button onclick="showPage('view-artist-detail')" class="mt-3 text-xs font-bold font-montserrat uppercase underline tracking-wider">
-                            Jelajahi Galeri Seni
+                        <p class="text-gray-400 font-inter text-sm">No artwork acquisition inquiries submitted yet.</p>
+                        <button onclick="showPage('view-artist-detail')" class="mt-3 text-xs font-bold font-space-grotesk uppercase underline tracking-wider">
+                            Explore Art Gallery
                         </button>
                     </div>
                 </div>
             </div>
+            </div>
         </section>
 
         <!-- VIEW 10: EDIT PROFILE / ALAMAT -->
-        <section id="view-edit-profile" class="view-page px-4 sm:px-6 md:px-12 pt-32 md:pt-40 pb-28 max-w-xl mx-auto space-y-8">
-            <div class="mb-4 flex items-center justify-between">
-                <button onclick="goBack()" class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-montserrat">
+        <section id="view-edit-profile" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
+            <div class="mb-6">
+                <button onclick="goBack()" class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>KEMBALI</span>
+                    <span>BACK</span>
                 </button>
-                <h1 class="text-xl font-bold font-montserrat uppercase text-black">Edit Profil & Alamat</h1>
             </div>
 
-            <div id="edit-profile-error" class="hidden bg-red-100 text-red-700 p-3 text-sm border border-red-200"></div>
-            <div id="edit-profile-success" class="hidden bg-green-100 text-green-700 p-3 text-sm border border-green-200"></div>
-
-            <form onsubmit="handleEditProfileSubmit(event)" class="space-y-6 bg-white border border-gray-200 p-6 md:p-8">
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Foto Profil</label>
-                    <input type="file" id="edit-avatar" accept="image/*" class="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:border-black font-roboto bg-gray-50">
-                    <p class="text-[10px] text-gray-500 mt-1 uppercase">Opsional. Maks 4MB.</p>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Nama Lengkap *</label>
-                    <input type="text" id="edit-name" required class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-roboto">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">No. HP / Whatsapp *</label>
-                    <input type="text" id="edit-phone" required class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-roboto">
-                </div>
-                
-                <div class="relative">
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Cari Kecamatan / Kota *</label>
-                    <input type="text" id="edit-area-search" class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-roboto" placeholder="Ketik nama kecamatan..." autocomplete="off">
-                    <ul id="edit-area-results" class="absolute z-20 w-full bg-white border border-gray-300 shadow-xl mt-1 hidden max-h-48 overflow-y-auto"></ul>
+            <div class="max-w-xl mx-auto space-y-6">
+                <div class="text-center">
+                    <h1 class="text-xl md:text-2xl font-bold font-space-grotesk uppercase text-black">Edit Profile & Address</h1>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-montserrat">Alamat Lengkap *</label>
-                    <textarea id="edit-address" required class="w-full border border-gray-300 p-3 text-sm h-24 focus:outline-none focus:border-black font-roboto resize-none" placeholder="Nama Jalan, RT/RW, Nomor Rumah, Patokan..."></textarea>
-                </div>
+                <div id="edit-profile-error" class="hidden bg-red-100 text-red-700 p-3 text-sm border border-red-200"></div>
+                <div id="edit-profile-success" class="hidden bg-green-100 text-green-700 p-3 text-sm border border-green-200"></div>
 
-                <input type="hidden" id="edit-area-id" required>
+                <form onsubmit="handleEditProfileSubmit(event)" class="space-y-6 bg-white border border-gray-200 p-6 md:p-8">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-space-grotesk">Profile Picture</label>
+                        <input type="file" id="edit-avatar" accept="image/*" class="w-full border border-gray-300 p-2 text-sm focus:outline-none focus:border-black font-inter bg-gray-50">
+                        <p class="text-[10px] text-gray-500 mt-1 uppercase">Optional. Max 4MB.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-space-grotesk">Full Name *</label>
+                        <input type="text" id="edit-name" required class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-inter">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-space-grotesk">Phone / WhatsApp *</label>
+                        <input type="text" id="edit-phone" required class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-inter">
+                    </div>
+                    <div class="relative" id="notisse-datepicker-container">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-space-grotesk">Date of Birth</label>
+                        
+                        <!-- Hidden actual date value for form submission (YYYY-MM-DD) -->
+                        <input type="hidden" id="edit-birthdate" name="birthdate">
 
-                <div class="pt-4 border-t border-gray-100 flex gap-3">
-                    <button type="button" onclick="goBack()" class="w-1/3 border border-gray-300 py-3.5 text-xs font-bold font-montserrat uppercase hover:bg-gray-50 transition-colors cursor-pointer">
-                        Batal
-                    </button>
-                    <button type="submit" id="edit-profile-btn" class="w-2/3 bg-black text-white font-bold font-montserrat uppercase py-3.5 text-xs tracking-wider hover:bg-neutral-800 transition-colors cursor-pointer">
-                        Simpan Perubahan
-                    </button>
-                </div>
-            </form>
+                        <!-- Custom Luxury Trigger Field -->
+                        <div id="datepicker-trigger" 
+                             onclick="toggleNotisseDatePicker(event)"
+                             class="w-full border border-gray-300 p-3 text-sm flex items-center justify-between bg-white cursor-pointer hover:border-black focus:border-black transition-colors select-none group">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <svg class="w-4 h-4 text-gray-400 group-hover:text-black transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <rect x="3" y="4" width="18" height="18" rx="0" ry="0" stroke-width="1.8"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6" stroke-width="1.8"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6" stroke-width="1.8"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10" stroke-width="1.8"></line>
+                                </svg>
+                                <span id="datepicker-display-text" class="text-gray-400 font-inter text-sm truncate">Select birth date (DD / MM / YYYY)</span>
+                            </div>
+                            <div class="flex items-center space-x-2 shrink-0">
+                                <button type="button" id="datepicker-clear-btn" onclick="clearNotisseDatePicker(event)" class="hidden text-gray-400 hover:text-black text-sm font-bold px-1 leading-none cursor-pointer" title="Clear date">
+                                    &times;
+                                </button>
+                                <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-black transition-transform duration-200" id="datepicker-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Bespoke Notisse Calendar Dropdown -->
+                        <div id="notisse-calendar-dropdown" 
+                             class="hidden absolute z-30 left-0 top-full mt-1.5 w-full sm:w-[340px] bg-white border border-black shadow-2xl p-4 font-space-grotesk select-none transition-all duration-200">
+                            
+                            <!-- Calendar Header: Month & Year Fast Jump -->
+                            <div class="flex items-center justify-between mb-3 pb-3 border-b border-gray-100">
+                                <button type="button" onclick="changeNotisseMonth(-1, event)" class="p-1.5 text-black hover:bg-neutral-100 transition-colors cursor-pointer" title="Previous Month">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                </button>
+
+                                <!-- Month & Year Dropdowns -->
+                                <div class="flex items-center space-x-2">
+                                    <select id="cal-month-select" onchange="onMonthSelectChange(this.value)" class="bg-neutral-100 hover:bg-neutral-200 text-black font-space-grotesk font-bold text-xs uppercase px-2 py-1.5 border-none focus:outline-none cursor-pointer transition-colors">
+                                        <option value="0">JANUARY</option>
+                                        <option value="1">FEBRUARY</option>
+                                        <option value="2">MARCH</option>
+                                        <option value="3">APRIL</option>
+                                        <option value="4">MAY</option>
+                                        <option value="5">JUNE</option>
+                                        <option value="6">JULY</option>
+                                        <option value="7">AUGUST</option>
+                                        <option value="8">SEPTEMBER</option>
+                                        <option value="9">OCTOBER</option>
+                                        <option value="10">NOVEMBER</option>
+                                        <option value="11">DECEMBER</option>
+                                    </select>
+
+                                    <select id="cal-year-select" onchange="onYearSelectChange(this.value)" class="bg-neutral-100 hover:bg-neutral-200 text-black font-space-grotesk font-bold text-xs uppercase px-2 py-1.5 border-none focus:outline-none cursor-pointer transition-colors">
+                                        <!-- Populated dynamically via JS -->
+                                    </select>
+                                </div>
+
+                                <button type="button" onclick="changeNotisseMonth(1, event)" class="p-1.5 text-black hover:bg-neutral-100 transition-colors cursor-pointer" title="Next Month">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            </div>
+
+                            <!-- Day Names -->
+                            <div class="grid grid-cols-7 text-center text-[10px] font-space-grotesk font-bold uppercase text-gray-400 mb-2 tracking-wider">
+                                <span>SU</span>
+                                <span>MO</span>
+                                <span>TU</span>
+                                <span>WE</span>
+                                <span>TH</span>
+                                <span>FR</span>
+                                <span>SA</span>
+                            </div>
+
+                            <!-- Days Grid -->
+                            <div id="cal-days-grid" class="grid grid-cols-7 gap-1 text-center font-space-grotesk text-xs">
+                                <!-- Populated dynamically -->
+                            </div>
+
+                            <!-- Calendar Footer -->
+                            <div class="flex items-center justify-between pt-3 mt-3 border-t border-gray-100">
+                                <button type="button" onclick="clearNotisseDatePicker(event)" class="text-gray-400 hover:text-black font-space-grotesk font-semibold uppercase tracking-wider text-[10px] cursor-pointer">
+                                    Clear
+                                </button>
+                                <button type="button" onclick="closeNotisseDatePicker()" class="bg-black text-white px-3.5 py-1.5 text-[10px] font-space-grotesk font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors cursor-pointer">
+                                    Done
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-space-grotesk">Search District / City *</label>
+                        <input type="text" id="edit-area-search" class="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-black font-inter" placeholder="Type district or city name..." autocomplete="off">
+                        <ul id="edit-area-results" class="absolute z-20 w-full bg-white border border-gray-300 shadow-xl mt-1 hidden max-h-48 overflow-y-auto"></ul>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 font-space-grotesk">Full Address *</label>
+                        <textarea id="edit-address" required class="w-full border border-gray-300 p-3 text-sm h-24 focus:outline-none focus:border-black font-inter resize-none" placeholder="Street name, unit, house number, landmarks..."></textarea>
+                    </div>
+
+                    <input type="hidden" id="edit-area-id" required>
+
+                    <div class="pt-4 border-t border-gray-100 flex gap-3">
+                        <button type="button" onclick="goBack()" class="w-1/3 border border-gray-300 py-3.5 text-xs font-bold font-space-grotesk uppercase hover:bg-gray-50 transition-colors cursor-pointer">
+                            Cancel
+                        </button>
+                        <button type="submit" id="edit-profile-btn" class="w-2/3 bg-black text-white font-bold font-space-grotesk uppercase py-3.5 text-xs tracking-wider hover:bg-neutral-800 transition-colors cursor-pointer">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
         </section>
 
     </main>
@@ -2148,18 +2212,23 @@
     <!-- MARQUEE TEXT GLOBAL -->
     <div id="global-marquee"
         class="fixed bottom-0 left-0 z-30 w-full border-t border-black overflow-hidden flex whitespace-nowrap py-2 md:py-2.5 bg-black shadow-lg">
+        @php
+            $marqueeStr = (isset($settings['marquee_text']) && !empty($settings['marquee_text']) && $settings['marquee_text'] !== 'NOTISSE WORLD WIDE SHIPPING') 
+                ? $settings['marquee_text'] 
+                : 'NOTISSE WORLDWIDE SHIPPING';
+        @endphp
         <div
-            class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
-            {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
+            class="animate-marquee inline-block font-space-grotesk font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
+            {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
         <div
-            class="animate-marquee inline-block font-montserrat font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
-            {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $settings['marquee_text'] ?? 'NOTISSE WORLD WIDE SHIPPING' }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
+            class="animate-marquee inline-block font-space-grotesk font-bold text-xs md:text-sm tracking-[0.22em] text-[#d52c2b] uppercase">
+            {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span> {{ $marqueeStr }} <span class="mx-3 md:mx-5 font-light opacity-50">///</span>&nbsp;
         </div>
     </div>
     <!-- TOAST NOTIFICATION -->
     <div id="toast-notification"
-        class="fixed top-24 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-full shadow-lg z-[60] flex items-center space-x-3 transition-all duration-300 opacity-0 translate-y-4 hidden font-montserrat text-sm tracking-wide">
+        class="fixed top-24 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-full shadow-lg z-[60] flex items-center space-x-3 transition-all duration-300 opacity-0 translate-y-4 hidden font-space-grotesk text-sm tracking-wide">
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -2176,18 +2245,24 @@
         let lastScrollY = window.scrollY;
         const scrollDelta = 8;
 
-        // A24-Inspired Header (Hide on Scroll Down, Reveal on Scroll Up & Morph Logo)
+        // Transparent Header with Smooth Fade on Scroll Down & Reveal on Scroll Up
         function updateHeaderState() {
             const activePage = document.querySelector('.view-page.active-view');
             const isShopPage = !activePage || activePage.id === 'view-shop';
             const mainHeader = document.getElementById('main-header');
             const logoContainer = document.getElementById('header-logo-container');
             const menuLeft = document.getElementById('menu-trigger');
-            const menuRight = document.getElementById('header-right-menu');
+            const searchTriggerBtn = document.getElementById('search-trigger');
+            const cartTrigger = document.getElementById('cart-trigger');
             const currentScrollY = window.scrollY;
             const diff = currentScrollY - lastScrollY;
 
             if (!mainHeader) return;
+
+            // Ensure header is always transparent
+            mainHeader.classList.remove('bg-white/90', 'backdrop-blur-[1px]', 'border-b', 'border-black/[0.08]', 'shadow-[0_2px_12px_rgba(0,0,0,0.03)]');
+            mainHeader.classList.add('bg-transparent', 'border-transparent');
+            mainHeader.style.transform = 'translateY(0)';
 
             // Check if any modal/overlay is currently opened
             const overlayBackdrop = document.getElementById('overlay-menu-backdrop');
@@ -2202,103 +2277,66 @@
                                   (modalLightbox && !modalLightbox.classList.contains('hidden'));
 
             if (currentScrollY <= 40) {
-                // At the very top: ALWAYS VISIBLE
-                mainHeader.style.transform = 'translateY(0)';
-                mainHeader.classList.remove('header-hidden');
-                mainHeader.classList.add('header-visible');
-
-                if (isShopPage) {
-                    // Shop Hero State: transparent, hidden controls, large wordmark
-                    mainHeader.classList.remove('bg-white/90', 'backdrop-blur-md', 'border-b', 'border-black/[0.08]', 'shadow-[0_2px_12px_rgba(0,0,0,0.03)]');
-                    mainHeader.classList.add('bg-transparent', 'border-transparent');
-
-                    if (menuLeft) {
-                        menuLeft.classList.remove('opacity-100', 'pointer-events-auto', 'translate-x-0');
-                        menuLeft.classList.add('opacity-0', 'pointer-events-none', '-translate-x-3');
-                    }
-                    if (menuRight) {
-                        menuRight.classList.remove('opacity-100', 'pointer-events-auto', 'translate-x-0');
-                        menuRight.classList.add('opacity-0', 'pointer-events-none', 'translate-x-3');
-                    }
-                    if (logoContainer) {
-                        logoContainer.classList.remove('logo-state-small');
-                        logoContainer.classList.add('logo-state-large');
-                    }
-                } else {
-                    // Other pages top state: white/blur, controls visible, large wordmark
-                    mainHeader.classList.add('bg-white/90', 'backdrop-blur-md', 'border-b', 'border-black/[0.08]', 'shadow-[0_2px_12px_rgba(0,0,0,0.03)]');
-                    mainHeader.classList.remove('bg-transparent', 'border-transparent');
-
-                    if (menuLeft) {
-                        menuLeft.classList.remove('opacity-0', 'pointer-events-none', '-translate-x-3');
-                        menuLeft.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
-                    }
-                    if (menuRight) {
-                        menuRight.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-3');
-                        menuRight.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
-                    }
-                    if (logoContainer) {
-                        logoContainer.classList.remove('logo-state-small');
-                        logoContainer.classList.add('logo-state-large');
-                    }
-                }
-            } else {
-                // When scrolled down beyond top (> 40px)
-                // Set sticky style (white/blur, controls visible, small logo)
-                mainHeader.classList.add('bg-white/90', 'backdrop-blur-md', 'border-b', 'border-black/[0.08]', 'shadow-[0_2px_12px_rgba(0,0,0,0.03)]');
-                mainHeader.classList.remove('bg-transparent', 'border-transparent');
-
+                // At the very top (window.scrollY <= 40):
+                // ALL header controls are visible & interactive!
                 if (menuLeft) {
                     menuLeft.classList.remove('opacity-0', 'pointer-events-none', '-translate-x-3');
                     menuLeft.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
                 }
-                if (menuRight) {
-                    menuRight.classList.remove('opacity-0', 'pointer-events-none', 'translate-x-3');
-                    menuRight.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
+                if (searchTriggerBtn) {
+                    searchTriggerBtn.classList.remove('opacity-0', 'pointer-events-none', 'header-fade-hidden');
+                    searchTriggerBtn.classList.add('opacity-100', 'pointer-events-auto', 'header-fade-visible');
                 }
                 if (logoContainer) {
-                    logoContainer.classList.add('logo-state-small');
-                    logoContainer.classList.remove('logo-state-large');
+                    logoContainer.classList.remove('header-fade-hidden', 'logo-state-small');
+                    logoContainer.classList.add('header-fade-visible', 'logo-state-large');
+                }
+                if (cartTrigger && !isOverlayOpen) {
+                    cartTrigger.classList.remove('opacity-0', 'pointer-events-none', 'state-minimal');
+                    cartTrigger.classList.add('opacity-100', 'pointer-events-auto');
+                }
+            } else {
+                // Scrolled down beyond top (> 40px):
+                // 1. Burger menu ALWAYS stays visible & interactive
+                if (menuLeft) {
+                    menuLeft.classList.remove('opacity-0', 'pointer-events-none', '-translate-x-3');
+                    menuLeft.classList.add('opacity-100', 'pointer-events-auto', 'translate-x-0');
                 }
 
-                // SMART HIDE ON SCROLL DOWN, REVEAL ON SCROLL UP
-                if (!isOverlayOpen) {
-                    if (diff > scrollDelta && currentScrollY > 70) {
-                        // Scrolling DOWN -> HIDE HEADER
-                        mainHeader.style.transform = 'translateY(-100%)';
-                        mainHeader.classList.add('header-hidden');
-                        mainHeader.classList.remove('header-visible');
-                    } else if (diff < -scrollDelta) {
-                        // Scrolling UP -> REVEAL HEADER
-                        mainHeader.style.transform = 'translateY(0)';
-                        mainHeader.classList.remove('header-hidden');
-                        mainHeader.classList.add('header-visible');
-                    }
+                // 2. Center logo smoothly FADES OUT completely (like A24 Shop)
+                if (logoContainer) {
+                    logoContainer.classList.add('header-fade-hidden');
+                    logoContainer.classList.remove('header-fade-visible');
                 }
-            }
 
-            // EXACT A24 MORPHING CART BUTTON (Triggers the moving connecting line animation)
-            const cartTrigger = document.getElementById('cart-trigger');
-            if (cartTrigger) {
-                if (isOverlayOpen || (isShopPage && currentScrollY <= 40)) {
-                    cartTrigger.classList.add('opacity-0', 'pointer-events-none');
-                } else {
+                // 3. Search trigger smoothly FADES OUT in place
+                if (searchTriggerBtn) {
+                    searchTriggerBtn.classList.add('header-fade-hidden');
+                    searchTriggerBtn.classList.remove('header-fade-visible');
+                }
+
+                // 4. Cart button smoothly fades horizontal label out & vertical label in (A24 minimal vertical layout),
+                // remaining fixed at the top right to follow the scroll ("ngikut")
+                if (cartTrigger && !isOverlayOpen) {
                     cartTrigger.classList.remove('opacity-0', 'pointer-events-none');
-                    // In A24, cart is in minimal (vertical) state ONLY when header is hidden on scroll down.
-                    // When scrolling up and header reappears (not header-hidden), cart returns to horizontal!
-                    const isHeaderHidden = mainHeader.classList.contains('header-hidden');
-                    if (isHeaderHidden) {
-                        cartTrigger.classList.add('state-minimal');
-                    } else {
-                        cartTrigger.classList.remove('state-minimal');
-                    }
+                    cartTrigger.classList.add('opacity-100', 'pointer-events-auto', 'state-minimal');
                 }
             }
-
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
         }
 
-        window.addEventListener('scroll', updateHeaderState, { passive: true });
+        let isHeaderTicking = false;
+        function handleHeaderScroll() {
+            if (!isHeaderTicking) {
+                requestAnimationFrame(() => {
+                    updateHeaderState();
+                    isHeaderTicking = false;
+                });
+                isHeaderTicking = true;
+            }
+        }
+
+        window.addEventListener('scroll', handleHeaderScroll, { passive: true });
         updateHeaderState();
 
         let navigationHistory = ['view-shop'];
@@ -2321,7 +2359,7 @@
                 cartState = await response.json();
                 renderCartItems();
             } catch (e) {
-                console.error("Gagal memuat keranjang:", e);
+                console.error("Failed to load cart:", e);
             }
         }
         
@@ -2398,10 +2436,10 @@
                 const pane = document.getElementById(`acc-pane-${t}`);
                 if (btn && pane) {
                     if (t === tab) {
-                        btn.className = "acc-tab-btn active pb-3 text-xs sm:text-sm font-bold font-montserrat uppercase tracking-wider border-b-2 border-black text-black cursor-pointer whitespace-nowrap";
+                        btn.className = "acc-tab-btn active pb-3 text-xs sm:text-sm font-bold font-space-grotesk uppercase tracking-wider border-b-2 border-black text-black cursor-pointer whitespace-nowrap";
                         pane.classList.remove('hidden');
                     } else {
-                        btn.className = "acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-montserrat uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap";
+                        btn.className = "acc-tab-btn pb-3 text-xs sm:text-sm font-medium font-space-grotesk uppercase tracking-wider border-b-2 border-transparent text-gray-400 hover:text-black transition-colors cursor-pointer whitespace-nowrap";
                         pane.classList.add('hidden');
                     }
                 }
@@ -2428,9 +2466,9 @@
             if (offers.length === 0) {
                 container.innerHTML = `
                     <div class="border border-gray-200 p-8 text-center bg-gray-50">
-                        <p class="text-gray-400 font-roboto text-sm">Belum ada penawaran karya seni yang diajukan.</p>
-                        <button onclick="showPage('view-artist-detail')" class="mt-3 text-xs font-bold font-montserrat uppercase underline tracking-wider cursor-pointer">
-                            Jelajahi Galeri Seni & Editorial
+                        <p class="text-gray-400 font-inter text-sm">No artwork acquisition inquiries submitted yet.</p>
+                        <button onclick="showPage('view-artist-detail')" class="mt-3 text-xs font-bold font-space-grotesk uppercase underline tracking-wider cursor-pointer">
+                            Explore Art Gallery & Editorial
                         </button>
                     </div>
                 `;
@@ -2439,25 +2477,25 @@
 
             container.innerHTML = offers.map((offer) => {
                 const artwork = offer.artwork || {};
-                const displayDate = offer.date ? new Date(offer.date).toLocaleDateString('id-ID') : '-';
+                const displayDate = offer.date ? new Date(offer.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '-';
                 return `
                     <div class="border border-gray-200 p-6 bg-white space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-100 gap-2">
                             <div>
                                 <span class="text-[10px] font-mono font-bold tracking-widest uppercase bg-black text-white px-2 py-0.5 inline-block">${offer.refId || '#NTS-ART'}</span>
-                                <span class="text-xs text-gray-400 font-roboto ml-2">${displayDate}</span>
+                                <span class="text-xs text-gray-400 font-inter ml-2">${displayDate}</span>
                             </div>
-                            <span class="text-[10px] font-semibold tracking-wider uppercase text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-montserrat w-fit">
-                                ${offer.status || 'Dalam Tinjauan Kurasi'}
+                            <span class="text-[10px] font-semibold tracking-wider uppercase text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-space-grotesk w-fit">
+                                ${offer.status || 'Under Curatorial Review'}
                             </span>
                         </div>
                         <div class="flex items-start space-x-4">
                             <img src="${artwork.image || '/footage-baju.jpg'}" alt="${artwork.title || 'Artwork'}" class="w-16 h-20 object-cover bg-gray-100 border border-gray-200 flex-shrink-0">
                             <div class="space-y-1 min-w-0 flex-1">
-                                <h4 class="font-bold text-sm text-black font-montserrat truncate">${artwork.title || 'Karya Seni Notisse'}</h4>
-                                <p class="text-xs text-gray-500 font-roboto">Seniman: <span class="font-semibold text-black">${artwork.artist || 'Curated Artist'}</span></p>
-                                <p class="text-xs text-emerald-700 font-montserrat font-bold pt-1">Nominal Ditawarkan: Rp ${offer.offerPrice} IDR</p>
-                                ${offer.message ? `<p class="text-xs text-gray-500 font-roboto italic bg-neutral-50 p-2 border border-neutral-100 mt-2">"${offer.message}"</p>` : ''}
+                                <h4 class="font-bold text-sm text-black font-space-grotesk truncate">${artwork.title || 'Notisse Artwork'}</h4>
+                                <p class="text-xs text-gray-500 font-inter">Artist: <span class="font-semibold text-black">${artwork.artist || 'Curated Artist'}</span></p>
+                                <p class="text-xs text-emerald-700 font-space-grotesk font-bold pt-1">Acquisition Value: Rp ${offer.offerPrice} IDR</p>
+                                ${offer.message ? `<p class="text-xs text-gray-500 font-inter italic bg-neutral-50 p-2 border border-neutral-100 mt-2">"${offer.message}"</p>` : ''}
                             </div>
                         </div>
                     </div>
@@ -2478,7 +2516,7 @@
                 if (orders.length === 0) {
                     container.innerHTML = `
                         <div class="border border-gray-200 rounded-lg p-6 space-y-4 bg-gray-50 text-center">
-                            <p class="text-gray-500 font-roboto text-sm">Belum ada pesanan terbaru.</p>
+                            <p class="text-gray-500 font-inter text-sm">No recent orders found.</p>
                         </div>
                     `;
                     return;
@@ -2493,9 +2531,9 @@
                                 <div class="w-12 h-16 bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
                                     <img src="{{ asset('footage-baju.jpg') }}" alt="${item.product_name}" class="w-full h-full object-cover">
                                 </div>
-                                <div class="text-xs font-roboto">
-                                    <p class="font-bold text-black font-montserrat uppercase">${item.product_name}</p>
-                                    <p class="text-gray-500">Ukuran: ${item.size} | Jumlah: ${item.quantity}</p>
+                                <div class="text-xs font-inter">
+                                    <p class="font-bold text-black font-space-grotesk uppercase">${item.product_name}</p>
+                                    <p class="text-gray-500">Size: ${item.size} | Qty: ${item.quantity}</p>
                                     <p class="font-semibold text-black mt-1">Rp ${parseInt(item.price).toLocaleString('id-ID')},00</p>
                                 </div>
                             </div>
@@ -2511,22 +2549,24 @@
                     } else if (st === 'pending') {
                         statusClass = "bg-yellow-500 text-black";
                         actionButtons = `
-                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-montserrat mt-2 w-full hover:bg-neutral-800 transition-colors cursor-pointer">Bayar Sekarang</button>
-                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-montserrat mt-2 w-full text-center cursor-pointer">Batalkan</button>
+                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full hover:bg-neutral-800 transition-colors cursor-pointer">Pay Now</button>
+                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-space-grotesk mt-2 w-full text-center cursor-pointer">Cancel Order</button>
                         `;
                     } else if (st === 'cancelled') {
                         statusClass = "bg-red-600 text-white";
                     }
 
+                    const placedDate = new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
                     container.innerHTML += `
                     <div class="border border-gray-200 rounded-lg p-6 space-y-4 bg-gray-50">
-                        <div class="flex justify-between items-start text-xs font-roboto pb-3 border-b border-gray-200">
+                        <div class="flex justify-between items-start text-xs font-inter pb-3 border-b border-gray-200">
                             <div>
-                                <p class="font-bold text-black font-montserrat">ORDER #NTS-${order.id}</p>
-                                <p class="text-gray-400">Dibuat pada ${new Date(order.created_at).toLocaleDateString('id-ID')}</p>
+                                <p class="font-bold text-black font-space-grotesk">ORDER #NTS-${order.id}</p>
+                                <p class="text-gray-400">Placed on ${placedDate}</p>
                             </div>
                             <div class="flex flex-col items-end">
-                                <span class="px-2.5 py-1 ${statusClass} font-bold rounded text-[10px] tracking-wider uppercase font-montserrat">${order.status}</span>
+                                <span class="px-2.5 py-1 ${statusClass} font-bold rounded text-[10px] tracking-wider uppercase font-space-grotesk">${order.status}</span>
                                 <div class="mt-2 w-full flex flex-col gap-1">
                                     ${actionButtons}
                                 </div>
@@ -2537,26 +2577,26 @@
                     `;
                 });
             } catch(e) {
-                console.error("Gagal memuat pesanan:", e);
+                console.error("Failed to load orders:", e);
             }
         }
 
         async function cancelOrder(id) {
-            if (!confirm("Apakah Anda yakin ingin membatalkan pesanan ini?")) return;
+            if (!confirm("Are you sure you want to cancel this order?")) return;
             try {
                 const response = await fetch(`/my-orders/${id}/cancel`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });
                 if (response.ok) {
-                    showToast("Pesanan berhasil dibatalkan.");
+                    showToast("Order cancelled successfully.");
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
-                    showToast("Gagal membatalkan pesanan.");
+                    showToast("Failed to cancel order.");
                 }
             } catch (e) {
                 console.error(e);
-                showToast("Terjadi kesalahan sistem.");
+                showToast("A system error occurred.");
             }
         }
 
@@ -2599,11 +2639,11 @@
                         }
                     });
                 } else {
-                    showToast(data.error || "Gagal memproses pembayaran");
+                    showToast(data.error || "Failed to process payment");
                 }
             } catch (err) {
                 console.error(err);
-                showToast("Terjadi kesalahan sistem.");
+                showToast("A system error occurred.");
             }
         }
 
@@ -2615,9 +2655,9 @@
             document.getElementById('user-display-email').innerText = loggedInUser.email;
             document.getElementById('user-display-name').innerText = loggedInUser.name;
             if (document.getElementById('user-display-address')) {
-                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'Belum ada alamat pengiriman.';
+                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'No shipping address saved yet.';
             }
-            showToast('Berhasil Login!');
+            showToast('Login Successful!');
             showPage('view-account-profile');
             fetchOrderHistory();
         }
@@ -2630,9 +2670,9 @@
             document.getElementById('user-display-email').innerText = loggedInUser.email;
             document.getElementById('user-display-name').innerText = loggedInUser.name;
             if (document.getElementById('user-display-address')) {
-                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'Belum ada alamat pengiriman.';
+                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'No shipping address saved yet.';
             }
-            showToast('Akun Berhasil Dibuat!');
+            showToast('Account Created Successfully!');
             showPage('view-account-profile');
             fetchOrderHistory();
         }
@@ -2675,15 +2715,17 @@
         /* LOGIKA REAL-TIME / INSTANT LIVE SEARCH (FULL-SCREEN EDITORIAL) */
         function openSearch() {
             overlaySearch.classList.remove('-translate-y-full');
+            overlaySearch.classList.add('translate-y-0');
             document.body.style.overflow = 'hidden';
             const searchInput = document.getElementById('search-input');
             if (searchInput) {
-                setTimeout(() => searchInput.focus(), 150);
+                setTimeout(() => searchInput.focus(), 250);
                 handleLiveSearch(searchInput.value || "");
             }
         }
 
         function closeSearch() {
+            overlaySearch.classList.remove('translate-y-0');
             overlaySearch.classList.add('-translate-y-full');
             document.body.style.overflow = 'auto';
         }
@@ -2735,9 +2777,9 @@
 
             if (filteredProducts.length === 0) {
                 gridContainer.innerHTML = `
-                    <div class="col-span-full text-center py-20 text-gray-400 font-roboto text-sm space-y-2">
-                        <p class="text-base text-black font-montserrat uppercase font-semibold">No products found matching "<span class="underline">${query}</span>"</p>
-                        <p class="text-xs text-gray-400 font-roboto">Try searching for keywords like "Tee", "Tank", "Shirt", or "Blazer".</p>
+                    <div class="col-span-full text-center py-20 text-gray-400 font-inter text-sm space-y-2">
+                        <p class="text-base text-black font-space-grotesk uppercase font-semibold">No products found matching "<span class="underline">${query}</span>"</p>
+                        <p class="text-xs text-gray-400 font-inter">Try searching for keywords like "Tee", "Tank", "Shirt", or "Blazer".</p>
                     </div>
                 `;
                 return;
@@ -2756,8 +2798,8 @@
                                 class="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
                         </div>
                         <div class="flex flex-col justify-between flex-grow pt-1 border-t border-gray-100">
-                            <h4 class="font-montserrat font-semibold text-xs sm:text-sm text-black group-hover:underline truncate uppercase">${item.name}</h4>
-                            <p class="font-montserrat text-xs text-gray-500 mt-1">${item.price}</p>
+                            <h4 class="font-space-grotesk font-semibold text-xs sm:text-sm text-black group-hover:underline truncate uppercase">${item.name}</h4>
+                            <p class="font-space-grotesk text-xs text-gray-500 mt-1">${item.price}</p>
                         </div>
                     </div>
                 `;
@@ -2888,50 +2930,101 @@
                 artistEl.onclick = () => openArtistProfile(artistName, 'Temanggung');
             }
 
-            // Update Description & Fabric Specs
+            // Update Description & Fabric Specs (Consistent with Terms and Condition style)
             const descContent = document.getElementById('pdetail-desc-content');
             if (descContent) {
-                let html = '';
+                let bulletItems = [];
+
                 if (currentProduct.specs) {
-                    html += `<div class="mb-3 p-2.5 bg-neutral-50 border border-neutral-200 text-[11px] font-mono text-gray-800">
-                                <strong>FABRIC & FIT SPECS:</strong> ${currentProduct.specs}
-                             </div>`;
+                    if (currentProduct.specs.includes('•')) {
+                        currentProduct.specs.split('•').forEach(s => {
+                            const trimmed = s.trim();
+                            if (trimmed) bulletItems.push(trimmed);
+                        });
+                    } else if (currentProduct.specs.includes('\n')) {
+                        currentProduct.specs.split('\n').forEach(s => {
+                            const trimmed = s.trim();
+                            if (trimmed) bulletItems.push(trimmed);
+                        });
+                    } else {
+                        const trimmed = currentProduct.specs.trim();
+                        if (trimmed) bulletItems.push(trimmed);
+                    }
                 }
+
                 const descText = currentProduct.description || "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting";
-                html += `<div class="leading-relaxed text-[11px] md:text-xs text-gray-700 font-mono space-y-1 mb-2 bg-neutral-50 p-3 border border-gray-100">
-                            ${descText.split('\n').filter(Boolean).map(line => `<div>&bull; ${line}</div>`).join('')}
-                         </div>`;
+                descText.split('\n').forEach(line => {
+                    const cleanLine = line.replace(/^[•\-\*\s]+/, '').trim();
+                    if (cleanLine && !bulletItems.some(item => item.toLowerCase() === cleanLine.toLowerCase())) {
+                        bulletItems.push(cleanLine);
+                    }
+                });
+
+                if (bulletItems.length === 0) {
+                    bulletItems = [
+                        "Heavyweight 24s Cotton Combed construction",
+                        "High-density screenprinted artwork on back and chest",
+                        "Boxy relaxed fit with reinforced ribbed collar",
+                        "Crafted & printed in Bandung, Indonesia"
+                    ];
+                }
+
+                let html = `<ul class="list-disc pl-5 space-y-2 leading-relaxed font-inter text-xs sm:text-[13px] md:text-sm text-gray-500">`;
+                bulletItems.forEach(item => {
+                    html += `<li>${item}</li>`;
+                });
+                html += `</ul>`;
+
                 descContent.innerHTML = html;
             }
 
             const sizeMenu = document.getElementById('size-dropdown-menu');
             if (sizeMenu) {
                 sizeMenu.innerHTML = '';
+                const sizeNameMap = {
+                    'S': 'Small',
+                    'M': 'Medium',
+                    'L': 'Large',
+                    'XL': 'Extra Large',
+                    'XXL': 'Double Extra Large',
+                    '2XL': 'Double Extra Large',
+                    'XXXL': 'Triple Extra Large',
+                    '3XL': 'Triple Extra Large'
+                };
                 if (currentProduct.stocks && currentProduct.stocks.length > 0) {
                     currentProduct.stocks.forEach(stock => {
+                        const sUpper = (stock.size || '').toUpperCase().trim();
+                        const fullName = sizeNameMap[sUpper] || stock.size;
                         if (stock.stock > 0) {
                             sizeMenu.innerHTML += `
                                 <div onclick="selectSize('${stock.size}')"
-                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-montserrat">
-                                    <span>${stock.size} <span class="lowercase tracking-normal font-normal opacity-60 ml-2">(Sisa: ${stock.stock})</span></span><span class="text-xs opacity-50">${stock.size}</span>
+                                    class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider cursor-pointer hover:bg-black hover:text-white transition-colors border-b border-gray-100 flex justify-between items-center font-space-grotesk">
+                                    <span>${fullName}</span><span class="text-xs opacity-50">${stock.size}</span>
                                 </div>
                             `;
                         } else {
                             sizeMenu.innerHTML += `
-                                <div class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b border-gray-100 flex justify-between items-center font-montserrat text-gray-300 cursor-not-allowed">
-                                    <span>${stock.size} (Habis)</span><span class="text-xs opacity-50">${stock.size}</span>
+                                <div class="size-option-item px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider border-b border-gray-100 flex justify-between items-center font-space-grotesk text-gray-300 cursor-not-allowed">
+                                    <span>${fullName} (Out of Stock)</span><span class="text-xs opacity-50">${stock.size}</span>
                                 </div>
                             `;
                         }
                     });
                 } else {
-                    sizeMenu.innerHTML = '<div class="px-4 py-2.5 text-xs">Stock Tidak Tersedia</div>';
+                    sizeMenu.innerHTML = '<div class="px-4 py-2.5 text-xs font-space-grotesk text-gray-400">Out of Stock</div>';
                 }
             }
 
             const sizeLabel = document.getElementById('selected-size-label');
             if (sizeLabel) sizeLabel.innerText = 'Select size: ';
             currentSelectedSize = null;
+
+            // Reset all accordions and size dropdown to collapsed state
+            document.querySelectorAll('#pdetail-left-col .accordion-content').forEach(c => c.classList.remove('expanded'));
+            document.querySelectorAll('#pdetail-left-col .chevron-icon').forEach(i => i.classList.remove('rotated'));
+            closeSizeDropdown();
+            updateProductDetailScroll();
+
             showPage('view-product-detail');
         }
 
@@ -2944,7 +3037,7 @@
 
             if (artist) {
                 if (artist.bio) {
-                    const bioEl = document.querySelector('#view-artist-detail .md\\:col-span-8 p.text-gray-700');
+                    const bioEl = document.getElementById('artist-profile-bio') || document.querySelector('#view-artist-detail .md\\:col-span-8 p.text-gray-700') || document.querySelector('#view-artist-detail .md\\:col-span-8 p.text-gray-800');
                     if (bioEl) bioEl.innerText = artist.bio;
                 }
                 if (artist.photo) {
@@ -2974,14 +3067,13 @@
                             <div class="w-full aspect-square bg-[#d9d9d9] mb-3 overflow-hidden">
                                 <img src="${edImg}" alt="${ed.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             </div>
-                            <h4 class="font-bold text-xs md:text-sm text-black font-montserrat group-hover:underline leading-snug">
+                            <h4 class="font-bold text-xs md:text-sm text-black font-space-grotesk group-hover:underline leading-snug">
                                 ${ed.title}
                             </h4>
-                            <p class="text-[11px] text-gray-500 font-roboto mt-1">${ed.author || 'Editorial Notisse'}</p>
-                            <div class="mt-2.5 flex items-center justify-between text-[11px] font-montserrat">
-                                <span class="text-black font-semibold hover:underline" onclick="event.stopPropagation(); openArtistEditorialDetailById(${ed.id})">Baca Preview &rarr;</span>
+                            <div class="mt-2.5 flex items-center justify-between text-[11px] font-space-grotesk">
+                                <span class="text-black font-semibold hover:underline" onclick="event.stopPropagation(); openArtistEditorialDetailById(${ed.id})">Read Preview &rarr;</span>
                                 <span onclick="event.stopPropagation(); navigateTo('view-editorials-all')" class="text-brandRed hover:underline font-bold inline-flex items-center gap-1 cursor-pointer">
-                                    <span>Halaman Terpisah</span>
+                                    <span>Editorial Page</span>
                                     <span>&nearr;</span>
                                 </span>
                             </div>
@@ -3008,19 +3100,13 @@
                         const card = document.createElement('div');
                         card.className = 'group cursor-pointer';
                         card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price);
-                        const priceFormatted = artw.price ? 'Rp ' + Number(artw.price).toLocaleString('id-ID') : 'Price on Inquiry';
                         card.innerHTML = `
-                            <div class="w-full aspect-[3/4] bg-[#d9d9d9] mb-3 overflow-hidden relative">
+                            <div class="w-full aspect-square bg-[#d9d9d9] mb-3.5 overflow-hidden relative">
                                 <img src="${artImg}" alt="${artw.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-sm text-white text-[9px] font-montserrat uppercase tracking-widest px-2 py-0.5">
-                                    ${artw.status || 'Original'}
-                                </span>
                             </div>
-                            <h4 class="font-bold text-xs sm:text-sm text-black font-montserrat group-hover:underline">
+                            <h4 class="font-bold text-sm sm:text-base text-black font-space-grotesk group-hover:underline">
                                 ${artw.title}
                             </h4>
-                            <p class="text-[11px] text-gray-500 font-roboto mt-0.5">${artw.medium || 'Artwork'} ${artw.dimensions ? '&bull; ' + artw.dimensions : ''}</p>
-                            <p class="text-xs font-montserrat font-extrabold text-black mt-1">${priceFormatted}</p>
                         `;
                         artGrid.appendChild(card);
                     });
@@ -3061,13 +3147,13 @@
             const contentEditorial = document.getElementById('artist-tab-content-editorial');
 
             if (tab === 'artwork') {
-                btnArtwork.className = 'pb-2 font-regular text-black border-b border-black transition-colors focus:outline-none cursor-pointer font-roboto';
-                btnEditorial.className = 'pb-2 font-regular text-gray-400 hover:text-black transition-colors focus:outline-none cursor-pointer font-roboto';
+                btnArtwork.className = 'pb-3 font-medium text-black border-b-2 border-black transition-colors focus:outline-none cursor-pointer font-space-grotesk';
+                btnEditorial.className = 'pb-3 font-medium text-gray-400 hover:text-black transition-colors focus:outline-none cursor-pointer font-space-grotesk';
                 contentArtwork.classList.remove('hidden');
                 contentEditorial.classList.add('hidden');
             } else {
-                btnEditorial.className = 'pb-2 font-regular text-black border-b border-black transition-colors focus:outline-none cursor-pointer font-roboto';
-                btnArtwork.className = 'pb-2 font-regular text-gray-400 hover:text-black transition-colors focus:outline-none cursor-pointer font-roboto';
+                btnEditorial.className = 'pb-3 font-medium text-black border-b-2 border-black transition-colors focus:outline-none cursor-pointer font-space-grotesk';
+                btnArtwork.className = 'pb-3 font-medium text-gray-400 hover:text-black transition-colors focus:outline-none cursor-pointer font-space-grotesk';
                 contentEditorial.classList.remove('hidden');
                 contentArtwork.classList.add('hidden');
             }
@@ -3222,7 +3308,7 @@
             const message = document.getElementById('offering-buyer-message').value.trim();
 
             if (!priceStr) {
-                showToast("Harap masukkan nominal tawaran");
+                showToast("Please enter an offer amount.");
                 return;
             }
 
@@ -3235,13 +3321,13 @@
             } catch (err) {}
 
             if (!activeUser) {
-                showToast("Silakan login atau daftar terlebih dahulu.");
+                showToast("Please login or create an account first.");
                 return;
             }
 
             const btn = document.querySelector('#artwork-offering-form-body button[type="submit"]');
             const origText = btn.innerText;
-            btn.innerText = "MENGIRIM...";
+            btn.innerText = "SUBMITTING...";
             btn.disabled = true;
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -3277,13 +3363,13 @@
                     document.getElementById('artwork-offering-form-body').classList.add('hidden');
                     document.getElementById('artwork-offering-success-body').classList.remove('hidden');
 
-                    showToast("Offering diajukan! Penawaran tercatat di sistem.");
+                    showToast("Acquisition inquiry submitted successfully!");
                 } else {
-                    showToast(data.message || "Gagal mengajukan penawaran.");
+                    showToast(data.message || "Failed to submit acquisition inquiry.");
                 }
             } catch (err) {
                 console.error(err);
-                showToast("Terjadi kesalahan sistem saat mengirim penawaran.");
+                showToast("A system error occurred while submitting inquiry.");
             } finally {
                 btn.innerText = origText;
                 btn.disabled = false;
@@ -3367,13 +3453,13 @@
                 if (paragraphs.length <= 1) {
                     if (topContent && paragraphs[0]) {
                         const pEl = document.createElement('p');
-                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-roboto';
+                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-inter';
                         pEl.innerText = paragraphs[0];
                         topContent.appendChild(pEl);
                     }
                     if (bottomContent && foundEd.excerpt && foundEd.excerpt !== paragraphs[0]) {
                         const pEl = document.createElement('p');
-                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-roboto';
+                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-inter';
                         pEl.innerText = foundEd.excerpt;
                         bottomContent.appendChild(pEl);
                     }
@@ -3381,7 +3467,7 @@
                     // Paragraf 1 di atas foto
                     if (topContent) {
                         const pEl = document.createElement('p');
-                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-roboto';
+                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-inter';
                         pEl.innerText = paragraphs[0];
                         topContent.appendChild(pEl);
                     }
@@ -3389,7 +3475,7 @@
                     if (bottomContent) {
                         for (let i = 1; i < paragraphs.length; i++) {
                             const pEl = document.createElement('p');
-                            pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-roboto';
+                            pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-inter';
                             pEl.innerText = paragraphs[i];
                             bottomContent.appendChild(pEl);
                         }
@@ -3472,7 +3558,7 @@
                                         class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 ease-out">
                                     ${f.title ? `
                                         <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                            <span class="text-white font-montserrat tracking-[0.2em] uppercase text-sm md:text-base">${f.title}</span>
+                                            <span class="text-white font-space-grotesk tracking-[0.2em] uppercase text-sm md:text-base">${f.title}</span>
                                         </div>
                                     ` : ''}
                                 </div>
@@ -3480,7 +3566,7 @@
                         `;
                     });
                 } else {
-                    grid.innerHTML = '<div class="col-span-2 py-16 text-center text-gray-400 font-roboto">Belum ada foto yang diunggah untuk album lookbook ini.</div>';
+                    grid.innerHTML = '<div class="col-span-2 py-16 text-center text-gray-400 font-inter">No photos uploaded for this lookbook album yet.</div>';
                 }
             }
 
@@ -3490,7 +3576,7 @@
         function showToast(message) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = 'bg-black text-white px-5 py-3 rounded text-xs font-montserrat uppercase tracking-wider shadow-xl transition-all duration-300 opacity-0 transform translate-y-2';
+            toast.className = 'bg-black text-white px-5 py-3 rounded text-xs font-space-grotesk uppercase tracking-wider shadow-xl transition-all duration-300 opacity-0 transform translate-y-2';
             toast.innerText = message;
             container.appendChild(toast);
 
@@ -3505,23 +3591,29 @@
         }
 
         function updateCarouselUI() {
-            const slidesContainer = document.getElementById('hero-carousel-slides');
-            const dots = document.querySelectorAll('.hero-dot');
-            if (slidesContainer) {
-                slidesContainer.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
-            }
-            dots.forEach((dot, index) => {
-                dot.style.opacity = index === currentSlideIndex ? '1' : '0.4';
+            const slides = document.querySelectorAll('.hero-carousel-slide');
+            slides.forEach((slide, index) => {
+                if (index === currentSlideIndex) {
+                    slide.classList.remove('opacity-0', 'pointer-events-none');
+                    slide.classList.add('opacity-100');
+                } else {
+                    slide.classList.remove('opacity-100');
+                    slide.classList.add('opacity-0', 'pointer-events-none');
+                }
             });
         }
 
         function nextSlide() {
-            currentSlideIndex = (currentSlideIndex + 1) % 3;
+            const slides = document.querySelectorAll('.hero-carousel-slide');
+            if (slides.length <= 1) return;
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
             updateCarouselUI();
         }
 
         function prevSlide() {
-            currentSlideIndex = (currentSlideIndex - 1 + 3) % 3;
+            const slides = document.querySelectorAll('.hero-carousel-slide');
+            if (slides.length <= 1) return;
+            currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
             updateCarouselUI();
         }
 
@@ -3532,22 +3624,52 @@
 
         function startAutoSlide() {
             stopAutoSlide();
-            slideInterval = setInterval(nextSlide, 2000);
+            slideInterval = setInterval(nextSlide, 3500);
         }
 
         function stopAutoSlide() {
             if (slideInterval) clearInterval(slideInterval);
         }
 
+        function updateProductDetailScroll() {
+            const leftCol = document.getElementById('pdetail-left-col');
+            if (!leftCol) return;
+            const hasExpandedAccordion = document.querySelector('#pdetail-left-col .accordion-content.expanded') !== null;
+            const isSizeDropdownActive = document.querySelector('#size-dropdown-menu.active') !== null;
+            if (hasExpandedAccordion || isSizeDropdownActive) {
+                leftCol.classList.remove('lg:overflow-y-hidden');
+                leftCol.classList.add('lg:overflow-y-auto');
+            } else {
+                leftCol.classList.remove('lg:overflow-y-auto');
+                leftCol.classList.add('lg:overflow-y-hidden');
+                leftCol.scrollTop = 0;
+            }
+        }
+
         function toggleSizeDropdown(e) {
             if (e) e.stopPropagation();
             const menu = document.getElementById('size-dropdown-menu');
-            if (menu) menu.classList.toggle('active');
+            if (menu) {
+                menu.classList.toggle('active');
+                updateProductDetailScroll();
+
+                if (menu.classList.contains('active')) {
+                    const leftCol = document.getElementById('pdetail-left-col');
+                    if (leftCol) {
+                        setTimeout(() => {
+                            leftCol.scrollBy({ top: 160, behavior: 'smooth' });
+                        }, 50);
+                    }
+                }
+            }
         }
 
         function closeSizeDropdown() {
             const menu = document.getElementById('size-dropdown-menu');
-            if (menu) menu.classList.remove('active');
+            if (menu && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                updateProductDetailScroll();
+            }
         }
 
         function selectSize(code) {
@@ -3561,7 +3683,15 @@
             const icon = document.getElementById('acc-icon-' + key);
             if (content) content.classList.toggle('expanded');
             if (icon) icon.classList.toggle('rotated');
+            updateProductDetailScroll();
         }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('custom-size-dropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                closeSizeDropdown();
+            }
+        });
 
         function formatRupiah(amount) {
             return 'Rp ' + amount.toLocaleString('id-ID') + ',00';
@@ -3582,7 +3712,7 @@
             if (!container) return;
 
             if (!cartState || cartState.length === 0) {
-                container.innerHTML = `<div class="text-center py-16 text-gray-400 text-sm font-roboto">Your cart is empty.</div>`;
+                container.innerHTML = `<div class="text-center py-16 text-gray-400 text-sm font-inter">Your cart is empty.</div>`;
             } else {
                 let html = '';
                 cartState.forEach((item, index) => {
@@ -3607,19 +3737,19 @@
                                     <img src="${itemImg}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='{{ asset('footage-baju.jpg') }}'">
                                 </div>
                                 <div>
-                                    <p class="font-semibold uppercase text-black text-xs md:text-sm font-montserrat">${item.name}</p>
-                                    <p class="text-xs text-gray-500 font-roboto">Size: ${item.size}</p>
+                                    <p class="font-semibold uppercase text-black text-xs md:text-sm font-space-grotesk">${item.name}</p>
+                                    <p class="text-xs text-gray-500 font-inter">Size: ${item.size}</p>
                                 </div>
                             </div>
                             <div class="col-span-3 md:col-span-3 flex justify-center">
                                 <div class="flex items-center border border-gray-400">
-                                    <button onclick="updateCartQty(${index}, -1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto cursor-pointer">−</button>
-                                    <span class="px-3 py-1 font-semibold font-roboto">${item.qty}</span>
-                                    <button onclick="updateCartQty(${index}, 1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-roboto cursor-pointer">+</button>
+                                    <button onclick="updateCartQty(${index}, -1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-inter cursor-pointer">−</button>
+                                    <span class="px-3 py-1 font-semibold font-inter">${item.qty}</span>
+                                    <button onclick="updateCartQty(${index}, 1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-inter cursor-pointer">+</button>
                                 </div>
                             </div>
-                            <div class="hidden md:block md:col-span-2 text-right font-montserrat">${formatRupiah(itemPrice)}</div>
-                            <div class="col-span-3 md:col-span-2 text-right font-medium font-montserrat">${formatRupiah(itemTotal)}</div>
+                            <div class="hidden md:block md:col-span-2 text-right font-space-grotesk">${formatRupiah(itemPrice)}</div>
+                            <div class="col-span-3 md:col-span-2 text-right font-medium font-space-grotesk">${formatRupiah(itemTotal)}</div>
                         </div>
                     `;
                 });
@@ -3686,7 +3816,7 @@
         }
 
         function addCrossSellItem() {
-            showToast("Fitur Cross Sell sedang dalam perbaikan");
+            showToast("Cross-sell item feature is temporarily unavailable");
         }
 
         async function addSelectedToCart() {
@@ -3717,11 +3847,11 @@
                     openCart();
                     showToast('Added to cart!');
                 } else {
-                    showToast(data.message || 'Gagal menambahkan ke keranjang');
+                    showToast(data.message || 'Failed to add to cart');
                 }
             } catch(e) {
                 console.error(e);
-                showToast('Terjadi kesalahan sistem.');
+                showToast('A system error occurred.');
             }
         }
 
@@ -3758,7 +3888,7 @@
                         areaResults.classList.remove('hidden');
                     }
                 } catch (e) {
-                    console.error("Gagal mengambil area", e);
+                    console.error("Failed to fetch areas", e);
                 }
             }, 500);
         }
@@ -3767,7 +3897,7 @@
             const shippingOptions = document.getElementById('shipping-options');
             const shippingContainer = document.getElementById('shipping-options-container');
 
-            if (shippingOptions) shippingOptions.innerHTML = '<span class="text-gray-400">Menghitung ongkos kirim...</span>';
+            if (shippingOptions) shippingOptions.innerHTML = '<span class="text-gray-400">Calculating shipping rate...</span>';
             if (shippingContainer) shippingContainer.classList.remove('hidden');
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -3805,11 +3935,11 @@
                         shippingOptions.appendChild(label);
                     });
                 } else {
-                    if (shippingOptions) shippingOptions.innerHTML = '<span class="text-red-500">Kurir tidak tersedia ke area ini.</span>';
+                    if (shippingOptions) shippingOptions.innerHTML = '<span class="text-red-500">Courier unavailable for this area.</span>';
                 }
             } catch (e) {
-                console.error("Gagal mengambil ongkir", e);
-                if (shippingOptions) shippingOptions.innerHTML = '<span class="text-red-500">Terjadi kesalahan koneksi.</span>';
+                console.error("Failed to fetch shipping rate", e);
+                if (shippingOptions) shippingOptions.innerHTML = '<span class="text-red-500">Connection error.</span>';
             }
         }
 
@@ -3844,6 +3974,204 @@
                 openCart();
             }
         });
+
+        // ====== BESPOKE NOTISSE DATE PICKER LOGIC ======
+        let calCurrentYear = 2000;
+        let calCurrentMonth = 0; // 0-11
+        let calSelectedDate = null; // YYYY-MM-DD
+        const calMonthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        function initNotisseDatePicker() {
+            const yearSelect = document.getElementById('cal-year-select');
+            if (!yearSelect) return;
+
+            const currentYear = new Date().getFullYear();
+            yearSelect.innerHTML = '';
+            for (let y = currentYear; y >= 1930; y--) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearSelect.appendChild(opt);
+            }
+
+            // Sync with existing value if set
+            const hiddenInput = document.getElementById('edit-birthdate');
+            if (hiddenInput && hiddenInput.value) {
+                setNotisseDatePickerValue(hiddenInput.value);
+            } else {
+                calCurrentYear = 2000;
+                calCurrentMonth = 0;
+                renderNotisseCalendarGrid();
+            }
+
+            // Close on click outside
+            document.addEventListener('click', function(e) {
+                const container = document.getElementById('notisse-datepicker-container');
+                if (container && !container.contains(e.target)) {
+                    closeNotisseDatePicker();
+                }
+            });
+        }
+
+        function toggleNotisseDatePicker(e) {
+            if (e) e.stopPropagation();
+            const dropdown = document.getElementById('notisse-calendar-dropdown');
+            const chevron = document.getElementById('datepicker-chevron');
+            if (!dropdown) return;
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                if (chevron) chevron.classList.add('rotate-180');
+                renderNotisseCalendarGrid();
+            } else {
+                closeNotisseDatePicker();
+            }
+        }
+
+        function closeNotisseDatePicker() {
+            const dropdown = document.getElementById('notisse-calendar-dropdown');
+            const chevron = document.getElementById('datepicker-chevron');
+            if (dropdown) dropdown.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+        }
+
+        function setNotisseDatePickerValue(dateStr) {
+            const hiddenInput = document.getElementById('edit-birthdate');
+            const displayText = document.getElementById('datepicker-display-text');
+            const clearBtn = document.getElementById('datepicker-clear-btn');
+
+            if (!dateStr) {
+                if (hiddenInput) hiddenInput.value = '';
+                if (displayText) {
+                    displayText.innerText = 'Select birth date (DD / MM / YYYY)';
+                    displayText.classList.remove('text-black', 'font-medium');
+                    displayText.classList.add('text-gray-400');
+                }
+                if (clearBtn) clearBtn.classList.add('hidden');
+                calSelectedDate = null;
+                calCurrentYear = 2000;
+                calCurrentMonth = 0;
+            } else {
+                if (hiddenInput) hiddenInput.value = dateStr;
+                calSelectedDate = dateStr;
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    const y = parseInt(parts[0]);
+                    const m = parseInt(parts[1]) - 1;
+                    const d = parseInt(parts[2]);
+                    calCurrentYear = y;
+                    calCurrentMonth = m;
+
+                    if (displayText) {
+                        displayText.innerText = `${d} ${calMonthNames[m]} ${y}`;
+                        displayText.classList.remove('text-gray-400');
+                        displayText.classList.add('text-black', 'font-medium');
+                    }
+                    if (clearBtn) clearBtn.classList.remove('hidden');
+                }
+            }
+            renderNotisseCalendarGrid();
+        }
+
+        function clearNotisseDatePicker(e) {
+            if (e) e.stopPropagation();
+            setNotisseDatePickerValue('');
+        }
+
+        function changeNotisseMonth(delta, e) {
+            if (e) e.stopPropagation();
+            calCurrentMonth += delta;
+            if (calCurrentMonth < 0) {
+                calCurrentMonth = 11;
+                calCurrentYear--;
+            } else if (calCurrentMonth > 11) {
+                calCurrentMonth = 0;
+                calCurrentYear++;
+            }
+            renderNotisseCalendarGrid();
+        }
+
+        function onMonthSelectChange(val) {
+            calCurrentMonth = parseInt(val);
+            renderNotisseCalendarGrid();
+        }
+
+        function onYearSelectChange(val) {
+            calCurrentYear = parseInt(val);
+            renderNotisseCalendarGrid();
+        }
+
+        function renderNotisseCalendarGrid() {
+            const monthSelect = document.getElementById('cal-month-select');
+            const yearSelect = document.getElementById('cal-year-select');
+            const daysGrid = document.getElementById('cal-days-grid');
+            if (!daysGrid) return;
+
+            if (monthSelect) monthSelect.value = calCurrentMonth;
+            if (yearSelect) yearSelect.value = calCurrentYear;
+
+            daysGrid.innerHTML = '';
+
+            const firstDayIndex = new Date(calCurrentYear, calCurrentMonth, 1).getDay(); // 0 is Sunday
+            const totalDaysInMonth = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
+            const prevMonthDays = new Date(calCurrentYear, calCurrentMonth, 0).getDate();
+
+            // Previous month overflow days
+            for (let i = firstDayIndex - 1; i >= 0; i--) {
+                const dayNum = prevMonthDays - i;
+                const cell = document.createElement('div');
+                cell.className = 'w-8 h-8 mx-auto flex items-center justify-center text-gray-300 text-[11px] pointer-events-none select-none';
+                cell.textContent = dayNum;
+                daysGrid.appendChild(cell);
+            }
+
+            // Current month days
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            for (let day = 1; day <= totalDaysInMonth; day++) {
+                const dateString = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isSelected = (calSelectedDate === dateString);
+                const isToday = (todayStr === dateString);
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = day;
+
+                let classes = 'w-8 h-8 mx-auto flex items-center justify-center text-xs transition-colors cursor-pointer ';
+                if (isSelected) {
+                    classes += 'bg-black text-white font-bold ring-2 ring-black';
+                } else if (isToday) {
+                    classes += 'border border-black font-bold text-black hover:bg-black hover:text-white';
+                } else {
+                    classes += 'text-black hover:bg-neutral-100 font-medium';
+                }
+
+                btn.className = classes;
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    selectNotisseDate(dateString);
+                };
+                daysGrid.appendChild(btn);
+            }
+
+            // Next month overflow padding (to complete 35 or 42 grid cells)
+            const filledCells = firstDayIndex + totalDaysInMonth;
+            const remaining = (filledCells % 7 === 0) ? 0 : 7 - (filledCells % 7);
+            for (let j = 1; j <= remaining; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'w-8 h-8 mx-auto flex items-center justify-center text-gray-300 text-[11px] pointer-events-none select-none';
+                cell.textContent = j;
+                daysGrid.appendChild(cell);
+            }
+        }
+
+        function selectNotisseDate(dateString) {
+            setNotisseDatePickerValue(dateString);
+            closeNotisseDatePicker();
+        }
+
+        document.addEventListener('DOMContentLoaded', initNotisseDatePicker);
+
         // ====== EDIT PROFILE LOGIC ======
         let editAreaSearchTimeout = null;
         const editAreaSearchInput = document.getElementById('edit-area-search');
@@ -3853,6 +4181,7 @@
             if (!loggedInUser) return;
             document.getElementById('edit-name').value = loggedInUser.name || '';
             document.getElementById('edit-phone').value = loggedInUser.phone || '';
+            setNotisseDatePickerValue(loggedInUser.birthdate || '');
             document.getElementById('edit-address').value = loggedInUser.address || '';
             document.getElementById('edit-area-id').value = loggedInUser.area_id || '';
             
@@ -3880,7 +4209,7 @@
                             if (data.areas && data.areas.length > 0) {
                                 data.areas.forEach(area => {
                                     const li = document.createElement('li');
-                                    li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-roboto border-b border-gray-100';
+                                    li.className = 'px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-inter border-b border-gray-100';
                                     li.innerText = area.name;
                                     li.onclick = () => {
                                         editAreaSearchInput.value = area.name;
@@ -3917,6 +4246,7 @@
             const formData = new FormData();
             formData.append('name', document.getElementById('edit-name').value);
             formData.append('phone', document.getElementById('edit-phone').value);
+            formData.append('birthdate', document.getElementById('edit-birthdate').value);
             formData.append('address', document.getElementById('edit-address').value);
             formData.append('area_id', document.getElementById('edit-area-id').value);
 
@@ -3926,12 +4256,12 @@
             }
 
             if (!formData.get('area_id')) {
-                errorBox.innerText = 'Pilih kecamatan dari daftar pencarian terlebih dahulu.';
+                errorBox.innerText = 'Please select a district/city from the search list.';
                 errorBox.classList.remove('hidden');
                 return;
             }
 
-            btn.innerText = 'MENYIMPAN...';
+            btn.innerText = 'SAVING...';
             btn.disabled = true;
 
             try {
@@ -3945,28 +4275,33 @@
                 
                 const data = await response.json();
                 if (response.ok && data.success) {
-                    successBox.innerText = 'Profil berhasil diperbarui.';
+                    successBox.innerText = 'Profile updated successfully.';
                     successBox.classList.remove('hidden');
                     
                     // Update frontend state
                     loggedInUser.name = formData.get('name');
                     loggedInUser.phone = formData.get('phone');
+                    loggedInUser.birthdate = data.user?.birthdate || formData.get('birthdate');
                     loggedInUser.address = formData.get('address');
                     loggedInUser.area_id = formData.get('area_id');
                     
                     localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
                     document.getElementById('user-display-name').innerText = loggedInUser.name;
                     document.getElementById('user-display-address').innerText = loggedInUser.address;
+                    const birthEl = document.getElementById('user-display-birthdate');
+                    if (birthEl && loggedInUser.birthdate) {
+                        birthEl.innerText = 'Date of Birth: ' + loggedInUser.birthdate;
+                    }
                     
                     setTimeout(() => {
                         window.location.reload();
-                    }, 1500);
+                    }, 1200);
                 } else {
-                    errorBox.innerText = data.message || 'Gagal menyimpan perubahan.';
+                    errorBox.innerText = data.message || 'Failed to save changes.';
                     errorBox.classList.remove('hidden');
                 }
             } catch (err) {
-                errorBox.innerText = 'Terjadi kesalahan jaringan.';
+                errorBox.innerText = 'A network error occurred.';
                 errorBox.classList.remove('hidden');
             } finally {
                 btn.innerText = originalText;
