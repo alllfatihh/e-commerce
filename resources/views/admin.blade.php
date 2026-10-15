@@ -216,6 +216,94 @@
         /* ── Tab nav ───────────────────────────── */
         .tab-btn { border-bottom: 2px solid transparent; transition: border-color 0.2s, color 0.2s; }
         .tab-btn.active { border-color: #111111; color: #111111; font-weight: 700; }
+
+        /* ── Custom Select (Clean SVG Chevron & Native Removed) ── */
+        .admin-select {
+            border: 1px solid #d1d5db;
+            background-color: #ffffff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+            padding: 0.65rem 2.25rem 0.65rem 0.9rem;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            border-radius: 2px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 0.9rem;
+            cursor: pointer;
+        }
+        .admin-select:focus {
+            border-color: #111111;
+            box-shadow: 0 0 0 1px #111111;
+        }
+
+        /* ── Action Buttons ────────────────────── */
+        .btn-action-edit {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.65rem;
+            font-size: 11px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #f3f4f6;
+            color: #1f2937;
+            border: 1px solid #e5e7eb;
+            border-radius: 2px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .btn-action-edit:hover {
+            background: #111111;
+            color: #ffffff;
+            border-color: #111111;
+        }
+
+        .btn-action-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.65rem;
+            font-size: 11px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            border-radius: 2px;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .btn-action-delete:hover {
+            background: #dc2626;
+            color: #ffffff;
+            border-color: #dc2626;
+        }
+
+        /* ── Dropzone & Upload Box ──────────────── */
+        .admin-dropzone {
+            position: relative;
+            border: 2px dashed #d1d5db;
+            background: #fafafa;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        .admin-dropzone:hover,
+        .admin-dropzone.dragover {
+            border-color: #111111;
+            background: #ffffff;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 <body>
@@ -467,8 +555,14 @@
                                 </div>
                             </td>
                             <td class="px-5 py-4 text-right whitespace-nowrap">
-                                <div class="flex items-center justify-end gap-3 font-space-grotesk">
+                                <div class="flex items-center justify-end gap-2 font-space-grotesk">
                                     @php
+                                        $resImg = function($p) {
+                                            if (!$p) return '';
+                                            if (\Illuminate\Support\Str::startsWith($p, 'http')) return $p;
+                                            if (file_exists(public_path('storage/' . $p))) return asset('storage/' . $p);
+                                            return asset($p);
+                                        };
                                         $productData = [
                                             'id'               => $product->id,
                                             'name'             => $product->name,
@@ -477,24 +571,25 @@
                                             'specs'            => $product->specs ?? '',
                                             'artist'           => $product->artist ?? '',
                                             'stocks'           => $product->stocks->pluck('stock','size'),
-                                            'frontImg'         => $product->image ? asset($product->image) : '',
-                                            'backImg'          => $product->back_image ? asset($product->back_image) : '',
-                                            'footageImg'       => $product->footage_image ? asset($product->footage_image) : '',
-                                            'sizechartImg'     => $product->size_chart_image ? asset($product->size_chart_image) : '',
+                                            'frontImg'         => $resImg($product->image),
+                                            'backImg'          => $resImg($product->back_image),
+                                            'footageImg'       => $resImg($product->footage_image),
+                                            'sizechartImg'     => $resImg($product->size_chart_image),
                                         ];
                                     @endphp
                                     <button type="button"
                                         onclick="openEditProductFromBtn(this)"
                                         data-product="{{ json_encode($productData) }}"
-                                        class="text-xs font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
+                                        class="btn-action-edit">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                         Edit
                                     </button>
                                     <form action="/admin/products/{{ $product->id }}" method="POST" class="inline"
-                                          onsubmit="return confirm({{ json_encode('Yakin hapus produk ' . $product->name . '?') }})">
+                                          onsubmit="event.preventDefault(); askConfirm('Yakin hapus produk {{ addslashes($product->name) }}?', this, 'Hapus Produk');">
                                         @method('DELETE') @csrf
-                                        <button type="submit"
-                                            class="text-xs font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer">
-                                            Delete
+                                        <button type="submit" class="btn-action-delete">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                            Hapus
                                         </button>
                                     </form>
                                 </div>
@@ -596,14 +691,16 @@
                                 <button type="button"
                                     onclick="openEditArtistFromBtn(this)"
                                     data-artist="{{ json_encode($artistData) }}"
-                                    class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer text-[11px]">
+                                    class="btn-action-edit">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     Edit
                                 </button>
                                 <form action="/admin/artists/{{ $art->id }}" method="POST" class="inline"
-                                      onsubmit="return confirm({{ json_encode('Hapus seniman ' . $art->name . ' beserta seluruh karya & editorialnya?') }})">
+                                      onsubmit="event.preventDefault(); askConfirm('Hapus seniman {{ addslashes($art->name) }} beserta seluruh karya & editorialnya?', this, 'Hapus Seniman');">
                                     @method('DELETE') @csrf
-                                    <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer text-[11px]">
-                                        Delete
+                                    <button type="submit" class="btn-action-delete">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                        Hapus
                                     </button>
                                 </form>
                             </div>
@@ -644,7 +741,7 @@
                 <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-gray-500 shrink-0">Filter Seniman:</label>
-                        <select id="creation-filter-artist" onchange="filterCreations()" class="admin-input text-xs py-1.5 bg-white max-w-[240px]">
+                        <select id="creation-filter-artist" onchange="filterCreations()" class="admin-select text-xs py-1.5 max-w-[240px]">
                             <option value="all">Semua Seniman (All Artists - {{ $artists->count() }})</option>
                             @foreach($artists as $artObj)
                                 <option value="{{ $artObj->id }}">{{ $artObj->name }} ({{ $artObj->city ?: 'Indonesia' }})</option>
@@ -654,7 +751,7 @@
 
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-gray-500 shrink-0">Tipe:</label>
-                        <select id="creation-filter-type" onchange="filterCreations()" class="admin-input text-xs py-1.5 bg-white">
+                        <select id="creation-filter-type" onchange="filterCreations()" class="admin-select text-xs py-1.5">
                             <option value="all">Semua Tipe (Total: {{ $artworks->count() + $editorials->count() }})</option>
                             <option value="artwork">🎨 Hanya Artwork Fisik ({{ $artworks->count() }})</option>
                             <option value="editorial">📰 Hanya Editorial Artikel ({{ $editorials->count() }})</option>
@@ -755,14 +852,16 @@
                             <button type="button"
                                 onclick="openEditArtworkFromBtn(this)"
                                 data-artwork="{{ json_encode($artworkData) }}"
-                                class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
+                                class="btn-action-edit">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                 Edit
                             </button>
                             <form action="/admin/artworks/{{ $art->id }}" method="POST" class="inline"
-                                  onsubmit="return confirm({{ json_encode('Hapus karya seni ' . $art->title . '?') }})">
+                                  onsubmit="event.preventDefault(); askConfirm('Hapus karya seni {{ addslashes($art->title) }}?', this, 'Hapus Artwork');">
                                 @method('DELETE') @csrf
-                                <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer">
-                                    Delete
+                                <button type="submit" class="btn-action-delete">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                    Hapus
                                 </button>
                             </form>
                         </div>
@@ -846,14 +945,16 @@
                             <button type="button"
                                 onclick="openEditEditorialFromBtn(this)"
                                 data-editorial="{{ json_encode($editorialData) }}"
-                                class="font-semibold uppercase tracking-wide text-blue-600 hover:text-blue-800 transition-colors cursor-pointer">
+                                class="btn-action-edit">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                 Edit
                             </button>
                             <form action="/admin/editorials/{{ $edit->id }}" method="POST" class="inline"
-                                  onsubmit="return confirm({{ json_encode('Hapus artikel editorial ' . $edit->title . '?') }})">
+                                  onsubmit="event.preventDefault(); askConfirm('Hapus artikel editorial {{ addslashes($edit->title) }}?', this, 'Hapus Editorial');">
                                 @method('DELETE') @csrf
-                                <button type="submit" class="font-semibold uppercase tracking-wide text-red-500 hover:text-red-700 transition-colors cursor-pointer">
-                                    Delete
+                                <button type="submit" class="btn-action-delete">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                    Hapus
                                 </button>
                             </form>
                         </div>
@@ -930,13 +1031,16 @@
                         </div>
                         <div class="px-4 py-2.5 border-t border-gray-100 bg-gray-50/50 flex items-center justify-between">
                             <button type="button" onclick="openMediaModal({{ $media->id }}, '{{ addslashes($media->title ?? '') }}', '{{ addslashes($media->description ?? '') }}', '{{ $media->product_id ?? '' }}', '{{ $media->order ?? 1 }}')"
-                                class="text-xs font-space-grotesk font-semibold uppercase tracking-wider text-black hover:underline cursor-pointer">
+                                class="btn-action-edit">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                 Edit Detail
                             </button>
-                            <form action="/admin/media/{{ $media->id }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus slide carousel ini?')">
+                            <form action="/admin/media/{{ $media->id }}" method="POST"
+                                  onsubmit="event.preventDefault(); askConfirm('Apakah Anda yakin ingin menghapus slide carousel ini?', this, 'Hapus Slide Carousel');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-xs font-space-grotesk font-semibold uppercase tracking-wider text-red-600 hover:underline cursor-pointer">
+                                <button type="submit" class="btn-action-delete">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                     Hapus
                                 </button>
                             </form>
@@ -1058,14 +1162,16 @@
 
                         <!-- Card Action Footer -->
                         <div class="p-4 pt-3 border-t border-gray-100 flex items-center justify-between bg-neutral-50">
-                            <button type="button" onclick="openManageLookbook({{ $lb->id }})" class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-black hover:text-[#d52c2b] transition-colors cursor-pointer flex items-center gap-1.5">
+                            <button type="button" onclick="openManageLookbook({{ $lb->id }})" class="btn-action-edit">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 <span>Kelola Isi & Video</span>
                             </button>
-                            <form action="/admin/lookbooks/{{ $lb->id }}" method="POST" onsubmit="return confirm('Hapus album Lookbook ini beserta seluruh fotonya?')">
+                            <form action="/admin/lookbooks/{{ $lb->id }}" method="POST"
+                                  onsubmit="event.preventDefault(); askConfirm('Hapus album Lookbook {{ addslashes($lb->title) }} beserta seluruh fotonya?', this, 'Hapus Album Lookbook');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-red-500 hover:text-red-700 transition-colors cursor-pointer">
+                                <button type="submit" class="btn-action-delete">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                     Hapus
                                 </button>
                             </form>
@@ -1183,12 +1289,12 @@
                                 <td class="px-5 py-4 text-right">
                                     <form action="/admin/offerings/{{ $offer->id }}/status" method="POST" class="inline-flex items-center gap-2 justify-end">
                                         @csrf
-                                        <select name="status" class="admin-input py-1 text-xs" style="padding-top: 0.25rem; padding-bottom: 0.25rem; width: auto;">
+                                        <select name="status" class="admin-select py-1 text-xs" style="padding-top: 0.35rem; padding-bottom: 0.35rem; width: auto;">
                                             <option value="Dalam Tinjauan Kurasi" {{ $offer->status == 'Dalam Tinjauan Kurasi' ? 'selected' : '' }}>Dalam Tinjauan</option>
                                             <option value="Diterima" {{ $offer->status == 'Diterima' ? 'selected' : '' }}>Diterima</option>
                                             <option value="Ditolak" {{ $offer->status == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
                                         </select>
-                                        <button type="submit" class="btn-primary" style="padding: 0.25rem 0.6rem; font-size: 0.7rem;">Update</button>
+                                        <button type="submit" class="btn-primary" style="padding: 0.35rem 0.75rem; font-size: 0.72rem;">Update</button>
                                     </form>
                                 </td>
                             </tr>
@@ -1367,8 +1473,17 @@
                             <span class="text-[9px] font-space-grotesk font-bold uppercase bg-black text-white px-1.5 py-0.5">Shop Grid</span>
                         </div>
                         <p class="text-[10px] text-gray-500 font-inter leading-normal">Foto tampak depan dengan latar bersih untuk cover katalog toko.</p>
-                        <input type="file" name="image" id="p-img-front" accept="image/*" onchange="previewImage(this,'preview-front')" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
-                        <img id="preview-front" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Front Preview">
+                        
+                        <div class="admin-dropzone p-3.5 text-center group" onclick="document.getElementById('p-img-front').click()">
+                            <input type="file" name="image" id="p-img-front" accept="image/*" onchange="handleFileSelect(this,'preview-front','filename-front')" class="hidden">
+                            <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih / Drag Foto Depan</span>
+                                <span class="text-[9px] text-gray-400 font-inter">PNG, JPG, WEBP maks 8MB</span>
+                            </div>
+                            <span id="filename-front" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                            <img id="preview-front" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Front Preview">
+                        </div>
                     </div>
 
                     <!-- 2. Foto Belakang Produk -->
@@ -1378,8 +1493,17 @@
                             <span class="text-[9px] font-space-grotesk font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Product Detail</span>
                         </div>
                         <p class="text-[10px] text-gray-500 font-inter leading-normal">Foto tampak belakang untuk memperlihatkan grafis/detail punggung.</p>
-                        <input type="file" name="back_image" id="p-img-back" accept="image/*" onchange="previewImage(this,'preview-back')" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
-                        <img id="preview-back" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Back Preview">
+                        
+                        <div class="admin-dropzone p-3.5 text-center group" onclick="document.getElementById('p-img-back').click()">
+                            <input type="file" name="back_image" id="p-img-back" accept="image/*" onchange="handleFileSelect(this,'preview-back','filename-back')" class="hidden">
+                            <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih / Drag Foto Belakang</span>
+                                <span class="text-[9px] text-gray-400 font-inter">PNG, JPG, WEBP maks 8MB</span>
+                            </div>
+                            <span id="filename-back" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                            <img id="preview-back" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Back Preview">
+                        </div>
                     </div>
 
                     <!-- 3. Foto On-Model Footage -->
@@ -1389,8 +1513,17 @@
                             <span class="text-[9px] font-space-grotesk font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Photoshoot</span>
                         </div>
                         <p class="text-[10px] text-gray-500 font-inter leading-normal">Foto produk saat dipakai model photoshoot / lookbook di halaman detail.</p>
-                        <input type="file" name="footage_image" id="p-img-footage" accept="image/*" onchange="previewImage(this,'preview-footage')" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
-                        <img id="preview-footage" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Footage Preview">
+                        
+                        <div class="admin-dropzone p-3.5 text-center group" onclick="document.getElementById('p-img-footage').click()">
+                            <input type="file" name="footage_image" id="p-img-footage" accept="image/*" onchange="handleFileSelect(this,'preview-footage','filename-footage')" class="hidden">
+                            <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih / Drag Foto Footage</span>
+                                <span class="text-[9px] text-gray-400 font-inter">PNG, JPG, WEBP maks 8MB</span>
+                            </div>
+                            <span id="filename-footage" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                            <img id="preview-footage" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Footage Preview">
+                        </div>
                     </div>
 
                     <!-- 4. Foto Size Chart -->
@@ -1400,8 +1533,17 @@
                             <span class="text-[9px] font-space-grotesk font-bold uppercase bg-neutral-700 text-white px-1.5 py-0.5">Size Guide</span>
                         </div>
                         <p class="text-[10px] text-gray-500 font-inter leading-normal">Tabel ukuran spesifik garmen ini yang tampil saat popup Size Guide diklik.</p>
-                        <input type="file" name="size_chart_image" id="p-img-sizechart" accept="image/*" onchange="previewImage(this,'preview-sizechart')" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
-                        <img id="preview-sizechart" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Size Chart Preview">
+                        
+                        <div class="admin-dropzone p-3.5 text-center group" onclick="document.getElementById('p-img-sizechart').click()">
+                            <input type="file" name="size_chart_image" id="p-img-sizechart" accept="image/*" onchange="handleFileSelect(this,'preview-sizechart','filename-sizechart')" class="hidden">
+                            <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih / Drag Foto Size Chart</span>
+                                <span class="text-[9px] text-gray-400 font-inter">PNG, JPG, WEBP maks 8MB</span>
+                            </div>
+                            <span id="filename-sizechart" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                            <img id="preview-sizechart" class="w-full h-28 object-cover border border-gray-200 hidden mt-2 rounded-sm" src="" alt="Size Chart Preview">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1464,17 +1606,33 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Profil / Portrait Seniman</label>
-                    <input type="file" name="photo" id="artist-photo-input" accept="image/*"
-                        onchange="previewImage(this,'artist-photo-preview')"
-                        class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
-                    <img id="artist-photo-preview" class="mt-3 w-32 h-32 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                    <div class="admin-dropzone p-4 text-center group" onclick="document.getElementById('artist-photo-input').click()">
+                        <input type="file" name="photo" id="artist-photo-input" accept="image/*"
+                            onchange="handleFileSelect(this,'artist-photo-preview','filename-artist-photo')"
+                            class="hidden">
+                        <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                            <svg class="w-6 h-6 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                            <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Upload Portrait Seniman</span>
+                            <span class="text-[9px] text-gray-400 font-inter">PNG, JPG, WEBP maks 8MB</span>
+                        </div>
+                        <span id="filename-artist-photo" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                        <img id="artist-photo-preview" class="mt-2 mx-auto w-28 h-28 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Karya Seni Unggulan (Preview)</label>
-                    <input type="file" name="artwork_preview" id="artist-art-input" accept="image/*"
-                        onchange="previewImage(this,'artist-art-preview')"
-                        class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
-                    <img id="artist-art-preview" class="mt-3 w-32 h-32 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                    <div class="admin-dropzone p-4 text-center group" onclick="document.getElementById('artist-art-input').click()">
+                        <input type="file" name="artwork_preview" id="artist-art-input" accept="image/*"
+                            onchange="handleFileSelect(this,'artist-art-preview','filename-artist-art')"
+                            class="hidden">
+                        <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                            <svg class="w-6 h-6 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                            <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Upload Preview Karya</span>
+                            <span class="text-[9px] text-gray-400 font-inter">PNG, JPG, WEBP maks 8MB</span>
+                        </div>
+                        <span id="filename-artist-art" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                        <img id="artist-art-preview" class="mt-2 mx-auto w-28 h-28 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                    </div>
                 </div>
             </div>
 
@@ -1516,7 +1674,7 @@
                 <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-black mb-1.5">
                     Seniman Pemilik Karya *
                 </label>
-                <select name="artist_id" id="art-artist-id" required class="admin-input bg-white font-medium">
+                <select name="artist_id" id="art-artist-id" required class="admin-select bg-white font-medium">
                     <option value="">-- Pilih Seniman Kolaborator --</option>
                     @foreach($artists as $artObj)
                         <option value="{{ $artObj->id }}">{{ $artObj->name }} &bull; {{ $artObj->city ?: 'Indonesia' }}</option>
@@ -1563,10 +1721,18 @@
 
             <div>
                 <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Karya Seni High-Res (Physical Artwork)</label>
-                <input type="file" name="image" id="artwork-img-input" accept="image/*"
-                    onchange="previewImage(this,'artwork-img-preview')"
-                    class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
-                <img id="artwork-img-preview" class="mt-3 w-40 h-28 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                <div class="admin-dropzone p-4 text-center group" onclick="document.getElementById('artwork-img-input').click()">
+                    <input type="file" name="image" id="artwork-img-input" accept="image/*"
+                        onchange="handleFileSelect(this,'artwork-img-preview','filename-artwork')"
+                        class="hidden">
+                    <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                        <svg class="w-6 h-6 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                        <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih / Drag Foto Artwork</span>
+                        <span class="text-[9px] text-gray-400 font-inter">Format PNG, JPG, WEBP maks 8MB</span>
+                    </div>
+                    <span id="filename-artwork" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                    <img id="artwork-img-preview" class="mt-2 mx-auto w-44 h-32 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                </div>
             </div>
 
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
@@ -1599,7 +1765,7 @@
                 <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-brandRed mb-1.5">
                     Seniman Terkait Artikel Ini *
                 </label>
-                <select name="artist_id" id="edit-artist-id" required class="admin-input bg-white font-medium">
+                <select name="artist_id" id="edit-artist-id" required class="admin-select bg-white font-medium">
                     <option value="">-- Pilih Seniman Yang Ditampilkan --</option>
                     @foreach($artists as $artObj)
                         <option value="{{ $artObj->id }}">{{ $artObj->name }} &bull; {{ $artObj->city ?: 'Indonesia' }}</option>
@@ -1636,10 +1802,18 @@
 
             <div>
                 <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Sampul / Featured Article Image</label>
-                <input type="file" name="image" id="editorial-img-input" accept="image/*"
-                    onchange="previewImage(this,'editorial-img-preview')"
-                    class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
-                <img id="editorial-img-preview" class="mt-3 w-40 h-28 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                <div class="admin-dropzone p-4 text-center group" onclick="document.getElementById('editorial-img-input').click()">
+                    <input type="file" name="image" id="editorial-img-input" accept="image/*"
+                        onchange="handleFileSelect(this,'editorial-img-preview','filename-editorial')"
+                        class="hidden">
+                    <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                        <svg class="w-6 h-6 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                        <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih / Drag Foto Sampul</span>
+                        <span class="text-[9px] text-gray-400 font-inter">Format PNG, JPG, WEBP maks 8MB</span>
+                    </div>
+                    <span id="filename-editorial" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                    <img id="editorial-img-preview" class="mt-2 mx-auto w-44 h-32 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                </div>
             </div>
 
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
@@ -1670,7 +1844,7 @@
 
             <div>
                 <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Tautkan ke Produk (Opsional)</label>
-                <select name="product_id" id="m-product-id" class="admin-input">
+                <select name="product_id" id="m-product-id" class="admin-select">
                     <option value="">-- Tidak Terhubung ke Produk --</option>
                     @foreach($products as $prod)
                         <option value="{{ $prod->id }}">{{ $prod->name }} (#{{ $prod->id }})</option>
@@ -1686,11 +1860,18 @@
 
             <div>
                 <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Upload Gambar Baru</label>
-                <input type="file" name="image" id="media-img-input" accept="image/*"
-                    onchange="previewImage(this,'media-img-preview')"
-                    class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
-                <img id="media-img-preview" class="mt-3 w-full max-h-48 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
-                <p class="text-[11px] text-gray-400 mt-1.5 font-inter">Biarkan kosong jika tidak ingin mengganti gambar.</p>
+                <div class="admin-dropzone p-4 text-center group" onclick="document.getElementById('media-img-input').click()">
+                    <input type="file" name="image" id="media-img-input" accept="image/*"
+                        onchange="handleFileSelect(this,'media-img-preview','filename-media')"
+                        class="hidden">
+                    <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                        <svg class="w-6 h-6 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                        <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih / Drag Gambar Baru</span>
+                        <span class="text-[9px] text-gray-400 font-inter">Biarkan kosong jika tidak ingin mengganti</span>
+                    </div>
+                    <span id="filename-media" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                    <img id="media-img-preview" class="mt-2 mx-auto w-full max-h-48 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                </div>
             </div>
 
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
@@ -1720,11 +1901,19 @@
 
             <div>
                 <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500 mb-1.5">Pilih File Gambar Slide *</label>
-                <input type="file" name="image" required accept="image/*"
-                    onchange="previewImage(this,'create-carousel-img-preview')"
-                    class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
-                <img id="create-carousel-img-preview" class="mt-3 w-full max-h-48 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
-                <p class="text-[11px] text-gray-400 mt-1.5 font-inter">Disarankan gambar beresolusi tinggi (rasio 16:9 atau landscape, misal 1920x1080 px).</p>
+                <div class="admin-dropzone p-5 text-center group" onclick="document.getElementById('create-carousel-img-input').click()">
+                    <input type="file" name="image" id="create-carousel-img-input" required accept="image/*"
+                        onchange="handleFileSelect(this,'create-carousel-img-preview','filename-carousel-create')"
+                        class="hidden">
+                    <div class="flex flex-col items-center justify-center gap-1.5 py-1">
+                        <svg class="w-7 h-7 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                        <span class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-gray-800 group-hover:text-black">Upload Slide Hero (16:9 Landscape)</span>
+                        <span class="text-[10px] text-gray-400 font-inter">Klik atau seret file gambar resolusi tinggi ke sini</span>
+                    </div>
+                    <span id="filename-carousel-create" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                    <img id="create-carousel-img-preview" class="mt-2 mx-auto w-full max-h-48 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+                </div>
+                <p class="text-[10px] text-gray-400 mt-1 font-inter">Disarankan gambar beresolusi tinggi (rasio 16:9 atau landscape, misal 1920x1080 px).</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1776,7 +1965,15 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Cover Image (Opsional)</label>
-                    <input type="file" name="cover_image" accept="image/*" class="admin-input py-1.5 text-xs bg-gray-50 cursor-pointer">
+                    <div class="admin-dropzone p-3 text-center group" onclick="document.getElementById('lb-cover-input').click()">
+                        <input type="file" name="cover_image" id="lb-cover-input" accept="image/*" onchange="handleFileSelect(this,'lb-cover-preview','filename-lb-cover')" class="hidden">
+                        <div class="flex items-center justify-center gap-1.5 py-0.5">
+                            <svg class="w-4 h-4 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                            <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih Cover Image</span>
+                        </div>
+                        <span id="filename-lb-cover" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                        <img id="lb-cover-preview" class="mt-2 mx-auto w-full h-20 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Cover Preview">
+                    </div>
                 </div>
             </div>
 
@@ -1794,7 +1991,14 @@
                 <p class="text-[11px] text-gray-500 font-inter">Video ini akan tampil sebagai video player melebar di paling atas halaman Lookbook pengunjung.</p>
                 <div>
                     <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Upload File Video (.mp4 / .mov)</label>
-                    <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
+                    <div class="admin-dropzone p-3 text-center group" onclick="document.getElementById('lb-create-video-input').click()">
+                        <input type="file" name="video" id="lb-create-video-input" accept="video/mp4,video/quicktime,video/webm" onchange="handleFileSelect(this,null,'filename-lb-create-video')" class="hidden">
+                        <div class="flex items-center justify-center gap-1.5 py-0.5">
+                            <svg class="w-4 h-4 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                            <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih File Video</span>
+                        </div>
+                        <span id="filename-lb-create-video" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Atau Path / Link Video</label>
@@ -1855,7 +2059,14 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Upload File Video Baru (.mp4)</label>
-                            <input type="file" name="video" accept="video/mp4,video/quicktime,video/webm" class="admin-input py-1.5 text-xs bg-gray-50 cursor-pointer">
+                            <div class="admin-dropzone p-3 text-center group" onclick="document.getElementById('manage-lb-video-file').click()">
+                                <input type="file" name="video" id="manage-lb-video-file" accept="video/mp4,video/quicktime,video/webm" onchange="handleFileSelect(this,null,'filename-manage-lb-video')" class="hidden">
+                                <div class="flex items-center justify-center gap-1.5 py-0.5">
+                                    <svg class="w-4 h-4 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                                    <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih Video Baru</span>
+                                </div>
+                                <span id="filename-manage-lb-video" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Atau Masukkan Path / URL Video</label>
@@ -1889,7 +2100,14 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                         <div>
                             <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Pilih File Foto *</label>
-                            <input type="file" name="image" required accept="image/*" class="admin-input py-1.5 text-xs bg-white cursor-pointer">
+                            <div class="admin-dropzone p-3 text-center group" onclick="document.getElementById('manage-lb-photo-input').click()">
+                                <input type="file" name="image" id="manage-lb-photo-input" required accept="image/*" onchange="handleFileSelect(this,null,'filename-manage-lb-photo')" class="hidden">
+                                <div class="flex items-center justify-center gap-1.5 py-0.5">
+                                    <svg class="w-4 h-4 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                    <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih Foto Photoshoot</span>
+                                </div>
+                                <span id="filename-manage-lb-photo" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Judul / Tema Foto (Opsional)</label>
@@ -1917,6 +2135,34 @@
 
         <div class="pt-4 mt-4 border-t border-gray-100 flex justify-end">
             <button type="button" onclick="closeManageLookbook()" class="btn-outline cursor-pointer">Tutup</button>
+        </div>
+    </div>
+</div>
+
+{{-- ══════════════════════════════════════════════════════════════
+     MODAL CONFIRM (Custom Luxury Confirmation Modal - No Native OS Dialogs)
+══════════════════════════════════════════════════════════════ --}}
+<div id="modal-confirm" class="modal-backdrop" onclick="closeConfirmModal()">
+    <div class="modal-box max-w-md p-6 text-center shadow-2xl" onclick="event.stopPropagation()">
+        <!-- Danger Warning Icon -->
+        <div class="mx-auto w-12 h-12 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-4 text-red-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+        <h3 id="confirm-modal-title" class="font-space-grotesk font-extrabold text-lg uppercase tracking-wider text-gray-900 mb-2">
+            Konfirmasi Penghapusan
+        </h3>
+        <p id="confirm-modal-message" class="text-xs text-gray-600 font-inter leading-relaxed mb-6">
+            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+        </p>
+        <div class="flex items-center justify-center gap-3">
+            <button type="button" onclick="closeConfirmModal()" class="btn-outline px-5 py-2.5 text-xs">
+                Batal
+            </button>
+            <button type="button" id="confirm-modal-btn" onclick="executeConfirmedAction()" class="bg-red-600 hover:bg-red-700 text-white font-space-grotesk font-bold uppercase tracking-wider px-5 py-2.5 text-xs transition-colors rounded-xs shadow-sm cursor-pointer">
+                Ya, Hapus
+            </button>
         </div>
     </div>
 </div>
@@ -2030,10 +2276,11 @@
                         </div>
                         <div class="p-2 border-t border-gray-200 flex items-center justify-between bg-white">
                             <span class="text-[9px] text-gray-400 font-mono truncate max-w-[80px]">${p.title || '#'+p.id}</span>
-                            <form action="/admin/lookbooks/photos/${p.id}" method="POST" onsubmit="return confirm('Hapus foto ini dari album?')">
+                            <form action="/admin/lookbooks/photos/${p.id}" method="POST" onsubmit="event.preventDefault(); askConfirm('Hapus foto ini dari album?', this, 'Hapus Foto Lookbook');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-[10px] text-red-600 hover:text-red-800 font-space-grotesk font-bold uppercase tracking-wider cursor-pointer">
+                                <button type="submit" class="btn-action-delete" style="font-size: 9px; padding: 2px 6px;">
+                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                     Hapus
                                 </button>
                             </form>
@@ -2119,6 +2366,10 @@
             const el = document.getElementById(id);
             if (el) { el.classList.add('hidden'); el.src = ''; }
         });
+        ['filename-front','filename-back','filename-footage','filename-sizechart'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.classList.add('hidden'); el.textContent = ''; }
+        });
 
         document.getElementById('modal-product').classList.add('open');
     }
@@ -2188,6 +2439,10 @@
         document.getElementById('artist-form-method').disabled = true;
         document.getElementById('artist-photo-preview').classList.add('hidden');
         document.getElementById('artist-art-preview').classList.add('hidden');
+        ['filename-artist-photo', 'filename-artist-art'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.classList.add('hidden'); el.textContent = ''; }
+        });
         const newcomerCheckbox = document.getElementById('artist-is-newcomer');
         if (newcomerCheckbox) newcomerCheckbox.checked = false;
         document.getElementById('modal-artist').classList.add('open');
@@ -2279,6 +2534,8 @@
         }
 
         document.getElementById('artwork-img-preview').classList.add('hidden');
+        const fArt = document.getElementById('filename-artwork');
+        if (fArt) { fArt.classList.add('hidden'); fArt.textContent = ''; }
         document.getElementById('modal-artwork').classList.add('open');
     }
 
@@ -2326,6 +2583,8 @@
         }
 
         document.getElementById('editorial-img-preview').classList.add('hidden');
+        const fEd = document.getElementById('filename-editorial');
+        if (fEd) { fEd.classList.add('hidden'); fEd.textContent = ''; }
         document.getElementById('modal-editorial').classList.add('open');
     }
 
@@ -2383,6 +2642,8 @@
             preview.classList.add('hidden');
             preview.src = '';
         }
+        const fCc = document.getElementById('filename-carousel-create');
+        if (fCc) { fCc.classList.add('hidden'); fCc.textContent = ''; }
         document.getElementById('modal-create-carousel').classList.add('open');
     }
 
@@ -2390,20 +2651,104 @@
         document.getElementById('modal-create-carousel').classList.remove('open');
     }
 
-    // ── Auto-dismiss toast ───────────────────────────────────────
+    // ── Universal Custom Confirmation Modal ───────────────────────
+    let pendingActionForm = null;
+
+    function askConfirm(message, formOrAction, title = 'Konfirmasi Penghapusan', btnText = 'Ya, Hapus') {
+        pendingActionForm = formOrAction;
+        const titleEl = document.getElementById('confirm-modal-title');
+        const msgEl   = document.getElementById('confirm-modal-message');
+        const btnEl   = document.getElementById('confirm-modal-btn');
+        if (titleEl) titleEl.textContent = title;
+        if (msgEl) msgEl.textContent = message;
+        if (btnEl) btnEl.textContent = btnText;
+        document.getElementById('modal-confirm').classList.add('open');
+    }
+
+    function executeConfirmedAction() {
+        if (typeof pendingActionForm === 'function') {
+            pendingActionForm();
+        } else if (pendingActionForm && typeof pendingActionForm.submit === 'function') {
+            pendingActionForm.submit();
+        }
+        closeConfirmModal();
+    }
+
+    function closeConfirmModal() {
+        const modal = document.getElementById('modal-confirm');
+        if (modal) modal.classList.remove('open');
+        pendingActionForm = null;
+    }
+
+    // ── File Selection & Drag-and-Drop Handler ────────────────────
+    function handleFileSelect(input, previewId, filenameId) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (filenameId) {
+                const fEl = document.getElementById(filenameId);
+                if (fEl) {
+                    fEl.textContent = file.name;
+                    fEl.classList.remove('hidden');
+                }
+            }
+            if (previewId) {
+                previewImage(input, previewId);
+            }
+        }
+    }
+
+    // ── Lookbook Modals ──────────────────────────────────────────
+    function closeCreateLookbookModal() {
+        document.getElementById('modal-create-lookbook').classList.remove('open');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.admin-dropzone').forEach(dropzone => {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+            dropzone.addEventListener('drop', e => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                const input = dropzone.querySelector('input[type="file"]');
+                if (files.length && input) {
+                    input.files = files;
+                    const changeEvent = new Event('change', { bubbles: true });
+                    input.dispatchEvent(changeEvent);
+                }
+            }, false);
+        });
+    });
+
+    // ── Auto-dismiss toasts ───────────────────────────────────────
     const toast = document.getElementById('toast-success');
     if (toast) setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s'; setTimeout(() => toast.remove(), 500); }, 4000);
+    const toastErr = document.getElementById('toast-error');
+    if (toastErr) setTimeout(() => { toastErr.style.opacity = '0'; toastErr.style.transition = 'opacity 0.5s'; setTimeout(() => toastErr.remove(), 500); }, 5000);
 
     // ── Keyboard ESC to close modals ─────────────────────────────
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
+            closeConfirmModal();
             closeProductModal();
             closeArtistModal();
             closeArtworkModal();
             closeEditorialModal();
             closeMediaModal();
             closeCreateCarouselModal();
-            closeLookbookModal();
+            closeCreateLookbookModal();
+            closeManageLookbook();
         }
     });
 </script>
