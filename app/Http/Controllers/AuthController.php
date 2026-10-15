@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
@@ -22,17 +23,23 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string|min:6',
             'phone' => 'required|string',
+            'birthdate' => 'nullable|date',
             'address' => 'required|string',
             'area_id' => 'required|string',
         ]);
 
+        $updateFields = [
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'area_id' => $request->area_id,
+        ];
+        if ($request->filled('birthdate')) {
+            $updateFields['birthdate'] = $request->birthdate;
+        }
+
         if (Auth::check()) {
             $user = Auth::user();
-            $user->update([
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'area_id' => $request->area_id,
-            ]);
+            $user->update($updateFields);
             return response()->json(['success' => true]);
         }
 
@@ -42,11 +49,7 @@ class AuthController extends Controller
             // Coba login
             if (Hash::check($request->password, $user->password)) {
                 // Update detail jika kosong
-                $user->update([
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'area_id' => $request->area_id,
-                ]);
+                $user->update($updateFields);
                 Auth::login($user);
                 $request->session()->regenerate();
                 return response()->json(['success' => true]);
@@ -55,14 +58,18 @@ class AuthController extends Controller
             }
         } else {
             // Registrasi baru
-            $user = User::create([
+            $createFields = [
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'area_id' => $request->area_id,
-            ]);
+            ];
+            if ($request->filled('birthdate')) {
+                $createFields['birthdate'] = $request->birthdate;
+            }
+            $user = User::create($createFields);
             Auth::login($user);
             $request->session()->regenerate();
             return response()->json(['success' => true]);
@@ -133,6 +140,15 @@ class AuthController extends Controller
         ];
 
         if ($request->hasFile('avatar')) {
+            if ($user->getRawOriginal('avatar')) {
+                $oldAvatar = ltrim($user->getRawOriginal('avatar'), '/');
+                if (Str::startsWith($oldAvatar, 'storage/')) {
+                    $oldAvatar = substr($oldAvatar, 8);
+                }
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldAvatar)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldAvatar);
+                }
+            }
             $path = $request->file('avatar')->store('avatars', 'public');
             $data['avatar'] = $path;
         }

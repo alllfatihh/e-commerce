@@ -2255,8 +2255,10 @@
         // --- HELPER: Resolve Image URL ---
         function resolveImageUrl(path, fallback = '') {
             if (!path) return fallback;
-            if (path.startsWith('http')) return path;
-            if (path.startsWith('products/') || path.startsWith('artists/') || path.startsWith('artworks/') || path.startsWith('editorials/') || path.startsWith('lookbooks/') || path.startsWith('site-media/')) {
+            if (path.startsWith('http://') || path.startsWith('https://')) return path;
+            if (path.startsWith('/storage/')) return path;
+            if (path.startsWith('storage/')) return '/' + path;
+            if (path.startsWith('products/') || path.startsWith('artists/') || path.startsWith('artworks/') || path.startsWith('editorials/') || path.startsWith('lookbooks/') || path.startsWith('site-media/') || path.startsWith('avatars/')) {
                 return '/storage/' + path;
             }
             return path.startsWith('/') ? path : '/' + path;
@@ -2476,15 +2478,39 @@
             }
         }
 
-        function renderArtworkOffers() {
+        async function renderArtworkOffers() {
             const container = document.getElementById('account-art-offers-list');
             if (!container) return;
             
             let offers = [];
             try {
-                offers = JSON.parse(localStorage.getItem('notisse_artwork_offers') || '[]');
+                const response = await fetch('/my-artwork-offers');
+                if (response.ok) {
+                    const serverOffers = await response.json();
+                    if (Array.isArray(serverOffers) && serverOffers.length > 0) {
+                        offers = serverOffers.map(o => ({
+                            refId: o.reference_number || '#NTS-ART',
+                            date: o.created_at,
+                            status: o.status || 'Dalam Tinjauan Kurasi',
+                            offerPrice: (Number(o.offering_price) || 0).toLocaleString('id-ID'),
+                            artwork: {
+                                title: o.artwork?.title || 'Notisse Artwork',
+                                artist: o.artwork?.artist?.name || 'Curated Artist',
+                                image: o.artwork?.image || '/footage-baju.jpg'
+                            }
+                        }));
+                    }
+                }
             } catch (e) {
-                offers = [];
+                console.warn('Could not fetch artwork offers from backend, falling back to localStorage');
+            }
+
+            if (offers.length === 0) {
+                try {
+                    offers = JSON.parse(localStorage.getItem('notisse_artwork_offers') || '[]');
+                } catch (e) {
+                    offers = [];
+                }
             }
             
             if (offers.length === 0) {

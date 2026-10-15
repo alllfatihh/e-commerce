@@ -30,9 +30,10 @@ class CartController extends Controller
     private function getFormattedItems($cart)
     {
         return $cart->items()->with('product')->get()->map(function($item) {
-            $imageUrl = asset('cart-placeholder.jpg'); // fallback
+            $imageUrl = asset('footage-baju.jpg'); // fallback
             if ($item->product && $item->product->image) {
-                $imageUrl = asset($item->product->image);
+                $img = $item->product->image;
+                $imageUrl = Str::startsWith($img, ['http://', 'https://']) ? $img : asset($img);
             }
 
             return [

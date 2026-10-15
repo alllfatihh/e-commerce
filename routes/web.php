@@ -13,7 +13,7 @@ Route::get('/', function () {
     $editorials = \App\Models\Editorial::with('artist')->latest()->get();
     $lookbooks = \App\Models\Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
     $settings = \App\Models\SiteSetting::pluck('value', 'key')->toArray();
-    $newcomer = \App\Models\Artist::where('is_newcomer', true)->first();
+    $newcomer = \App\Models\Artist::where('is_newcomer', true)->first() ?: \App\Models\Artist::first();
     $carousels = \App\Models\SiteMedia::where('section', 'carousel')->orderBy('order')->get();
     
     return view('welcome', compact('products', 'fotoshoots', 'artists', 'editorials', 'lookbooks', 'settings', 'newcomer', 'carousels'));
@@ -55,6 +55,7 @@ Route::match(['post', 'put'], '/admin/lookbooks/{id}', [AdminController::class, 
 Route::delete('/admin/lookbooks/{id}', [AdminController::class, 'deleteLookbook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::post('/admin/lookbooks/{id}/photos', [AdminController::class, 'storeLookbookPhoto'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::delete('/admin/lookbooks/photos/{id}', [AdminController::class, 'deleteLookbookPhoto'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/admin/settings', [AdminController::class, 'updateSettings'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 // Cart Routes
 use App\Http\Controllers\CartController;
@@ -67,7 +68,14 @@ Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship'])->w
 
 use App\Http\Controllers\ArtworkOfferingController;
 Route::post('/api/artwork-offerings', [ArtworkOfferingController::class, 'store'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::get('/my-artwork-offers', function () {
+    if (!auth()->check()) return response()->json([]);
 
+    return \App\Models\ArtworkOffering::with(['artwork.artist'])
+        ->where('user_id', auth()->id())
+        ->orderBy('created_at', 'desc')
+        ->get();
+});
 
 // Checkout Routes
 Route::post('/checkout', [CheckoutController::class, 'process'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
@@ -78,7 +86,7 @@ Route::post('/midtrans/webhook', [CheckoutController::class, 'webhook'])->withou
 Route::get('/my-orders', function () {
     if (!auth()->check()) return response()->json([]);
 
-    $orders = \App\Models\Order::with('items')
+    $orders = \App\Models\Order::with('items.product')
         ->where('user_id', auth()->id())
         ->orderBy('created_at', 'desc')
         ->take(10)

@@ -282,6 +282,13 @@
                 </span>
             @endif
         </a>
+
+        <a href="#section-settings" onclick="showSection('settings')"
+           class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
+           id="nav-settings">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+            <span>Site Settings</span>
+        </a>
     </nav>
 
     <!-- Bottom links -->
@@ -530,6 +537,13 @@
                                 $photoUrl = $art->photo ? (Str::startsWith($art->photo, 'http') ? $art->photo : (file_exists(public_path('storage/' . $art->photo)) ? asset('storage/' . $art->photo) : asset($art->photo))) : 'https://placehold.co/500x500/181818/ffffff?text=' . urlencode($art->name);
                             @endphp
                             <img src="{{ $photoUrl }}" alt="{{ $art->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            @if($art->is_newcomer)
+                            <div class="absolute top-2.5 right-2.5">
+                                <span class="text-[9px] font-bold font-space-grotesk tracking-widest uppercase bg-amber-400 text-black px-2 py-0.5 shadow-sm">
+                                    ★ NEWCOMER
+                                </span>
+                            </div>
+                            @endif
                             @if($art->city)
                             <div class="absolute bottom-2.5 left-2.5">
                                 <span class="text-[9px] font-bold font-space-grotesk tracking-widest uppercase bg-black text-white px-2 py-0.5 shadow-sm">
@@ -576,6 +590,7 @@
                                         'bio'              => $art->bio ?? '',
                                         'photoUrl'         => $art->photo ? asset($art->photo) : '',
                                         'artUrl'           => $art->artwork_preview ? asset($art->artwork_preview) : '',
+                                        'is_newcomer'      => (bool)$art->is_newcomer,
                                     ];
                                 @endphp
                                 <button type="button"
@@ -1187,6 +1202,67 @@
             </div>
         </section>
 
+        {{-- ─────────────────────────────────────────────────────────
+             SECTION 7: SITE SETTINGS (BRANDING & GLOBAL CONFIG)
+        ───────────────────────────────────────────────────────── --}}
+        <section id="section-settings" class="section-card hidden">
+            <div class="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Site Settings & Global Branding</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola teks pengumuman bergerak (Marquee Text), kontak resmi atelier, dan informasi footer toko Notisse.</p>
+                </div>
+            </div>
+
+            <form action="/admin/settings" method="POST" class="max-w-3xl space-y-6">
+                @csrf
+
+                <!-- Marquee Text -->
+                <div class="p-5 bg-neutral-50 border border-gray-200 space-y-2">
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black">
+                        Teks Marquee (Announcement Bar / Running Text) *
+                    </label>
+                    <input type="text" name="marquee_text" value="{{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }}" required
+                        placeholder="Contoh: NOTISSE WORLDWIDE SHIPPING" class="admin-input">
+                    <p class="text-[11px] text-gray-400 font-inter">Teks ini akan berjalan secara otomatis di bagian paling bawah halaman depan (global marquee banner).</p>
+                </div>
+
+                <!-- Kontak Informasi -->
+                <div class="p-5 bg-neutral-50 border border-gray-200 space-y-4">
+                    <h3 class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-black border-b border-gray-200 pb-2">Kontak & Media Sosial</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Official Contact Email</label>
+                            <input type="email" name="contact_email" value="{{ $settings['contact_email'] ?? 'hello@notisse.com' }}" placeholder="hello@notisse.com" class="admin-input">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">WhatsApp / Phone Number</label>
+                            <input type="text" name="contact_phone" value="{{ $settings['contact_phone'] ?? '+62 811 2233 4455' }}" placeholder="+62 811 2233 4455" class="admin-input">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Instagram URL</label>
+                        <input type="text" name="instagram_link" value="{{ $settings['instagram_link'] ?? '#' }}" placeholder="https://instagram.com/notisse" class="admin-input">
+                    </div>
+                </div>
+
+                <!-- Footer Description -->
+                <div class="p-5 bg-neutral-50 border border-gray-200 space-y-2">
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black">
+                        Deskripsi Singkat Footer (Brand Narrative)
+                    </label>
+                    <textarea name="footer_description" rows="3" class="admin-input resize-none leading-relaxed">{{ $settings['footer_description'] ?? 'Notisse is a concept brand exploring the intersection of modern aesthetics and raw street culture. Based in Indonesia, curating global narratives.' }}</textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                    <button type="submit" class="btn-primary px-8 py-3 cursor-pointer">
+                        Simpan Pengaturan Situs
+                    </button>
+                </div>
+            </form>
+        </section>
+
     </main>
 </div>
 
@@ -1400,6 +1476,14 @@
                         class="admin-input py-2 text-sm bg-gray-50 cursor-pointer">
                     <img id="artist-art-preview" class="mt-3 w-32 h-32 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
                 </div>
+            </div>
+
+            <div class="bg-amber-50/70 border border-amber-200/80 rounded p-3 flex items-start gap-3">
+                <input type="checkbox" name="is_newcomer" id="artist-is-newcomer" value="1" class="mt-0.5 rounded border-gray-300 text-black focus:ring-black cursor-pointer">
+                <label for="artist-is-newcomer" class="text-xs text-gray-700 cursor-pointer">
+                    <span class="font-bold text-gray-900 block font-space-grotesk uppercase tracking-wider text-[11px]">Jadikan Newcomer Utama (Homepage Feature)</span>
+                    Jika dicentang, seniman ini akan menjadi sorotan utama seniman baru ("Newcomer") di homepage. Menandai seniman ini akan otomatis menonaktifkan status newcomer seniman lain.
+                </label>
             </div>
 
             <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
@@ -1845,14 +1929,15 @@
 
     // ── Section switcher ────────────────────────────────────────
     function showSection(name) {
-        const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings'];
+        const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'settings'];
         const titles = {
             'products':  'Products Catalog Management',
             'artists':   'Artists & Collaborators Management',
             'artworks':  'Artworks & Artist Editorial Management',
             'media':     'Site Visual Media (Hero & Lookbook)',
             'orders':    'Customer Orders & Transactions',
-            'offerings': 'Artwork Offerings Management'
+            'offerings': 'Artwork Offerings Management',
+            'settings':  'Site Settings & Global Branding'
         };
 
         sections.forEach(s => {
@@ -2103,10 +2188,12 @@
         document.getElementById('artist-form-method').disabled = true;
         document.getElementById('artist-photo-preview').classList.add('hidden');
         document.getElementById('artist-art-preview').classList.add('hidden');
+        const newcomerCheckbox = document.getElementById('artist-is-newcomer');
+        if (newcomerCheckbox) newcomerCheckbox.checked = false;
         document.getElementById('modal-artist').classList.add('open');
     }
 
-    function openEditArtistModal(id, name, city, bio, photoUrl, artUrl) {
+    function openEditArtistModal(id, name, city, bio, photoUrl, artUrl, isNewcomer) {
         document.getElementById('modal-artist-title').textContent = 'Edit Artist (Edit Seniman)';
         document.getElementById('artist-form').action = '/admin/artists/' + id;
         document.getElementById('artist-form-method').value = 'PUT';
@@ -2119,13 +2206,16 @@
         setPreviewImage('artist-photo-preview', photoUrl);
         setPreviewImage('artist-art-preview', artUrl);
 
+        const newcomerCheckbox = document.getElementById('artist-is-newcomer');
+        if (newcomerCheckbox) newcomerCheckbox.checked = !!isNewcomer;
+
         document.getElementById('modal-artist').classList.add('open');
     }
 
     function openEditArtistFromBtn(btn) {
         try {
             const a = JSON.parse(btn.getAttribute('data-artist'));
-            openEditArtistModal(a.id, a.name, a.city, a.bio, a.photoUrl, a.artUrl);
+            openEditArtistModal(a.id, a.name, a.city, a.bio, a.photoUrl, a.artUrl, a.is_newcomer);
         } catch(e) {
             console.error("Gagal membuka modal edit seniman:", e);
         }

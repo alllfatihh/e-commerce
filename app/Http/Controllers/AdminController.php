@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductStock;
 use App\Models\Order;
 use App\Models\SiteMedia;
+use App\Models\SiteSetting;
 use App\Models\Fotoshoot;
 use App\Models\Lookbook;
 use App\Models\Artist;
@@ -19,10 +20,26 @@ use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
+    private function deleteStorageFile(?string $path): void
+    {
+        if (!$path || Str::startsWith($path, ['http://', 'https://'])) {
+            return;
+        }
+
+        $cleanPath = ltrim($path, '/');
+        if (Str::startsWith($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        }
+
+        if (Storage::disk('public')->exists($cleanPath)) {
+            Storage::disk('public')->delete($cleanPath);
+        }
+    }
+
     public function index()
     {
         $products = Product::with('stocks')->orderBy('id', 'desc')->get();
-        $orders = Order::with('items')->orderBy('id', 'desc')->take(30)->get();
+        $orders = Order::with(['items.product', 'user'])->orderBy('id', 'desc')->take(30)->get();
         $carousels = SiteMedia::where('section', 'carousel')->orderBy('order')->get();
         $footages = SiteMedia::where('section', 'footage')->orderBy('order')->get();
         $artists = Artist::with(['artworks', 'editorials'])->orderBy('id', 'desc')->get();
@@ -30,6 +47,7 @@ class AdminController extends Controller
         $editorials = Editorial::with('artist')->orderBy('id', 'desc')->get();
         $offerings = ArtworkOffering::with(['user', 'artwork.artist'])->orderBy('id', 'desc')->get();
         $lookbooks = Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
+        $settings = SiteSetting::pluck('value', 'key')->toArray();
 
         $stats = [
             'total_products'   => $products->count(),
@@ -43,7 +61,7 @@ class AdminController extends Controller
             'paid_revenue'     => Order::where('status', 'paid')->sum('total_amount'),
         ];
 
-        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'lookbooks', 'stats'));
+        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'lookbooks', 'settings', 'stats'));
     }
 
     // ─── Products ─────────────────────────────────────────────
@@ -114,15 +132,19 @@ class AdminController extends Controller
         $data = $request->only('name', 'price', 'description', 'specs', 'artist');
 
         if ($request->hasFile('image')) {
+            $this->deleteStorageFile($product->getRawOriginal('image'));
             $data['image'] = $request->file('image')->store('products', 'public');
         }
         if ($request->hasFile('back_image')) {
+            $this->deleteStorageFile($product->getRawOriginal('back_image'));
             $data['back_image'] = $request->file('back_image')->store('products', 'public');
         }
         if ($request->hasFile('footage_image')) {
+            $this->deleteStorageFile($product->getRawOriginal('footage_image'));
             $data['footage_image'] = $request->file('footage_image')->store('products', 'public');
         }
         if ($request->hasFile('size_chart_image')) {
+            $this->deleteStorageFile($product->getRawOriginal('size_chart_image'));
             $data['size_chart_image'] = $request->file('size_chart_image')->store('products', 'public');
         }
 
@@ -147,7 +169,15 @@ class AdminController extends Controller
     public function deleteProduct($id)
     {
         $product = Product::findOrFail($id);
+
+        $this->deleteStorageFile($product->getRawOriginal('image'));
+        $this->deleteStorageFile($product->getRawOriginal('back_image'));
+        $this->deleteStorageFile($product->getRawOriginal('footage_image'));
+        $this->deleteStorageFile($product->getRawOriginal('size_chart_image'));
+
+        ProductStock::where('product_id', $product->id)->delete();
         $product->delete();
+
         return redirect()->back()->with('success', 'Produk berhasil dihapus.');
     }
 
@@ -160,9 +190,18 @@ class AdminController extends Controller
             'bio'             => 'nullable|string',
             'photo'           => 'nullable|image|max:8192',
             'artwork_preview' => 'nullable|image|max:8192',
+            'is_newcomer'     => 'nullable|boolean',
         ]);
 
         $data = $request->only('name', 'city', 'bio');
+        $isNewcomer = $request->boolean('is_newcomer');
+
+        if ($isNewcomer) {
+            Artist::where('is_newcomer', true)->update(['is_newcomer' => false]);
+            $data['is_newcomer'] = true;
+        } else {
+            $data['is_newcomer'] = false;
+        }
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('artists', 'public');
@@ -186,14 +225,25 @@ class AdminController extends Controller
             'bio'             => 'nullable|string',
             'photo'           => 'nullable|image|max:8192',
             'artwork_preview' => 'nullable|image|max:8192',
+            'is_newcomer'     => 'nullable|boolean',
         ]);
 
         $data = $request->only('name', 'city', 'bio');
+        $isNewcomer = $request->boolean('is_newcomer');
+
+        if ($isNewcomer) {
+            Artist::where('id', '!=', $artist->id)->where('is_newcomer', true)->update(['is_newcomer' => false]);
+            $data['is_newcomer'] = true;
+        } else {
+            $data['is_newcomer'] = false;
+        }
 
         if ($request->hasFile('photo')) {
+            $this->deleteStorageFile($artist->getRawOriginal('photo'));
             $data['photo'] = $request->file('photo')->store('artists', 'public');
         }
         if ($request->hasFile('artwork_preview')) {
+            $this->deleteStorageFile($artist->getRawOriginal('artwork_preview'));
             $data['artwork_preview'] = $request->file('artwork_preview')->store('artists', 'public');
         }
 
@@ -205,6 +255,9 @@ class AdminController extends Controller
     public function deleteArtist($id)
     {
         $artist = Artist::findOrFail($id);
+
+        $this->deleteStorageFile($artist->getRawOriginal('photo'));
+        $this->deleteStorageFile($artist->getRawOriginal('artwork_preview'));
         $artist->delete();
 
         return redirect()->back()->with('success', 'Seniman berhasil dihapus.');
@@ -258,23 +311,25 @@ class AdminController extends Controller
         $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
 
         if ($request->hasFile('image')) {
+            $this->deleteStorageFile($artwork->getRawOriginal('image'));
             $path = $request->file('image')->store('artworks', 'public');
             $data['image'] = $path;
         }
 
         $artwork->update($data);
 
-        return redirect()->back()->with('success', 'Karya seni (Artwork) berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Karya seni berhasil diperbarui.');
     }
 
     public function deleteArtwork($id)
     {
         $artwork = Artwork::findOrFail($id);
+        $this->deleteStorageFile($artwork->getRawOriginal('image'));
         $artwork->delete();
-        return redirect()->back()->with('success', 'Karya seni (Artwork) berhasil dihapus.');
+        return redirect()->back()->with('success', 'Karya seni berhasil dihapus.');
     }
 
-    // ─── Editorial Articles (Artikel per Seniman) ─────────────
+    // ─── Editorials (Artikel & Wawancara Eksklusif) ────────────
     public function storeEditorial(Request $request)
     {
         $request->validate([
@@ -282,8 +337,8 @@ class AdminController extends Controller
             'title'      => 'required|string|max:255',
             'author'     => 'nullable|string|max:255',
             'excerpt'    => 'nullable|string',
-            'content'    => 'nullable|string',
-            'video_url'  => 'nullable|string|max:500',
+            'content'    => 'required|string',
+            'video_url'  => 'nullable|string',
             'image'      => 'nullable|image|max:8192',
         ]);
 
@@ -293,12 +348,12 @@ class AdminController extends Controller
             $path = $request->file('image')->store('editorials', 'public');
             $data['image'] = $path;
         } else {
-            $data['image'] = 'https://placehold.co/600x600/d9d9d9/555555?text=Editorial+Article';
+            $data['image'] = 'https://placehold.co/600x600/d9d9d9/555555?text=New+Editorial';
         }
 
         Editorial::create($data);
 
-        return redirect()->back()->with('success', 'Artikel editorial berhasil ditambahkan untuk seniman terkait.');
+        return redirect()->back()->with('success', 'Artikel editorial berhasil ditambahkan.');
     }
 
     public function updateEditorial(Request $request, $id)
@@ -310,14 +365,15 @@ class AdminController extends Controller
             'title'      => 'required|string|max:255',
             'author'     => 'nullable|string|max:255',
             'excerpt'    => 'nullable|string',
-            'content'    => 'nullable|string',
-            'video_url'  => 'nullable|string|max:500',
+            'content'    => 'required|string',
+            'video_url'  => 'nullable|string',
             'image'      => 'nullable|image|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
 
         if ($request->hasFile('image')) {
+            $this->deleteStorageFile($editorial->getRawOriginal('image'));
             $path = $request->file('image')->store('editorials', 'public');
             $data['image'] = $path;
         }
@@ -330,6 +386,7 @@ class AdminController extends Controller
     public function deleteEditorial($id)
     {
         $editorial = Editorial::findOrFail($id);
+        $this->deleteStorageFile($editorial->getRawOriginal('image'));
         $editorial->delete();
         return redirect()->back()->with('success', 'Artikel editorial berhasil dihapus.');
     }
@@ -369,7 +426,7 @@ class AdminController extends Controller
         $request->validate([
             'title'       => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'product_id'  => 'nullable|integer',
+            'product_id'  => 'nullable',
             'image'       => 'nullable|image|max:8192',
             'order'       => 'nullable|integer',
         ]);
@@ -381,14 +438,15 @@ class AdminController extends Controller
         if ($request->filled('description')) {
             $data['description'] = $request->description;
         }
-        if ($request->filled('product_id')) {
-            $data['product_id'] = $request->product_id;
+        if ($request->has('product_id')) {
+            $data['product_id'] = $request->filled('product_id') ? $request->product_id : null;
         }
         if ($request->filled('order')) {
             $data['order'] = (int)$request->order;
         }
 
         if ($request->hasFile('image')) {
+            $this->deleteStorageFile($media->getRawOriginal('image'));
             $path = $request->file('image')->store('site-media', 'public');
             $data['image'] = $path;
         }
@@ -402,13 +460,27 @@ class AdminController extends Controller
     {
         $media = SiteMedia::findOrFail($id);
 
-        if ($media->image && !Str::startsWith($media->image, 'http') && file_exists(storage_path('app/public/' . $media->image))) {
-            @unlink(storage_path('app/public/' . $media->image));
-        }
-
+        $this->deleteStorageFile($media->getRawOriginal('image'));
         $media->delete();
 
         return redirect()->back()->with('success', 'Gambar media berhasil dihapus.');
+    }
+
+    // ─── Site Settings ─────────────────────────────────────────
+    public function updateSettings(Request $request)
+    {
+        $data = $request->except(['_token', '_method']);
+        foreach ($data as $key => $value) {
+            SiteSetting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value ?? '']
+            );
+        }
+
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+
+        return redirect()->back()->with('success', 'Pengaturan situs (Site Settings) berhasil diperbarui.');
     }
 
     // ─── Biteship Sync ───────────────────────────────────────
@@ -487,12 +559,14 @@ class AdminController extends Controller
         $lookbook->description = $request->description;
 
         if ($request->hasFile('video')) {
+            $this->deleteStorageFile($lookbook->getRawOriginal('video_url'));
             $lookbook->video_url = $request->file('video')->store('lookbooks/videos', 'public');
         } elseif ($request->filled('video_url')) {
             $lookbook->video_url = $request->video_url;
         }
 
         if ($request->hasFile('cover_image')) {
+            $this->deleteStorageFile($lookbook->getRawOriginal('cover_image'));
             $lookbook->cover_image = $request->file('cover_image')->store('lookbooks/covers', 'public');
         }
 
@@ -503,9 +577,18 @@ class AdminController extends Controller
 
     public function deleteLookbook($id)
     {
-        $lookbook = Lookbook::findOrFail($id);
+        $lookbook = Lookbook::with('fotoshoots')->findOrFail($id);
         $title = $lookbook->title;
+
+        foreach ($lookbook->fotoshoots as $photo) {
+            $this->deleteStorageFile($photo->getRawOriginal('image'));
+            $photo->delete();
+        }
+
+        $this->deleteStorageFile($lookbook->getRawOriginal('cover_image'));
+        $this->deleteStorageFile($lookbook->getRawOriginal('video_url'));
         $lookbook->delete();
+
         return redirect('/admin')->with('success', 'Lookbook "' . $title . '" beserta foto-fotonya berhasil dihapus.');
     }
 
@@ -528,7 +611,7 @@ class AdminController extends Controller
             'image'       => $path,
         ]);
 
-        if (empty($lookbook->cover_image)) {
+        if (empty($lookbook->getRawOriginal('cover_image'))) {
             $lookbook->update(['cover_image' => $path]);
         }
 
@@ -538,6 +621,7 @@ class AdminController extends Controller
     public function deleteLookbookPhoto($id)
     {
         $photo = Fotoshoot::findOrFail($id);
+        $this->deleteStorageFile($photo->getRawOriginal('image'));
         $photo->delete();
         return redirect('/admin')->with('success', 'Foto lookbook berhasil dihapus.');
     }
