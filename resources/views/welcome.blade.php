@@ -1143,9 +1143,13 @@
                             class="group cursor-pointer bg-white flex flex-col justify-between h-full hover:bg-gray-50 transition-colors duration-300">
 
                             <div class="relative w-full aspect-[3/4] bg-[#f4f4f4] overflow-hidden">
-                                <img src="{{ asset($product->image) }}" alt="{{ $product->name }}"
+                                @php
+                                    $pImg = $product->image ? (Str::startsWith($product->image, 'http') ? $product->image : (file_exists(public_path('storage/' . $product->image)) ? asset('storage/' . $product->image) : asset($product->image))) : asset('footage-baju.jpg');
+                                    $pHovImg = $product->footage_image ? (Str::startsWith($product->footage_image, 'http') ? $product->footage_image : (file_exists(public_path('storage/' . $product->footage_image)) ? asset('storage/' . $product->footage_image) : asset($product->footage_image))) : asset('footagebaju2.jpg');
+                                @endphp
+                                <img src="{{ $pImg }}" alt="{{ $product->name }}"
                                     class="absolute inset-0 w-full h-full object-cover mix-blend-multiply transition-opacity duration-500 ease-out group-hover:opacity-0 z-10">
-                                <img src="{{ asset('footagebaju2.jpg') }}" alt="{{ $product->name }} Hover"
+                                <img src="{{ $pHovImg }}" alt="{{ $product->name }} Hover"
                                     class="absolute inset-0 w-full h-full object-cover mix-blend-multiply transition-all duration-500 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-105 z-0">
                             </div>
 
@@ -1341,15 +1345,19 @@
             <div class="mb-16">
                 <h2 class="text-xl md:text-2xl font-bold mb-6 tracking-wide text-black font-space-grotesk">Newcomer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10 mb-8">
+                    @php
+                        $ncPortrait = isset($newcomer) && $newcomer->portrait_image ? (Str::startsWith($newcomer->portrait_image, 'http') ? $newcomer->portrait_image : (file_exists(public_path('storage/' . $newcomer->portrait_image)) ? asset('storage/' . $newcomer->portrait_image) : (Str::startsWith($newcomer->portrait_image, 'storage/') ? asset($newcomer->portrait_image) : asset($newcomer->portrait_image)))) : asset('masmus.jpeg');
+                        $ncArtwork = isset($newcomer) && $newcomer->artwork_image ? (Str::startsWith($newcomer->artwork_image, 'http') ? $newcomer->artwork_image : (file_exists(public_path('storage/' . $newcomer->artwork_image)) ? asset('storage/' . $newcomer->artwork_image) : (Str::startsWith($newcomer->artwork_image, 'storage/') ? asset($newcomer->artwork_image) : asset($newcomer->artwork_image)))) : asset('home.jpg');
+                    @endphp
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
                         onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')">
-                        <img src="{{ asset($newcomer->portrait_image ?? 'masmus.jpeg') }}"
+                        <img src="{{ $ncPortrait }}"
                             alt="{{ $newcomer->name ?? 'Mustafa Portrait' }}"
                             class="w-full h-full object-cover grayscale group-hover:scale-105 transition-all duration-500">
                     </div>
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
                         onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')">
-                        <img src="{{ asset($newcomer->artwork_image ?? 'home.jpg') }}" alt="{{ $newcomer->name ?? 'Mustafa Artwork' }}"
+                        <img src="{{ $ncArtwork }}" alt="{{ $newcomer->name ?? 'Mustafa Artwork' }}"
                             class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
                     </div>
                 </div>
@@ -1926,7 +1934,10 @@
             <div class="border border-black bg-white p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
                 <div class="flex items-center space-x-5">
                     @if(auth()->check() && auth()->user()->avatar)
-                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="w-16 h-16 object-cover border border-black shrink-0">
+                        @php
+                            $userAvatar = Str::startsWith(auth()->user()->avatar, 'http') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar);
+                        @endphp
+                        <img src="{{ $userAvatar }}" alt="Avatar" class="w-16 h-16 object-cover border border-black shrink-0">
                     @else
                         <div class="w-16 h-16 bg-black text-white flex items-center justify-center font-bold text-xl font-space-grotesk tracking-wider border border-black shrink-0">
                             {{ auth()->check() ? strtoupper(substr(auth()->user()->name ?? 'N', 0, 2)) : 'NT' }}
@@ -2007,7 +2018,10 @@
                     <div class="flex justify-between items-start border-b border-gray-100 pb-4">
                         <div class="flex items-center gap-4">
                             @if(auth()->check() && auth()->user()->avatar)
-                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="w-12 h-12 rounded-full object-cover border border-gray-200">
+                                @php
+                                    $userAvatarMobile = Str::startsWith(auth()->user()->avatar, 'http') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar);
+                                @endphp
+                                <img src="{{ $userAvatarMobile }}" alt="Avatar" class="w-12 h-12 rounded-full object-cover border border-gray-200">
                             @else
                                 <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
                                     <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -2238,6 +2252,16 @@
 
     <!-- JAVASCRIPT CONTROLLER -->
     <script>
+        // --- HELPER: Resolve Image URL ---
+        function resolveImageUrl(path, fallback = '') {
+            if (!path) return fallback;
+            if (path.startsWith('http')) return path;
+            if (path.startsWith('products/') || path.startsWith('artists/') || path.startsWith('artworks/') || path.startsWith('editorials/') || path.startsWith('lookbooks/') || path.startsWith('site-media/')) {
+                return '/storage/' + path;
+            }
+            return path.startsWith('/') ? path : '/' + path;
+        }
+
         let currentSelectedSize = "M";
         let currentSlideIndex = 0;
         let slideInterval = null;
@@ -2490,7 +2514,7 @@
                             </span>
                         </div>
                         <div class="flex items-start space-x-4">
-                            <img src="${artwork.image || '/footage-baju.jpg'}" alt="${artwork.title || 'Artwork'}" class="w-16 h-20 object-cover bg-gray-100 border border-gray-200 flex-shrink-0">
+                            <img src="${resolveImageUrl(artwork.image, '/footage-baju.jpg')}" alt="${artwork.title || 'Artwork'}" class="w-16 h-20 object-cover bg-gray-100 border border-gray-200 flex-shrink-0">
                             <div class="space-y-1 min-w-0 flex-1">
                                 <h4 class="font-bold text-sm text-black font-space-grotesk truncate">${artwork.title || 'Notisse Artwork'}</h4>
                                 <p class="text-xs text-gray-500 font-inter">Artist: <span class="font-semibold text-black">${artwork.artist || 'Curated Artist'}</span></p>
@@ -2529,7 +2553,7 @@
                             itemsHtml += `
                             <div class="flex items-center space-x-4 mt-4">
                                 <div class="w-12 h-16 bg-gray-100 flex-shrink-0 border border-gray-200 overflow-hidden">
-                                    <img src="{{ asset('footage-baju.jpg') }}" alt="${item.product_name}" class="w-full h-full object-cover">
+                                    <img src="${resolveImageUrl(item.product?.image || item.image, '{{ asset('footage-baju.jpg') }}')}" alt="${item.product_name}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="text-xs font-inter">
                                     <p class="font-bold text-black font-space-grotesk uppercase">${item.product_name}</p>
@@ -2793,7 +2817,7 @@
                     <div onclick="selectSearchResult('${escapedName}', '${item.price}', '${item.image}')" 
                         class="group cursor-pointer flex flex-col justify-between bg-white border border-gray-100 hover:border-black transition-all duration-300 p-2.5 sm:p-3 shadow-sm hover:shadow-md">
                         <div class="relative w-full aspect-[3/4] bg-[#f4f4f4] mb-3 overflow-hidden">
-                            <img src="${item.image}" alt="${item.name}" 
+                            <img src="${resolveImageUrl(item.image, '{{ asset('footage-baju.jpg') }}')}" alt="${item.name}" 
                                 onerror="this.src='{{ asset('footage-baju.jpg') }}'"
                                 class="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-500">
                         </div>
@@ -2880,10 +2904,7 @@
             } else if (currentProduct.image) {
                 const imgEl = document.getElementById('pdetail-image');
                 if (imgEl) {
-                    const imgSrc = currentProduct.image.startsWith('http') || currentProduct.image.startsWith('/') 
-                        ? currentProduct.image 
-                        : '/' + currentProduct.image;
-                    imgEl.src = imgSrc;
+                    imgEl.src = resolveImageUrl(currentProduct.image, '{{ asset('footage-baju.jpg') }}');
                 }
             }
 
@@ -2891,10 +2912,7 @@
             const backImgEl = document.getElementById('pdetail-back-image');
             if (backImgEl) {
                 if (currentProduct.back_image) {
-                    const bSrc = currentProduct.back_image.startsWith('http') || currentProduct.back_image.startsWith('/') 
-                        ? currentProduct.back_image 
-                        : '/' + currentProduct.back_image;
-                    backImgEl.src = bSrc;
+                    backImgEl.src = resolveImageUrl(currentProduct.back_image, '{{ asset('footage-baju-belakang.jpg') }}');
                 } else {
                     backImgEl.src = "{{ asset('footage-baju-belakang.jpg') }}";
                 }
@@ -2904,10 +2922,7 @@
             const footImgEl = document.getElementById('pdetail-footage-image');
             if (footImgEl) {
                 if (currentProduct.footage_image) {
-                    const fSrc = currentProduct.footage_image.startsWith('http') || currentProduct.footage_image.startsWith('/') 
-                        ? currentProduct.footage_image 
-                        : '/' + currentProduct.footage_image;
-                    footImgEl.src = fSrc;
+                    footImgEl.src = resolveImageUrl(currentProduct.footage_image, '{{ asset('footagebaju2.jpg') }}');
                 } else {
                     footImgEl.src = "{{ asset('footagebaju2.jpg') }}";
                 }
@@ -2916,9 +2931,7 @@
             // Update Size Chart Image & Lightbox Click
             const sizeChartBox = document.getElementById('pdetail-size-box');
             const sizeChartImg = document.getElementById('pdetail-size-img');
-            const chartSrc = currentProduct.size_chart_image 
-                ? (currentProduct.size_chart_image.startsWith('http') || currentProduct.size_chart_image.startsWith('/') ? currentProduct.size_chart_image : '/' + currentProduct.size_chart_image)
-                : "{{ asset('size chart 1.png') }}";
+            const chartSrc = resolveImageUrl(currentProduct.size_chart_image, "{{ asset('size chart 1.png') }}");
             if (sizeChartImg) sizeChartImg.src = chartSrc;
             if (sizeChartBox) sizeChartBox.onclick = () => openLightbox(chartSrc, (currentProduct.name || 'NOTISSE APPAREL') + ' SIZE CHART');
 
@@ -3059,7 +3072,7 @@
                     if (edEmpty) edEmpty.classList.add('hidden');
                     edGrid.classList.remove('hidden');
                     editorials.forEach(ed => {
-                        const edImg = ed.image ? (ed.image.startsWith('http') || ed.image.startsWith('/') ? ed.image : '/' + ed.image) : 'https://placehold.co/600x600/d9d9d9/555555?text=Editorial';
+                        const edImg = resolveImageUrl(ed.image, 'https://placehold.co/600x600/d9d9d9/555555?text=Editorial');
                         const card = document.createElement('div');
                         card.className = 'group cursor-pointer';
                         card.onclick = () => openArtistEditorialDetailById(ed.id);
@@ -3096,7 +3109,7 @@
                     if (artEmpty) artEmpty.classList.add('hidden');
                     artGrid.classList.remove('hidden');
                     artworks.forEach(artw => {
-                        const artImg = artw.image ? (artw.image.startsWith('http') || artw.image.startsWith('/') ? artw.image : '/' + artw.image) : 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork';
+                        const artImg = resolveImageUrl(artw.image, 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork');
                         const card = document.createElement('div');
                         card.className = 'group cursor-pointer';
                         card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price);
@@ -3230,7 +3243,7 @@
             const prevSpecs = document.getElementById('offering-artwork-specs');
 
             const curArt = currentActiveArtwork || {};
-            if (prevImg) prevImg.src = curArt.image || 'https://placehold.co/400x500/222/fff?text=Artwork';
+            if (prevImg) prevImg.src = resolveImageUrl(curArt.image, 'https://placehold.co/400x500/222/fff?text=Artwork');
             if (prevTitle) prevTitle.innerText = curArt.title || 'Artwork';
             if (prevArtist) prevArtist.innerText = curArt.artist || 'Mustafa Alatas';
             if (prevSpecs) prevSpecs.innerText = `${curArt.medium || 'Oil on canvas'} • ${curArt.dimensions || '60x60cm'}`;
@@ -3482,18 +3495,20 @@
                     }
                 }
 
-                const edImg = foundEd.image ? (foundEd.image.startsWith('http') || foundEd.image.startsWith('/') ? foundEd.image : '/' + foundEd.image) : '/home.jpg';
+                const edImg = resolveImageUrl(foundEd.image, '/home.jpg');
                 const portraitEl = document.getElementById('editorial-detail-portrait');
                 if (portraitEl) {
-                    portraitEl.src = (foundArtist && foundArtist.photo) ? (foundArtist.photo.startsWith('http') || foundArtist.photo.startsWith('/') ? foundArtist.photo : '/' + foundArtist.photo) : (edImg.includes('masmus') ? edImg : '/masmus.jpeg');
+                    portraitEl.src = (foundArtist && foundArtist.photo) 
+                        ? resolveImageUrl(foundArtist.photo, (edImg.includes('masmus') ? edImg : '/masmus.jpeg')) 
+                        : (edImg.includes('masmus') ? edImg : '/masmus.jpeg');
                 }
 
                 let artImg = '/artwork.jpeg';
                 if (foundArtist && foundArtist.artworks && foundArtist.artworks.length > 0) {
                     const firstArt = foundArtist.artworks[0].image;
-                    artImg = firstArt.startsWith('http') || firstArt.startsWith('/') ? firstArt : '/' + firstArt;
+                    artImg = resolveImageUrl(firstArt, '/artwork.jpeg');
                 } else if (foundArtist && foundArtist.artwork_preview) {
-                    artImg = foundArtist.artwork_preview.startsWith('http') || foundArtist.artwork_preview.startsWith('/') ? foundArtist.artwork_preview : '/' + foundArtist.artwork_preview;
+                    artImg = resolveImageUrl(foundArtist.artwork_preview, '/artwork.jpeg');
                 }
                 const artworkEl = document.getElementById('editorial-detail-artwork');
                 if (artworkEl) artworkEl.src = artImg;
@@ -3503,7 +3518,7 @@
                     featuredImg = edImg;
                 } else if (foundArtist && foundArtist.artworks && foundArtist.artworks.length > 2) {
                     const featArt = foundArtist.artworks[2].image;
-                    featuredImg = featArt.startsWith('http') || featArt.startsWith('/') ? featArt : '/' + featArt;
+                    featuredImg = resolveImageUrl(featArt, '/home.jpg');
                 }
                 const featuredEl = document.getElementById('editorial-detail-featured');
                 if (featuredEl) {
@@ -3533,10 +3548,7 @@
             const videoPlayer = document.getElementById('lookbook-video-player');
             const videoSource = document.getElementById('lookbook-video-source');
             if (videoPlayer && videoSource) {
-                let vSrc = (lb && lb.video_url) ? lb.video_url : "{{ asset('video/editorial.mp4') }}";
-                if (!vSrc.startsWith('http') && !vSrc.startsWith('/')) {
-                    vSrc = vSrc.startsWith('video/') ? '/' + vSrc : '/storage/' + vSrc;
-                }
+                let vSrc = (lb && lb.video_url) ? resolveImageUrl(lb.video_url) : "{{ asset('video/editorial.mp4') }}";
                 videoSource.src = vSrc;
                 videoPlayer.load();
                 videoPlayer.play().catch(() => {});
@@ -3547,9 +3559,7 @@
                 grid.innerHTML = '';
                 if (lb.fotoshoots.length > 0) {
                     lb.fotoshoots.forEach(f => {
-                        const imgUrl = f.image.startsWith('http') || f.image.startsWith('/') 
-                            ? f.image 
-                            : (f.image.startsWith('lookbooks') ? '/storage/' + f.image : '/' + f.image);
+                        const imgUrl = resolveImageUrl(f.image);
                         const escapedTitle = (f.title || '').replace(/'/g, "\\'");
                         grid.innerHTML += `
                             <div class="w-full group cursor-pointer" onclick="openLightbox('${imgUrl}', '${escapedTitle}')">
@@ -3721,14 +3731,7 @@
                     totalAmount += itemTotal;
                     totalItemCount += item.qty;
 
-                    let itemImg = item.image || '';
-                    if (itemImg) {
-                        if (!itemImg.startsWith('http') && !itemImg.startsWith('/')) {
-                            itemImg = '/' + itemImg;
-                        }
-                    } else {
-                        itemImg = "{{ asset('footage-baju.jpg') }}";
-                    }
+                    let itemImg = resolveImageUrl(item.image, "{{ asset('footage-baju.jpg') }}");
 
                     html += `
                         <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100 cart-animated-item" style="animation-delay: ${index * 70}ms">
