@@ -1,6 +1,11 @@
-        <!-- VIEW 6B: CONTACT PAGE -->
+@extends('layouts.app')
+
+@section('title', 'Contact & Workshop - Notisse')
+
+@section('content')
+<!-- VIEW 6B: CONTACT PAGE -->
         <section id="view-contact"
-            class="view-page px-6 sm:px-12 md:px-16 lg:px-20 xl:px-24 py-20 md:py-28 min-h-[calc(100vh-80px)] flex flex-col justify-center items-start w-full">
+            class="view-page active-view px-6 sm:px-12 md:px-16 lg:px-20 xl:px-24 py-20 md:py-28 min-h-[calc(100vh-80px)] flex flex-col justify-center items-start w-full">
             <div class="space-y-10 sm:space-y-12 text-left max-w-3xl">
                 <!-- Workshop Section -->
                 <div class="space-y-2">
@@ -27,4 +32,4 @@
                 </div>
             </div>
         </section>
-
+@endsection

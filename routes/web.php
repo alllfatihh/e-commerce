@@ -6,17 +6,100 @@ use App\Http\Controllers\AuthController;
 use App\Models\Product;
 use App\Models\Fotoshoot;
 
+// ─── Front Store Multi-Page Routes ─────────────────────────
+// Shop & Products
 Route::get('/', function () {
     $products = Product::with('stocks')->get();
-    $fotoshoots = Fotoshoot::all();
-    $artists = \App\Models\Artist::with(['artworks', 'editorials'])->get();
-    $editorials = \App\Models\Editorial::with('artist')->latest()->get();
-    $lookbooks = \App\Models\Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
-    $settings = \App\Models\SiteSetting::pluck('value', 'key')->toArray();
-    $newcomer = \App\Models\Artist::where('is_newcomer', true)->first() ?: \App\Models\Artist::first();
     $carousels = \App\Models\SiteMedia::where('section', 'carousel')->orderBy('order')->get();
-    
-    return view('welcome', compact('products', 'fotoshoots', 'artists', 'editorials', 'lookbooks', 'settings', 'newcomer', 'carousels'));
+    return view('shop.index', compact('products', 'carousels'));
+});
+
+Route::get('/shop', function () {
+    $products = Product::with('stocks')->get();
+    $carousels = \App\Models\SiteMedia::where('section', 'carousel')->orderBy('order')->get();
+    return view('shop.index', compact('products', 'carousels'));
+});
+
+Route::get('/products/{id}', function ($id) {
+    $product = Product::with('stocks')->findOrFail($id);
+    $products = Product::with('stocks')->get();
+    return view('shop.show', compact('product', 'products'));
+});
+
+// Artists & Artworks
+Route::get('/artists', function () {
+    $artists = \App\Models\Artist::with(['artworks', 'editorials'])->get();
+    $newcomer = \App\Models\Artist::where('is_newcomer', true)->first() ?: \App\Models\Artist::first();
+    return view('artists.index', compact('artists', 'newcomer'));
+});
+
+Route::get('/artists/{id}', function ($id) {
+    $artist = \App\Models\Artist::with(['artworks', 'editorials', 'products'])->findOrFail($id);
+    $artists = \App\Models\Artist::with(['artworks', 'editorials'])->get();
+    return view('artists.show', compact('artist', 'artists'));
+});
+
+Route::get('/artworks/{id}', function ($id) {
+    $artwork = \App\Models\Artwork::with('artist')->findOrFail($id);
+    return view('artworks.show', compact('artwork'));
+});
+
+// Editorials
+Route::get('/editorials', function () {
+    $editorials = \App\Models\Editorial::with('artist')->latest()->get();
+    return view('editorials.index', compact('editorials'));
+});
+
+Route::get('/editorials/{id}', function ($id) {
+    $editorial = \App\Models\Editorial::with('artist')->findOrFail($id);
+    return view('editorials.show', compact('editorial'));
+});
+
+// Lookbooks
+Route::get('/lookbooks', function () {
+    $lookbooks = \App\Models\Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
+    return view('lookbooks.index', compact('lookbooks'));
+});
+
+Route::get('/lookbooks/{id}', function ($id) {
+    $lookbook = \App\Models\Lookbook::with('fotoshoots')->findOrFail($id);
+    $lookbooks = \App\Models\Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
+    return view('lookbooks.show', compact('lookbook', 'lookbooks'));
+});
+
+// Brand Information Pages
+Route::get('/about', function () {
+    return view('pages.about');
+});
+
+Route::get('/contact', function () {
+    return view('pages.contact');
+});
+
+// Customer Authentication
+Route::get('/login', function () {
+    if (auth()->check()) return redirect('/account');
+    return view('auth.login');
+});
+
+Route::get('/register', function () {
+    if (auth()->check()) return redirect('/account');
+    return view('auth.register');
+});
+
+// Customer Account
+Route::get('/account', function () {
+    if (!auth()->check()) return redirect('/login');
+    $user = auth()->user();
+    $orders = \App\Models\Order::with('items.product')->where('user_id', $user->id)->latest()->take(10)->get();
+    $offerings = \App\Models\ArtworkOffering::with('artwork.artist')->where('user_id', $user->id)->latest()->get();
+    return view('account.profile', compact('user', 'orders', 'offerings'));
+});
+
+Route::get('/account/edit', function () {
+    if (!auth()->check()) return redirect('/login');
+    $user = auth()->user();
+    return view('account.edit', compact('user'));
 });
 
 // Seamless Auth & Google Login

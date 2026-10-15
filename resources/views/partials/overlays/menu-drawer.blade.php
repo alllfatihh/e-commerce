@@ -13,22 +13,22 @@
             </div>
 
             <nav class="flex flex-col space-y-6 md:space-y-8 my-auto font-space-grotesk">
-                <a href="javascript:void(0)" onclick="navigateTo('view-shop')"
+                <a href="/shop"
                     class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">SHOP</a>
-                <a href="javascript:void(0)" onclick="navigateTo('view-artist-collab')"
+                <a href="/artists"
                     class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">ARTIST COLLAB</a>
-                <a href="javascript:void(0)" onclick="navigateTo('view-lookbook-list')"
+                <a href="/lookbooks"
                     class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">LOOKBOOK</a>
-                <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
+                <a href="/editorials"
                     class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">EDITORIAL</a>
-                <a href="javascript:void(0)" onclick="navigateTo('view-about')"
+                <a href="/about"
                     class="font-space-grotesk text-2xl sm:text-3xl md:text-[32px] font-medium tracking-wider hover:translate-x-2 hover:text-gray-200 transition-all duration-300 w-fit">ABOUT</a>
             </nav>
 
             <div class="flex items-center space-x-6 sm:space-x-8 font-space-grotesk mb-2">
-                <a href="javascript:void(0)" onclick="closeMenu(); handleAccountButtonClick();"
+                <a href="/account"
                     class="text-base md:text-lg font-medium tracking-widest text-white/80 hover:text-white transition-all duration-300 w-fit">ACCOUNT</a>
-                <a href="javascript:void(0)" onclick="navigateTo('view-contact')"
+                <a href="/contact"
                     class="text-base md:text-lg font-medium tracking-widest text-white/80 hover:text-white transition-all duration-300 w-fit">CONTACT</a>
             </div>
 

@@ -1,8 +1,13 @@
-        <!-- VIEW 9: LOGGED-IN ACCOUNT DASHBOARD -->
-        <section id="view-account-profile" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
+@extends('layouts.app')
+
+@section('title', 'My Account - Notisse')
+
+@section('content')
+<!-- VIEW 9: LOGGED-IN ACCOUNT DASHBOARD -->
+        <section id="view-account-profile" class="view-page active-view w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
             <!-- Back to Shop (Top Left) -->
             <div class="mb-6">
-                <button onclick="showPage('view-shop')"
+                <button onclick="window.location.href='/shop'"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK TO SHOP</span>
@@ -140,7 +145,7 @@
                 <div id="account-art-offers-list" class="space-y-4">
                     <div class="border border-gray-200 p-8 text-center bg-gray-50">
                         <p class="text-gray-400 font-inter text-sm">No artwork acquisition inquiries submitted yet.</p>
-                        <button onclick="showPage('view-artist-detail')" class="mt-3 text-xs font-bold font-space-grotesk uppercase underline tracking-wider">
+                        <button onclick="window.location.href='/artists'" class="mt-3 text-xs font-bold font-space-grotesk uppercase underline tracking-wider">
                             Explore Art Gallery
                         </button>
                     </div>
@@ -148,4 +153,4 @@
             </div>
             </div>
         </section>
-
+@endsection

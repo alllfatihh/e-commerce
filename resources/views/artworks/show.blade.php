@@ -1,7 +1,12 @@
-        <!-- VIEW 3C: ARTWORK DETAIL PAGE (WITH DIRECT OFFERING ACQUISITION PANEL) -->
-        <section id="view-artist-artwork-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
+@extends('layouts.app')
+
+@section('title', (isset($artwork) ? $artwork->title : 'Artwork Detail') . ' - Notisse')
+
+@section('content')
+<!-- VIEW 3C: ARTWORK DETAIL PAGE (WITH DIRECT OFFERING ACQUISITION PANEL) -->
+        <section id="view-artist-artwork-detail" class="view-page active-view w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6 flex items-center justify-between">
-                <button onclick="goBack()"
+                <button onclick="window.history.length > 1 ? window.history.back() : window.location.href='/artists'"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK TO ARTIST PROFILE</span>
@@ -71,4 +76,32 @@
                 </div>
             </div>
         </section>
+@endsection
 
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        @if(isset($artwork))
+            curArt = {
+                id: {!! $artwork->id !!},
+                title: {!! json_encode($artwork->title) !!},
+                image: {!! json_encode($artwork->image) !!},
+                specs: {!! json_encode($artwork->specs ?? 'Original artwork on canvas') !!},
+                price: {!! $artwork->price ?? 0 !!},
+                formattedPrice: {!! json_encode('Rp ' . number_format($artwork->price ?? 0, 0, ',', '.')) !!},
+                artistName: {!! json_encode($artwork->artist->name ?? 'Artist') !!}
+            };
+            const titleEl = document.getElementById('artwork-detail-title');
+            if (titleEl) titleEl.innerText = curArt.title;
+            const priceEl = document.getElementById('artwork-detail-price');
+            if (priceEl) priceEl.innerText = curArt.formattedPrice;
+            const specsEl = document.getElementById('artwork-detail-specs');
+            if (specsEl) specsEl.innerText = curArt.specs;
+            const artistEl = document.getElementById('artwork-detail-artist');
+            if (artistEl) artistEl.innerText = curArt.artistName;
+            const prevImg = document.getElementById('artwork-detail-img');
+            if (prevImg) prevImg.src = resolveImageUrl(curArt.image, 'https://placehold.co/400x500/222/fff?text=Artwork');
+        @endif
+    });
+</script>
+@endpush

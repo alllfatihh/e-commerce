@@ -120,7 +120,7 @@
             try { loggedInUser = JSON.parse(localStorage.getItem('notisse_user')); } catch(e){}
         }
 
-        let productsData = @json($products);
+        let productsData = @json($products ?? []);
         let artistsData = @json($artists ?? []);
         let editorialsData = @json($editorials ?? []);
         let lookbooksData = @json($lookbooks ?? []);

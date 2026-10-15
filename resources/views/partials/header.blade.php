@@ -12,7 +12,7 @@
         <!-- Center: Dual Animated Logo (Switches to Small Logo on Scroll) -->
         <div id="header-logo-container"
             class="header-logo-container logo-state-large header-fade-visible absolute left-1/2 transform -translate-x-1/2 cursor-pointer flex items-center justify-center select-none py-1 h-7 sm:h-8"
-            onclick="showPage('view-shop')" title="Back to Shop">
+            onclick="window.location.href='/'" title="Back to Shop">
             <!-- Large Brand Wordmark -->
             <img id="header-logo-large" src="{{ asset('logo.png') }}" alt="Notisse Logo"
                 class="header-logo-large h-5 sm:h-6 md:h-6.5 w-auto object-contain select-none">

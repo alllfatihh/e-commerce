@@ -1,5 +1,10 @@
-        <!-- VIEW 8: REGISTER / DAFTAR AKUN PAGE -->
-        <section id="view-register" class="view-page px-6 py-12 max-w-md mx-auto">
+@extends('layouts.app')
+
+@section('title', 'Register - Notisse')
+
+@section('content')
+<!-- VIEW 8: REGISTER / DAFTAR AKUN PAGE -->
+        <section id="view-register" class="view-page active-view px-6 pt-24 py-12 max-w-md mx-auto">
             <div class="bg-white border border-black rounded-2xl p-8 sm:p-10 shadow-2xl space-y-6">
                 <!-- Signature N/Notisse Logo Top Center -->
                 <div class="flex justify-center">
@@ -43,10 +48,10 @@
                 <div class="text-center pt-2 border-t border-gray-100">
                     <p class="text-xs text-gray-500 font-inter">
                         Already have an account?
-                        <a href="javascript:void(0)" onclick="showPage('view-login')"
+                        <a href="javascript:void(0)" href="/login"
                             class="font-bold underline text-black">Log in here</a>
                     </p>
                 </div>
             </div>
         </section>
-
+@endsection
