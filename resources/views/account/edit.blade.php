@@ -1,12 +1,7 @@
-@extends('layouts.app')
-
-@section('title', 'Edit Profile - Notisse')
-
-@section('content')
-<!-- VIEW 10: EDIT PROFILE / ALAMAT -->
-        <section id="view-edit-profile" class="view-page active-view w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
+        <!-- VIEW 10: EDIT PROFILE / ALAMAT -->
+        <section id="view-edit-profile" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
             <div class="mb-6">
-                <button onclick="window.location.href='/account'" class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
+                <button onclick="goBack()" class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK</span>
                 </button>
@@ -143,7 +138,7 @@
                     <input type="hidden" id="edit-area-id" required>
 
                     <div class="pt-4 border-t border-gray-100 flex gap-3">
-                        <button type="button" onclick="window.location.href='/account'" class="w-1/3 border border-gray-300 py-3.5 text-xs font-bold font-space-grotesk uppercase hover:bg-gray-50 transition-colors cursor-pointer">
+                        <button type="button" onclick="goBack()" class="w-1/3 border border-gray-300 py-3.5 text-xs font-bold font-space-grotesk uppercase hover:bg-gray-50 transition-colors cursor-pointer">
                             Cancel
                         </button>
                         <button type="submit" id="edit-profile-btn" class="w-2/3 bg-black text-white font-bold font-space-grotesk uppercase py-3.5 text-xs tracking-wider hover:bg-neutral-800 transition-colors cursor-pointer">
@@ -153,4 +148,4 @@
                 </form>
             </div>
         </section>
-@endsection
+

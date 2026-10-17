@@ -1,13 +1,8 @@
-@extends('layouts.app')
-
-@section('title', (isset($editorial) ? $editorial->title : 'Editorial Detail') . ' - Notisse')
-
-@section('content')
-<!-- VIEW 3D: EDITORIAL ARTICLE DETAIL PAGE -->
-        <section id="view-artist-editorial-detail" class="view-page active-view w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
+        <!-- VIEW 3D: EDITORIAL ARTICLE DETAIL PAGE -->
+        <section id="view-artist-editorial-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <!-- Navigation -->
             <div class="mb-4 sm:mb-6">
-                <button onclick="window.location.href='/editorials'"
+                <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK</span>
@@ -63,14 +58,4 @@
                 <img id="editorial-detail-featured" src="{{ asset('home.jpg') }}" alt="Editorial Feature" class="hidden">
             </article>
         </section>
-@endsection
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        @if(isset($editorial))
-            openEditorialDetail({!! json_encode($editorial->title) !!}, {!! json_encode($editorial->image) !!});
-        @endif
-    });
-</script>
-@endpush

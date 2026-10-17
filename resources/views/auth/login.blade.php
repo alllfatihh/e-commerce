@@ -1,10 +1,5 @@
-@extends('layouts.app')
-
-@section('title', 'Login - Notisse')
-
-@section('content')
-<!-- VIEW 7: LOGIN PAGE -->
-        <section id="view-login" class="view-page active-view px-6 pt-24 py-12 max-w-md mx-auto">
+        <!-- VIEW 7: LOGIN PAGE -->
+        <section id="view-login" class="view-page px-6 py-12 max-w-md mx-auto">
             <div class="text-center mb-8">
                 <div class="flex justify-center mb-4">
                     <img src="{{ asset('logowebkecil.png') }}" alt="Notisse Logo" class="h-12 w-auto object-contain">
@@ -46,10 +41,10 @@
                 <div class="text-center pt-4">
                     <p class="text-xs text-gray-500 font-inter">
                         Don't have an account yet?
-                        <a href="javascript:void(0)" href="/register"
+                        <a href="javascript:void(0)" onclick="showPage('view-register')"
                             class="font-bold underline text-black">Register now</a>
                     </p>
                 </div>
             </form>
         </section>
-@endsection
+

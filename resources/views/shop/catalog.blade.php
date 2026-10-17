@@ -1,9 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Notisse - Shop Collection')
-
-@section('content')
-<!-- VIEW 1: SHOP CATALOG WITH AUTO-SLIDING HERO CAROUSEL -->
+        <!-- VIEW 1: SHOP CATALOG WITH AUTO-SLIDING HERO CAROUSEL -->
         <section id="view-shop" class="view-page active-view pb-16">
             <div class="relative w-full h-screen overflow-hidden bg-black group">
                 <div id="hero-carousel-slides" class="relative w-full h-full">
@@ -36,22 +31,22 @@
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Shop</span>
                     </a>
-                    <a href="javascript:void(0)" onclick="window.location.href='/artists'"
+                    <a href="javascript:void(0)" onclick="navigateTo('view-artist-collab')"
                         class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Artist Collab</span>
                     </a>
-                    <a href="javascript:void(0)" onclick="window.location.href='/lookbooks'"
+                    <a href="javascript:void(0)" onclick="navigateTo('view-lookbook-list')"
                         class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Lookbook</span>
                     </a>
-                    <a href="javascript:void(0)" onclick="window.location.href='/editorials'"
+                    <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
                         class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Editorial</span>
                     </a>
-                    <a href="javascript:void(0)" onclick="window.location.href='/about'"
+                    <a href="javascript:void(0)" onclick="navigateTo('view-about')"
                         class="group flex items-start pointer-events-auto cursor-pointer transition-opacity duration-300 text-white hover:opacity-70">
                         <span
                             class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">About</span>
@@ -64,7 +59,7 @@
             <div id="shop-catalog" class="w-full">
                 <div class="grid grid-cols-2 lg:grid-cols-4 bg-black gap-[1px] border-b border-black">
                     @foreach($products as $product)
-                        <div onclick="window.location.href='/products/{{ $product->id }}'"
+                        <div onclick="openProductDetail({{ $product->id }})"
                             class="group cursor-pointer bg-white flex flex-col justify-between h-full hover:bg-gray-50 transition-colors duration-300">
 
                             <div class="relative w-full aspect-[3/4] bg-[#f4f4f4] overflow-hidden">
@@ -91,4 +86,4 @@
                 </div>
             </div>
         </section>
-@endsection
+

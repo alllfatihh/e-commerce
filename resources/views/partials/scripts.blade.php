@@ -2090,6 +2090,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             renderCartItems();
 
+            const initialView = @json($activeView ?? null);
+            if (initialView) {
+                showPage(initialView);
+            }
+
+            const initialProductId = @json($initialProductId ?? null);
+            if (initialProductId) {
+                openProductDetail(initialProductId);
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('open_checkout') === 'true') {
                 window.history.replaceState({}, document.title, window.location.pathname);

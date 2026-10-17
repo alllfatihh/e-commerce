@@ -1,10 +1,5 @@
-@extends('layouts.app')
-
-@section('title', 'Artist Collaborations - Notisse')
-
-@section('content')
-<!-- VIEW 3: ARTIST COLLAB LIST PAGE -->
-        <section id="view-artist-collab" class="view-page active-view w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 sm:pt-24 pb-16">
+        <!-- VIEW 3: ARTIST COLLAB LIST PAGE -->
+        <section id="view-artist-collab" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 sm:pt-24 pb-16">
             <div class="mb-16">
                 <h2 class="text-xl md:text-2xl font-bold mb-6 tracking-wide text-black font-space-grotesk">Newcomer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10 mb-8">
@@ -13,13 +8,13 @@
                         $ncArtwork = isset($newcomer) && $newcomer->artwork_image ? (Str::startsWith($newcomer->artwork_image, 'http') ? $newcomer->artwork_image : (file_exists(public_path('storage/' . $newcomer->artwork_image)) ? asset('storage/' . $newcomer->artwork_image) : (Str::startsWith($newcomer->artwork_image, 'storage/') ? asset($newcomer->artwork_image) : asset($newcomer->artwork_image)))) : asset('home.jpg');
                     @endphp
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
-                        onclick="window.location.href='/artists/{{ $newcomer->id ?? 1 }}'">
+                        onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')">
                         <img src="{{ $ncPortrait }}"
                             alt="{{ $newcomer->name ?? 'Mustafa Portrait' }}"
                             class="w-full h-full object-cover grayscale group-hover:scale-105 transition-all duration-500">
                     </div>
                     <div class="aspect-[16/10] bg-gray-200 overflow-hidden group cursor-pointer"
-                        onclick="window.location.href='/artists/{{ $newcomer->id ?? 1 }}'">
+                        onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')">
                         <img src="{{ $ncArtwork }}" alt="{{ $newcomer->name ?? 'Mustafa Artwork' }}"
                             class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500">
                     </div>
@@ -31,7 +26,7 @@
                         {{ $newcomer->bio ?? 'Mustafa Alatas is a contemporary visual artist based in Temanggung whose distinct brush strokes and visceral storytelling bring deep cultural narratives into modern street apparel.' }}
                     </p>
                     <div class="pt-2">
-                        <button onclick="window.location.href='/artists/{{ $newcomer->id ?? 1 }}'"
+                        <button onclick="openArtistProfile('{{ addslashes($newcomer->name ?? 'Mustafa Alatas') }}', '{{ addslashes($newcomer->city ?? 'Temanggung') }}')"
                             class="btn-brush text-xs md:text-sm py-2 px-6 cursor-pointer font-space-grotesk">Read More</button>
                     </div>
                 </div>
@@ -60,7 +55,7 @@
                             @php
                                 $aPhoto = $artItem->photo ? (Str::startsWith($artItem->photo, 'http') ? $artItem->photo : (file_exists(public_path('storage/' . $artItem->photo)) ? asset('storage/' . $artItem->photo) : asset($artItem->photo))) : 'https://placehold.co/500x500/181818/ffffff?text=' . urlencode($artItem->name);
                             @endphp
-                            <div class="artist-card group cursor-pointer" data-artist-name="{{ $artItem->name }}" data-artist-city="{{ $artItem->city }}" onclick="window.location.href='/artists/{{ $artItem->id }}'">
+                            <div class="artist-card group cursor-pointer" data-artist-name="{{ $artItem->name }}" data-artist-city="{{ $artItem->city }}" onclick="openArtistProfile('{{ addslashes($artItem->name) }}', '{{ addslashes($artItem->city) }}')">
                                 <div class="w-full aspect-square bg-gray-200 mb-3.5 overflow-hidden">
                                     <img src="{{ $aPhoto }}"
                                         alt="{{ $artItem->name }}"
@@ -89,4 +84,4 @@
                 </div>
             </div>
         </section>
-@endsection
+
