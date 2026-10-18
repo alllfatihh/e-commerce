@@ -76,21 +76,36 @@ class AuthController extends Controller
         }
     }
 
-    public function googleRedirect()
-    {
-        return Socialite::driver('google')->redirect();
-    }
-
-    public function googleCallback()
+    public function googleRedirect(Request $request)
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            if ($request->has('from')) {
+                session(['google_auth_from' => $request->get('from')]);
+                session()->save();
+            }
+            return Socialite::driver('google')->redirect();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Google redirect error: ' . $e->getMessage());
+            return redirect('/login')->with('error', 'Gagal menghubungkan ke Google: ' . $e->getMessage());
+        }
+    }
+
+    public function googleCallback(Request $request)
+    {
+        try {
+            if (!$request->has('code') || $request->has('error')) {
+                $errorMsg = $request->get('error_description', $request->get('error', 'Login Google dibatalkan atau ditolak.'));
+                \Illuminate\Support\Facades\Log::warning('Google callback canceled or missing code: ' . $errorMsg);
+                return redirect('/login')->with('error', $errorMsg);
+            }
+
+            $googleUser = Socialite::driver('google')->stateless()->user();
             
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
                 $user = User::create([
-                    'name' => $googleUser->getName(),
+                    'name' => $googleUser->getName() ?? 'User',
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'password' => null, 
@@ -102,16 +117,22 @@ class AuthController extends Controller
                 }
             }
 
-            Auth::login($user);
+            Auth::login($user, true);
             request()->session()->regenerate();
 
-            if (!$user->area_id) {
-                return redirect('/auth/checkout');
+            $from = session()->pull('google_auth_from');
+            if ($from === 'login' || $from === 'account') {
+                return redirect('/account')->with('success', 'Berhasil masuk dengan akun Google!');
             }
 
-            return redirect('/?open_checkout=true');
+            if (!$user->area_id) {
+                return redirect('/auth/checkout')->with('success', 'Berhasil masuk dengan akun Google! Silakan lengkapi detail pengiriman.');
+            }
+
+            return redirect('/?open_checkout=true')->with('success', 'Berhasil masuk dengan akun Google!');
         } catch (\Exception $e) {
-            return redirect('/')->with('error', 'Login via Google gagal.');
+            \Illuminate\Support\Facades\Log::error('Google login error: ' . $e->getMessage());
+            return redirect('/login')->with('error', 'Login via Google gagal: ' . $e->getMessage());
         }
     }
 

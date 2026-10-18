@@ -11,7 +11,7 @@
             <!-- Artist Header Bio -->
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-start mb-10">
                 <div class="md:col-span-4 lg:col-span-3 aspect-[4/5] bg-gray-200 overflow-hidden">
-                    <img src="https://placehold.co/600x750/333333/ffffff?text=Mustafa+Alatas" alt="Mustafa Alatas"
+                    <img id="artist-profile-photo" src="https://placehold.co/600x750/333333/ffffff?text=Mustafa+Alatas" alt="Mustafa Alatas"
                         class="w-full h-full object-cover grayscale">
                 </div>
 

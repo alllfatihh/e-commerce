@@ -38,32 +38,68 @@ Route::get('/shop', function () use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-shop'));
 });
 
+Route::get('/product/{id}', function ($id) use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-product-detail', ['initialProductId' => (int) $id]));
+});
+
 Route::get('/products/{id}', function ($id) use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-product-detail', ['initialProductId' => (int) $id]));
+});
+
+Route::get('/artist', function () use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-artist-collab'));
 });
 
 Route::get('/artists', function () use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-artist-collab'));
 });
 
+Route::get('/artist-collab', function () use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-artist-collab'));
+});
+
+Route::get('/artist/{id}', function ($id) use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-artist-detail', ['initialArtistId' => (int) $id]));
+});
+
 Route::get('/artists/{id}', function ($id) use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-artist-detail', ['initialArtistId' => (int) $id]));
+});
+
+Route::get('/artwork/{id}', function ($id) use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-artist-artwork-detail', ['initialArtworkId' => (int) $id]));
 });
 
 Route::get('/artworks/{id}', function ($id) use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-artist-artwork-detail', ['initialArtworkId' => (int) $id]));
 });
 
+Route::get('/editorial', function () use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-editorials-all'));
+});
+
 Route::get('/editorials', function () use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-editorials-all'));
+});
+
+Route::get('/editorial/{id}', function ($id) use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-editorial-detail', ['initialEditorialId' => (int) $id]));
 });
 
 Route::get('/editorials/{id}', function ($id) use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-editorial-detail', ['initialEditorialId' => (int) $id]));
 });
 
+Route::get('/lookbook', function () use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-lookbook-list'));
+});
+
 Route::get('/lookbooks', function () use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-lookbook-list'));
+});
+
+Route::get('/lookbook/{id}', function ($id) use ($getStorefrontData) {
+    return view('welcome', $getStorefrontData('view-lookbook-detail', ['initialLookbookId' => (int) $id]));
 });
 
 Route::get('/lookbooks/{id}', function ($id) use ($getStorefrontData) {

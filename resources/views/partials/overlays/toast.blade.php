@@ -11,3 +11,28 @@
         <span id="toast-message" class="font-medium">Notification message</span>
     </div>
 
+    @if(session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof showToast === 'function') {
+                    showToast(@json(session('error')));
+                }
+            }, 300);
+        });
+    </script>
+    @endif
+
+    @if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (typeof showToast === 'function') {
+                    showToast(@json(session('success')));
+                }
+            }, 300);
+        });
+    </script>
+    @endif
+
+

@@ -116,7 +116,10 @@
         let navigationHistory = ['view-shop'];
         let isAuthenticated = localStorage.getItem('notisse_auth') === 'true' || {{ auth()->check() ? 'true' : 'false' }};
         let loggedInUser = @json(auth()->user());
-        if (!loggedInUser && localStorage.getItem('notisse_user')) {
+        if (loggedInUser) {
+            localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
+            localStorage.setItem('notisse_auth', 'true');
+        } else if (localStorage.getItem('notisse_user')) {
             try { loggedInUser = JSON.parse(localStorage.getItem('notisse_user')); } catch(e){}
         }
 
@@ -199,7 +202,11 @@
                 showPage('view-account-profile');
                 fetchOrderHistory();
             } else {
-                window.location.href = '/auth/checkout';
+                if (document.getElementById('view-login')) {
+                    showPage('view-login');
+                } else {
+                    window.location.href = '/login';
+                }
             }
         }
 
@@ -815,12 +822,28 @@
             showPage('view-product-detail');
         }
 
-        function openArtistProfile(name, location) {
-            const artist = (typeof artistsData !== 'undefined' && artistsData) ? artistsData.find(a => (a.name || '').toLowerCase() === (name || '').toLowerCase()) : null;
+        function openArtistProfile(artistIdOrName, location) {
+            let artist = null;
+            if (typeof artistsData !== 'undefined' && artistsData) {
+                if (typeof artistIdOrName === 'number' || (!isNaN(Number(artistIdOrName)) && String(artistIdOrName).trim() !== '')) {
+                    artist = artistsData.find(a => Number(a.id) === Number(artistIdOrName));
+                }
+                if (!artist) {
+                    artist = artistsData.find(a => (a.name || '').toLowerCase() === String(artistIdOrName || '').toLowerCase());
+                }
+            }
 
-            document.getElementById('artist-profile-name').innerText = name;
-            document.getElementById('artist-profile-location').innerText = artist && artist.city ? artist.city : (location || 'Indonesia');
-            document.getElementById('editorial-section-title').innerText = "Articles Featuring " + name;
+            const name = artist ? artist.name : (typeof artistIdOrName === 'string' ? artistIdOrName : 'Mustafa Alatas');
+            const loc = artist && artist.city ? artist.city : (location || 'Indonesia');
+
+            const nameEl = document.getElementById('artist-profile-name');
+            if (nameEl) nameEl.innerText = name;
+
+            const locEl = document.getElementById('artist-profile-location');
+            if (locEl) locEl.innerText = loc;
+
+            const titleEl = document.getElementById('editorial-section-title');
+            if (titleEl) titleEl.innerText = "Articles Featuring " + name;
 
             if (artist) {
                 if (artist.bio) {
@@ -828,10 +851,9 @@
                     if (bioEl) bioEl.innerText = artist.bio;
                 }
                 if (artist.photo) {
-                    const photoEl = document.querySelector('#view-artist-detail .md\\:col-span-4 img');
+                    const photoEl = document.getElementById('artist-profile-photo') || document.querySelector('#view-artist-detail .md\\:col-span-4 img');
                     if (photoEl) {
-                        const pSrc = artist.photo.startsWith('http') || artist.photo.startsWith('/') ? artist.photo : '/' + artist.photo;
-                        photoEl.src = pSrc;
+                        photoEl.src = resolveImageUrl(artist.photo, '/masmus.jpeg');
                     }
                 }
             }
@@ -2098,6 +2120,11 @@
             const initialProductId = @json($initialProductId ?? null);
             if (initialProductId) {
                 openProductDetail(initialProductId);
+            }
+
+            const initialArtistId = @json($initialArtistId ?? null);
+            if (initialArtistId) {
+                openArtistProfile(initialArtistId);
             }
 
             const urlParams = new URLSearchParams(window.location.search);
