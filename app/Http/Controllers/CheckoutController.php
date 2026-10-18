@@ -219,55 +219,132 @@ class CheckoutController extends Controller
 
             $data = $response->json();
 
-            // Fallback Simulasi jika Biteship error (karena kurang saldo di akun, timeout, dll)
-            if ($response->failed() || (isset($data['success']) && $data['success'] === false) || empty($data['pricing'])) {
-                return response()->json([
-                    'success' => true,
-                    'pricing' => [
-                        [
-                            'courier_name' => 'JNE',
-                            'courier_service_name' => 'REG',
-                            'price' => 15000
-                        ],
-                        [
-                            'courier_name' => 'SiCepat',
-                            'courier_service_name' => 'REG',
-                            'price' => 12000
-                        ],
-                        [
-                            'courier_name' => 'J&T',
-                            'courier_service_name' => 'EZ',
-                            'price' => 17000
-                        ]
-                    ]
-                ]);
+            // Live Biteship API Check
+            if ($response->successful() && !empty($data['pricing']) && (!isset($data['success']) || $data['success'] !== false)) {
+                return response()->json($data);
             }
 
-            return response()->json($data);
+            // Log info jika Biteship API rate tidak mengembalikan pricing (misal saldo habis / akun test)
+            \Illuminate\Support\Facades\Log::info('Biteship rates API fallback triggered: ' . json_encode($data));
+
+            // Gunakan Kalkulasi Fallback Cerdas Berbasis Zona & Berat Destinasi
+            $fallbackPricing = $this->getZoneFallbackRates($validated['destination_area_id'], $biteshipItems);
+            return response()->json($fallbackPricing);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('getShippingRates error: ' . $e->getMessage());
-            // Berikan fallback jika terjadi exception server
-            return response()->json([
-                'success' => true,
-                'pricing' => [
-                    [
-                        'courier_name' => 'JNE',
-                        'courier_service_name' => 'REG',
-                        'price' => 15000
-                    ],
-                    [
-                        'courier_name' => 'SiCepat',
-                        'courier_service_name' => 'REG',
-                        'price' => 12000
-                    ],
-                    [
-                        'courier_name' => 'J&T',
-                        'courier_service_name' => 'EZ',
-                        'price' => 17000
-                    ]
-                ]
-            ]);
+            $fallbackPricing = $this->getZoneFallbackRates($request->input('destination_area_id', ''), $request->input('items', []));
+            return response()->json($fallbackPricing);
         }
+    }
+
+    /**
+     * Fallback tarif cerdas berdasarkan lokasi provinsi & berat jika saldo Biteship belum di-topup
+     */
+    private function getZoneFallbackRates(string $destinationAreaId, array $items): array
+    {
+        // 1. Hitung total berat dalam kilogram
+        $totalGrams = 0;
+        foreach ($items as $item) {
+            $qty = $item['quantity'] ?? 1;
+            $weight = $item['weight'] ?? 200;
+            $totalGrams += ($weight * $qty);
+        }
+        $weightKg = max(1, (int) ceil($totalGrams / 1000));
+
+        // 2. Ambil detail lokasi dari Biteship Maps API (Free endpoint)
+        $province = '';
+        $city = '';
+        if ($destinationAreaId) {
+            try {
+                $areaRes = Http::withHeaders([
+                    'Authorization' => env('BITESHIP_API_KEY')
+                ])->timeout(3)->get("https://api.biteship.com/v1/maps/areas/{$destinationAreaId}");
+
+                if ($areaRes->successful()) {
+                    $areaData = $areaRes->json();
+                    if (!empty($areaData['areas'][0])) {
+                        $province = strtolower($areaData['areas'][0]['administrative_division_level_1_name'] ?? '');
+                        $city = strtolower($areaData['areas'][0]['administrative_division_level_2_name'] ?? '');
+                    }
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Failed area lookup for zone fallback: ' . $e->getMessage());
+            }
+        }
+
+        // 3. Tentukan tarif dasar per kg dari gudang asal (Dayeuhkolot, Bandung)
+        $jneBase = 12000;
+        $sicepatBase = 11000;
+        $jntBase = 13000;
+        $duration = '1 - 3 hari';
+
+        if (str_contains($city, 'bandung') || str_contains($city, 'cimahi')) {
+            // Bandung Raya (Lokal)
+            $jneBase = 10000;
+            $sicepatBase = 9000;
+            $jntBase = 10000;
+            $duration = '1 - 2 hari';
+        } elseif (str_contains($province, 'jakarta') || str_contains($province, 'banten') || str_contains($province, 'jawa barat')) {
+            // DKI Jakarta, Banten, Jawa Barat
+            $jneBase = 12000;
+            $sicepatBase = 11000;
+            $jntBase = 13000;
+            $duration = '1 - 3 hari';
+        } elseif (str_contains($province, 'jawa tengah') || str_contains($province, 'jawa timur') || str_contains($province, 'yogyakarta')) {
+            // Jawa Tengah, DIY, Jawa Timur
+            $jneBase = 19000;
+            $sicepatBase = 18000;
+            $jntBase = 20000;
+            $duration = '2 - 3 hari';
+        } elseif (str_contains($province, 'bali') || str_contains($province, 'nusa tenggara barat') || str_contains($province, 'lampung') || str_contains($province, 'sumatera selatan')) {
+            // Bali, NTB, Lampung, Sumsel
+            $jneBase = 28000;
+            $sicepatBase = 26000;
+            $jntBase = 30000;
+            $duration = '2 - 4 hari';
+        } elseif (str_contains($province, 'sumatera') || str_contains($province, 'riau') || str_contains($province, 'jambi') || str_contains($province, 'bengkulu') || str_contains($province, 'aceh') || str_contains($province, 'bangka') || str_contains($province, 'kalimantan')) {
+            // Sumatera lainnya & Kalimantan
+            $jneBase = 38000;
+            $sicepatBase = 36000;
+            $jntBase = 40000;
+            $duration = '3 - 5 hari';
+        } elseif (str_contains($province, 'sulawesi') || str_contains($province, 'nusa tenggara timur') || str_contains($province, 'gorontalo')) {
+            // Sulawesi & NTT
+            $jneBase = 46000;
+            $sicepatBase = 44000;
+            $jntBase = 48000;
+            $duration = '3 - 6 hari';
+        } elseif (str_contains($province, 'papua') || str_contains($province, 'maluku')) {
+            // Maluku & Papua
+            $jneBase = 95000;
+            $sicepatBase = 90000;
+            $jntBase = 100000;
+            $duration = '4 - 8 hari';
+        }
+
+        return [
+            'success' => true,
+            'pricing' => [
+                [
+                    'courier_name' => 'SiCepat',
+                    'courier_service_name' => 'REG',
+                    'duration' => $duration,
+                    'price' => $sicepatBase * $weightKg
+                ],
+                [
+                    'courier_name' => 'JNE',
+                    'courier_service_name' => 'REG',
+                    'duration' => $duration,
+                    'price' => $jneBase * $weightKg
+                ],
+                [
+                    'courier_name' => 'J&T',
+                    'courier_service_name' => 'EZ',
+                    'duration' => $duration,
+                    'price' => $jntBase * $weightKg
+                ]
+            ]
+        ];
     }
 
     public function webhook(Request $request)
