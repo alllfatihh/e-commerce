@@ -9,18 +9,46 @@ use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
+    public static function mergeGuestCart(int $userId, ?string $sessionId): void
+    {
+        if (!$sessionId) return;
+
+        $guestCart = Cart::where('session_id', $sessionId)->first();
+        if (!$guestCart) return;
+
+        $userCart = Cart::firstOrCreate(['user_id' => $userId]);
+
+        foreach ($guestCart->items as $guestItem) {
+            $existing = $userCart->items()
+                ->where('product_id', $guestItem->product_id)
+                ->where('size', $guestItem->size)
+                ->first();
+
+            if ($existing) {
+                $existing->increment('quantity', $guestItem->quantity);
+                $guestItem->delete();
+            } else {
+                $guestItem->update(['cart_id' => $userCart->id]);
+            }
+        }
+
+        $guestCart->delete();
+    }
+
     private function getCart(Request $request)
     {
         $userId = auth()->id();
         $sessionId = $request->cookie('notisse_cart_session');
 
-        if (!$userId && !$sessionId) {
-            $sessionId = Str::uuid()->toString();
-        }
-
         if ($userId) {
+            if ($sessionId) {
+                self::mergeGuestCart($userId, $sessionId);
+            }
             $cart = Cart::firstOrCreate(['user_id' => $userId]);
         } else {
+            if (!$sessionId) {
+                $sessionId = Str::uuid()->toString();
+            }
             $cart = Cart::firstOrCreate(['session_id' => $sessionId]);
         }
 

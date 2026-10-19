@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use App\Http\Controllers\CartController;
 
 class AuthController extends Controller
 {
@@ -74,6 +75,7 @@ class AuthController extends Controller
                     ]);
                 }
                 Auth::login($user);
+                CartController::mergeGuestCart($user->id, $request->cookie('notisse_cart_session'));
                 $request->session()->regenerate();
                 return response()->json(['success' => true]);
             } else {
@@ -103,6 +105,7 @@ class AuthController extends Controller
                 'is_primary' => true,
             ]);
             Auth::login($user);
+            CartController::mergeGuestCart($user->id, $request->cookie('notisse_cart_session'));
             $request->session()->regenerate();
             return response()->json(['success' => true]);
         }
@@ -160,6 +163,7 @@ class AuthController extends Controller
             }
 
             Auth::login($user, true);
+            CartController::mergeGuestCart($user->id, request()->cookie('notisse_cart_session'));
             request()->session()->regenerate();
 
             $from = session()->pull('google_auth_from');
