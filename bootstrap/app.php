@@ -17,14 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->validateCsrfTokens(except: [
-            'shipping-rates',
-            'checkout',
             'midtrans/*',
-            'auth/seamless',
-            'logout',
-            'update-profile',
-            'admin/*',
-            'my-orders/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

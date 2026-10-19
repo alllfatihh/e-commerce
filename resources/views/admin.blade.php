@@ -5,7 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notisse — Atelier Admin Panel</title>
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('logowebkecil.png') }}" type="image/png">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        (function() {
+            const originalFetch = window.fetch;
+            window.fetch = function(url, init) {
+                init = init || {};
+                const method = (init.method || 'GET').toUpperCase();
+                if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+                    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    if (token) {
+                        if (!init.headers) {
+                            init.headers = {};
+                        }
+                        if (init.headers instanceof Headers) {
+                            if (!init.headers.has('X-CSRF-TOKEN')) init.headers.set('X-CSRF-TOKEN', token);
+                        } else if (Array.isArray(init.headers)) {
+                            if (!init.headers.some(([k]) => k.toLowerCase() === 'x-csrf-token')) {
+                                init.headers.push(['X-CSRF-TOKEN', token]);
+                            }
+                        } else {
+                            if (!init.headers['X-CSRF-TOKEN'] && !init.headers['x-csrf-token']) {
+                                init.headers['X-CSRF-TOKEN'] = token;
+                            }
+                        }
+                    }
+                }
+                return originalFetch.call(this, url, init);
+            };
+        })();
+    </script>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>

@@ -145,63 +145,63 @@ Route::get('/checkout', [AuthController::class, 'showCheckoutAuth']);
 Route::get('/auth/checkout', [AuthController::class, 'showCheckoutAuth']);
 Route::get('/auth/google', [AuthController::class, 'googleRedirect']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
-Route::post('/auth/seamless', [AuthController::class, 'seamlessRegisterOrLogin'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/auth/seamless', [AuthController::class, 'seamlessRegisterOrLogin']);
 Route::post('/logout', function () {
     auth()->logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
     return response()->json(['success' => true]);
-})->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::post('/update-profile', [AuthController::class, 'updateProfile'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+});
+Route::post('/update-profile', [AuthController::class, 'updateProfile']);
 
 // Admin Routes (Protected with RBAC: auth + admin)
 use App\Http\Controllers\AdminController;
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index']);
-    Route::post('/admin/products', [AdminController::class, 'storeProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::match(['post', 'put'], '/admin/products/{id}', [AdminController::class, 'updateProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::delete('/admin/products/{id}', [AdminController::class, 'deleteProduct'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/media', [AdminController::class, 'storeMedia'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::match(['post', 'put'], '/admin/media/{id}', [AdminController::class, 'updateMedia'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::delete('/admin/media/{id}', [AdminController::class, 'deleteMedia'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/artworks', [AdminController::class, 'storeArtwork'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::match(['post', 'put'], '/admin/artworks/{id}', [AdminController::class, 'updateArtwork'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::delete('/admin/artworks/{id}', [AdminController::class, 'deleteArtwork'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/editorials', [AdminController::class, 'storeEditorial'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::match(['post', 'put'], '/admin/editorials/{id}', [AdminController::class, 'updateEditorial'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::delete('/admin/editorials/{id}', [AdminController::class, 'deleteEditorial'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/artists', [AdminController::class, 'storeArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::match(['post', 'put'], '/admin/artists/{id}', [AdminController::class, 'updateArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::delete('/admin/artists/{id}', [AdminController::class, 'deleteArtist'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/offerings/{id}/status', [AdminController::class, 'updateOfferingStatus'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/lookbooks', [AdminController::class, 'storeLookbook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::match(['post', 'put'], '/admin/lookbooks/{id}', [AdminController::class, 'updateLookbook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::delete('/admin/lookbooks/{id}', [AdminController::class, 'deleteLookbook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/lookbooks/{id}/photos', [AdminController::class, 'storeLookbookPhoto'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::delete('/admin/lookbooks/photos/{id}', [AdminController::class, 'deleteLookbookPhoto'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/settings', [AdminController::class, 'updateSettings'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-    Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+    Route::post('/admin/products', [AdminController::class, 'storeProduct']);
+    Route::match(['post', 'put'], '/admin/products/{id}', [AdminController::class, 'updateProduct']);
+    Route::delete('/admin/products/{id}', [AdminController::class, 'deleteProduct']);
+    Route::post('/admin/media', [AdminController::class, 'storeMedia']);
+    Route::match(['post', 'put'], '/admin/media/{id}', [AdminController::class, 'updateMedia']);
+    Route::delete('/admin/media/{id}', [AdminController::class, 'deleteMedia']);
+    Route::post('/admin/artworks', [AdminController::class, 'storeArtwork']);
+    Route::match(['post', 'put'], '/admin/artworks/{id}', [AdminController::class, 'updateArtwork']);
+    Route::delete('/admin/artworks/{id}', [AdminController::class, 'deleteArtwork']);
+    Route::post('/admin/editorials', [AdminController::class, 'storeEditorial']);
+    Route::match(['post', 'put'], '/admin/editorials/{id}', [AdminController::class, 'updateEditorial']);
+    Route::delete('/admin/editorials/{id}', [AdminController::class, 'deleteEditorial']);
+    Route::post('/admin/artists', [AdminController::class, 'storeArtist']);
+    Route::match(['post', 'put'], '/admin/artists/{id}', [AdminController::class, 'updateArtist']);
+    Route::delete('/admin/artists/{id}', [AdminController::class, 'deleteArtist']);
+    Route::post('/admin/offerings/{id}/status', [AdminController::class, 'updateOfferingStatus']);
+    Route::post('/admin/lookbooks', [AdminController::class, 'storeLookbook']);
+    Route::match(['post', 'put'], '/admin/lookbooks/{id}', [AdminController::class, 'updateLookbook']);
+    Route::delete('/admin/lookbooks/{id}', [AdminController::class, 'deleteLookbook']);
+    Route::post('/admin/lookbooks/{id}/photos', [AdminController::class, 'storeLookbookPhoto']);
+    Route::delete('/admin/lookbooks/photos/{id}', [AdminController::class, 'deleteLookbookPhoto']);
+    Route::post('/admin/settings', [AdminController::class, 'updateSettings']);
+    Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship']);
 });
 
 // Cart Routes
 use App\Http\Controllers\CartController;
-Route::get('/api/cart', [CartController::class, 'index'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::post('/api/cart', [CartController::class, 'add'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::post('/api/cart/clear', [CartController::class, 'clear'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::put('/api/cart/{id}', [CartController::class, 'updateItem'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::delete('/api/cart/{id}', [CartController::class, 'remove'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::get('/api/cart', [CartController::class, 'index']);
+Route::post('/api/cart', [CartController::class, 'add']);
+Route::post('/api/cart/clear', [CartController::class, 'clear']);
+Route::put('/api/cart/{id}', [CartController::class, 'updateItem']);
+Route::delete('/api/cart/{id}', [CartController::class, 'remove']);
 
 use App\Http\Controllers\ArtworkOfferingController;
 use App\Http\Controllers\AddressController;
 
 // User Address Book Routes (Max 3)
 Route::get('/api/user/addresses', [AddressController::class, 'index']);
-Route::post('/api/user/addresses', [AddressController::class, 'store'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::put('/api/user/addresses/{id}', [AddressController::class, 'update'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::delete('/api/user/addresses/{id}', [AddressController::class, 'destroy'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-Route::post('/api/user/addresses/{id}/primary', [AddressController::class, 'setPrimary'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/api/user/addresses', [AddressController::class, 'store']);
+Route::put('/api/user/addresses/{id}', [AddressController::class, 'update']);
+Route::delete('/api/user/addresses/{id}', [AddressController::class, 'destroy']);
+Route::post('/api/user/addresses/{id}/primary', [AddressController::class, 'setPrimary']);
 
-Route::post('/api/artwork-offerings', [ArtworkOfferingController::class, 'store'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/api/artwork-offerings', [ArtworkOfferingController::class, 'store']);
 Route::get('/my-artwork-offers', function () {
     if (!auth()->check()) return response()->json([]);
 
@@ -212,9 +212,9 @@ Route::get('/my-artwork-offers', function () {
 });
 
 // Checkout Routes
-Route::post('/checkout', [CheckoutController::class, 'process'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/checkout', [CheckoutController::class, 'process']);
 Route::get('/shipping-areas', [CheckoutController::class, 'searchArea']);
-Route::post('/shipping-rates', [CheckoutController::class, 'getShippingRates'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/shipping-rates', [CheckoutController::class, 'getShippingRates']);
 Route::post('/midtrans/webhook', [CheckoutController::class, 'webhook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 Route::get('/my-orders', function () {
@@ -280,7 +280,7 @@ Route::post('/my-orders/{id}/cancel', function ($id) {
         }
     }
     return response()->json(['success' => true]);
-})->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+});
 
 Route::post('/my-orders/{id}/pay', function ($id) {
     $order = \App\Models\Order::with('items')->find($id);
@@ -316,7 +316,7 @@ Route::post('/my-orders/{id}/pay', function ($id) {
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
-})->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+});
 
 // HANYA UNTUK TESTING LOKAL (Karena Midtrans tidak bisa menembak webhook ke localhost)
 Route::post('/midtrans/local-success', function (\Illuminate\Http\Request $request) {
