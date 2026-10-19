@@ -21,6 +21,9 @@
                             $userAvatar = Str::startsWith($rawAvatar, ['http://', 'https://']) ? $rawAvatar : asset(ltrim($rawAvatar, '/'));
                         @endphp
                         <img src="{{ $userAvatar }}" alt="Avatar" class="w-16 h-16 object-cover border border-black shrink-0" onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                        <div class="w-16 h-16 bg-black text-white hidden items-center justify-center font-bold text-xl font-space-grotesk tracking-wider border border-black shrink-0">
+                            {{ strtoupper(substr(auth()->user()->name ?? 'N', 0, 2)) }}
+                        </div>
                     @else
                         <div class="w-16 h-16 bg-black text-white flex items-center justify-center font-bold text-xl font-space-grotesk tracking-wider border border-black shrink-0">
                             {{ auth()->check() ? strtoupper(substr(auth()->user()->name ?? 'N', 0, 2)) : 'NT' }}

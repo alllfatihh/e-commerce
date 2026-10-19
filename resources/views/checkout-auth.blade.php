@@ -241,9 +241,16 @@
                 @else
                 <div class="mb-8 p-4 bg-neutral-50 border border-black flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <div class="w-9 h-9 bg-black text-white flex items-center justify-center font-bold text-xs font-space-grotesk">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'NT', 0, 2)) }}
-                        </div>
+                        @if(auth()->check() && auth()->user()->avatar)
+                            <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}" class="w-9 h-9 object-cover border border-black shrink-0" onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
+                            <div class="w-9 h-9 bg-black text-white hidden items-center justify-center font-bold text-xs font-space-grotesk shrink-0">
+                                {{ strtoupper(substr(auth()->user()->name ?? 'NT', 0, 2)) }}
+                            </div>
+                        @else
+                            <div class="w-9 h-9 bg-black text-white flex items-center justify-center font-bold text-xs font-space-grotesk shrink-0">
+                                {{ strtoupper(substr(auth()->user()->name ?? 'NT', 0, 2)) }}
+                            </div>
+                        @endif
                         <div>
                             <div class="flex items-center space-x-2">
                                 <span class="font-bold text-xs font-space-grotesk uppercase text-black">{{ auth()->user()->name }}</span>
@@ -908,6 +915,12 @@
             const areaId = document.getElementById('area_id').value;
             const errorBox = document.getElementById('error-message');
             errorBox.classList.add('hidden');
+
+            if (!cart || cart.length === 0) {
+                errorBox.innerHTML = '<strong>Cart is Empty:</strong> Please add items to your cart before proceeding to checkout.';
+                errorBox.classList.remove('hidden');
+                return;
+            }
 
             if (!areaId) {
                 errorBox.innerHTML = '<strong>Select Shipping District:</strong> Please type your district name in the search box and select an option from the list.';

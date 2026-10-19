@@ -34,7 +34,7 @@
                 class="header__link--cart focus:outline-none select-none cursor-pointer opacity-100 pointer-events-auto">
                 <span class="header__link--cart__default-label">CART</span>
                 <span class="header__link--cart__vertical-label">CART</span>
-                <span id="header-cart-badge" class="header__link--cart__counter font-bold">2</span>
+                <span id="header-cart-badge" class="header__link--cart__counter font-bold">0</span>
             </button>
         </div>
     </header>
