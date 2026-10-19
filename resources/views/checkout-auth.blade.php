@@ -190,7 +190,7 @@
                         <span class="text-[10px] font-space-grotesk font-bold tracking-[0.2em] uppercase text-gray-500">Express Social Checkout</span>
                         <span class="text-[10px] text-gray-400 font-inter">1-Click Connect</span>
                     </div>
-                    <a href="/auth/google" id="google-checkout-btn" onclick="window.location.href='/auth/google'" class="w-full flex items-center justify-center space-x-3 bg-white hover:bg-neutral-100 border border-gray-300 py-3 px-4 transition-all shadow-sm group cursor-pointer relative z-10">
+                    <a href="/auth/google?from=checkout" id="google-checkout-btn" onclick="window.location.href='/auth/google?from=checkout'" class="w-full flex items-center justify-center space-x-3 bg-white hover:bg-neutral-100 border border-gray-300 py-3 px-4 transition-all shadow-sm group cursor-pointer relative z-10">
                         <svg class="w-4 h-4 pointer-events-none" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -287,10 +287,40 @@
                             <h2 class="text-sm font-bold font-space-grotesk uppercase tracking-[0.15em] text-black">2. Shipping Address</h2>
                         </div>
 
+                        @if(isset($addresses) && $addresses->count() > 0)
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="label-luxury mb-0">Saved Addresses (Max 3)</label>
+                                <span class="text-[10px] font-space-grotesk text-gray-400 font-semibold uppercase">{{ $addresses->count() }} / 3 Saved</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-{{ min(3, $addresses->count()) }} gap-2.5 mb-2">
+                                @foreach($addresses as $sAddr)
+                                    <button type="button" 
+                                            onclick="selectSavedCheckoutAddress({{ json_encode($sAddr) }})"
+                                            id="saved-addr-btn-{{ $sAddr->id }}"
+                                            class="saved-addr-card text-left p-3 border {{ $sAddr->is_primary ? 'border-black bg-neutral-50 ring-1 ring-black' : 'border-gray-200 bg-white hover:border-gray-400' }} transition-all cursor-pointer">
+                                        <div class="flex items-center justify-between gap-1">
+                                            <span class="text-[9px] font-space-grotesk font-bold uppercase tracking-widest px-1.5 py-0.5 bg-neutral-200 text-neutral-800">
+                                                {{ $sAddr->label }}
+                                            </span>
+                                            @if($sAddr->is_primary)
+                                                <span class="text-[8px] font-space-grotesk font-bold uppercase tracking-wider text-black">
+                                                    DEFAULT
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <p class="font-bold text-xs font-space-grotesk uppercase mt-1.5 truncate text-black">{{ $sAddr->recipient_name }}</p>
+                                        <p class="text-[11px] text-gray-500 font-inter truncate mt-0.5">{{ $sAddr->address }}</p>
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+                        @endif
+
                         <div>
                             <label class="label-luxury">Full Recipient Name *</label>
                             <input type="text" id="name" class="input-luxury" placeholder="Recipient full name"
-                                   value="{{ auth()->user()->name ?? '' }}" required>
+                                   value="{{ (isset($addresses) && $addresses->firstWhere('is_primary', true)) ? $addresses->firstWhere('is_primary', true)->recipient_name : (auth()->user()->name ?? '') }}" required>
                         </div>
 
                         <div class="relative">
@@ -704,6 +734,45 @@
             updateTotalDisplay();
         };
 
+        window.selectSavedCheckoutAddress = function(addr) {
+            if (!addr) return;
+
+            document.querySelectorAll('.saved-addr-card').forEach(card => {
+                card.classList.remove('border-black', 'bg-neutral-50', 'ring-1', 'ring-black');
+                card.classList.add('border-gray-200', 'bg-white');
+            });
+            const selectedBtn = document.getElementById(`saved-addr-btn-${addr.id}`);
+            if (selectedBtn) {
+                selectedBtn.classList.remove('border-gray-200', 'bg-white');
+                selectedBtn.classList.add('border-black', 'bg-neutral-50', 'ring-1', 'ring-black');
+            }
+
+            const nameEl = document.getElementById('name');
+            const phoneEl = document.getElementById('phone');
+            const addrEl = document.getElementById('address');
+            const areaIdEl = document.getElementById('area_id');
+            const areaNameEl = document.getElementById('area_name');
+            const areaSearchEl = document.getElementById('area-search');
+
+            if (nameEl && addr.recipient_name) nameEl.value = addr.recipient_name;
+            if (phoneEl && addr.phone) phoneEl.value = addr.phone;
+            if (addrEl && addr.address) addrEl.value = addr.address;
+            if (areaIdEl && addr.area_id) areaIdEl.value = addr.area_id;
+            if (areaNameEl) areaNameEl.value = addr.area_name || '';
+            if (areaSearchEl) areaSearchEl.value = addr.area_name || '';
+
+            const badge = document.getElementById('confirmed-area-badge');
+            const badgeText = document.getElementById('confirmed-area-text');
+            if (badge && badgeText) {
+                badgeText.innerText = addr.area_name || `Area (${addr.area_id})`;
+                badge.classList.remove('hidden');
+            }
+
+            if (addr.area_id && typeof fetchShippingRates === 'function') {
+                fetchShippingRates(addr.area_id);
+            }
+        };
+
         // Biteship Area Autocomplete Logic
         const areaSearchInput = document.getElementById('area-search');
         const areaResultsBox = document.getElementById('area-results');
@@ -878,6 +947,7 @@
                         items: items,
                         shipping_cost: selectedShippingCost,
                         courier_name: selectedCourierName,
+                        promo_code: appliedPromoCode || null,
                         _token: csrfToken
                     };
 

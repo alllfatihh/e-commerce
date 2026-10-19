@@ -1,5 +1,5 @@
         <!-- VIEW 8: REGISTER / DAFTAR AKUN PAGE -->
-        <section id="view-register" class="view-page px-6 py-12 max-w-md mx-auto">
+        <section id="view-register" class="view-page {{ ($activeView ?? '') === 'view-register' ? 'active-view' : '' }} px-6 py-12 max-w-md mx-auto">
             <div class="bg-white border border-black rounded-2xl p-8 sm:p-10 shadow-2xl space-y-6">
                 <!-- Signature N/Notisse Logo Top Center -->
                 <div class="flex justify-center">

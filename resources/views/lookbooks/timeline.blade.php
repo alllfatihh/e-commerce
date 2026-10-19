@@ -1,6 +1,6 @@
         <!-- VIEW 4: LOOKBOOK INDEX PAGE (LEFT-ALIGNED MINIMALIST TIMELINE) -->
         <section id="view-lookbook-list"
-            class="view-page min-h-[75vh] w-full px-6 sm:px-10 md:px-16 lg:px-20 py-16 md:py-24 flex flex-col justify-center items-start">
+            class="view-page {{ ($activeView ?? '') === 'view-lookbook-list' ? 'active-view' : '' }} min-h-[75vh] w-full px-6 sm:px-10 md:px-16 lg:px-20 py-16 md:py-24 flex flex-col justify-center items-start">
             <div class="relative pl-8 md:pl-12 my-auto text-left">
                 <!-- Vertical Timeline Line -->
                 <div class="absolute left-0 top-3 bottom-3 w-[1.5px] bg-gray-300"></div>

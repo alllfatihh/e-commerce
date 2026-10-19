@@ -16,6 +16,7 @@ $getStorefrontData = function ($activeView = 'view-shop', $extra = []) {
     $settings = \App\Models\SiteSetting::pluck('value', 'key')->toArray();
     $newcomer = \App\Models\Artist::where('is_newcomer', true)->first() ?: \App\Models\Artist::first();
     $carousels = \App\Models\SiteMedia::where('section', 'carousel')->orderBy('order')->get();
+    $addresses = auth()->check() ? auth()->user()->addresses : collect();
 
     return array_merge(compact(
         'products',
@@ -26,6 +27,7 @@ $getStorefrontData = function ($activeView = 'view-shop', $extra = []) {
         'settings',
         'newcomer',
         'carousels',
+        'addresses',
         'activeView'
     ), $extra);
 };
@@ -83,11 +85,11 @@ Route::get('/editorials', function () use ($getStorefrontData) {
 });
 
 Route::get('/editorial/{id}', function ($id) use ($getStorefrontData) {
-    return view('welcome', $getStorefrontData('view-editorial-detail', ['initialEditorialId' => (int) $id]));
+    return view('welcome', $getStorefrontData('view-artist-editorial-detail', ['initialEditorialId' => (int) $id]));
 });
 
 Route::get('/editorials/{id}', function ($id) use ($getStorefrontData) {
-    return view('welcome', $getStorefrontData('view-editorial-detail', ['initialEditorialId' => (int) $id]));
+    return view('welcome', $getStorefrontData('view-artist-editorial-detail', ['initialEditorialId' => (int) $id]));
 });
 
 Route::get('/lookbook', function () use ($getStorefrontData) {
@@ -135,10 +137,11 @@ Route::get('/account', function () use ($getStorefrontData) {
 Route::get('/account/edit', function () use ($getStorefrontData) {
     if (!auth()->check()) return redirect('/login');
     $user = auth()->user();
-    return view('welcome', $getStorefrontData('view-account-edit', compact('user')));
+    return view('welcome', $getStorefrontData('view-edit-profile', compact('user')));
 });
 
 // Seamless Auth & Google Login
+Route::get('/checkout', [AuthController::class, 'showCheckoutAuth']);
 Route::get('/auth/checkout', [AuthController::class, 'showCheckoutAuth']);
 Route::get('/auth/google', [AuthController::class, 'googleRedirect']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
@@ -186,6 +189,15 @@ Route::delete('/api/cart/{id}', [CartController::class, 'remove'])->withoutMiddl
 Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 use App\Http\Controllers\ArtworkOfferingController;
+use App\Http\Controllers\AddressController;
+
+// User Address Book Routes (Max 3)
+Route::get('/api/user/addresses', [AddressController::class, 'index']);
+Route::post('/api/user/addresses', [AddressController::class, 'store'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::put('/api/user/addresses/{id}', [AddressController::class, 'update'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::delete('/api/user/addresses/{id}', [AddressController::class, 'destroy'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+Route::post('/api/user/addresses/{id}/primary', [AddressController::class, 'setPrimary'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
 Route::post('/api/artwork-offerings', [ArtworkOfferingController::class, 'store'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 Route::get('/my-artwork-offers', function () {
     if (!auth()->check()) return response()->json([]);
@@ -217,18 +229,25 @@ Route::get('/my-orders', function () {
             try {
                 \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
                 \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-                $status = \Midtrans\Transaction::status($order->id . '-' . strtotime($order->created_at));
+                $midtransId = $order->midtrans_order_id ?? ($order->id . '-' . strtotime($order->created_at));
+                $status = \Midtrans\Transaction::status($midtransId);
 
                 if ($status && in_array($status->transaction_status, ['settlement', 'capture'])) {
                     $order->update(['status' => 'paid']);
                 } elseif ($status && in_array($status->transaction_status, ['cancel', 'deny', 'expire'])) {
                     $order->update(['status' => 'cancelled']);
+                    foreach ($order->items as $item) {
+                        if ($item->product_id) {
+                            \App\Models\ProductStock::where('product_id', $item->product_id)
+                                ->where('size', $item->size)
+                                ->increment('stock', $item->quantity);
+                        }
+                    }
                 }
             } catch (\Exception $e) {
                 // Abaikan jika tidak ditemukan di Midtrans
             }
         }
-
     }
 
     return $orders;
@@ -251,7 +270,8 @@ Route::post('/my-orders/{id}/cancel', function ($id) {
         try {
             \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
             \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-            \Midtrans\Transaction::cancel($order->id . '-' . strtotime($order->created_at));
+            $midtransId = $order->midtrans_order_id ?? ($order->id . '-' . strtotime($order->created_at));
+            \Midtrans\Transaction::cancel($midtransId);
         } catch (\Exception $e) {
             // Abaikan jika tidak ditemukan di Midtrans
         }
@@ -270,9 +290,10 @@ Route::post('/my-orders/{id}/pay', function ($id) {
     \Midtrans\Config::$isSanitized = true;
     \Midtrans\Config::$is3ds = true;
 
+    $midtransOrderId = $order->id . '-' . time();
     $params = [
         'transaction_details' => [
-            'order_id' => $order->id . '-' . time(),
+            'order_id' => $midtransOrderId,
             'gross_amount' => $order->total_amount,
         ],
         'customer_details' => [
@@ -284,6 +305,10 @@ Route::post('/my-orders/{id}/pay', function ($id) {
 
     try {
         $snapToken = \Midtrans\Snap::getSnapToken($params);
+        $order->update([
+            'midtrans_order_id' => $midtransOrderId,
+            'snap_token' => $snapToken,
+        ]);
         return response()->json(['snap_token' => $snapToken]);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
@@ -293,7 +318,7 @@ Route::post('/my-orders/{id}/pay', function ($id) {
 // HANYA UNTUK TESTING LOKAL (Karena Midtrans tidak bisa menembak webhook ke localhost)
 Route::post('/midtrans/local-success', function (\Illuminate\Http\Request $request) {
     $orderId = explode('-', $request->order_id)[0];
-    $order = \App\Models\Order::find($orderId);
+    $order = \App\Models\Order::where('midtrans_order_id', $request->order_id)->first() ?? \App\Models\Order::find($orderId);
     if ($order && $order->status !== 'paid') {
         $order->update(['status' => 'paid']);
         // Stock deduction is already handled during CheckoutController process.

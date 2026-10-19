@@ -1,5 +1,5 @@
         <!-- VIEW 3: ARTIST COLLAB LIST PAGE -->
-        <section id="view-artist-collab" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 sm:pt-24 pb-16">
+        <section id="view-artist-collab" class="view-page {{ ($activeView ?? '') === 'view-artist-collab' ? 'active-view' : '' }} w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 sm:pt-24 pb-16">
             <div class="mb-16">
                 <h2 class="text-xl md:text-2xl font-bold mb-6 tracking-wide text-black font-space-grotesk">Newcomer</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10 mb-8">

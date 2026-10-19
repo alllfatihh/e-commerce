@@ -1,5 +1,5 @@
         <!-- VIEW 1: SHOP CATALOG WITH AUTO-SLIDING HERO CAROUSEL -->
-        <section id="view-shop" class="view-page active-view pb-16">
+        <section id="view-shop" class="view-page {{ ($activeView ?? 'view-shop') === 'view-shop' ? 'active-view' : '' }} pb-16">
             <div class="relative w-full h-screen overflow-hidden bg-black group">
                 <div id="hero-carousel-slides" class="relative w-full h-full">
                     @if(isset($carousels) && $carousels->count() > 0)

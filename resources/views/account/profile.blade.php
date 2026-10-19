@@ -1,5 +1,5 @@
         <!-- VIEW 9: LOGGED-IN ACCOUNT DASHBOARD -->
-        <section id="view-account-profile" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
+        <section id="view-account-profile" class="view-page {{ ($activeView ?? '') === 'view-account-profile' ? 'active-view' : '' }} w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
             <!-- Back to Shop (Top Left) -->
             <div class="mb-6">
                 <button onclick="showPage('view-shop')"
@@ -17,9 +17,10 @@
                 <div class="flex items-center space-x-5">
                     @if(auth()->check() && auth()->user()->avatar)
                         @php
-                            $userAvatar = Str::startsWith(auth()->user()->avatar, 'http') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar);
+                            $rawAvatar = auth()->user()->avatar;
+                            $userAvatar = Str::startsWith($rawAvatar, ['http://', 'https://']) ? $rawAvatar : asset(ltrim($rawAvatar, '/'));
                         @endphp
-                        <img src="{{ $userAvatar }}" alt="Avatar" class="w-16 h-16 object-cover border border-black shrink-0">
+                        <img src="{{ $userAvatar }}" alt="Avatar" class="w-16 h-16 object-cover border border-black shrink-0" onerror="this.onerror=null; this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden');">
                     @else
                         <div class="w-16 h-16 bg-black text-white flex items-center justify-center font-bold text-xl font-space-grotesk tracking-wider border border-black shrink-0">
                             {{ auth()->check() ? strtoupper(substr(auth()->user()->name ?? 'N', 0, 2)) : 'NT' }}
@@ -84,49 +85,79 @@
                 </div>
             </div>
 
-            <!-- TAB 2: ADDRESS BOOK -->
+            <!-- TAB 2: ADDRESS BOOK (UP TO 3 SAVED ADDRESSES) -->
             <div id="acc-pane-address" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-4">
                     <div>
-                        <h2 class="text-base font-bold font-space-grotesk text-black uppercase tracking-wider">Primary Shipping Address</h2>
-                        <p class="text-xs text-gray-400 font-inter mt-0.5">This address is used for shipping calculations during checkout.</p>
+                        <div class="flex items-center gap-2.5">
+                            <h2 class="text-base font-bold font-space-grotesk text-black uppercase tracking-wider">Saved Shipping Addresses</h2>
+                            <span id="address-counter-badge" class="text-[10px] font-space-grotesk font-bold tracking-widest uppercase bg-neutral-100 border border-gray-200 px-2 py-0.5 text-black">
+                                {{ auth()->check() ? auth()->user()->addresses()->count() : 0 }} / 3 ALAMAT
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-400 font-inter mt-1">Kelola hingga 3 alamat pengiriman untuk mempermudah pemilihan kurir & checkout.</p>
                     </div>
-                    <button onclick="showEditProfile()" class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-black underline">
-                        Change Address
+                    <button type="button" id="btn-add-address-trigger" onclick="openAddressModal()" class="px-4 py-2.5 bg-black hover:bg-neutral-800 text-white font-space-grotesk font-bold text-xs uppercase tracking-wider transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer shrink-0 shadow-sm {{ (auth()->check() && auth()->user()->addresses()->count() >= 3) ? 'hidden' : '' }}">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Add New Address</span>
                     </button>
                 </div>
 
-                <div class="border border-gray-200 p-6 md:p-8 bg-white space-y-4">
-                    <div class="flex justify-between items-start border-b border-gray-100 pb-4">
-                        <div class="flex items-center gap-4">
-                            @if(auth()->check() && auth()->user()->avatar)
-                                @php
-                                    $userAvatarMobile = Str::startsWith(auth()->user()->avatar, 'http') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar);
-                                @endphp
-                                <img src="{{ $userAvatarMobile }}" alt="Avatar" class="w-12 h-12 rounded-full object-cover border border-gray-200">
-                            @else
-                                <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
-                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                <!-- Addresses Cards Grid -->
+                <div id="saved-addresses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    @if(auth()->check() && auth()->user()->addresses->count() > 0)
+                        @foreach(auth()->user()->addresses as $addr)
+                            <div class="border {{ $addr->is_primary ? 'border-black ring-1 ring-black' : 'border-gray-200' }} bg-white p-5 flex flex-col justify-between space-y-4 hover:shadow-sm transition-all relative">
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest px-2.5 py-0.5 bg-neutral-100 text-neutral-800 border border-gray-200">
+                                            {{ $addr->label }}
+                                        </span>
+                                        @if($addr->is_primary)
+                                            <span class="text-[9px] font-space-grotesk font-bold uppercase tracking-widest px-2 py-0.5 bg-black text-white">
+                                                PRIMARY
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-black text-sm font-space-grotesk uppercase">{{ $addr->recipient_name }}</h3>
+                                        <p class="text-xs text-gray-500 font-inter mt-0.5">{{ $addr->phone }}</p>
+                                    </div>
+                                    <div class="text-xs font-inter text-gray-700 leading-relaxed border-t border-gray-100 pt-2.5">
+                                        <p class="line-clamp-3">{{ $addr->address }}</p>
+                                        <div class="mt-2 text-[11px] text-gray-400 font-inter">
+                                            <span class="font-semibold text-gray-600">Wilayah:</span> {{ $addr->area_name ?: $addr->area_id }}
+                                        </div>
+                                    </div>
                                 </div>
-                            @endif
-                            <div>
-                                <span class="text-[10px] font-bold font-space-grotesk tracking-widest uppercase bg-neutral-100 text-neutral-600 px-2 py-0.5 inline-block mb-1.5">User Profile</span>
-                                <h3 class="font-bold text-black text-base font-space-grotesk" id="user-display-name">{{ auth()->check() ? auth()->user()->name : 'Guest' }}</h3>
-                                <p class="text-xs text-gray-500 font-inter mt-0.5" id="user-display-phone">{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : 'No phone number set' }}</p>
-                                <p class="text-xs text-gray-500 font-inter mt-0.5" id="user-display-birthdate">
-                                    {{ auth()->check() && auth()->user()->birthdate ? 'Date of Birth: ' . \Carbon\Carbon::parse(auth()->user()->birthdate)->format('d M Y') : '' }}
-                                </p>
+
+                                <div class="border-t border-gray-100 pt-3 flex items-center justify-between text-xs font-space-grotesk">
+                                    @if(!$addr->is_primary)
+                                        <button type="button" onclick="setPrimaryAddress({{ $addr->id }})" class="text-[10px] font-bold uppercase tracking-wider text-neutral-600 hover:text-black underline cursor-pointer">
+                                            Set as Primary
+                                        </button>
+                                    @else
+                                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Default</span>
+                                    @endif
+                                    <div class="flex items-center space-x-3">
+                                        <button type="button" onclick="editAddressModal({{ $addr->id }})" class="text-[10px] font-bold uppercase tracking-wider text-black hover:underline cursor-pointer">
+                                            Edit
+                                        </button>
+                                        <button type="button" onclick="deleteAddressConfirm({{ $addr->id }})" class="text-[10px] font-bold uppercase tracking-wider text-red-500 hover:text-red-700 underline cursor-pointer">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                        @endforeach
+                    @else
+                        <div class="col-span-full border border-gray-200 p-8 text-center bg-gray-50 space-y-3">
+                            <p class="text-gray-400 font-inter text-sm">Belum ada alamat pengiriman yang tersimpan.</p>
+                            <button type="button" onclick="openAddressModal()" class="px-4 py-2 bg-black text-white text-xs font-bold font-space-grotesk uppercase tracking-wider cursor-pointer">
+                                + Tambah Alamat Sekarang
+                            </button>
                         </div>
-                        <button onclick="showEditProfile()" class="text-xs font-semibold uppercase tracking-wider text-black hover:underline font-space-grotesk">
-                            Edit
-                        </button>
-                    </div>
-                    <div>
-                        <p class="text-xs font-inter text-gray-700 leading-relaxed" id="user-display-address">
-                            {{ auth()->check() && auth()->user()->address ? auth()->user()->address : 'No shipping address saved yet. Please add an address for seamless checkout.' }}
-                        </p>
-                    </div>
+                    @endif
                 </div>
             </div>
 

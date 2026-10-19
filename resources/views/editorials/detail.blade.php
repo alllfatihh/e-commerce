@@ -1,5 +1,5 @@
         <!-- VIEW 3D: EDITORIAL ARTICLE DETAIL PAGE -->
-        <section id="view-artist-editorial-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
+        <section id="view-artist-editorial-detail" class="view-page {{ ($activeView ?? '') === 'view-artist-editorial-detail' ? 'active-view' : '' }} w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <!-- Navigation -->
             <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"

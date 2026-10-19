@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'logout',
             'update-profile',
             'admin/*',
+            'my-orders/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

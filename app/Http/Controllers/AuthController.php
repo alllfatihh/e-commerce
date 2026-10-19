@@ -13,7 +13,8 @@ class AuthController extends Controller
 {
     public function showCheckoutAuth()
     {
-        return view('checkout-auth');
+        $addresses = Auth::check() ? Auth::user()->addresses : collect();
+        return view('checkout-auth', compact('addresses'));
     }
 
     public function seamlessRegisterOrLogin(Request $request)
@@ -40,6 +41,17 @@ class AuthController extends Controller
         if (Auth::check()) {
             $user = Auth::user();
             $user->update($updateFields);
+            if ($user->addresses()->count() === 0) {
+                $user->addresses()->create([
+                    'label' => 'Utama',
+                    'recipient_name' => $user->name,
+                    'phone' => $user->phone ?? '',
+                    'address' => $user->address,
+                    'area_id' => $user->area_id,
+                    'area_name' => $request->input('area_name'),
+                    'is_primary' => true,
+                ]);
+            }
             return response()->json(['success' => true]);
         }
 
@@ -50,6 +62,17 @@ class AuthController extends Controller
             if (Hash::check($request->password, $user->password)) {
                 // Update detail jika kosong
                 $user->update($updateFields);
+                if ($user->addresses()->count() === 0) {
+                    $user->addresses()->create([
+                        'label' => 'Utama',
+                        'recipient_name' => $user->name,
+                        'phone' => $user->phone ?? '',
+                        'address' => $user->address,
+                        'area_id' => $user->area_id,
+                        'area_name' => $request->input('area_name'),
+                        'is_primary' => true,
+                    ]);
+                }
                 Auth::login($user);
                 $request->session()->regenerate();
                 return response()->json(['success' => true]);
@@ -70,6 +93,15 @@ class AuthController extends Controller
                 $createFields['birthdate'] = $request->birthdate;
             }
             $user = User::create($createFields);
+            $user->addresses()->create([
+                'label' => 'Utama',
+                'recipient_name' => $user->name,
+                'phone' => $user->phone ?? '',
+                'address' => $user->address,
+                'area_id' => $user->area_id,
+                'area_name' => $request->input('area_name'),
+                'is_primary' => true,
+            ]);
             Auth::login($user);
             $request->session()->regenerate();
             return response()->json(['success' => true]);
@@ -83,7 +115,10 @@ class AuthController extends Controller
                 session(['google_auth_from' => $request->get('from')]);
                 session()->save();
             }
-            return Socialite::driver('google')->redirect();
+            return Socialite::driver('google')
+                ->stateless()
+                ->with(['prompt' => 'select_account'])
+                ->redirect();
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Google redirect error: ' . $e->getMessage());
             return redirect('/login')->with('error', 'Gagal menghubungkan ke Google: ' . $e->getMessage());
@@ -108,12 +143,19 @@ class AuthController extends Controller
                     'name' => $googleUser->getName() ?? 'User',
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
                     'password' => null, 
                 ]);
             } else {
-                // Update google_id if empty
+                $updates = [];
                 if (!$user->google_id) {
-                    $user->update(['google_id' => $googleUser->getId()]);
+                    $updates['google_id'] = $googleUser->getId();
+                }
+                if (!$user->getRawOriginal('avatar') && $googleUser->getAvatar()) {
+                    $updates['avatar'] = $googleUser->getAvatar();
+                }
+                if (!empty($updates)) {
+                    $user->update($updates);
                 }
             }
 
@@ -125,11 +167,15 @@ class AuthController extends Controller
                 return redirect('/account')->with('success', 'Berhasil masuk dengan akun Google!');
             }
 
-            if (!$user->area_id) {
-                return redirect('/auth/checkout')->with('success', 'Berhasil masuk dengan akun Google! Silakan lengkapi detail pengiriman.');
+            if ($from === 'checkout') {
+                return redirect('/checkout')->with('success', 'Berhasil masuk dengan akun Google!');
             }
 
-            return redirect('/?open_checkout=true')->with('success', 'Berhasil masuk dengan akun Google!');
+            if (!$user->area_id) {
+                return redirect('/checkout')->with('success', 'Berhasil masuk dengan akun Google! Silakan lengkapi detail pengiriman.');
+            }
+
+            return redirect('/checkout')->with('success', 'Berhasil masuk dengan akun Google!');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Google login error: ' . $e->getMessage());
             return redirect('/login')->with('error', 'Login via Google gagal: ' . $e->getMessage());

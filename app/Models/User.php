@@ -41,6 +41,16 @@ class User extends Authenticatable
         return $this->hasMany(ArtworkOffering::class);
     }
 
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class)->orderBy('is_primary', 'desc')->orderBy('id', 'asc');
+    }
+
+    public function primaryAddress()
+    {
+        return $this->hasOne(UserAddress::class)->where('is_primary', true);
+    }
+
     public function getAvatarAttribute($value)
     {
         return $this->resolveMediaUrl($value);

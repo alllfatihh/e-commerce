@@ -159,7 +159,21 @@
         const cartTrigger = document.getElementById('cart-trigger');
         const cartClose = document.getElementById('cart-close');
 
-        function showPage(pageId, isBacking = false) {
+        const PAGE_URL_MAP = {
+            'view-shop': '/',
+            'view-artist-collab': '/artist',
+            'view-editorials-all': '/editorial',
+            'view-lookbook-list': '/lookbook',
+            'view-about': '/about',
+            'view-contact': '/contact',
+            'view-login': '/login',
+            'view-register': '/register',
+            'view-account-profile': '/account',
+            'view-edit-profile': '/account/edit',
+            'view-account-edit': '/account/edit',
+        };
+
+        function showPage(pageId, isBacking = false, updateUrl = true) {
             const activePage = document.querySelector('.view-page.active-view');
             const currentActiveId = activePage ? activePage.id : null;
 
@@ -180,10 +194,29 @@
                 mainHeader.classList.add('header-visible');
             }
             updateHeaderState();
+
+            // Save active view in sessionStorage
+            sessionStorage.setItem('notisse_active_view', pageId);
+
+            // Update browser URL so page refresh always stays on the current view
+            if (updateUrl && PAGE_URL_MAP[pageId]) {
+                let targetUrl = PAGE_URL_MAP[pageId];
+                if (pageId === 'view-account-profile') {
+                    const savedTab = sessionStorage.getItem('notisse_active_acc_tab');
+                    if (savedTab && savedTab !== 'orders') {
+                        targetUrl += `#${savedTab}`;
+                    }
+                }
+                if (window.location.pathname !== targetUrl && (window.location.pathname + window.location.hash) !== targetUrl) {
+                    history.pushState({ pageId: pageId }, '', targetUrl);
+                }
+            }
         }
 
         function goBack() {
-            if (navigationHistory.length > 0) {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else if (navigationHistory.length > 0) {
                 const previousPageId = navigationHistory.pop();
                 showPage(previousPageId, true);
             } else {
@@ -195,6 +228,76 @@
             closeMenu();
             showPage(pageId);
         }
+
+        window.addEventListener('popstate', (event) => {
+            const state = event.state;
+            if (state && state.pageId) {
+                if (state.pageId === 'view-product-detail' && state.productId) {
+                    openProductDetail(state.productId, null, null, false);
+                } else if (state.pageId === 'view-artist-detail' && state.artistId) {
+                    openArtistProfile(state.artistId, null, false);
+                } else if (state.pageId === 'view-artist-artwork-detail' && state.artworkId) {
+                    openArtistArtworkDetailById(state.artworkId, false);
+                } else if (state.pageId === 'view-artist-editorial-detail' && state.editorialId) {
+                    openArtistEditorialDetailById(state.editorialId, false);
+                } else if (state.pageId === 'view-lookbook-detail' && state.lookbookId) {
+                    openLookbookDetail(state.lookbookId, false);
+                } else {
+                    showPage(state.pageId, true, false);
+                    if (state.pageId === 'view-account-profile' && state.tab) {
+                        switchAccountTab(state.tab);
+                    }
+                }
+            } else {
+                const path = window.location.pathname;
+                if (path === '/' || path === '/shop') {
+                    showPage('view-shop', true, false);
+                } else if (path.startsWith('/product/') || path.startsWith('/products/')) {
+                    const pid = path.replace(/^\/products?\//, '');
+                    openProductDetail(pid, null, null, false);
+                } else if (path === '/artist' || path === '/artists' || path === '/artist-collab') {
+                    showPage('view-artist-collab', true, false);
+                } else if (path.startsWith('/artist/') || path.startsWith('/artists/')) {
+                    const aid = path.replace(/^\/artists?\//, '');
+                    openArtistProfile(aid, null, false);
+                } else if (path.startsWith('/artwork/') || path.startsWith('/artworks/')) {
+                    const wid = path.replace(/^\/artworks?\//, '');
+                    openArtistArtworkDetailById(wid, false);
+                } else if (path === '/editorial' || path === '/editorials') {
+                    showPage('view-editorials-all', true, false);
+                } else if (path.startsWith('/editorial/') || path.startsWith('/editorials/')) {
+                    const eid = path.replace(/^\/editorials?\//, '');
+                    openArtistEditorialDetailById(eid, false);
+                } else if (path === '/lookbook' || path === '/lookbooks') {
+                    showPage('view-lookbook-list', true, false);
+                } else if (path.startsWith('/lookbook/') || path.startsWith('/lookbooks/')) {
+                    const lid = path.replace(/^\/lookbooks?\//, '');
+                    openLookbookDetail(lid, false);
+                } else if (path === '/about') {
+                    showPage('view-about', true, false);
+                } else if (path === '/contact') {
+                    showPage('view-contact', true, false);
+                } else if (path === '/login') {
+                    showPage('view-login', true, false);
+                } else if (path === '/register') {
+                    showPage('view-register', true, false);
+                } else if (path === '/account') {
+                    showPage('view-account-profile', true, false);
+                    const hash = window.location.hash.replace('#', '');
+                    if (hash) switchAccountTab(hash);
+                } else if (path === '/account/edit') {
+                    showPage('view-edit-profile', true, false);
+                } else {
+                    showPage('view-shop', true, false);
+                }
+            }
+
+            if (window.location.hash === '#cart' || (state && state.cartOpen)) {
+                openCart(false);
+            } else if (overlayCart && !overlayCart.classList.contains('hidden') && window.location.hash !== '#cart') {
+                closeCart(false);
+            }
+        });
 
         /* ACCOUNT FUNCTIONALITIES */
         function handleAccountButtonClick() {
@@ -225,6 +328,11 @@
                     }
                 }
             });
+
+            sessionStorage.setItem('notisse_active_acc_tab', tab);
+            if (window.location.pathname === '/account' || window.location.pathname === '/') {
+                history.replaceState({ pageId: 'view-account-profile', tab: tab }, '', `/account#${tab}`);
+            }
 
             if (tab === 'orders') {
                 fetchOrderHistory();
@@ -619,7 +727,7 @@
         }
 
         /* CART DRAWER LOGIC */
-        function openCart() {
+        function openCart(updateUrl = true) {
             renderCartItems();
             overlayCart.classList.remove('hidden');
             const cartTrigger = document.getElementById('cart-trigger');
@@ -633,9 +741,16 @@
             if (loggedInUser && loggedInUser.area_id && cartState.length > 0) {
                 fetchShippingRates(loggedInUser.area_id);
             }
+
+            if (updateUrl && !window.location.hash.includes('cart')) {
+                history.pushState({ cartOpen: true }, '', window.location.pathname + '#cart');
+            }
+            try {
+                sessionStorage.setItem('notisse_cart_open', 'true');
+            } catch(e) {}
         }
 
-        function closeCart() {
+        function closeCart(updateUrl = true) {
             cartDrawerContent.classList.add('translate-x-full');
             overlayCart.classList.add('opacity-0');
             setTimeout(() => {
@@ -643,12 +758,19 @@
                 document.body.style.overflow = 'auto';
                 updateHeaderState();
             }, 300);
+
+            if (updateUrl && window.location.hash === '#cart') {
+                history.pushState({}, '', window.location.pathname);
+            }
+            try {
+                sessionStorage.removeItem('notisse_cart_open');
+            } catch(e) {}
         }
 
-        cartTrigger.addEventListener('click', openCart);
-        cartClose.addEventListener('click', closeCart);
+        cartTrigger.addEventListener('click', () => openCart(true));
+        cartClose.addEventListener('click', () => closeCart(true));
 
-        function openProductDetail(productIdOrName, price, image) {
+        function openProductDetail(productIdOrName, price, image, updateUrl = true) {
             let product = null;
             if (typeof productIdOrName === 'number') {
                 product = productsData ? productsData.find(p => p.id === productIdOrName) : null;
@@ -819,10 +941,17 @@
             closeSizeDropdown();
             updateProductDetailScroll();
 
-            showPage('view-product-detail');
+            showPage('view-product-detail', false, false);
+            if (updateUrl && currentProduct && currentProduct.id) {
+                history.pushState({ pageId: 'view-product-detail', productId: currentProduct.id }, '', '/product/' + currentProduct.id);
+                try {
+                    sessionStorage.setItem('notisse_active_view', 'view-product-detail');
+                    sessionStorage.setItem('notisse_product_id', currentProduct.id);
+                } catch (e) {}
+            }
         }
 
-        function openArtistProfile(artistIdOrName, location) {
+        function openArtistProfile(artistIdOrName, location, updateUrl = true) {
             let artist = null;
             if (typeof artistsData !== 'undefined' && artistsData) {
                 if (typeof artistIdOrName === 'number' || (!isNaN(Number(artistIdOrName)) && String(artistIdOrName).trim() !== '')) {
@@ -908,7 +1037,7 @@
                         const artImg = resolveImageUrl(artw.image, 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork');
                         const card = document.createElement('div');
                         card.className = 'group cursor-pointer';
-                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price);
+                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price, artw.id);
                         card.innerHTML = `
                             <div class="w-full aspect-square bg-[#d9d9d9] mb-3.5 overflow-hidden relative">
                                 <img src="${artImg}" alt="${artw.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -926,7 +1055,14 @@
             }
 
             switchArtistTab('editorial');
-            showPage('view-artist-detail');
+            showPage('view-artist-detail', false, false);
+            if (updateUrl && artist && artist.id) {
+                history.pushState({ pageId: 'view-artist-detail', artistId: artist.id }, '', '/artist/' + artist.id);
+                try {
+                    sessionStorage.setItem('notisse_active_view', 'view-artist-detail');
+                    sessionStorage.setItem('notisse_artist_id', artist.id);
+                } catch (e) {}
+            }
         }
 
         function filterArtists(query) {
@@ -976,8 +1112,9 @@
             image: "https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View"
         };
 
-        function openArtistArtworkDetail(title, artist, medium, dimensions, image, price) {
+        function openArtistArtworkDetail(title, artist, medium, dimensions, image, price, id = null, updateUrl = true) {
             currentActiveArtwork = {
+                id: id,
                 title: title || 'Artwork',
                 artist: artist || 'Mustafa Alatas',
                 medium: medium || 'Oil on canvas',
@@ -1007,7 +1144,44 @@
                 priceEl.innerText = pVal > 0 ? 'Rp ' + pVal.toLocaleString('id-ID') : 'Price on Inquiry';
             }
 
-            showPage('view-artist-artwork-detail');
+            showPage('view-artist-artwork-detail', false, false);
+            if (updateUrl && id) {
+                history.pushState({ pageId: 'view-artist-artwork-detail', artworkId: id }, '', '/artwork/' + id);
+                try {
+                    sessionStorage.setItem('notisse_active_view', 'view-artist-artwork-detail');
+                    sessionStorage.setItem('notisse_artwork_id', id);
+                } catch (e) {}
+            }
+        }
+
+        function openArtistArtworkDetailById(id, updateUrl = true) {
+            let foundArt = null;
+            let foundArtist = null;
+            if (typeof artistsData !== 'undefined' && artistsData) {
+                for (const a of artistsData) {
+                    if (a.artworks) {
+                        const art = a.artworks.find(w => Number(w.id) === Number(id));
+                        if (art) {
+                            foundArt = art;
+                            foundArtist = a;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (foundArt) {
+                const artImg = resolveImageUrl(foundArt.image, 'https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View');
+                openArtistArtworkDetail(
+                    foundArt.title,
+                    foundArtist ? foundArtist.name : 'Mustafa Alatas',
+                    foundArt.medium || 'Oil on canvas',
+                    foundArt.dimensions || '60x60cm',
+                    artImg,
+                    foundArt.price || 0,
+                    foundArt.id,
+                    updateUrl
+                );
+            }
         }
 
         /* ARTWORK OFFERING MODAL LOGIC */
@@ -1220,7 +1394,7 @@
             showPage('view-artist-editorial-detail');
         }
 
-        function openArtistEditorialDetailById(id) {
+        function openArtistEditorialDetailById(id, updateUrl = true) {
             let foundEd = null;
             let foundArtist = null;
 
@@ -1322,11 +1496,18 @@
                 }
             }
 
-            showPage('view-artist-editorial-detail');
+            showPage('view-artist-editorial-detail', false, false);
+            if (updateUrl && id) {
+                history.pushState({ pageId: 'view-artist-editorial-detail', editorialId: id }, '', '/editorial/' + id);
+                try {
+                    sessionStorage.setItem('notisse_active_view', 'view-artist-editorial-detail');
+                    sessionStorage.setItem('notisse_editorial_id', id);
+                } catch (e) {}
+            }
         }
 
         /* LOOKBOOK DYNAMIC LOADER & DETAIL */
-        function openLookbookDetail(id) {
+        function openLookbookDetail(id, updateUrl = true) {
             let lb = null;
             if (typeof lookbooksData !== 'undefined' && lookbooksData && lookbooksData.length > 0) {
                 if (id) {
@@ -1376,7 +1557,14 @@
                 }
             }
 
-            showPage('view-lookbook-detail');
+            showPage('view-lookbook-detail', false, false);
+            if (updateUrl && lb && lb.id) {
+                history.pushState({ pageId: 'view-lookbook-detail', lookbookId: lb.id }, '', '/lookbook/' + lb.id);
+                try {
+                    sessionStorage.setItem('notisse_active_view', 'view-lookbook-detail');
+                    sessionStorage.setItem('notisse_lookbook_id', lb.id);
+                } catch (e) {}
+            }
         }
 
         function showToast(message) {
@@ -1753,26 +1941,8 @@
                 showToast("Cart is empty!");
                 return;
             }
-            window.location.href = '/auth/checkout';
+            window.location.href = '/checkout';
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            const lastPage = sessionStorage.getItem('current_page') || 'view-shop';
-            showPage(lastPage);
-            
-            if(lastPage === 'view-account-profile' && loggedInUser) {
-                fetchOrderHistory();
-            }
-            updateHeaderState();
-            renderCartItems();
-            startAutoSlide();
-            
-            if (urlParams.get('open_checkout') === 'true') {
-                openCart();
-            }
-        });
 
         // ====== BESPOKE NOTISSE DATE PICKER LOGIC ======
         let calCurrentYear = 2000;
@@ -2108,34 +2278,401 @@
             }
         }
 
+        // ─── USER ADDRESS BOOK SYSTEM (MAX 3 ADDRESSES) ───
+        let userSavedAddresses = @json($addresses ?? []);
+
+        function openAddressModal(addressData = null) {
+            const modal = document.getElementById('address-modal');
+            const titleEl = document.getElementById('address-modal-title');
+            const errorBox = document.getElementById('address-modal-error');
+            const submitBtnText = document.getElementById('modal-submit-btn-text');
+
+            if (!modal) return;
+            errorBox.classList.add('hidden');
+            errorBox.innerText = '';
+
+            if (addressData) {
+                // Edit mode
+                titleEl.innerText = 'Edit Address';
+                submitBtnText.innerText = 'SIMPAN PERUBAHAN';
+                document.getElementById('modal-address-id').value = addressData.id;
+                document.getElementById('modal-address-label').value = addressData.label || '';
+                document.getElementById('modal-recipient-name').value = addressData.recipient_name || '';
+                document.getElementById('modal-phone').value = addressData.phone || '';
+                document.getElementById('modal-address-detail').value = addressData.address || '';
+                document.getElementById('modal-area-id').value = addressData.area_id || '';
+                document.getElementById('modal-area-name').value = addressData.area_name || '';
+                document.getElementById('modal-area-search').value = addressData.area_name || '';
+                document.getElementById('modal-is-primary').checked = !!addressData.is_primary;
+
+                if (addressData.area_id) {
+                    const conf = document.getElementById('modal-confirmed-area');
+                    const confText = document.getElementById('modal-confirmed-area-text');
+                    if (conf && confText) {
+                        confText.innerText = addressData.area_name || addressData.area_id;
+                        conf.classList.remove('hidden');
+                    }
+                }
+            } else {
+                // Add mode
+                titleEl.innerText = 'Add New Address';
+                submitBtnText.innerText = 'SIMPAN ALAMAT';
+                document.getElementById('modal-address-id').value = '';
+                document.getElementById('modal-address-label').value = 'Rumah';
+                document.getElementById('modal-recipient-name').value = (typeof loggedInUser !== 'undefined' && loggedInUser?.name) ? loggedInUser.name : '';
+                document.getElementById('modal-phone').value = (typeof loggedInUser !== 'undefined' && loggedInUser?.phone) ? loggedInUser.phone : '';
+                document.getElementById('modal-address-detail').value = '';
+                document.getElementById('modal-area-id').value = '';
+                document.getElementById('modal-area-name').value = '';
+                document.getElementById('modal-area-search').value = '';
+                document.getElementById('modal-is-primary').checked = (userSavedAddresses.length === 0);
+
+                const conf = document.getElementById('modal-confirmed-area');
+                if (conf) conf.classList.add('hidden');
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setupModalAreaSearch();
+        }
+
+        function closeAddressModal() {
+            const modal = document.getElementById('address-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function setAddressLabelPreset(label) {
+            const input = document.getElementById('modal-address-label');
+            if (input) input.value = label;
+        }
+
+        let modalAreaTimeout = null;
+        function setupModalAreaSearch() {
+            const searchInput = document.getElementById('modal-area-search');
+            const resultsBox = document.getElementById('modal-area-results');
+            const spinner = document.getElementById('modal-area-spinner');
+            const areaIdInput = document.getElementById('modal-area-id');
+            const areaNameInput = document.getElementById('modal-area-name');
+            const confBox = document.getElementById('modal-confirmed-area');
+            const confText = document.getElementById('modal-confirmed-area-text');
+
+            if (!searchInput || searchInput.dataset.listenerAttached) return;
+            searchInput.dataset.listenerAttached = 'true';
+
+            searchInput.addEventListener('input', function() {
+                const keyword = this.value.trim();
+                clearTimeout(modalAreaTimeout);
+
+                if (keyword.length < 3) {
+                    resultsBox.classList.add('hidden');
+                    return;
+                }
+
+                if (spinner) spinner.classList.remove('hidden');
+
+                modalAreaTimeout = setTimeout(async () => {
+                    try {
+                        const res = await fetch(`/shipping-areas?keyword=${encodeURIComponent(keyword)}`);
+                        const data = await res.json();
+                        if (spinner) spinner.classList.add('hidden');
+
+                        resultsBox.innerHTML = '';
+                        if (data.areas && data.areas.length > 0) {
+                            data.areas.forEach(area => {
+                                const li = document.createElement('li');
+                                li.className = 'px-3 py-2 hover:bg-neutral-100 cursor-pointer text-xs font-inter border-b border-gray-100 flex items-center justify-between';
+                                li.innerHTML = `<span class="truncate">${area.name}</span><span class="text-[9px] font-space-grotesk font-bold uppercase text-gray-400 shrink-0 ml-2">Pilih</span>`;
+                                li.onclick = () => {
+                                    searchInput.value = area.name;
+                                    areaIdInput.value = area.id;
+                                    areaNameInput.value = area.name;
+                                    if (confBox && confText) {
+                                        confText.innerText = area.name;
+                                        confBox.classList.remove('hidden');
+                                    }
+                                    resultsBox.classList.add('hidden');
+                                };
+                                resultsBox.appendChild(li);
+                            });
+                            resultsBox.classList.remove('hidden');
+                        } else {
+                            resultsBox.innerHTML = '<li class="px-3 py-2 text-gray-400 text-xs font-inter italic">Kecamatan tidak ditemukan.</li>';
+                            resultsBox.classList.remove('hidden');
+                        }
+                    } catch (err) {
+                        if (spinner) spinner.classList.add('hidden');
+                        console.error('Error fetching areas:', err);
+                    }
+                }, 400);
+            });
+
+            document.addEventListener('click', function(e) {
+                if (resultsBox && !searchInput.contains(e.target) && !resultsBox.contains(e.target)) {
+                    resultsBox.classList.add('hidden');
+                }
+            });
+        }
+
+        async function handleAddressFormSubmit(e) {
+            e.preventDefault();
+            const errorBox = document.getElementById('address-modal-error');
+            const submitBtn = document.getElementById('modal-submit-btn');
+            const originalBtnText = document.getElementById('modal-submit-btn-text').innerText;
+
+            errorBox.classList.add('hidden');
+            errorBox.innerText = '';
+
+            const id = document.getElementById('modal-address-id').value;
+            const areaId = document.getElementById('modal-area-id').value;
+
+            if (!areaId) {
+                errorBox.innerText = 'Silakan pilih kecamatan/kota dari daftar pencarian.';
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            const payload = {
+                label: document.getElementById('modal-address-label').value.trim(),
+                recipient_name: document.getElementById('modal-recipient-name').value.trim(),
+                phone: document.getElementById('modal-phone').value.trim(),
+                address: document.getElementById('modal-address-detail').value.trim(),
+                area_id: areaId,
+                area_name: document.getElementById('modal-area-name').value.trim() || document.getElementById('modal-area-search').value.trim(),
+                is_primary: document.getElementById('modal-is-primary').checked
+            };
+
+            submitBtn.disabled = true;
+            document.getElementById('modal-submit-btn-text').innerText = 'MENYIMPAN...';
+
+            try {
+                const url = id ? `/api/user/addresses/${id}` : '/api/user/addresses';
+                const method = id ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    userSavedAddresses = data.addresses || [];
+                    renderSavedAddresses(userSavedAddresses);
+                    closeAddressModal();
+                    if (typeof showToast === 'function') {
+                        showToast(data.message || 'Alamat berhasil disimpan.');
+                    }
+                } else {
+                    errorBox.innerText = data.message || 'Gagal menyimpan alamat.';
+                    errorBox.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorBox.innerText = 'Terjadi kesalahan jaringan. Silakan coba lagi.';
+                errorBox.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                document.getElementById('modal-submit-btn-text').innerText = originalBtnText;
+            }
+        }
+
+        async function editAddressModal(id) {
+            const addr = userSavedAddresses.find(a => a.id === id);
+            if (addr) {
+                openAddressModal(addr);
+            } else {
+                try {
+                    const res = await fetch('/api/user/addresses');
+                    const data = await res.json();
+                    if (data.addresses) {
+                        userSavedAddresses = data.addresses;
+                        const found = userSavedAddresses.find(a => a.id === id);
+                        if (found) openAddressModal(found);
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+        }
+
+        async function setPrimaryAddress(id) {
+            try {
+                const response = await fetch(`/api/user/addresses/${id}/primary`, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    userSavedAddresses = data.addresses || [];
+                    renderSavedAddresses(userSavedAddresses);
+                    if (typeof showToast === 'function') {
+                        showToast('Alamat utama berhasil diperbarui.');
+                    }
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function deleteAddressConfirm(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus alamat ini?')) return;
+
+            try {
+                const response = await fetch(`/api/user/addresses/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    userSavedAddresses = data.addresses || [];
+                    renderSavedAddresses(userSavedAddresses);
+                    if (typeof showToast === 'function') {
+                        showToast(data.message || 'Alamat berhasil dihapus.');
+                    }
+                } else {
+                    alert(data.message || 'Gagal menghapus alamat.');
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function renderSavedAddresses(addresses) {
+            const container = document.getElementById('saved-addresses-grid');
+            const badge = document.getElementById('address-counter-badge');
+            const addBtnTrigger = document.getElementById('btn-add-address-trigger');
+
+            if (!container) return;
+
+            const count = addresses ? addresses.length : 0;
+            if (badge) badge.innerText = `${count} / 3 ALAMAT`;
+
+            if (addBtnTrigger) {
+                if (count >= 3) {
+                    addBtnTrigger.classList.add('hidden');
+                } else {
+                    addBtnTrigger.classList.remove('hidden');
+                }
+            }
+
+            if (!addresses || addresses.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full border border-gray-200 p-8 text-center bg-gray-50 space-y-3">
+                        <p class="text-gray-400 font-inter text-sm">Belum ada alamat pengiriman yang tersimpan.</p>
+                        <button type="button" onclick="openAddressModal()" class="px-4 py-2 bg-black text-white text-xs font-bold font-space-grotesk uppercase tracking-wider cursor-pointer">
+                            + Tambah Alamat Sekarang
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = addresses.map(addr => `
+                <div class="border ${addr.is_primary ? 'border-black ring-1 ring-black' : 'border-gray-200'} bg-white p-5 flex flex-col justify-between space-y-4 hover:shadow-sm transition-all relative">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-widest px-2.5 py-0.5 bg-neutral-100 text-neutral-800 border border-gray-200">
+                                ${addr.label}
+                            </span>
+                            ${addr.is_primary ? `
+                                <span class="text-[9px] font-space-grotesk font-bold uppercase tracking-widest px-2 py-0.5 bg-black text-white">
+                                    PRIMARY
+                                </span>
+                            ` : ''}
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-black text-sm font-space-grotesk uppercase">${addr.recipient_name}</h3>
+                            <p class="text-xs text-gray-500 font-inter mt-0.5">${addr.phone}</p>
+                        </div>
+                        <div class="text-xs font-inter text-gray-700 leading-relaxed border-t border-gray-100 pt-2.5">
+                            <p class="line-clamp-3">${addr.address}</p>
+                            <div class="mt-2 text-[11px] text-gray-400 font-inter">
+                                <span class="font-semibold text-gray-600">Wilayah:</span> ${addr.area_name || addr.area_id}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-100 pt-3 flex items-center justify-between text-xs font-space-grotesk">
+                        ${!addr.is_primary ? `
+                            <button type="button" onclick="setPrimaryAddress(${addr.id})" class="text-[10px] font-bold uppercase tracking-wider text-neutral-600 hover:text-black underline cursor-pointer">
+                                Set as Primary
+                            </button>
+                        ` : `
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Default</span>
+                        `}
+                        <div class="flex items-center space-x-3">
+                            <button type="button" onclick="editAddressModal(${addr.id})" class="text-[10px] font-bold uppercase tracking-wider text-black hover:underline cursor-pointer">
+                                Edit
+                            </button>
+                            <button type="button" onclick="deleteAddressConfirm(${addr.id})" class="text-[10px] font-bold uppercase tracking-wider text-red-500 hover:text-red-700 underline cursor-pointer">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         // Initial Cart & URL Trigger Setup
         document.addEventListener('DOMContentLoaded', () => {
             renderCartItems();
 
             const initialView = @json($activeView ?? null);
-            if (initialView) {
-                showPage(initialView);
-            }
-
             const initialProductId = @json($initialProductId ?? null);
+            const initialArtistId = @json($initialArtistId ?? null);
+            const initialArtworkId = @json($initialArtworkId ?? null);
+            const initialEditorialId = @json($initialEditorialId ?? null);
+            const initialLookbookId = @json($initialLookbookId ?? null);
+
             if (initialProductId) {
-                openProductDetail(initialProductId);
+                openProductDetail(initialProductId, null, null, false);
+            } else if (initialArtistId) {
+                openArtistProfile(initialArtistId, null, false);
+            } else if (initialArtworkId) {
+                openArtistArtworkDetailById(initialArtworkId, false);
+            } else if (initialEditorialId) {
+                openArtistEditorialDetailById(initialEditorialId, false);
+            } else if (initialLookbookId) {
+                openLookbookDetail(initialLookbookId, false);
+            } else if (initialView) {
+                showPage(initialView, false, false);
+                if (initialView === 'view-account-profile') {
+                    const hash = window.location.hash.replace('#', '');
+                    const savedTab = sessionStorage.getItem('notisse_active_acc_tab');
+                    const tabToOpen = hash || savedTab || 'orders';
+                    switchAccountTab(tabToOpen);
+                }
+            } else {
+                // Fallback to sessionStorage if loaded on root / but user previously viewed another page
+                const savedView = sessionStorage.getItem('notisse_active_view');
+                if (savedView && document.getElementById(savedView)) {
+                    showPage(savedView, false, false);
+                    if (savedView === 'view-account-profile') {
+                        const savedTab = sessionStorage.getItem('notisse_active_acc_tab');
+                        if (savedTab) switchAccountTab(savedTab);
+                    }
+                }
             }
 
-            const initialArtistId = @json($initialArtistId ?? null);
-            if (initialArtistId) {
-                openArtistProfile(initialArtistId);
+            if (typeof startAutoSlide === 'function') {
+                startAutoSlide();
             }
 
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('open_checkout') === 'true') {
-                window.history.replaceState({}, document.title, window.location.pathname);
+            const shouldOpenCart = urlParams.get('open_checkout') === 'true' || urlParams.get('cart') === 'true' || window.location.hash === '#cart' || sessionStorage.getItem('notisse_cart_open') === 'true';
+
+            if (shouldOpenCart) {
                 setTimeout(() => {
-                    openCart();
+                    openCart(false);
                     if (loggedInUser && loggedInUser.area_id && cartState.length > 0) {
                         fetchShippingRates(loggedInUser.area_id);
                     }
-                }, 300);
+                }, 200);
             }
         });
     </script>

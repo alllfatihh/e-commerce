@@ -1,5 +1,5 @@
         <!-- VIEW 3B: ARTIST PROFILE PAGE -->
-        <section id="view-artist-detail" class="view-page w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
+        <section id="view-artist-detail" class="view-page {{ ($activeView ?? '') === 'view-artist-detail' ? 'active-view' : '' }} w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">

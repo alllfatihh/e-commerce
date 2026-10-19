@@ -30,7 +30,7 @@
                 </div>
                 <p class="text-xs text-gray-400 font-space-grotesk">Shipping will be calculated at checkout.</p>
                 <div class="pt-4 w-full text-right">
-                    <button onclick="window.location.href='/auth/checkout'"
+                    <button onclick="window.location.href='/checkout'"
                         class="btn-brush text-sm md:text-base cursor-pointer font-space-grotesk" id="checkout-btn">
                         CHECKOUT
                     </button>

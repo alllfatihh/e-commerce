@@ -18,6 +18,7 @@
     @include('partials.overlays.cart-drawer')
     @include('partials.overlays.artwork-offering-modal')
     @include('partials.overlays.lightbox-modal')
+    @include('partials.overlays.address-modal')
     @include('partials.overlays.toast')
 
     {{-- Main Application Page Views (Organized Per Module Folder) --}}
