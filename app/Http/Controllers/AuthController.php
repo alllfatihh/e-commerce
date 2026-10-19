@@ -198,7 +198,7 @@ class AuthController extends Controller
             'birthdate' => 'nullable|date',
             'address' => 'required|string',
             'area_id' => 'required|string',
-            'avatar' => 'nullable|image|max:4096'
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096'
         ]);
 
         $user = Auth::user();

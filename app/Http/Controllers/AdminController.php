@@ -73,10 +73,10 @@ class AdminController extends Controller
             'description'      => 'nullable|string',
             'specs'            => 'nullable|string',
             'artist'           => 'nullable|string|max:255',
-            'image'            => 'nullable|image|max:8192',
-            'back_image'       => 'nullable|image|max:8192',
-            'footage_image'    => 'nullable|image|max:8192',
-            'size_chart_image' => 'nullable|image|max:8192',
+            'image'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'back_image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'footage_image'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'stocks'           => 'nullable|array'
         ]);
 
@@ -122,10 +122,10 @@ class AdminController extends Controller
             'description'      => 'nullable|string',
             'specs'            => 'nullable|string',
             'artist'           => 'nullable|string|max:255',
-            'image'            => 'nullable|image|max:8192',
-            'back_image'       => 'nullable|image|max:8192',
-            'footage_image'    => 'nullable|image|max:8192',
-            'size_chart_image' => 'nullable|image|max:8192',
+            'image'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'back_image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'footage_image'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'stocks'           => 'nullable|array'
         ]);
 
@@ -188,8 +188,8 @@ class AdminController extends Controller
             'name'            => 'required|string|max:255',
             'city'            => 'nullable|string|max:255',
             'bio'             => 'nullable|string',
-            'photo'           => 'nullable|image|max:8192',
-            'artwork_preview' => 'nullable|image|max:8192',
+            'photo'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'artwork_preview' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'is_newcomer'     => 'nullable|boolean',
         ]);
 
@@ -223,8 +223,8 @@ class AdminController extends Controller
             'name'            => 'required|string|max:255',
             'city'            => 'nullable|string|max:255',
             'bio'             => 'nullable|string',
-            'photo'           => 'nullable|image|max:8192',
-            'artwork_preview' => 'nullable|image|max:8192',
+            'photo'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'artwork_preview' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'is_newcomer'     => 'nullable|boolean',
         ]);
 
@@ -275,7 +275,7 @@ class AdminController extends Controller
             'status'      => 'nullable|string|max:100',
             'price'       => 'nullable|numeric',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|max:8192',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
@@ -305,7 +305,7 @@ class AdminController extends Controller
             'status'      => 'nullable|string|max:100',
             'price'       => 'nullable|numeric',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|max:8192',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
@@ -339,7 +339,7 @@ class AdminController extends Controller
             'excerpt'    => 'nullable|string',
             'content'    => 'required|string',
             'video_url'  => 'nullable|string',
-            'image'      => 'nullable|image|max:8192',
+            'image'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
@@ -367,7 +367,7 @@ class AdminController extends Controller
             'excerpt'    => 'nullable|string',
             'content'    => 'required|string',
             'video_url'  => 'nullable|string',
-            'image'      => 'nullable|image|max:8192',
+            'image'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
@@ -398,7 +398,7 @@ class AdminController extends Controller
             'section'     => 'required|string|in:carousel,footage',
             'title'       => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image'       => 'required|image|max:8192',
+            'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:8192',
             'order'       => 'nullable|integer',
         ]);
 
@@ -427,7 +427,7 @@ class AdminController extends Controller
             'title'       => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'product_id'  => 'nullable',
-            'image'       => 'nullable|image|max:8192',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'order'       => 'nullable|integer',
         ]);
 
@@ -515,7 +515,7 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'video'       => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
             'video_url'   => 'nullable|string',
-            'cover_image' => 'nullable|image|max:8192',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = [
@@ -549,7 +549,7 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'video'       => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
             'video_url'   => 'nullable|string',
-            'cover_image' => 'nullable|image|max:8192',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $lookbook->title = $request->title;
@@ -599,7 +599,7 @@ class AdminController extends Controller
         $request->validate([
             'title'       => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image'       => 'required|image|max:8192',
+            'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $path = $request->file('image')->store('lookbooks/photos', 'public');
