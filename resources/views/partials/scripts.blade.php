@@ -495,6 +495,22 @@
                         `;
                     }
 
+                    let breakdownHtml = '';
+                    if (order.subtotal && parseFloat(order.subtotal) > 0) {
+                        breakdownHtml = `
+                            <div class="mt-3 pt-2 border-t border-gray-200/60 flex flex-wrap justify-between items-center text-xs font-inter text-gray-500 gap-2">
+                                <span>Subtotal: Rp ${parseInt(order.subtotal).toLocaleString('id-ID')} | Ongkir: Rp ${parseInt(order.shipping_cost || 0).toLocaleString('id-ID')}${order.discount_amount > 0 ? ` | Diskon: -Rp ${parseInt(order.discount_amount).toLocaleString('id-ID')}` : ''}</span>
+                                <span class="font-bold text-black font-space-grotesk text-sm">Total: Rp ${parseInt(order.total_amount).toLocaleString('id-ID')}</span>
+                            </div>
+                        `;
+                    } else {
+                        breakdownHtml = `
+                            <div class="mt-3 pt-2 border-t border-gray-200/60 flex justify-end items-center text-xs font-inter">
+                                <span class="font-bold text-black font-space-grotesk text-sm">Total: Rp ${parseInt(order.total_amount).toLocaleString('id-ID')}</span>
+                            </div>
+                        `;
+                    }
+
                     const placedDate = new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
                     container.innerHTML += `
@@ -512,6 +528,7 @@
                             </div>
                         </div>
                         ${itemsHtml}
+                        ${breakdownHtml}
                         ${shippingInfoHtml}
                     </div>
                     `;

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Midtrans\Notification;
@@ -92,50 +93,77 @@ class CheckoutController extends Controller
             }
         }
 
+        // Anti-Shipping Cost Tampering: Validasi batas bawah ongkir secara server-side
         $shippingCost = (int) $validated['shipping_cost'];
-        $totalAmount = max(10000, $subtotal - $discountAmount + $shippingCost);
-
-        // PRE-CHECK STOCK
-        foreach ($verifiedItems as $item) {
-            $productId = $item['id'];
-            $size = $item['size'];
-            
-            if ($productId) {
-                $stockRecord = \App\Models\ProductStock::where('product_id', $productId)->where('size', $size)->first();
-                if (!$stockRecord || $stockRecord->stock < $item['quantity']) {
-                    return response()->json(['success' => false, 'error' => 'Maaf, stok produk "' . $item['name'] . '" (' . $size . ') tidak mencukupi.'], 400);
-                }
-            }
+        $minZoneRate = $this->getMinimumShippingRate($validated['destination_area_id'], $verifiedItems);
+        if ($shippingCost < $minZoneRate) {
+            $shippingCost = $minZoneRate;
         }
 
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'customer_name' => $validated['customer_name'],
-            'customer_email' => $validated['customer_email'],
-            'customer_phone' => $validated['customer_phone'],
-            'shipping_address' => $validated['shipping_address'],
-            'destination_area_id' => $validated['destination_area_id'] ?? null,
-            'total_amount' => $totalAmount,
-            'status' => 'pending',
-            'courier_name' => $validated['courier_name'],
-        ]);
+        $totalAmount = max(10000, $subtotal - $discountAmount + $shippingCost);
 
-        foreach ($verifiedItems as $item) {
-            $productId = $item['id'];
-            $size = $item['size'];
-            
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $productId,
-                'product_name' => $item['name'],
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'size' => $size,
-            ]);
+        // ATOMIC INVENTORY CONCURRENCY LOCK & TRANSACTION
+        try {
+            $order = DB::transaction(function () use ($validated, $verifiedItems, $subtotal, $shippingCost, $discountAmount, $totalAmount) {
+                // 1. Pessimistic Locking: Kunci dan verifikasi stok secara atomik
+                foreach ($verifiedItems as $item) {
+                    $productId = $item['id'];
+                    $size = $item['size'];
+                    
+                    if ($productId) {
+                        $stockRecord = \App\Models\ProductStock::where('product_id', $productId)
+                            ->where('size', $size)
+                            ->lockForUpdate()
+                            ->first();
 
-            if ($productId) {
-                \App\Models\ProductStock::where('product_id', $productId)->where('size', $size)->decrement('stock', $item['quantity']);
-            }
+                        if (!$stockRecord || $stockRecord->stock < $item['quantity']) {
+                            throw new \Exception('Maaf, stok produk "' . $item['name'] . '" (' . $size . ') tidak mencukupi.');
+                        }
+                    }
+                }
+
+                // 2. Buat Order dengan rincian finansial lengkap (Subtotal, Ongkir, Diskon)
+                $createdOrder = Order::create([
+                    'user_id' => auth()->id(),
+                    'customer_name' => $validated['customer_name'],
+                    'customer_email' => $validated['customer_email'],
+                    'customer_phone' => $validated['customer_phone'],
+                    'shipping_address' => $validated['shipping_address'],
+                    'destination_area_id' => $validated['destination_area_id'] ?? null,
+                    'subtotal' => $subtotal,
+                    'shipping_cost' => $shippingCost,
+                    'discount_amount' => $discountAmount,
+                    'total_amount' => $totalAmount,
+                    'status' => 'pending',
+                    'courier_name' => $validated['courier_name'],
+                ]);
+
+                // 3. Catat OrderItems dan kurangi stok secara atomik
+                foreach ($verifiedItems as $item) {
+                    $productId = $item['id'];
+                    $size = $item['size'];
+                    
+                    OrderItem::create([
+                        'order_id' => $createdOrder->id,
+                        'product_id' => $productId,
+                        'product_name' => $item['name'],
+                        'price' => $item['price'],
+                        'quantity' => $item['quantity'],
+                        'size' => $size,
+                    ]);
+
+                    if ($productId) {
+                        \App\Models\ProductStock::where('product_id', $productId)
+                            ->where('size', $size)
+                            ->decrement('stock', $item['quantity']);
+                    }
+                }
+
+                return $createdOrder;
+            });
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Checkout order/stock transaction aborted: ' . $e->getMessage());
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
         }
 
         // Konfigurasi Midtrans
@@ -348,6 +376,22 @@ class CheckoutController extends Controller
                 ]
             ]
         ];
+    }
+
+    /**
+     * Dapatkan tarif batas bawah ongkir secara server-side untuk mencegah tampering
+     */
+    private function getMinimumShippingRate(string $destinationAreaId, array $items): int
+    {
+        $rates = $this->getZoneFallbackRates($destinationAreaId, $items);
+        $minPrice = 9000;
+        if (!empty($rates['pricing'])) {
+            $prices = array_column($rates['pricing'], 'price');
+            if (!empty($prices)) {
+                $minPrice = (int) min($prices);
+            }
+        }
+        return $minPrice;
     }
 
     public function webhook(Request $request)

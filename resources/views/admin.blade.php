@@ -1277,8 +1277,17 @@
                                     @endforeach
                                 </div>
                             </td>
-                            <td class="px-5 py-4 whitespace-nowrap font-space-grotesk font-bold text-sm text-gray-900">
-                                Rp {{ number_format($order->total_amount, 0, ',', '.') }}
+                            <td class="px-5 py-4 whitespace-nowrap">
+                                <p class="font-space-grotesk font-bold text-sm text-gray-900">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</p>
+                                @if($order->subtotal > 0)
+                                <div class="text-[10px] text-gray-500 font-inter mt-1 space-y-0.5">
+                                    <p>Subtotal: Rp {{ number_format($order->subtotal, 0, ',', '.') }}</p>
+                                    <p>Ongkir: Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</p>
+                                    @if($order->discount_amount > 0)
+                                    <p class="text-emerald-600 font-semibold">Diskon: -Rp {{ number_format($order->discount_amount, 0, ',', '.') }}</p>
+                                    @endif
+                                </div>
+                                @endif
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap">
                                 <span class="inline-block px-2.5 py-1 text-[10px] font-space-grotesk font-bold uppercase tracking-wider rounded border {{ $badgeCls }}">
