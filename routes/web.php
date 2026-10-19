@@ -145,7 +145,7 @@ Route::get('/checkout', [AuthController::class, 'showCheckoutAuth']);
 Route::get('/auth/checkout', [AuthController::class, 'showCheckoutAuth']);
 Route::get('/auth/google', [AuthController::class, 'googleRedirect']);
 Route::get('/auth/google/callback', [AuthController::class, 'googleCallback']);
-Route::post('/auth/seamless', [AuthController::class, 'seamlessRegisterOrLogin']);
+Route::post('/auth/seamless', [AuthController::class, 'seamlessRegisterOrLogin'])->middleware('throttle:10,1');
 Route::post('/logout', function () {
     auth()->logout();
     request()->session()->invalidate();
@@ -203,7 +203,7 @@ Route::put('/api/user/addresses/{id}', [AddressController::class, 'update']);
 Route::delete('/api/user/addresses/{id}', [AddressController::class, 'destroy']);
 Route::post('/api/user/addresses/{id}/primary', [AddressController::class, 'setPrimary']);
 
-Route::post('/api/artwork-offerings', [ArtworkOfferingController::class, 'store']);
+Route::post('/api/artwork-offerings', [ArtworkOfferingController::class, 'store'])->middleware('throttle:15,1');
 Route::get('/my-artwork-offers', function () {
     if (!auth()->check()) return response()->json([]);
 
@@ -213,10 +213,10 @@ Route::get('/my-artwork-offers', function () {
         ->get();
 });
 
-// Checkout Routes
-Route::post('/checkout', [CheckoutController::class, 'process']);
-Route::get('/shipping-areas', [CheckoutController::class, 'searchArea']);
-Route::post('/shipping-rates', [CheckoutController::class, 'getShippingRates']);
+// Checkout Routes (Protected with Rate Limiting)
+Route::post('/checkout', [CheckoutController::class, 'process'])->middleware('throttle:15,1');
+Route::get('/shipping-areas', [CheckoutController::class, 'searchArea'])->middleware('throttle:60,1');
+Route::post('/shipping-rates', [CheckoutController::class, 'getShippingRates'])->middleware('throttle:60,1');
 Route::post('/midtrans/webhook', [CheckoutController::class, 'webhook'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 Route::get('/my-orders', function () {
