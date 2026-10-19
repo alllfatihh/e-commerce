@@ -237,6 +237,7 @@ Route::get('/my-orders', function () {
 
                 if ($status && in_array($status->transaction_status, ['settlement', 'capture'])) {
                     $order->update(['status' => 'paid']);
+                    (new \App\Http\Controllers\CheckoutController)->dispatchBiteshipOrder($order);
                 } elseif ($status && in_array($status->transaction_status, ['cancel', 'deny', 'expire'])) {
                     $order->update(['status' => 'cancelled']);
                     foreach ($order->items as $item) {
@@ -324,7 +325,7 @@ Route::post('/midtrans/local-success', function (\Illuminate\Http\Request $reque
     $order = \App\Models\Order::where('midtrans_order_id', $request->order_id)->first() ?? \App\Models\Order::find($orderId);
     if ($order && $order->status !== 'paid') {
         $order->update(['status' => 'paid']);
-        // Stock deduction is already handled during CheckoutController process.
+        (new \App\Http\Controllers\CheckoutController)->dispatchBiteshipOrder($order);
     }
     return response()->json(['success' => true]);
 })->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);

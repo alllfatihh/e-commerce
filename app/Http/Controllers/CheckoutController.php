@@ -114,6 +114,7 @@ class CheckoutController extends Controller
             'customer_email' => $validated['customer_email'],
             'customer_phone' => $validated['customer_phone'],
             'shipping_address' => $validated['shipping_address'],
+            'destination_area_id' => $validated['destination_area_id'] ?? null,
             'total_amount' => $totalAmount,
             'status' => 'pending',
             'courier_name' => $validated['courier_name'],
@@ -136,63 +137,6 @@ class CheckoutController extends Controller
                 \App\Models\ProductStock::where('product_id', $productId)->where('size', $size)->decrement('stock', $item['quantity']);
             }
         }
-
-        // Biteship Order Creation (dengan fallback aman)
-        $biteshipItems = array_map(function($item) {
-            return [
-                "name" => $item['name'],
-                "description" => $item['name'],
-                "value" => $item['price'],
-                "length" => 20,
-                "width" => 20,
-                "height" => 5,
-                "weight" => 200,
-                "quantity" => $item['quantity']
-            ];
-        }, $verifiedItems);
-
-        $courierParts = explode(' ', $validated['courier_name']);
-        $courierCompany = strtolower($courierParts[0]);
-        if ($courierCompany === 'j&t') $courierCompany = 'jnt';
-        $courierType = strtolower($courierParts[1] ?? 'reg');
-
-        $biteshipOrderId = 'BS-' . uniqid();
-        try {
-            $biteshipResponse = Http::withHeaders([
-                'Authorization' => env('BITESHIP_API_KEY')
-            ])->timeout(5)->post('https://api.biteship.com/v1/orders', [
-                "shipper_contact_name" => "Notisse Admin",
-                "shipper_contact_phone" => "081234567890",
-                "shipper_contact_email" => "admin@notisse.com",
-                "shipper_organization" => "Notisse",
-                "origin_contact_name" => "Notisse Admin",
-                "origin_contact_phone" => "081234567890",
-                "origin_address" => env('STORE_ORIGIN_ADDRESS', "Jl. Sukapura No.62, Dayeuhkolot"),
-                "origin_area_id" => env('STORE_ORIGIN_AREA_ID', "IDNP9IDNC22IDND2044IDZ40353"),
-                "destination_contact_name" => $validated['customer_name'],
-                "destination_contact_phone" => $validated['customer_phone'],
-                "destination_contact_email" => $validated['customer_email'],
-                "destination_address" => $validated['shipping_address'],
-                "destination_area_id" => $validated['destination_area_id'],
-                "courier_company" => $courierCompany,
-                "courier_type" => $courierType,
-                "delivery_type" => "now",
-                "items" => $biteshipItems
-            ]);
-
-            $biteshipData = $biteshipResponse->json();
-            \Illuminate\Support\Facades\Log::info('Biteship Create Order Response:', (array) $biteshipData);
-
-            if (isset($biteshipData['id'])) {
-                $biteshipOrderId = $biteshipData['id'];
-            }
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('Biteship create order exception: ' . $e->getMessage());
-        }
-
-        $order->update([
-            'biteship_order_id' => $biteshipOrderId, 
-        ]);
 
         // Konfigurasi Midtrans
         $midtransOrderId = $order->id . '-' . time();
@@ -459,10 +403,109 @@ class CheckoutController extends Controller
             }
 
             $order->save();
+
+            // Auto dispatch Biteship courier order when payment is confirmed (paid)
+            if ($order->status === 'paid' && $oldStatus !== 'paid') {
+                $this->dispatchBiteshipOrder($order);
+            }
+
             return response()->json(['status' => 'success', 'order_status' => $order->status]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Midtrans Webhook Exception: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Dispatch order to Biteship courier API upon confirmed payment
+     */
+    public function dispatchBiteshipOrder(Order $order): ?array
+    {
+        // Don't duplicate if already dispatched to live Biteship
+        if ($order->biteship_order_id && !str_starts_with($order->biteship_order_id, 'BS-MANUAL') && !str_starts_with($order->biteship_order_id, 'BS-')) {
+            return ['success' => true, 'already_dispatched' => true, 'id' => $order->biteship_order_id];
+        }
+
+        $apiKey = env('BITESHIP_API_KEY');
+        if (!$apiKey) {
+            \Illuminate\Support\Facades\Log::warning('dispatchBiteshipOrder skipped: BITESHIP_API_KEY is not configured');
+            return null;
+        }
+
+        $order->loadMissing('items.product');
+
+        $biteshipItems = [];
+        foreach ($order->items as $item) {
+            $biteshipItems[] = [
+                "name" => $item->product_name ?? 'Produk Notisse',
+                "description" => ($item->product_name ?? 'Produk Notisse') . ($item->size ? ' (' . $item->size . ')' : ''),
+                "value" => (int) $item->price,
+                "length" => 20,
+                "width" => 20,
+                "height" => 5,
+                "weight" => 200,
+                "quantity" => (int) $item->quantity
+            ];
+        }
+
+        if (empty($biteshipItems)) {
+            $biteshipItems[] = [
+                "name" => "Apparel Notisse",
+                "description" => "Apparel Notisse",
+                "value" => (int) $order->total_amount,
+                "length" => 20,
+                "width" => 20,
+                "height" => 5,
+                "weight" => 200,
+                "quantity" => 1
+            ];
+        }
+
+        $courierParts = explode(' ', $order->courier_name ?? 'JNE REG');
+        $courierCompany = strtolower($courierParts[0] ?? 'jne');
+        if ($courierCompany === 'j&t') $courierCompany = 'jnt';
+        $courierType = strtolower($courierParts[1] ?? 'reg');
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => $apiKey
+            ])->timeout(8)->post('https://api.biteship.com/v1/orders', [
+                "shipper_contact_name" => "Notisse Admin",
+                "shipper_contact_phone" => "081234567890",
+                "shipper_contact_email" => "admin@notisse.com",
+                "shipper_organization" => "Notisse",
+                "origin_contact_name" => "Notisse Admin",
+                "origin_contact_phone" => "081234567890",
+                "origin_address" => env('STORE_ORIGIN_ADDRESS', "Jl. Sukapura No.62, Dayeuhkolot"),
+                "origin_area_id" => env('STORE_ORIGIN_AREA_ID', "IDNP9IDNC22IDND2044IDZ40353"),
+                "destination_contact_name" => $order->customer_name,
+                "destination_contact_phone" => $order->customer_phone,
+                "destination_contact_email" => $order->customer_email,
+                "destination_address" => $order->shipping_address,
+                "destination_area_id" => $order->destination_area_id,
+                "courier_company" => $courierCompany,
+                "courier_type" => $courierType,
+                "delivery_type" => "now",
+                "items" => $biteshipItems
+            ]);
+
+            $biteshipData = $response->json();
+            \Illuminate\Support\Facades\Log::info('Biteship Dispatch Order Response for #' . $order->id . ':', (array) $biteshipData);
+
+            if (isset($biteshipData['id'])) {
+                $updateData = ['biteship_order_id' => $biteshipData['id']];
+                if (!empty($biteshipData['courier']['waybill_id'])) {
+                    $updateData['tracking_number'] = $biteshipData['courier']['waybill_id'];
+                } elseif (!empty($biteshipData['courier']['tracking_id'])) {
+                    $updateData['tracking_number'] = $biteshipData['courier']['tracking_id'];
+                }
+                $order->update($updateData);
+                return $biteshipData;
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('dispatchBiteshipOrder exception for #' . $order->id . ': ' . $e->getMessage());
+        }
+
+        return null;
     }
 }
