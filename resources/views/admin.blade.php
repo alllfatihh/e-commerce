@@ -1219,45 +1219,120 @@
              SECTION 5: ORDERS
         ───────────────────────────────────────────────────────── --}}
         <section id="section-orders" class="section-card hidden">
-            <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] mb-5 text-brandDark">Recent Orders</h2>
+            <div class="flex justify-between items-center mb-5">
+                <div>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Recent Orders & Fulfillment</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola pesanan pelanggan, input nomor resi (AWB), perbarui status pengiriman (Processing, Shipped, Delivered), dan request pickup kurir.</p>
+                </div>
+            </div>
 
             <div class="bg-white border border-gray-200 overflow-x-auto shadow-sm">
                 <table class="w-full text-left border-collapse">
                     <thead class="border-b border-gray-200 bg-gray-50">
                         <tr class="text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-500">
-                            <th class="px-5 py-3.5">Order ID</th>
-                            <th class="px-5 py-3.5">Customer</th>
+                            <th class="px-5 py-3.5">Order ID & Date</th>
+                            <th class="px-5 py-3.5">Customer & Shipping Address</th>
+                            <th class="px-5 py-3.5">Items</th>
+                            <th class="px-5 py-3.5">Total Amount</th>
                             <th class="px-5 py-3.5">Status</th>
-                            <th class="px-5 py-3.5">Amount (IDR)</th>
-                            <th class="px-5 py-3.5">Courier</th>
-                            <th class="px-5 py-3.5">Date</th>
+                            <th class="px-5 py-3.5">Courier & AWB (Resi)</th>
+                            <th class="px-5 py-3.5 text-right">Update Status & Resi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($orders as $order)
-                        <tr class="admin-tr">
-                            <td class="px-5 py-4 font-mono text-xs text-gray-500 font-bold">#{{ $order->id }}</td>
-                            <td class="px-5 py-4">
-                                <p class="text-sm font-inter font-medium text-gray-900">{{ $order->customer_name }}</p>
-                                <p class="text-xs text-gray-400 mt-0.5">{{ $order->customer_email ?? '' }}</p>
+                        @php
+                            $statusClasses = [
+                                'paid' => 'bg-emerald-100 text-emerald-800 border-emerald-300',
+                                'processing' => 'bg-blue-100 text-blue-800 border-blue-300',
+                                'shipped' => 'bg-purple-100 text-purple-800 border-purple-300',
+                                'delivered' => 'bg-emerald-600 text-white border-emerald-700',
+                                'cancelled' => 'bg-red-100 text-red-800 border-red-300',
+                                'pending' => 'bg-amber-100 text-amber-800 border-amber-300',
+                            ];
+                            $badgeCls = $statusClasses[$order->status] ?? 'bg-gray-100 text-gray-800 border-gray-300';
+                        @endphp
+                        <tr class="admin-tr align-top hover:bg-neutral-50 transition-colors">
+                            <td class="px-5 py-4 whitespace-nowrap">
+                                <p class="font-space-grotesk font-bold text-sm text-gray-900">#{{ $order->id }}</p>
+                                <p class="text-[11px] text-gray-400 font-inter mt-0.5">
+                                    {{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}
+                                </p>
+                                @if($order->midtrans_order_id)
+                                <p class="text-[9px] font-mono text-gray-400 mt-1" title="Midtrans ID">MD: {{ Str::limit($order->midtrans_order_id, 16) }}</p>
+                                @endif
                             </td>
-                            <td class="px-5 py-4">
-                                <span class="inline-block px-2.5 py-1 text-[11px] font-space-grotesk font-bold uppercase tracking-wide
-                                    {{ $order->status === 'paid' ? 'badge-paid' : ($order->status === 'cancelled' ? 'badge-cancelled' : 'badge-pending') }}">
+                            <td class="px-5 py-4 min-w-[220px]">
+                                <p class="text-sm font-inter font-bold text-gray-900">{{ $order->customer_name }}</p>
+                                <p class="text-xs text-gray-500 font-inter">{{ $order->customer_phone }}</p>
+                                <p class="text-xs text-gray-400 font-inter mt-0.5 line-clamp-2" title="{{ $order->shipping_address }}">{{ $order->shipping_address }}</p>
+                            </td>
+                            <td class="px-5 py-4 min-w-[180px]">
+                                <div class="space-y-1">
+                                    @foreach($order->items as $it)
+                                    <div class="text-xs font-inter text-gray-700">
+                                        <span class="font-bold text-black font-space-grotesk uppercase">{{ $it->product_name }}</span>
+                                        <span class="text-gray-500">({{ $it->size }} x{{ $it->quantity }})</span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td class="px-5 py-4 whitespace-nowrap font-space-grotesk font-bold text-sm text-gray-900">
+                                Rp {{ number_format($order->total_amount, 0, ',', '.') }}
+                            </td>
+                            <td class="px-5 py-4 whitespace-nowrap">
+                                <span class="inline-block px-2.5 py-1 text-[10px] font-space-grotesk font-bold uppercase tracking-wider rounded border {{ $badgeCls }}">
                                     {{ $order->status }}
                                 </span>
                             </td>
-                            <td class="px-5 py-4 text-sm font-inter font-bold text-gray-900">
-                                Rp {{ number_format($order->total_amount, 0, ',', '.') }}
+                            <td class="px-5 py-4 min-w-[190px]">
+                                <p class="text-xs font-bold font-space-grotesk text-gray-800 uppercase">{{ $order->courier_name ?? '—' }}</p>
+                                @if($order->tracking_number)
+                                <div class="mt-1 flex items-center gap-1.5">
+                                    <span class="font-mono text-xs font-bold bg-gray-100 text-gray-900 px-2 py-0.5 rounded border border-gray-300">
+                                        {{ $order->tracking_number }}
+                                    </span>
+                                </div>
+                                @else
+                                <p class="text-[11px] text-gray-400 italic mt-0.5">Resi belum diinput</p>
+                                @endif
+
+                                @if($order->biteship_order_id)
+                                <p class="text-[9px] text-emerald-600 font-mono mt-1">Biteship: {{ Str::limit($order->biteship_order_id, 18) }}</p>
+                                @endif
+
+                                @if(in_array($order->status, ['paid', 'processing']) && empty($order->biteship_order_id))
+                                <form action="/admin/orders/{{ $order->id }}/dispatch" method="POST" class="mt-2">
+                                    @csrf
+                                    <button type="submit" onclick="return confirm('Kirim permintaan pickup ke Biteship sekarang?')" class="text-[10px] bg-[#E2FF00] hover:bg-yellow-300 text-black font-space-grotesk font-bold uppercase tracking-wider px-2 py-1 rounded border border-black/10 transition-colors">
+                                        ⚡ Dispatch Biteship
+                                    </button>
+                                </form>
+                                @endif
                             </td>
-                            <td class="px-5 py-4 text-xs text-gray-600">{{ $order->courier_name ?? '—' }}</td>
-                            <td class="px-5 py-4 text-xs text-gray-400 font-inter">
-                                {{ \Carbon\Carbon::parse($order->created_at)->format('d M Y, H:i') }}
+                            <td class="px-5 py-4 text-right">
+                                <form action="/admin/orders/{{ $order->id }}/status" method="POST" class="inline-flex flex-col gap-1.5 items-end">
+                                    @csrf
+                                    <div class="flex items-center gap-1.5">
+                                        <select name="status" class="text-xs border border-gray-300 rounded px-2 py-1 font-space-grotesk font-semibold bg-white text-gray-800 focus:outline-none focus:border-black">
+                                            <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
+                                            <option value="paid" {{ $order->status === 'paid' ? 'selected' : '' }}>Paid</option>
+                                            <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing</option>
+                                            <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped</option>
+                                            <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                                            <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                        </select>
+                                        <button type="submit" class="px-2.5 py-1 bg-black text-white rounded text-[11px] font-space-grotesk font-bold uppercase tracking-wider hover:bg-neutral-800 transition-colors">
+                                            Simpan
+                                        </button>
+                                    </div>
+                                    <input type="text" name="tracking_number" value="{{ $order->tracking_number }}" placeholder="Input No. Resi..." class="text-xs border border-gray-300 rounded px-2 py-1 font-mono text-gray-800 w-44 placeholder-gray-400 focus:border-black focus:outline-none">
+                                </form>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-5 py-12 text-center text-sm text-gray-400 font-inter">No orders yet.</td>
+                            <td colspan="7" class="px-5 py-12 text-center text-sm text-gray-400 font-inter">Belum ada pesanan masuk.</td>
                         </tr>
                         @endforelse
                     </tbody>

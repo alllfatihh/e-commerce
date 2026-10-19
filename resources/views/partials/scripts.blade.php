@@ -458,7 +458,13 @@
                     let actionButtons = '';
                     const st = (order.status || '').toLowerCase();
                     if (st === 'paid') {
-                        statusClass = "bg-green-600 text-white";
+                        statusClass = "bg-emerald-600 text-white";
+                    } else if (st === 'processing') {
+                        statusClass = "bg-blue-600 text-white";
+                    } else if (st === 'shipped') {
+                        statusClass = "bg-purple-600 text-white";
+                    } else if (st === 'delivered') {
+                        statusClass = "bg-emerald-700 text-white";
                     } else if (st === 'pending') {
                         statusClass = "bg-yellow-500 text-black";
                         actionButtons = `
@@ -467,6 +473,26 @@
                         `;
                     } else if (st === 'cancelled') {
                         statusClass = "bg-red-600 text-white";
+                    }
+
+                    let shippingInfoHtml = '';
+                    if (order.courier_name || order.tracking_number) {
+                        shippingInfoHtml = `
+                            <div class="mt-3 pt-3 border-t border-gray-200 flex flex-wrap items-center justify-between text-xs font-inter gap-2">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-gray-500">Kurir:</span>
+                                    <span class="font-bold text-gray-800 uppercase font-space-grotesk">${order.courier_name || '—'}</span>
+                                </div>
+                                ${order.tracking_number ? `
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-gray-500">No. Resi (AWB):</span>
+                                    <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-gray-300 text-gray-900 select-all tracking-wider">${order.tracking_number}</span>
+                                </div>
+                                ` : `
+                                <span class="text-gray-400 italic text-[11px]">Resi dalam persiapan pengiriman</span>
+                                `}
+                            </div>
+                        `;
                     }
 
                     const placedDate = new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -486,6 +512,7 @@
                             </div>
                         </div>
                         ${itemsHtml}
+                        ${shippingInfoHtml}
                     </div>
                     `;
                 });

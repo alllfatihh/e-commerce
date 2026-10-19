@@ -625,4 +625,62 @@ class AdminController extends Controller
         $photo->delete();
         return redirect('/admin')->with('success', 'Foto lookbook berhasil dihapus.');
     }
+
+    public function updateOrderStatus(Request $request, $id)
+    {
+        $order = Order::with('items')->findOrFail($id);
+
+        $request->validate([
+            'status' => 'required|string|in:pending,paid,processing,shipped,delivered,cancelled',
+            'tracking_number' => 'nullable|string|max:100',
+        ]);
+
+        $oldStatus = $order->status;
+        $order->status = $request->input('status');
+
+        if ($request->has('tracking_number')) {
+            $order->tracking_number = $request->input('tracking_number');
+        }
+
+        // If status changed to cancelled and wasn't cancelled before, restore stock
+        if ($oldStatus !== 'cancelled' && $order->status === 'cancelled') {
+            foreach ($order->items as $item) {
+                if ($item->product_id) {
+                    ProductStock::where('product_id', $item->product_id)
+                        ->where('size', $item->size)
+                        ->increment('stock', $item->quantity);
+                }
+            }
+        }
+
+        $order->save();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'order' => $order]);
+        }
+
+        return redirect('/admin')->with('success', 'Status pesanan #' . $order->id . ' berhasil diperbarui.');
+    }
+
+    public function dispatchBiteship(Request $request, $id)
+    {
+        $order = Order::with('items')->findOrFail($id);
+
+        $checkoutController = new \App\Http\Controllers\CheckoutController();
+        $result = $checkoutController->dispatchBiteshipOrder($order);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => $result !== null,
+                'result' => $result,
+                'order' => $order->fresh()
+            ]);
+        }
+
+        if ($result) {
+            return redirect('/admin')->with('success', 'Pesanan #' . $order->id . ' berhasil didispatch ke Biteship.');
+        } else {
+            return redirect('/admin')->with('error', 'Gagal dispatch ke Biteship. Periksa konfigurasi API Key atau saldo Biteship.');
+        }
+    }
 }

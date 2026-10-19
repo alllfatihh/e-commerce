@@ -181,6 +181,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/lookbooks/photos/{id}', [AdminController::class, 'deleteLookbookPhoto']);
     Route::post('/admin/settings', [AdminController::class, 'updateSettings']);
     Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship']);
+    Route::post('/admin/orders/{id}/status', [AdminController::class, 'updateOrderStatus']);
+    Route::post('/admin/orders/{id}/dispatch', [AdminController::class, 'dispatchBiteship']);
 });
 
 // Cart Routes
