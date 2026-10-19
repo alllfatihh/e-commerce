@@ -11,12 +11,17 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Traits\ResolvesMediaUrls;
 
-#[Fillable(['name', 'email', 'password', 'google_id', 'phone', 'birthdate', 'address', 'area_id', 'avatar'])]
+#[Fillable(['name', 'email', 'password', 'google_id', 'phone', 'birthdate', 'address', 'area_id', 'avatar', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, ResolvesMediaUrls;
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
 
     /**
      * Get the attributes that should be cast.
