@@ -1,11 +1,6 @@
         <!-- VIEW 8: REGISTER / DAFTAR AKUN PAGE -->
-        <section id="view-register" class="view-page {{ ($activeView ?? '') === 'view-register' ? 'active-view' : '' }} px-6 py-12 max-w-md mx-auto">
+        <section id="view-register" class="view-page {{ ($activeView ?? '') === 'view-register' ? 'active-view' : '' }} px-6 pt-24 pb-16 max-w-md mx-auto">
             <div class="bg-white border border-black rounded-2xl p-8 sm:p-10 shadow-2xl space-y-6">
-                <!-- Signature N/Notisse Logo Top Center -->
-                <div class="flex justify-center">
-                    <img src="{{ asset('logowebkecil.png') }}" alt="Notisse" class="h-12 w-auto object-contain">
-                </div>
-
                 <!-- Headline Tagline -->
                 <h2 class="text-center font-space-grotesk text-lg sm:text-xl font-medium text-black leading-snug px-2">
                     Join and engage with the creative journey of our artists

@@ -1,9 +1,6 @@
         <!-- VIEW 7: LOGIN PAGE -->
-        <section id="view-login" class="view-page {{ ($activeView ?? '') === 'view-login' ? 'active-view' : '' }} px-6 py-12 max-w-md mx-auto">
+        <section id="view-login" class="view-page {{ ($activeView ?? '') === 'view-login' ? 'active-view' : '' }} px-6 pt-24 pb-16 max-w-md mx-auto">
             <div class="text-center mb-8">
-                <div class="flex justify-center mb-4">
-                    <img src="{{ asset('logowebkecil.png') }}" alt="Notisse Logo" class="h-12 w-auto object-contain">
-                </div>
                 <h2 class="text-2xl font-bold font-space-grotesk uppercase tracking-wider text-black">Login Account</h2>
                 <p class="text-xs text-gray-500 font-inter mt-1">Sign in to access your collection and orders.</p>
             </div>
