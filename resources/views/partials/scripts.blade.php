@@ -484,9 +484,10 @@
                                     <span class="font-bold text-gray-800 uppercase font-space-grotesk">${order.courier_name || '—'}</span>
                                 </div>
                                 ${order.tracking_number ? `
-                                <div class="flex items-center gap-1.5">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <span class="text-gray-500">No. Resi (AWB):</span>
                                     <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-gray-300 text-gray-900 select-all tracking-wider">${order.tracking_number}</span>
+                                    <button type="button" onclick="navigator.clipboard.writeText('${order.tracking_number}'); showToast('No. Resi disalin!');" class="text-[10px] text-gray-500 hover:text-black underline cursor-pointer font-space-grotesk font-semibold uppercase">Salin</button>
                                 </div>
                                 ` : `
                                 <span class="text-gray-400 italic text-[11px]">Resi dalam persiapan pengiriman</span>
