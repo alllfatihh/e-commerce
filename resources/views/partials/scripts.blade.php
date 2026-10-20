@@ -604,34 +604,146 @@
             }
         }
 
-        function handleLoginSubmit(e) {
+        async function handleLoginSubmit(e) {
             e.preventDefault();
-            isAuthenticated = true;
-            localStorage.setItem('notisse_auth', 'true');
-            localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
-            document.getElementById('user-display-email').innerText = loggedInUser.email;
-            document.getElementById('user-display-name').innerText = loggedInUser.name;
-            if (document.getElementById('user-display-address')) {
-                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'No shipping address saved yet.';
+            const emailInput = document.getElementById('login-email');
+            const pwInput = document.getElementById('login-password');
+            const rememberInput = document.getElementById('login-remember');
+            const errorBox = document.getElementById('login-error-msg');
+            const btn = document.getElementById('login-submit-btn');
+
+            if (!emailInput || !pwInput) return;
+
+            if (errorBox) {
+                errorBox.classList.add('hidden');
+                errorBox.innerText = '';
             }
-            showToast('Login Successful!');
-            showPage('view-account-profile');
-            fetchOrderHistory();
+
+            const originalText = btn ? btn.innerText : 'LOG IN';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'AUTHENTICATING...';
+            }
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: emailInput.value.trim(),
+                        password: pwInput.value,
+                        remember: rememberInput ? rememberInput.checked : false
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showToast('Login berhasil!');
+                    if (data.user) {
+                        localStorage.setItem('notisse_auth', 'true');
+                        localStorage.setItem('notisse_user', JSON.stringify(data.user));
+                    }
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.reload();
+                    }
+                } else {
+                    if (errorBox) {
+                        errorBox.innerText = data.message || (data.errors ? Object.values(data.errors)[0][0] : 'Email atau password salah.');
+                        errorBox.classList.remove('hidden');
+                    } else {
+                        showToast(data.message || 'Login gagal.');
+                    }
+                }
+            } catch (err) {
+                if (errorBox) {
+                    errorBox.innerText = 'Terjadi kesalahan koneksi server. Silakan coba lagi.';
+                    errorBox.classList.remove('hidden');
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            }
         }
 
-        function handleRegisterSubmit(e) {
+        async function handleRegisterSubmit(e) {
             e.preventDefault();
-            isAuthenticated = true;
-            localStorage.setItem('notisse_auth', 'true');
-            localStorage.setItem('notisse_user', JSON.stringify(loggedInUser));
-            document.getElementById('user-display-email').innerText = loggedInUser.email;
-            document.getElementById('user-display-name').innerText = loggedInUser.name;
-            if (document.getElementById('user-display-address')) {
-                document.getElementById('user-display-address').innerText = loggedInUser.address ? loggedInUser.address : 'No shipping address saved yet.';
+            const nameInput = document.getElementById('reg-name');
+            const emailInput = document.getElementById('reg-email');
+            const pwInput = document.getElementById('reg-password');
+            const pwConfirmInput = document.getElementById('reg-password-confirm');
+            const errorBox = document.getElementById('register-error-msg');
+            const btn = document.getElementById('register-submit-btn');
+
+            if (!nameInput || !emailInput || !pwInput) return;
+
+            if (errorBox) {
+                errorBox.classList.add('hidden');
+                errorBox.innerText = '';
             }
-            showToast('Account Created Successfully!');
-            showPage('view-account-profile');
-            fetchOrderHistory();
+
+            if (pwInput.value !== pwConfirmInput.value) {
+                if (errorBox) {
+                    errorBox.innerText = 'Konfirmasi password tidak cocok.';
+                    errorBox.classList.remove('hidden');
+                }
+                return;
+            }
+
+            const originalText = btn ? btn.innerText : 'CREATE ACCOUNT';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'CREATING ACCOUNT...';
+            }
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: nameInput.value.trim(),
+                        email: emailInput.value.trim(),
+                        password: pwInput.value,
+                        password_confirmation: pwConfirmInput.value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showToast('Akun berhasil dibuat!');
+                    if (data.user) {
+                        localStorage.setItem('notisse_auth', 'true');
+                        localStorage.setItem('notisse_user', JSON.stringify(data.user));
+                    }
+                    window.location.href = data.redirect || '/account';
+                } else {
+                    if (errorBox) {
+                        errorBox.innerText = data.message || (data.errors ? Object.values(data.errors)[0][0] : 'Pendaftaran gagal.');
+                        errorBox.classList.remove('hidden');
+                    }
+                }
+            } catch (err) {
+                if (errorBox) {
+                    errorBox.innerText = 'Terjadi kesalahan koneksi server. Silakan coba lagi.';
+                    errorBox.classList.remove('hidden');
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            }
         }
 
         async function handleLogout() {

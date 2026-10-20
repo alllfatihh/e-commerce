@@ -140,7 +140,9 @@ Route::get('/account/edit', function () use ($getStorefrontData) {
     return view('welcome', $getStorefrontData('view-edit-profile', compact('user')));
 });
 
-// Seamless Auth & Google Login
+// Seamless Auth, Manual Login/Register & Google Login
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:15,1');
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:10,1');
 Route::get('/checkout', [AuthController::class, 'showCheckoutAuth']);
 Route::get('/auth/checkout', [AuthController::class, 'showCheckoutAuth']);
 Route::get('/auth/google', [AuthController::class, 'googleRedirect']);

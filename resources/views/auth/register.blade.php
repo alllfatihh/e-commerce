@@ -35,28 +35,30 @@
 
                 <!-- Registration Form -->
                 <form onsubmit="handleRegisterSubmit(event)" class="space-y-4">
+                    <div id="register-error-msg" class="hidden p-3 bg-red-50 border-l-4 border-red-600 text-red-800 text-xs font-inter font-medium leading-relaxed"></div>
+
                     <div>
-                        <input type="text" required placeholder="Full Name"
+                        <input type="text" id="reg-name" required placeholder="Full Name"
                             class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-inter placeholder-gray-400">
                     </div>
 
                     <div>
-                        <input type="email" required placeholder="Email Address"
+                        <input type="email" id="reg-email" required placeholder="Email Address"
                             class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-inter placeholder-gray-400">
                     </div>
 
                     <div>
-                        <input type="password" required placeholder="Password"
+                        <input type="password" id="reg-password" required minlength="6" placeholder="Password (Min. 6 Characters)"
                             class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-inter placeholder-gray-400">
                     </div>
 
                     <div>
-                        <input type="password" required placeholder="Confirm Password"
+                        <input type="password" id="reg-password-confirm" required minlength="6" placeholder="Confirm Password"
                             class="w-full border border-black rounded-xl p-3.5 text-sm focus:outline-none font-inter placeholder-gray-400">
                     </div>
 
                     <div class="pt-4 flex justify-center">
-                        <button type="submit" class="btn-brush w-full text-sm uppercase cursor-pointer font-space-grotesk">
+                        <button type="submit" id="register-submit-btn" class="btn-brush w-full text-sm uppercase cursor-pointer font-space-grotesk">
                             CREATE ACCOUNT
                         </button>
                     </div>

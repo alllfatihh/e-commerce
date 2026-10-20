@@ -12,6 +12,72 @@ use App\Http\Controllers\CartController;
 
 class AuthController extends Controller
 {
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $remember = $request->boolean('remember', false);
+
+        if (Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+            $user = Auth::user();
+            CartController::mergeGuestCart($user->id, $request->cookie('notisse_cart_session'));
+
+            $redirectUrl = $user->isAdmin() ? '/admin' : '/account';
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login berhasil.',
+                'user' => $user,
+                'redirect' => $redirectUrl,
+            ]);
+        }
+
+        // Check if user exists but has no password (e.g. Google-registered)
+        $user = User::where('email', $credentials['email'])->first();
+        if ($user && empty($user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Akun ini terdaftar via Google. Silakan klik "Sign in with Google" untuk masuk.',
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Email atau password yang Anda masukkan salah.',
+        ], 422);
+    }
+
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'role' => 'user',
+        ]);
+
+        Auth::login($user, true);
+        CartController::mergeGuestCart($user->id, $request->cookie('notisse_cart_session'));
+        $request->session()->regenerate();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pendaftaran akun berhasil.',
+            'user' => $user,
+            'redirect' => '/account',
+        ]);
+    }
+
     public function showCheckoutAuth()
     {
         $addresses = Auth::check() ? Auth::user()->addresses : collect();

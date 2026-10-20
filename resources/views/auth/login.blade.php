@@ -31,31 +31,33 @@
             </div>
 
             <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <div id="login-error-msg" class="hidden p-3 bg-red-50 border-l-4 border-red-600 text-red-800 text-xs font-inter font-medium leading-relaxed"></div>
+
                 <div>
                     <label
                         class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1 font-space-grotesk">Email</label>
-                    <input type="email" required placeholder="name@email.com"
+                    <input type="email" id="login-email" required placeholder="name@email.com"
                         class="w-full border border-black rounded-lg p-3 text-sm focus:outline-none font-inter">
                 </div>
 
                 <div>
                     <label
                         class="block text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1 font-space-grotesk">Password</label>
-                    <input type="password" required placeholder="••••••••"
+                    <input type="password" id="login-password" required placeholder="••••••••"
                         class="w-full border border-black rounded-lg p-3 text-sm focus:outline-none font-inter">
                 </div>
 
                 <div class="flex items-center justify-between text-xs font-inter pt-1">
                     <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" class="accent-black">
+                        <input type="checkbox" id="login-remember" class="accent-black">
                         <span class="text-gray-600">Remember me</span>
                     </label>
-                    <a href="javascript:void(0)" onclick="showToast('Password reset instructions sent to your email.')"
+                    <a href="javascript:void(0)" onclick="showToast('Silakan masuk dengan akun Google atau hubungi admin.')"
                         class="underline text-gray-500 hover:text-black">Forgot password?</a>
                 </div>
 
                 <div class="pt-4 flex justify-center">
-                    <button type="submit" class="btn-brush w-full text-sm uppercase cursor-pointer font-space-grotesk">
+                    <button type="submit" id="login-submit-btn" class="btn-brush w-full text-sm uppercase cursor-pointer font-space-grotesk">
                         LOG IN
                     </button>
                 </div>
