@@ -5,7 +5,7 @@
     <div id="global-marquee"
         class="fixed bottom-0 left-0 z-30 w-full border-t border-black overflow-hidden flex whitespace-nowrap py-2 md:py-2.5 bg-black shadow-lg">
         @php
-            $marqueeStr = (isset($settings['marquee_text']) && !empty($settings['marquee_text']) && $settings['marquee_text'] !== 'NOTISSE WORLD WIDE SHIPPING') 
+            $marqueeStr = !empty($settings['marquee_text']) 
                 ? $settings['marquee_text'] 
                 : 'NOTISSE WORLDWIDE SHIPPING';
         @endphp

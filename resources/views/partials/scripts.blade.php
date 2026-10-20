@@ -605,6 +605,20 @@
             }
         }
 
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            const eye = btn.querySelector('.eye-icon');
+            const eyeSlash = btn.querySelector('.eye-slash-icon');
+            if (eye && eyeSlash) {
+                eye.classList.toggle('hidden', isPassword);
+                eyeSlash.classList.toggle('hidden', !isPassword);
+            }
+        }
+        window.togglePasswordVisibility = togglePasswordVisibility;
+
         async function handleLoginSubmit(e) {
             e.preventDefault();
             const emailInput = document.getElementById('login-email');

@@ -14,7 +14,9 @@ use App\Models\Artist;
 use App\Models\Artwork;
 use App\Models\Editorial;
 use App\Models\ArtworkOffering;
+use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -48,6 +50,7 @@ class AdminController extends Controller
         $offerings = ArtworkOffering::with(['user', 'artwork.artist'])->orderBy('id', 'desc')->get();
         $lookbooks = Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
         $settings = SiteSetting::pluck('value', 'key')->toArray();
+        $adminUsers = User::where('role', 'admin')->orderBy('id', 'asc')->get();
 
         $stats = [
             'total_products'   => $products->count(),
@@ -58,10 +61,11 @@ class AdminController extends Controller
             'total_editorials' => $editorials->count(),
             'total_offerings'  => $offerings->count(),
             'total_lookbooks'  => $lookbooks->count(),
+            'total_admins'     => $adminUsers->count(),
             'paid_revenue'     => Order::where('status', 'paid')->sum('total_amount'),
         ];
 
-        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'lookbooks', 'settings', 'stats'));
+        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'lookbooks', 'settings', 'stats', 'adminUsers'));
     }
 
     // ─── Products ─────────────────────────────────────────────
@@ -109,7 +113,7 @@ class AdminController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan.');
+        return redirect('/admin#section-products')->with('success', 'Produk berhasil ditambahkan.');
     }
 
     public function updateProduct(Request $request, $id)
@@ -163,7 +167,7 @@ class AdminController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Produk berhasil diperbarui.');
+        return redirect('/admin#section-products')->with('success', 'Produk berhasil diperbarui.');
     }
 
     public function deleteProduct($id)
@@ -178,7 +182,7 @@ class AdminController extends Controller
         ProductStock::where('product_id', $product->id)->delete();
         $product->delete();
 
-        return redirect()->back()->with('success', 'Produk berhasil dihapus.');
+        return redirect('/admin#section-products')->with('success', 'Produk berhasil dihapus.');
     }
 
     // ─── Artists (Seniman Kolaborator) ────────────────────────
@@ -212,7 +216,7 @@ class AdminController extends Controller
 
         Artist::create($data);
 
-        return redirect()->back()->with('success', 'Seniman kolaborator berhasil ditambahkan.');
+        return redirect('/admin#section-artists')->with('success', 'Seniman kolaborator berhasil ditambahkan.');
     }
 
     public function updateArtist(Request $request, $id)
@@ -249,7 +253,7 @@ class AdminController extends Controller
 
         $artist->update($data);
 
-        return redirect()->back()->with('success', 'Data seniman kolaborator berhasil diperbarui.');
+        return redirect('/admin#section-artists')->with('success', 'Data seniman kolaborator berhasil diperbarui.');
     }
 
     public function deleteArtist($id)
@@ -260,7 +264,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($artist->getRawOriginal('artwork_preview'));
         $artist->delete();
 
-        return redirect()->back()->with('success', 'Seniman berhasil dihapus.');
+        return redirect('/admin#section-artists')->with('success', 'Seniman berhasil dihapus.');
     }
 
     // ─── Artworks (Karya Seni Fisik per Seniman) ──────────────
@@ -289,7 +293,7 @@ class AdminController extends Controller
 
         Artwork::create($data);
 
-        return redirect()->back()->with('success', 'Karya seni (Artwork) berhasil ditambahkan untuk seniman terkait.');
+        return redirect('/admin#section-artworks')->with('success', 'Karya seni (Artwork) berhasil ditambahkan untuk seniman terkait.');
     }
 
     public function updateArtwork(Request $request, $id)
@@ -318,7 +322,7 @@ class AdminController extends Controller
 
         $artwork->update($data);
 
-        return redirect()->back()->with('success', 'Karya seni berhasil diperbarui.');
+        return redirect('/admin#section-artworks')->with('success', 'Karya seni berhasil diperbarui.');
     }
 
     public function deleteArtwork($id)
@@ -326,7 +330,7 @@ class AdminController extends Controller
         $artwork = Artwork::findOrFail($id);
         $this->deleteStorageFile($artwork->getRawOriginal('image'));
         $artwork->delete();
-        return redirect()->back()->with('success', 'Karya seni berhasil dihapus.');
+        return redirect('/admin#section-artworks')->with('success', 'Karya seni berhasil dihapus.');
     }
 
     // ─── Editorials (Artikel & Wawancara Eksklusif) ────────────
@@ -353,7 +357,7 @@ class AdminController extends Controller
 
         Editorial::create($data);
 
-        return redirect()->back()->with('success', 'Artikel editorial berhasil ditambahkan.');
+        return redirect('/admin#section-artworks')->with('success', 'Artikel editorial berhasil ditambahkan.');
     }
 
     public function updateEditorial(Request $request, $id)
@@ -380,7 +384,7 @@ class AdminController extends Controller
 
         $editorial->update($data);
 
-        return redirect()->back()->with('success', 'Artikel editorial berhasil diperbarui.');
+        return redirect('/admin#section-artworks')->with('success', 'Artikel editorial berhasil diperbarui.');
     }
 
     public function deleteEditorial($id)
@@ -388,7 +392,7 @@ class AdminController extends Controller
         $editorial = Editorial::findOrFail($id);
         $this->deleteStorageFile($editorial->getRawOriginal('image'));
         $editorial->delete();
-        return redirect()->back()->with('success', 'Artikel editorial berhasil dihapus.');
+        return redirect('/admin#section-artworks')->with('success', 'Artikel editorial berhasil dihapus.');
     }
 
     // ─── Site Media (Carousel & Footage) ─────────────────────
@@ -416,7 +420,7 @@ class AdminController extends Controller
             'order'       => $order,
         ]);
 
-        return redirect()->back()->with('success', 'Gambar ' . ($request->section === 'carousel' ? 'Hero Carousel' : 'Footage') . ' baru berhasil ditambahkan.');
+        return redirect('/admin#section-media')->with('success', 'Gambar ' . ($request->section === 'carousel' ? 'Hero Carousel' : 'Footage') . ' baru berhasil ditambahkan.');
     }
 
     public function updateMedia(Request $request, $id)
@@ -453,7 +457,7 @@ class AdminController extends Controller
 
         $media->update($data);
 
-        return redirect()->back()->with('success', 'Gambar media berhasil diperbarui.');
+        return redirect('/admin#section-media')->with('success', 'Gambar media berhasil diperbarui.');
     }
 
     public function deleteMedia($id)
@@ -463,7 +467,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($media->getRawOriginal('image'));
         $media->delete();
 
-        return redirect()->back()->with('success', 'Gambar media berhasil dihapus.');
+        return redirect('/admin#section-media')->with('success', 'Gambar media berhasil dihapus.');
     }
 
     // ─── Site Settings ─────────────────────────────────────────
@@ -480,7 +484,7 @@ class AdminController extends Controller
         Artisan::call('cache:clear');
         Artisan::call('view:clear');
 
-        return redirect()->back()->with('success', 'Pengaturan situs (Site Settings) berhasil diperbarui.');
+        return redirect('/admin#section-settings')->with('success', 'Pengaturan situs (Site Settings) berhasil diperbarui.');
     }
 
     // ─── Biteship Sync ───────────────────────────────────────
@@ -488,7 +492,7 @@ class AdminController extends Controller
     {
         Artisan::call('biteship:sync-products');
         $output = Artisan::output();
-        return redirect()->back()->with('success', 'Sinkronisasi Biteship Selesai: ' . $output);
+        return redirect('/admin#section-settings')->with('success', 'Sinkronisasi Biteship Selesai: ' . $output);
     }
 
     // ─── Artwork Offerings ─────────────────────────────────────
@@ -503,7 +507,7 @@ class AdminController extends Controller
             'status' => $request->status
         ]);
 
-        return redirect('/admin')->with('success', 'Status penawaran karya berhasil diperbarui!');
+        return redirect('/admin#section-offerings')->with('success', 'Status penawaran karya berhasil diperbarui!');
     }
 
     // ─── Lookbooks Management ───────────────────────────────
@@ -536,7 +540,7 @@ class AdminController extends Controller
 
         $lookbook = Lookbook::create($data);
 
-        return redirect('/admin')->with('success', 'Lookbook album "' . $lookbook->title . '" berhasil dibuat.');
+        return redirect('/admin#section-media')->with('success', 'Lookbook album "' . $lookbook->title . '" berhasil dibuat.');
     }
 
     public function updateLookbook(Request $request, $id)
@@ -572,7 +576,7 @@ class AdminController extends Controller
 
         $lookbook->save();
 
-        return redirect('/admin')->with('success', 'Lookbook "' . $lookbook->title . '" berhasil diperbarui.');
+        return redirect('/admin#section-media')->with('success', 'Lookbook "' . $lookbook->title . '" berhasil diperbarui.');
     }
 
     public function deleteLookbook($id)
@@ -589,7 +593,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($lookbook->getRawOriginal('video_url'));
         $lookbook->delete();
 
-        return redirect('/admin')->with('success', 'Lookbook "' . $title . '" beserta foto-fotonya berhasil dihapus.');
+        return redirect('/admin#section-media')->with('success', 'Lookbook "' . $title . '" beserta foto-fotonya berhasil dihapus.');
     }
 
     public function storeLookbookPhoto(Request $request, $id)
@@ -615,7 +619,7 @@ class AdminController extends Controller
             $lookbook->update(['cover_image' => $path]);
         }
 
-        return redirect('/admin')->with('success', 'Foto berhasil ditambahkan ke lookbook "' . $lookbook->title . '".');
+        return redirect('/admin#section-media')->with('success', 'Foto berhasil ditambahkan ke lookbook "' . $lookbook->title . '".');
     }
 
     public function deleteLookbookPhoto($id)
@@ -623,7 +627,7 @@ class AdminController extends Controller
         $photo = Fotoshoot::findOrFail($id);
         $this->deleteStorageFile($photo->getRawOriginal('image'));
         $photo->delete();
-        return redirect('/admin')->with('success', 'Foto lookbook berhasil dihapus.');
+        return redirect('/admin#section-media')->with('success', 'Foto lookbook berhasil dihapus.');
     }
 
     public function updateOrderStatus(Request $request, $id)
@@ -659,7 +663,7 @@ class AdminController extends Controller
             return response()->json(['success' => true, 'order' => $order]);
         }
 
-        return redirect('/admin')->with('success', 'Status pesanan #' . $order->id . ' berhasil diperbarui.');
+        return redirect('/admin#section-orders')->with('success', 'Status pesanan #' . $order->id . ' berhasil diperbarui.');
     }
 
     public function dispatchBiteship(Request $request, $id)
@@ -678,9 +682,48 @@ class AdminController extends Controller
         }
 
         if ($result) {
-            return redirect('/admin')->with('success', 'Pesanan #' . $order->id . ' berhasil didispatch ke Biteship.');
+            return redirect('/admin#section-orders')->with('success', 'Pesanan #' . $order->id . ' berhasil didispatch ke Biteship.');
         } else {
-            return redirect('/admin')->with('error', 'Gagal dispatch ke Biteship. Periksa konfigurasi API Key atau saldo Biteship.');
+            return redirect('/admin#section-orders')->with('error', 'Gagal dispatch ke Biteship. Periksa konfigurasi API Key atau saldo Biteship.');
         }
+    }
+
+    // ─── Admin Accounts Management ──────────────────────────────
+    public function storeAdmin(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6',
+        ], [
+            'name.required'     => 'Nama admin wajib diisi.',
+            'email.required'    => 'Email admin wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'email.unique'      => 'Email ini sudah terdaftar sebagai pengguna/admin.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min'      => 'Password minimal harus 6 karakter.',
+        ]);
+
+        User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => Hash::make($request->password),
+            'role'     => 'admin',
+        ]);
+
+        return redirect('/admin#section-admins')->with('success', 'Akun admin baru "' . $request->name . '" berhasil dibuat.');
+    }
+
+    public function deleteAdmin($id)
+    {
+        if (auth()->id() == $id) {
+            return redirect('/admin#section-admins')->with('error', 'Anda tidak dapat menghapus akun admin yang sedang Anda gunakan saat ini.');
+        }
+
+        $admin = User::where('role', 'admin')->findOrFail($id);
+        $adminName = $admin->name;
+        $admin->delete();
+
+        return redirect('/admin#section-admins')->with('success', 'Akun admin "' . $adminName . '" berhasil dihapus.');
     }
 }

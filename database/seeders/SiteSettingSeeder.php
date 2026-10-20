@@ -14,10 +14,11 @@ class SiteSettingSeeder extends Seeder
     {
         $settings = [
             ['key' => 'marquee_text', 'value' => 'NOTISSE WORLDWIDE SHIPPING'],
-            ['key' => 'footer_description', 'value' => 'Notisse is a concept brand exploring the intersection of modern aesthetics and raw street culture. Based in Indonesia, curating global narratives.'],
-            ['key' => 'contact_email', 'value' => 'hello@notisse.com'],
-            ['key' => 'contact_phone', 'value' => '+62 811 2233 4455'],
-            ['key' => 'instagram_link', 'value' => '#'],
+            ['key' => 'contact_workshop', 'value' => 'Jl Mangga Dua, Desa Sukapura, DayeuhKolot, Bandung.'],
+            ['key' => 'contact_email', 'value' => 'notissebrand@gmail.com'],
+            ['key' => 'contact_phone', 'value' => '+62 856 0771 4704'],
+            ['key' => 'instagram_link', 'value' => 'https://instagram.com/notisse'],
+            ['key' => 'site_description', 'value' => 'NOTISSE IS AN ALTERNATIVE MOVEMENT IN ART EXHIBITION. WOVEN INTO THE FABRIC OF EVERYDAY LIFE. SO ART BECOMES PART OF DAILY ACTIVITY NOT A SEPARATE OCCASION.'],
         ];
 
         foreach ($settings as $setting) {

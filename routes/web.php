@@ -152,7 +152,10 @@ Route::post('/logout', function () {
     auth()->logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
-    return response()->json(['success' => true]);
+    if (request()->expectsJson() || request()->ajax()) {
+        return response()->json(['success' => true]);
+    }
+    return redirect('/login');
 });
 Route::post('/update-profile', [AuthController::class, 'updateProfile']);
 
@@ -185,6 +188,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship']);
     Route::post('/admin/orders/{id}/status', [AdminController::class, 'updateOrderStatus']);
     Route::post('/admin/orders/{id}/dispatch', [AdminController::class, 'dispatchBiteship']);
+    Route::post('/admin/admins', [AdminController::class, 'storeAdmin']);
+    Route::delete('/admin/admins/{id}', [AdminController::class, 'deleteAdmin']);
 });
 
 // Cart Routes

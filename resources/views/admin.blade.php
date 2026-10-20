@@ -406,6 +406,18 @@
             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
             <span>Site Settings</span>
         </a>
+
+        <a href="#section-admins" onclick="showSection('admins')"
+           class="nav-link flex items-center justify-between px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
+           id="nav-admins">
+            <span class="flex items-center gap-3">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 11v6m3-3h-6"/></svg>
+                <span>Akun Admin</span>
+            </span>
+            <span class="bg-white/20 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full font-space-grotesk">
+                {{ count($adminUsers ?? []) }}
+            </span>
+        </a>
     </nav>
 
     <!-- Bottom links -->
@@ -1428,7 +1440,7 @@
             <div class="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Site Settings & Global Branding</h2>
-                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola teks pengumuman bergerak (Marquee Text), kontak resmi atelier, dan informasi footer toko Notisse.</p>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola teks running announcement (Marquee Text), kontak resmi workshop atelier, tautan Instagram, serta narasi halaman About.</p>
                 </div>
             </div>
 
@@ -1442,36 +1454,46 @@
                     </label>
                     <input type="text" name="marquee_text" value="{{ $settings['marquee_text'] ?? 'NOTISSE WORLDWIDE SHIPPING' }}" required
                         placeholder="Contoh: NOTISSE WORLDWIDE SHIPPING" class="admin-input">
-                    <p class="text-[11px] text-gray-400 font-inter">Teks ini akan berjalan secara otomatis di bagian paling bawah halaman depan (global marquee banner).</p>
+                    <p class="text-[11px] text-gray-400 font-inter">Teks ini langsung berjalan secara otomatis di banner paling bawah seluruh halaman website Notisse.</p>
                 </div>
 
-                <!-- Kontak Informasi -->
+                <!-- Kontak Informasi Sesuai Halaman Contact -->
                 <div class="p-5 bg-neutral-50 border border-gray-200 space-y-4">
-                    <h3 class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-black border-b border-gray-200 pb-2">Kontak & Media Sosial</h3>
+                    <div class="border-b border-gray-200 pb-2">
+                        <h3 class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-black">Kontak & Lokasi Atelier (Sesuai Halaman Contact)</h3>
+                        <p class="text-[11px] text-gray-400 font-inter mt-0.5">Informasi kontak ini langsung tampil pada halaman Contact di website Notisse.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Lokasi Workshop Atelier</label>
+                        <input type="text" name="contact_workshop" value="{{ $settings['contact_workshop'] ?? ($settings['workshop_address'] ?? 'Jl Mangga Dua, Desa Sukapura, DayeuhKolot, Bandung.') }}" placeholder="Jl Mangga Dua, Desa Sukapura, DayeuhKolot, Bandung." class="admin-input">
+                    </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Official Contact Email</label>
-                            <input type="email" name="contact_email" value="{{ $settings['contact_email'] ?? 'hello@notisse.com' }}" placeholder="hello@notisse.com" class="admin-input">
+                            <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Official Email</label>
+                            <input type="email" name="contact_email" value="{{ $settings['contact_email'] ?? 'notissebrand@gmail.com' }}" placeholder="notissebrand@gmail.com" class="admin-input">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">WhatsApp / Phone Number</label>
-                            <input type="text" name="contact_phone" value="{{ $settings['contact_phone'] ?? '+62 811 2233 4455' }}" placeholder="+62 811 2233 4455" class="admin-input">
+                            <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">WhatsApp Number</label>
+                            <input type="text" name="contact_phone" value="{{ $settings['contact_phone'] ?? '+62 856 0771 4704' }}" placeholder="+62 856 0771 4704" class="admin-input">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Instagram URL</label>
-                        <input type="text" name="instagram_link" value="{{ $settings['instagram_link'] ?? '#' }}" placeholder="https://instagram.com/notisse" class="admin-input">
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Instagram URL (Tampil di Halaman Contact)</label>
+                        <input type="text" name="instagram_link" value="{{ $settings['instagram_link'] ?? 'https://instagram.com/notisse' }}" placeholder="https://instagram.com/notisse" class="admin-input">
+                        <p class="text-[11px] text-gray-400 font-inter mt-1">Masukkan tautan profil Instagram lengkap (contoh: https://instagram.com/notisse) untuk ditampilkan di halaman Contact.</p>
                     </div>
                 </div>
 
-                <!-- Footer Description -->
+                <!-- Deskripsi Singkat untuk Mengubah Halaman About -->
                 <div class="p-5 bg-neutral-50 border border-gray-200 space-y-2">
                     <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black">
-                        Deskripsi Singkat Footer (Brand Narrative)
+                        Deskripsi Singkat / Konten Halaman About (Brand Statement)
                     </label>
-                    <textarea name="footer_description" rows="3" class="admin-input resize-none leading-relaxed">{{ $settings['footer_description'] ?? 'Notisse is a concept brand exploring the intersection of modern aesthetics and raw street culture. Based in Indonesia, curating global narratives.' }}</textarea>
+                    <textarea name="site_description" rows="4" class="admin-input resize-none leading-relaxed">{{ $settings['site_description'] ?? 'NOTISSE IS AN ALTERNATIVE MOVEMENT IN ART EXHIBITION. WOVEN INTO THE FABRIC OF EVERYDAY LIFE. SO ART BECOMES PART OF DAILY ACTIVITY NOT A SEPARATE OCCASION.' }}</textarea>
+                    <p class="text-[11px] text-gray-400 font-inter">Teks ini langsung difungsikan untuk menampilkan narasi utama di Halaman About (Brand Narrative) website Notisse.</p>
                 </div>
 
                 <div class="pt-2 flex justify-end">
@@ -1480,6 +1502,172 @@
                     </button>
                 </div>
             </form>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────
+             SECTION 8: ADMIN ACCOUNTS MANAGEMENT
+        ───────────────────────────────────────────────────────── --}}
+        <section id="section-admins" class="section-card hidden">
+            <div class="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Manajemen Akun Admin</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola dan buat akun administrator baru untuk mengakses dan mengelola panel atelier Notisse.</p>
+                </div>
+                <div>
+                    <form action="/logout" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-space-grotesk font-bold uppercase tracking-wider text-red-600 hover:text-white bg-red-50 hover:bg-red-600 border border-red-200 hover:border-red-600 transition-all rounded-xs shadow-sm cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                            </svg>
+                            <span>Logout dari Admin</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            @if($errors->any())
+            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-600 text-red-800 text-xs font-inter space-y-1">
+                @foreach($errors->all() as $err)
+                    <p>&bull; {{ $err }}</p>
+                @endforeach
+            </div>
+            @endif
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- FORM BUAT AKUN ADMIN BARU -->
+                <div class="lg:col-span-1 bg-neutral-50 border border-gray-200 p-5 rounded-xs space-y-4">
+                    <div class="border-b border-gray-200 pb-3">
+                        <h3 class="font-space-grotesk font-bold text-sm uppercase tracking-wider text-black flex items-center gap-2">
+                            <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 11v6m3-3h-6"/></svg>
+                            <span>Buat Akun Admin Baru</span>
+                        </h3>
+                        <p class="text-[11px] text-gray-500 font-inter mt-1">Akun admin baru akan memiliki akses penuh ke seluruh menu panel ini.</p>
+                    </div>
+
+                    <form action="/admin/admins" method="POST" class="space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 mb-1">
+                                Nama Lengkap Admin *
+                            </label>
+                            <input type="text" name="name" required placeholder="Contoh: Zaid Atelier" class="admin-input">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 mb-1">
+                                Email Admin *
+                            </label>
+                            <input type="email" name="email" required placeholder="admin2@notisse.com" class="admin-input">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 mb-1">
+                                Password Akun (Min. 6 Karakter) *
+                            </label>
+                            <div class="relative">
+                                <input type="password" id="admin-new-password" name="password" required minlength="6" placeholder="••••••••" class="admin-input pr-10">
+                                <button type="button" onclick="togglePasswordVisibility('admin-new-password', this)"
+                                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black focus:outline-none p-1 transition-colors cursor-pointer"
+                                    title="Tampilkan / Sembunyikan Password">
+                                    <svg class="w-4 h-4 eye-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <svg class="w-4 h-4 eye-slash-icon hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="submit" class="w-full btn-primary py-3 text-xs uppercase font-space-grotesk tracking-wider cursor-pointer">
+                                + Buat Akun Admin
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- TABEL DAFTAR AKUN ADMIN TERDAFTAR -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                        <h3 class="font-space-grotesk font-bold text-sm uppercase tracking-wider text-black">
+                            Daftar Akun Admin Terdaftar ({{ count($adminUsers ?? []) }})
+                        </h3>
+                    </div>
+
+                    <div class="overflow-x-auto border border-gray-200 bg-white">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-gray-200 bg-neutral-50 text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-600">
+                                    <th class="px-4 py-3">Administrator</th>
+                                    <th class="px-4 py-3">Email</th>
+                                    <th class="px-4 py-3">Didaftarkan</th>
+                                    <th class="px-4 py-3 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-xs">
+                                @forelse($adminUsers as $admin)
+                                <tr class="hover:bg-neutral-50/70 transition-colors">
+                                    <td class="px-4 py-3.5">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full bg-black text-white font-space-grotesk font-bold flex items-center justify-center text-xs uppercase shrink-0">
+                                                {{ strtoupper(substr($admin->name, 0, 1)) }}
+                                            </div>
+                                            <div>
+                                                <p class="font-space-grotesk font-bold text-gray-900 uppercase">{{ $admin->name }}</p>
+                                                @if($admin->id === auth()->id())
+                                                    <span class="inline-block text-[9px] font-space-grotesk font-bold uppercase tracking-wider bg-black text-white px-1.5 py-0.5 mt-0.5">
+                                                        Akun Anda Saat Ini
+                                                    </span>
+                                                @else
+                                                    <span class="inline-block text-[9px] font-space-grotesk font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 mt-0.5">
+                                                        Admin Atelier
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3.5 font-mono text-gray-700">
+                                        {{ $admin->email }}
+                                    </td>
+                                    <td class="px-4 py-3.5 text-gray-500 font-inter">
+                                        {{ $admin->created_at ? $admin->created_at->format('d M Y, H:i') : '-' }}
+                                    </td>
+                                    <td class="px-4 py-3.5 text-right">
+                                        @if($admin->id === auth()->id())
+                                            <div class="flex items-center justify-end gap-2">
+                                                <form action="/logout" method="POST" class="inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn-action-delete !bg-neutral-100 !text-neutral-700 !border-neutral-300 hover:!bg-black hover:!text-white hover:!border-black transition-colors" title="Keluar dari akun admin ini">
+                                                        Logout
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            <form id="delete-admin-form-{{ $admin->id }}" action="/admin/admins/{{ $admin->id }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" onclick="askConfirm('Apakah Anda yakin ingin menghapus akun admin {{ $admin->name }} ({{ $admin->email }})?', document.getElementById('delete-admin-form-{{ $admin->id }}'), 'Hapus Akun Admin', 'Ya, Hapus Admin')" class="btn-action-delete">
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="px-4 py-8 text-center text-gray-400 font-inter text-xs">
+                                        Belum ada data admin terdaftar.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -2288,7 +2476,7 @@
 
     // ── Section switcher ────────────────────────────────────────
     function showSection(name) {
-        const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'settings'];
+        const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'settings', 'admins'];
         const titles = {
             'products':  'Products Catalog Management',
             'artists':   'Artists & Collaborators Management',
@@ -2296,8 +2484,11 @@
             'media':     'Site Visual Media (Hero & Lookbook)',
             'orders':    'Customer Orders & Transactions',
             'offerings': 'Artwork Offerings Management',
-            'settings':  'Site Settings & Global Branding'
+            'settings':  'Site Settings & Global Branding',
+            'admins':    'Manajemen Akun Admin'
         };
+
+        if (!sections.includes(name)) return;
 
         sections.forEach(s => {
             const el = document.getElementById('section-' + s);
@@ -2310,6 +2501,13 @@
         if (pageTitle && titles[name]) {
             pageTitle.innerText = titles[name];
         }
+
+        try {
+            sessionStorage.setItem('notisse_admin_section', name);
+            if (window.location.hash !== '#section-' + name) {
+                history.replaceState(null, '', '#section-' + name);
+            }
+        } catch (e) {}
     }
 
     // ── Media tab switcher ──────────────────────────────────────
@@ -2320,6 +2518,10 @@
             if (pane) pane.classList.toggle('hidden', t !== tab);
             if (btn)  btn.classList.toggle('active', t === tab);
         });
+
+        try {
+            sessionStorage.setItem('notisse_admin_media_tab', tab);
+        } catch (e) {}
     }
 
     // ── Lookbook modal helpers ──────────────────────────────────
@@ -2841,6 +3043,35 @@
                     input.dispatchEvent(changeEvent);
                 }
             }, false);
+        });
+
+        // ── Auto switch to section from URL hash or sessionStorage ───
+        const validSections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'settings', 'admins'];
+        let activeSec = 'products';
+        const hashMatch = window.location.hash.replace('#section-', '').replace('#', '');
+        
+        if (hashMatch && validSections.includes(hashMatch)) {
+            activeSec = hashMatch;
+        } else {
+            const savedSec = sessionStorage.getItem('notisse_admin_section');
+            if (savedSec && validSections.includes(savedSec)) {
+                activeSec = savedSec;
+            }
+        }
+        showSection(activeSec);
+
+        if (activeSec === 'media') {
+            const savedMediaTab = sessionStorage.getItem('notisse_admin_media_tab');
+            if (savedMediaTab && ['carousel', 'footage', 'lookbook'].includes(savedMediaTab)) {
+                switchMediaTab(savedMediaTab);
+            }
+        }
+
+        window.addEventListener('hashchange', () => {
+            const newHash = window.location.hash.replace('#section-', '').replace('#', '');
+            if (newHash && validSections.includes(newHash)) {
+                showSection(newHash);
+            }
         });
     });
 
