@@ -2,17 +2,18 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use App\Models\User;
-use App\Models\Product;
-use App\Models\ProductStock;
 use App\Models\Artist;
 use App\Models\Artwork;
+use App\Models\ArtworkOffering;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
+use App\Models\ProductStock;
+use App\Models\User;
 use App\Models\UserAddress;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Tests\TestCase;
 
 class NotisseE2ETest extends TestCase
 {
@@ -187,7 +188,7 @@ class NotisseE2ETest extends TestCase
         $res->assertStatus(200);
         $addr1 = UserAddress::where('user_id', $user->id)->first();
         $this->assertNotNull($addr1);
-        $this->assertTrue((bool)$addr1->is_primary);
+        $this->assertTrue((bool) $addr1->is_primary);
 
         // Create second address as primary
         $res2 = $this->postJson('/api/user/addresses', [
@@ -202,9 +203,9 @@ class NotisseE2ETest extends TestCase
         $res2->assertStatus(200);
 
         // Address 1 should now not be primary, Address 2 should be primary
-        $this->assertFalse((bool)$addr1->fresh()->is_primary);
+        $this->assertFalse((bool) $addr1->fresh()->is_primary);
         $addr2 = UserAddress::where('label', 'Office')->first();
-        $this->assertTrue((bool)$addr2->is_primary);
+        $this->assertTrue((bool) $addr2->is_primary);
 
         // Update address 1
         $resUpdate = $this->putJson("/api/user/addresses/{$addr1->id}", [
@@ -365,5 +366,187 @@ class NotisseE2ETest extends TestCase
 
         $this->assertEquals('cancelled', $order->fresh()->status);
         $this->assertEquals(7, $stock->fresh()->stock); // 5 + 2 restored
+    }
+
+    /** 8. Seamless Auth & Profile Update */
+    public function test_seamless_auth_and_profile_update(): void
+    {
+        $payload = [
+            'name' => 'Seamless Customer',
+            'email' => 'seamless@example.com',
+            'password' => 'secret123',
+            'phone' => '08987654321',
+            'address' => 'Jl. Asia Afrika No. 5',
+            'area_id' => 'area_999',
+            'area_name' => 'Bandung Kota',
+        ];
+
+        $res = $this->postJson('/auth/seamless', $payload);
+        $res->assertStatus(200)
+            ->assertJson(['success' => true]);
+
+        $user = User::where('email', 'seamless@example.com')->first();
+        $this->assertNotNull($user);
+        $this->assertAuthenticatedAs($user);
+        $this->assertCount(1, $user->addresses);
+
+        // Update profile
+        $resUpdate = $this->postJson('/update-profile', [
+            'name' => 'Seamless Customer Updated',
+            'phone' => '08999999999',
+            'birthdate' => '2000-01-15',
+            'address' => 'Jl. Merdeka No. 10',
+            'area_id' => 'area_888',
+        ]);
+        $resUpdate->assertStatus(200)
+            ->assertJson(['success' => true]);
+
+        $this->assertEquals('Seamless Customer Updated', $user->fresh()->name);
+        $this->assertEquals('08999999999', $user->fresh()->phone);
+    }
+
+    /** 9. Checkout Insufficient Stock Guard */
+    public function test_checkout_rejects_when_stock_insufficient(): void
+    {
+        $user = User::create([
+            'name' => 'Low Stock Buyer',
+            'email' => 'lowstock@example.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        $product = Product::create([
+            'name' => 'LIMITED HOODIE',
+            'price' => 750000,
+        ]);
+
+        ProductStock::create([
+            'product_id' => $product->id,
+            'size' => 'M',
+            'stock' => 1,
+        ]);
+
+        $this->actingAs($user);
+
+        // Attempt to checkout 5 items when only 1 available
+        $res = $this->postJson('/checkout', [
+            'customer_name' => $user->name,
+            'customer_email' => $user->email,
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Jl. Cihampelas No. 50',
+            'destination_area_id' => 'area_bandung',
+            'shipping_cost' => 15000,
+            'courier_name' => 'JNE Reguler',
+            'items' => [
+                [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'size' => 'M',
+                    'quantity' => 5,
+                    'price' => 750000,
+                ],
+            ],
+        ]);
+
+        $res->assertStatus(400)
+            ->assertJson([
+                'success' => false,
+            ]);
+
+        // Stock must remain unchanged
+        $this->assertEquals(1, ProductStock::where('product_id', $product->id)->where('size', 'M')->value('stock'));
+    }
+
+    /** 10. Midtrans Local Success Webhook Sync */
+    public function test_midtrans_local_success_webhook_marks_order_paid(): void
+    {
+        $order = Order::create([
+            'customer_name' => 'Webhook Tester',
+            'customer_email' => 'webhook@example.com',
+            'customer_phone' => '08111111111',
+            'shipping_address' => 'Jl. Test Webhook',
+            'total_amount' => 350000,
+            'status' => 'pending',
+            'midtrans_order_id' => 'ORDER-TEST-12345',
+        ]);
+
+        $res = $this->postJson('/midtrans/local-success', [
+            'order_id' => 'ORDER-TEST-12345',
+        ]);
+
+        $res->assertStatus(200)
+            ->assertJson(['success' => true]);
+
+        $this->assertEquals('paid', $order->fresh()->status);
+    }
+
+    /** 11. Admin Product Management Lifecycle */
+    public function test_admin_product_lifecycle(): void
+    {
+        $admin = User::create([
+            'name' => 'Catalog Manager',
+            'email' => 'catalog_admin@example.com',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+        ]);
+
+        $this->actingAs($admin);
+
+        // Create product
+        $resStore = $this->post('/admin/products', [
+            'name' => 'NOTISSE VINTAGE JACKET',
+            'price' => 850000,
+            'description' => 'A luxury vintage jacket',
+            'specs' => 'Cotton Heavyweight 330gsm',
+            'stocks' => [
+                'M' => 10,
+                'L' => 15,
+            ],
+        ]);
+        $resStore->assertRedirect();
+
+        $product = Product::where('name', 'NOTISSE VINTAGE JACKET')->first();
+        $this->assertNotNull($product);
+        $this->assertCount(2, $product->stocks);
+
+        // Delete product
+        $resDelete = $this->delete("/admin/products/{$product->id}");
+        $resDelete->assertRedirect();
+        $this->assertNull(Product::find($product->id));
+    }
+
+    /** 12. Admin Artwork Offering Approval */
+    public function test_admin_artwork_offering_moderation(): void
+    {
+        $admin = User::create([
+            'name' => 'Gallery Curator',
+            'email' => 'curator@example.com',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+        ]);
+
+        $artist = Artist::create(['name' => 'Artist Gallery']);
+        $artwork = Artwork::create([
+            'artist_id' => $artist->id,
+            'title' => 'Curated Piece',
+            'status' => 'available',
+            'image' => 'artworks/sample.jpg',
+        ]);
+
+        $offering = ArtworkOffering::create([
+            'artwork_id' => $artwork->id,
+            'user_id' => $admin->id,
+            'reference_number' => 'NTS-ART-TEST01',
+            'offering_price' => 20000000,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($admin);
+
+        $res = $this->post("/admin/offerings/{$offering->id}/status", [
+            'status' => 'accepted',
+        ]);
+        $res->assertRedirect('/admin');
+
+        $this->assertEquals('accepted', $offering->fresh()->status);
     }
 }

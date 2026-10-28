@@ -400,6 +400,34 @@
             @endif
         </a>
 
+        <a href="#section-discounts" onclick="showSection('discounts')"
+           class="nav-link flex items-center justify-between px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
+           id="nav-discounts">
+            <span class="flex items-center gap-3">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 14l6-6M9 8h.01M15 14h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Discount Codes</span>
+            </span>
+            @if(($stats['total_discounts'] ?? 0) > 0)
+                <span class="bg-white/20 text-white font-bold text-[10px] px-2 py-0.5 rounded-full font-space-grotesk">
+                    {{ $stats['total_discounts'] }}
+                </span>
+            @endif
+        </a>
+
+        <a href="#section-admins" onclick="showSection('admins')"
+           class="nav-link flex items-center justify-between px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
+           id="nav-admins">
+            <span class="flex items-center gap-3">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span>Kelola Admin</span>
+            </span>
+            @if(($stats['total_admins'] ?? 0) > 0)
+                <span class="bg-white/20 text-white font-bold text-[10px] px-2 py-0.5 rounded-full font-space-grotesk">
+                    {{ $stats['total_admins'] }}
+                </span>
+            @endif
+        </a>
+
         <a href="#section-settings" onclick="showSection('settings')"
            class="nav-link flex items-center gap-3 px-6 py-3.5 text-xs font-space-grotesk tracking-wider uppercase text-white/90"
            id="nav-settings">
@@ -444,6 +472,12 @@
             <div id="toast-success" class="flex items-center gap-2 bg-accentYellow px-4 py-2 text-xs font-space-grotesk font-bold uppercase tracking-wide text-brandDark border border-black/10 shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                 {{ session('success') }}
+            </div>
+            @endif
+            @if(session('error'))
+            <div id="toast-error" class="flex items-center gap-2 bg-red-600 text-white px-4 py-2 text-xs font-space-grotesk font-bold uppercase tracking-wide border border-red-700 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                {{ session('error') }}
             </div>
             @endif
             <a href="/" target="_blank" class="text-xs font-space-grotesk font-semibold tracking-wider uppercase border border-gray-300 hover:border-black px-3.5 py-1.5 transition-colors text-gray-700 hover:text-black">
@@ -1422,6 +1456,210 @@
         </section>
 
         {{-- ─────────────────────────────────────────────────────────
+             SECTION 6.5: DISCOUNT & PROMO CODES MANAGEMENT
+        ───────────────────────────────────────────────────────── --}}
+        <section id="section-discounts" class="section-card hidden">
+            <div class="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Discount & Promo Codes Management</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola kupon promo, diskon persentase maupun potongan harga tetap untuk pelanggan toko Notisse.</p>
+                </div>
+                <div>
+                    <button onclick="openCreateDiscountModal()" class="btn-primary flex items-center gap-2 cursor-pointer shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                        <span>Tambah Kode Diskon</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table of Discount Codes -->
+            <div class="overflow-x-auto border border-gray-200">
+                <table class="w-full text-left text-xs font-inter border-collapse">
+                    <thead class="bg-gray-50 border-b border-gray-200 font-space-grotesk font-bold uppercase tracking-wider text-[11px] text-gray-600">
+                        <tr>
+                            <th class="px-5 py-3.5">Kode Kupon</th>
+                            <th class="px-5 py-3.5">Deskripsi</th>
+                            <th class="px-5 py-3.5">Nilai Diskon</th>
+                            <th class="px-5 py-3.5">Ketentuan</th>
+                            <th class="px-5 py-3.5">Penggunaan</th>
+                            <th class="px-5 py-3.5">Masa Berlaku</th>
+                            <th class="px-5 py-3.5">Status</th>
+                            <th class="px-5 py-3.5 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 bg-white">
+                        @forelse($discounts as $discount)
+                            <tr class="hover:bg-neutral-50/70 transition-colors">
+                                <td class="px-5 py-4">
+                                    <span class="font-space-grotesk font-bold text-sm tracking-widest text-black bg-neutral-100 px-2.5 py-1 border border-neutral-300 rounded-xs select-all">
+                                        {{ $discount->code }}
+                                    </span>
+                                </td>
+                                <td class="px-5 py-4 text-gray-600 max-w-xs truncate">
+                                    {{ $discount->description ?: '-' }}
+                                </td>
+                                <td class="px-5 py-4 font-space-grotesk font-bold text-black text-sm">
+                                    @if($discount->type === 'percentage')
+                                        <span class="text-emerald-700">{{ (int)$discount->value }}% OFF</span>
+                                        @if($discount->max_discount_amount)
+                                            <p class="text-[10px] font-normal text-gray-400 font-inter">Maks. Rp {{ number_format($discount->max_discount_amount, 0, ',', '.') }}</p>
+                                        @endif
+                                    @else
+                                        <span class="text-blue-700">Rp {{ number_format($discount->value, 0, ',', '.') }}</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-4 text-gray-600 text-[11px]">
+                                    @if($discount->min_order_amount > 0)
+                                        <span>Min. Belanja: Rp {{ number_format($discount->min_order_amount, 0, ',', '.') }}</span>
+                                    @else
+                                        <span class="text-gray-400">Tanpa min. belanja</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-4 font-space-grotesk text-xs">
+                                    <span class="font-bold text-black">{{ $discount->used_count }}</span>
+                                    <span class="text-gray-400">/ {{ $discount->usage_limit ?: '∞' }} dipakai</span>
+                                </td>
+                                <td class="px-5 py-4 text-[11px] text-gray-500">
+                                    @if($discount->start_date || $discount->end_date)
+                                        <div>{{ $discount->start_date ? $discount->start_date->format('d/m/Y') : 'Mulai Sekarang' }}</div>
+                                        <div class="text-gray-400">&darr; {{ $discount->end_date ? $discount->end_date->format('d/m/Y') : 'Tanpa batas' }}</div>
+                                    @else
+                                        <span class="text-emerald-600 font-medium">Selalu Aktif</span>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-4">
+                                    <form action="/admin/discounts/{{ $discount->id }}/toggle" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" title="Klik untuk ubah status"
+                                            class="cursor-pointer px-2.5 py-1 text-[10px] font-space-grotesk font-bold uppercase tracking-wider border rounded-xs transition-colors {{ $discount->is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' : 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-gray-200' }}">
+                                            {{ $discount->is_active ? '● Aktif' : '○ Nonaktif' }}
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="px-5 py-4 text-right">
+                                    <div class="inline-flex items-center gap-2">
+                                        <button onclick='openEditDiscountModal(@json($discount))'
+                                            class="btn-action-edit">
+                                            Edit
+                                        </button>
+                                        <form action="/admin/discounts/{{ $discount->id }}" method="POST" onsubmit="return confirm('Hapus kode diskon {{ $discount->code }}?');" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-action-delete">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="px-5 py-12 text-center text-sm text-gray-400 font-inter">
+                                    Belum ada kode diskon yang dibuat. Klik tombol "Tambah Kode Diskon" untuk membuat kupon pertama.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────
+             SECTION: ADMIN & STAFF MANAGEMENT
+        ───────────────────────────────────────────────────────── --}}
+        <section id="section-admins" class="section-card hidden">
+            <div class="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] text-brandDark">Admin & Staff Management</h2>
+                    <p class="text-xs text-gray-500 font-inter mt-0.5">Kelola akun administrator sistem Notisse. Tambah akun pengelola baru, perbarui nama/email/password, atau hapus akses admin.</p>
+                </div>
+                <div>
+                    <button onclick="openCreateAdminModal()" class="btn-primary flex items-center gap-2 cursor-pointer shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+                        <span>Tambah Admin Baru</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table of Admins -->
+            <div class="overflow-x-auto border border-gray-200">
+                <table class="w-full text-left text-xs font-inter border-collapse">
+                    <thead class="bg-gray-50 border-b border-gray-200 font-space-grotesk font-bold uppercase tracking-wider text-[11px] text-gray-600">
+                        <tr>
+                            <th class="px-5 py-3.5">Administrator</th>
+                            <th class="px-5 py-3.5">Email</th>
+                            <th class="px-5 py-3.5">No. Telepon</th>
+                            <th class="px-5 py-3.5">Role</th>
+                            <th class="px-5 py-3.5">Terdaftar</th>
+                            <th class="px-5 py-3.5 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 bg-white">
+                        @forelse($admins as $adminItem)
+                            <tr class="hover:bg-neutral-50/70 transition-colors">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-black text-white font-space-grotesk font-bold text-xs flex items-center justify-center shrink-0 uppercase">
+                                            {{ substr($adminItem->name, 0, 2) }}
+                                        </div>
+                                        <div>
+                                            <div class="font-space-grotesk font-bold text-sm text-black flex items-center gap-2">
+                                                <span>{{ $adminItem->name }}</span>
+                                                @if(auth()->id() === $adminItem->id)
+                                                    <span class="bg-black text-white text-[9px] font-space-grotesk uppercase px-1.5 py-0.5 tracking-wider rounded-xs font-bold">Anda</span>
+                                                @endif
+                                            </div>
+                                            <div class="text-[11px] text-gray-400">ID: #{{ $adminItem->id }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 text-gray-700 font-mono text-xs select-all">
+                                    {{ $adminItem->email }}
+                                </td>
+                                <td class="px-5 py-4 text-gray-600 text-xs">
+                                    {{ $adminItem->phone ?: '-' }}
+                                </td>
+                                <td class="px-5 py-4">
+                                    <span class="px-2.5 py-1 text-[10px] font-space-grotesk font-bold uppercase tracking-wider bg-black text-white border border-black rounded-xs">
+                                        ADMIN
+                                    </span>
+                                </td>
+                                <td class="px-5 py-4 text-gray-500 text-[11px]">
+                                    {{ $adminItem->created_at ? $adminItem->created_at->format('d M Y, H:i') : '-' }}
+                                </td>
+                                <td class="px-5 py-4 text-right">
+                                    <div class="inline-flex items-center gap-2">
+                                        <button onclick='openEditAdminModal(@json($adminItem))'
+                                            class="btn-action-edit">
+                                            Edit
+                                        </button>
+                                        @if(auth()->id() !== $adminItem->id && count($admins) > 1)
+                                            <form action="/admin/admins/{{ $adminItem->id }}" method="POST" onsubmit="return confirm('Hapus hak akses admin untuk {{ $adminItem->name }}? Tindakan ini tidak dapat dibatalkan.');" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn-action-delete">
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="text-[11px] text-gray-400 italic px-2">Terkunci</span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-5 py-12 text-center text-sm text-gray-400 font-inter">
+                                    Belum ada administrator lain. Klik tombol "Tambah Admin Baru" untuk menambahkan akun admin.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        {{-- ─────────────────────────────────────────────────────────
              SECTION 7: SITE SETTINGS (BRANDING & GLOBAL CONFIG)
         ───────────────────────────────────────────────────────── --}}
         <section id="section-settings" class="section-card hidden">
@@ -2252,6 +2490,124 @@
     </div>
 </div>
 
+{{-- ── MODAL: DISCOUNT CODE (CREATE / EDIT) ──────────────────────── --}}
+<div id="modal-discount" class="modal-backdrop" onclick="closeDiscountModal()">
+    <div class="modal-box max-w-xl" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="modal-discount-title" class="font-space-grotesk font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Kode Diskon</h3>
+            <button onclick="closeDiscountModal()" class="modal-close-btn">&times;</button>
+        </div>
+
+        <form id="form-discount" action="/admin/discounts" method="POST" class="p-6 space-y-4">
+            @csrf
+            <input type="hidden" name="_method" id="discount-form-method" value="POST">
+
+            <div>
+                <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Kode Kupon / Promo *</label>
+                <input type="text" name="code" id="discount-code" required placeholder="Contoh: FLASH10, MINGGUHEMAT" class="admin-input uppercase font-mono tracking-wider font-bold">
+            </div>
+
+            <div>
+                <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Deskripsi Singkat</label>
+                <input type="text" name="description" id="discount-description" placeholder="Contoh: Diskon akhir pekan untuk semua apparel" class="admin-input">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Tipe Diskon *</label>
+                    <select name="type" id="discount-type" class="admin-input" onchange="handleDiscountTypeChange(this.value)">
+                        <option value="percentage">Persentase (%)</option>
+                        <option value="fixed">Potongan Tetap (Rp)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5" id="discount-value-label">Nilai Diskon (%) *</label>
+                    <input type="number" step="any" min="0" name="value" id="discount-value" required placeholder="Contoh: 15" class="admin-input font-mono">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Min. Belanja Subtotal (Rp)</label>
+                    <input type="number" min="0" name="min_order_amount" id="discount-min-order" placeholder="0 (Tanpa minimum)" class="admin-input font-mono">
+                </div>
+                <div id="discount-max-cap-container">
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Maks. Potongan (Rp)</label>
+                    <input type="number" min="0" name="max_discount_amount" id="discount-max-discount" placeholder="Kosongkan jika tanpa batas" class="admin-input font-mono">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Batas Kuota</label>
+                    <input type="number" min="1" name="usage_limit" id="discount-usage-limit" placeholder="Kosong = Bebas" class="admin-input font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Mulai Tanggal</label>
+                    <input type="date" name="start_date" id="discount-start-date" class="admin-input text-xs font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Sampai Tanggal</label>
+                    <input type="date" name="end_date" id="discount-end-date" class="admin-input text-xs font-mono">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+                <input type="checkbox" name="is_active" id="discount-is-active" value="1" checked class="w-4 h-4 text-black border-gray-300 rounded focus:ring-black">
+                <label for="discount-is-active" class="text-xs font-space-grotesk font-bold uppercase tracking-wider text-gray-800 cursor-pointer">Aktifkan Kode Diskon Ini Sekarang</label>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button type="button" onclick="closeDiscountModal()" class="btn-outline px-4 py-2 text-xs">Batal</button>
+                <button type="submit" id="discount-submit-btn" class="btn-primary">Simpan Kode Diskon</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ── MODAL: ADMIN MANAGEMENT (CREATE / EDIT) ────────────────────── --}}
+<div id="modal-admin" class="modal-backdrop" onclick="closeAdminModal()">
+    <div class="modal-box max-w-lg" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 id="modal-admin-title" class="font-space-grotesk font-extrabold text-xl uppercase tracking-[0.15em] text-gray-900">Tambah Admin Baru</h3>
+            <button onclick="closeAdminModal()" class="modal-close-btn">&times;</button>
+        </div>
+
+        <form id="form-admin" action="/admin/admins" method="POST" class="p-6 space-y-4">
+            @csrf
+            <input type="hidden" name="_method" id="admin-form-method" value="POST">
+
+            <div>
+                <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Nama Lengkap *</label>
+                <input type="text" name="name" id="admin-name" required placeholder="Contoh: Budi Santoso" class="admin-input">
+            </div>
+
+            <div>
+                <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Alamat Email *</label>
+                <input type="email" name="email" id="admin-email" required placeholder="admin@notisse.com" class="admin-input font-mono">
+            </div>
+
+            <div>
+                <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Nomor Telepon / WhatsApp</label>
+                <input type="text" name="phone" id="admin-phone" placeholder="Contoh: 08123456789" class="admin-input font-mono">
+            </div>
+
+            <div>
+                <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">
+                    <span id="admin-password-label">Password *</span>
+                </label>
+                <input type="password" name="password" id="admin-password" placeholder="Minimal 6 karakter" class="admin-input font-mono">
+                <p id="admin-password-hint" class="text-[11px] text-gray-400 font-inter mt-1 hidden">Kosongkan kolom password jika tidak ingin mengubah password akun admin ini.</p>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button type="button" onclick="closeAdminModal()" class="btn-outline px-4 py-2 text-xs">Batal</button>
+                <button type="submit" id="admin-submit-btn" class="btn-primary">Simpan Admin</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {{-- ══════════════════════════════════════════════════════════════
      MODAL CONFIRM (Custom Luxury Confirmation Modal - No Native OS Dialogs)
 ══════════════════════════════════════════════════════════════ --}}
@@ -2288,7 +2644,7 @@
 
     // ── Section switcher ────────────────────────────────────────
     function showSection(name) {
-        const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'settings'];
+        const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'discounts', 'admins', 'settings'];
         const titles = {
             'products':  'Products Catalog Management',
             'artists':   'Artists & Collaborators Management',
@@ -2296,6 +2652,8 @@
             'media':     'Site Visual Media (Hero & Lookbook)',
             'orders':    'Customer Orders & Transactions',
             'offerings': 'Artwork Offerings Management',
+            'discounts': 'Discount & Promo Codes Management',
+            'admins':    'Admin & Staff Management',
             'settings':  'Site Settings & Global Branding'
         };
 
@@ -2850,6 +3208,119 @@
     const toastErr = document.getElementById('toast-error');
     if (toastErr) setTimeout(() => { toastErr.style.opacity = '0'; toastErr.style.transition = 'opacity 0.5s'; setTimeout(() => toastErr.remove(), 500); }, 5000);
 
+    // ── Discount Code Modals ────────────────────────────────────
+    function handleDiscountTypeChange(type) {
+        const label = document.getElementById('discount-value-label');
+        const capContainer = document.getElementById('discount-max-cap-container');
+        if (type === 'percentage') {
+            if (label) label.textContent = 'Nilai Diskon (%) *';
+            if (capContainer) capContainer.classList.remove('hidden');
+        } else {
+            if (label) label.textContent = 'Nilai Diskon (Rp) *';
+            if (capContainer) capContainer.classList.add('hidden');
+        }
+    }
+
+    function openCreateDiscountModal() {
+        const form = document.getElementById('form-discount');
+        if (form) form.reset();
+        document.getElementById('modal-discount-title').textContent = 'Tambah Kode Diskon';
+        document.getElementById('discount-form-method').value = 'POST';
+        form.action = '/admin/discounts';
+        document.getElementById('discount-is-active').checked = true;
+        handleDiscountTypeChange('percentage');
+        document.getElementById('modal-discount').classList.add('open');
+    }
+
+    function openEditDiscountModal(discount) {
+        const form = document.getElementById('form-discount');
+        document.getElementById('modal-discount-title').textContent = 'Edit Kode Diskon';
+        document.getElementById('discount-form-method').value = 'PUT';
+        form.action = '/admin/discounts/' + discount.id;
+
+        document.getElementById('discount-code').value = discount.code || '';
+        document.getElementById('discount-description').value = discount.description || '';
+        document.getElementById('discount-type').value = discount.type || 'percentage';
+        document.getElementById('discount-value').value = discount.value || '';
+        document.getElementById('discount-min-order').value = discount.min_order_amount || '';
+        document.getElementById('discount-max-discount').value = discount.max_discount_amount || '';
+        document.getElementById('discount-usage-limit').value = discount.usage_limit || '';
+
+        if (discount.start_date) {
+            document.getElementById('discount-start-date').value = discount.start_date.substring(0, 10);
+        } else {
+            document.getElementById('discount-start-date').value = '';
+        }
+
+        if (discount.end_date) {
+            document.getElementById('discount-end-date').value = discount.end_date.substring(0, 10);
+        } else {
+            document.getElementById('discount-end-date').value = '';
+        }
+
+        document.getElementById('discount-is-active').checked = !!discount.is_active;
+
+        handleDiscountTypeChange(discount.type || 'percentage');
+        document.getElementById('modal-discount').classList.add('open');
+    }
+
+    function closeDiscountModal() {
+        document.getElementById('modal-discount').classList.remove('open');
+    }
+
+    // ── Admin Modal Helpers ─────────────────────────────────────
+    function openCreateAdminModal() {
+        document.getElementById('modal-admin-title').innerText = 'Tambah Admin Baru';
+        document.getElementById('admin-submit-btn').innerText = 'Simpan Admin';
+        document.getElementById('admin-form-method').value = 'POST';
+
+        const form = document.getElementById('form-admin');
+        form.action = '/admin/admins';
+        form.reset();
+
+        const pwdInput = document.getElementById('admin-password');
+        pwdInput.required = true;
+        pwdInput.placeholder = 'Minimal 6 karakter';
+        document.getElementById('admin-password-label').innerText = 'Password *';
+        document.getElementById('admin-password-hint').classList.add('hidden');
+
+        document.getElementById('modal-admin').classList.add('open');
+    }
+
+    function openEditAdminModal(admin) {
+        document.getElementById('modal-admin-title').innerText = 'Edit Data Admin: ' + (admin.name || '');
+        document.getElementById('admin-submit-btn').innerText = 'Perbarui Data Admin';
+        document.getElementById('admin-form-method').value = 'PUT';
+
+        const form = document.getElementById('form-admin');
+        form.action = '/admin/admins/' + admin.id;
+
+        document.getElementById('admin-name').value = admin.name || '';
+        document.getElementById('admin-email').value = admin.email || '';
+        document.getElementById('admin-phone').value = admin.phone || '';
+
+        const pwdInput = document.getElementById('admin-password');
+        pwdInput.required = false;
+        pwdInput.value = '';
+        pwdInput.placeholder = 'Kosongkan jika tidak diubah';
+        document.getElementById('admin-password-label').innerText = 'Password Baru (Opsional)';
+        document.getElementById('admin-password-hint').classList.remove('hidden');
+
+        document.getElementById('modal-admin').classList.add('open');
+    }
+
+    function closeAdminModal() {
+        document.getElementById('modal-admin').classList.remove('open');
+    }
+
+    // ── Check Hash on Load ────────────────────────────────────────
+    window.addEventListener('load', () => {
+        const hash = window.location.hash.replace('#section-', '').replace('#', '');
+        if (hash && ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'discounts', 'admins', 'settings'].includes(hash)) {
+            showSection(hash);
+        }
+    });
+
     // ── Keyboard ESC to close modals ─────────────────────────────
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
@@ -2862,6 +3333,8 @@
             closeCreateCarouselModal();
             closeCreateLookbookModal();
             closeManageLookbook();
+            closeDiscountModal();
+            closeAdminModal();
         }
     });
 </script>

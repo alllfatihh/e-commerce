@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             FotoshootSeeder::class,
             ProductStockSeeder::class,
+            DiscountCodeSeeder::class,
         ]);
     }
 }

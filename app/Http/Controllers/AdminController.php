@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
-use App\Models\ProductStock;
-use App\Models\Order;
-use App\Models\SiteMedia;
-use App\Models\SiteSetting;
-use App\Models\Fotoshoot;
-use App\Models\Lookbook;
 use App\Models\Artist;
 use App\Models\Artwork;
-use App\Models\Editorial;
 use App\Models\ArtworkOffering;
+use App\Models\DiscountCode;
+use App\Models\Editorial;
+use App\Models\Fotoshoot;
+use App\Models\Lookbook;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\ProductStock;
+use App\Models\SiteMedia;
+use App\Models\SiteSetting;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -22,7 +25,7 @@ class AdminController extends Controller
 {
     private function deleteStorageFile(?string $path): void
     {
-        if (!$path || Str::startsWith($path, ['http://', 'https://'])) {
+        if (! $path || Str::startsWith($path, ['http://', 'https://'])) {
             return;
         }
 
@@ -47,37 +50,41 @@ class AdminController extends Controller
         $editorials = Editorial::with('artist')->orderBy('id', 'desc')->get();
         $offerings = ArtworkOffering::with(['user', 'artwork.artist'])->orderBy('id', 'desc')->get();
         $lookbooks = Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
+        $discounts = DiscountCode::orderBy('id', 'desc')->get();
+        $admins = User::where('role', 'admin')->orderBy('id', 'asc')->get();
         $settings = SiteSetting::pluck('value', 'key')->toArray();
 
         $stats = [
-            'total_products'   => $products->count(),
-            'total_stock'      => ProductStock::sum('stock'),
-            'total_orders'     => Order::count(),
-            'total_artists'    => $artists->count(),
-            'total_artworks'   => $artworks->count(),
+            'total_products' => $products->count(),
+            'total_stock' => ProductStock::sum('stock'),
+            'total_orders' => Order::count(),
+            'total_artists' => $artists->count(),
+            'total_artworks' => $artworks->count(),
             'total_editorials' => $editorials->count(),
-            'total_offerings'  => $offerings->count(),
-            'total_lookbooks'  => $lookbooks->count(),
-            'paid_revenue'     => Order::where('status', 'paid')->sum('total_amount'),
+            'total_offerings' => $offerings->count(),
+            'total_lookbooks' => $lookbooks->count(),
+            'total_discounts' => $discounts->count(),
+            'total_admins' => $admins->count(),
+            'paid_revenue' => Order::where('status', 'paid')->sum('total_amount'),
         ];
 
-        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'lookbooks', 'settings', 'stats'));
+        return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'lookbooks', 'discounts', 'admins', 'settings', 'stats'));
     }
 
     // ─── Products ─────────────────────────────────────────────
     public function storeProduct(Request $request)
     {
         $request->validate([
-            'name'             => 'required|string|max:255',
-            'price'            => 'required|numeric',
-            'description'      => 'nullable|string',
-            'specs'            => 'nullable|string',
-            'artist'           => 'nullable|string|max:255',
-            'image'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'back_image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'footage_image'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'description' => 'nullable|string',
+            'specs' => 'nullable|string',
+            'artist' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'back_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'footage_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'stocks'           => 'nullable|array'
+            'stocks' => 'nullable|array',
         ]);
 
         $data = $request->only('name', 'price', 'description', 'specs', 'artist');
@@ -102,8 +109,8 @@ class AdminController extends Controller
                 if ($qty !== null && $qty !== '') {
                     ProductStock::create([
                         'product_id' => $product->id,
-                        'size'       => $size,
-                        'stock'      => (int) $qty
+                        'size' => $size,
+                        'stock' => (int) $qty,
                     ]);
                 }
             }
@@ -117,16 +124,16 @@ class AdminController extends Controller
         $product = Product::findOrFail($id);
 
         $request->validate([
-            'name'             => 'required|string|max:255',
-            'price'            => 'required|numeric',
-            'description'      => 'nullable|string',
-            'specs'            => 'nullable|string',
-            'artist'           => 'nullable|string|max:255',
-            'image'            => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'back_image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'footage_image'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'description' => 'nullable|string',
+            'specs' => 'nullable|string',
+            'artist' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'back_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'footage_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'stocks'           => 'nullable|array'
+            'stocks' => 'nullable|array',
         ]);
 
         $data = $request->only('name', 'price', 'description', 'specs', 'artist');
@@ -155,7 +162,7 @@ class AdminController extends Controller
                 if ($qty !== null && $qty !== '') {
                     $stock = ProductStock::firstOrNew([
                         'product_id' => $product->id,
-                        'size'       => $size
+                        'size' => $size,
                     ]);
                     $stock->stock = (int) $qty;
                     $stock->save();
@@ -185,12 +192,12 @@ class AdminController extends Controller
     public function storeArtist(Request $request)
     {
         $request->validate([
-            'name'            => 'required|string|max:255',
-            'city'            => 'nullable|string|max:255',
-            'bio'             => 'nullable|string',
-            'photo'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'name' => 'required|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'bio' => 'nullable|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'artwork_preview' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'is_newcomer'     => 'nullable|boolean',
+            'is_newcomer' => 'nullable|boolean',
         ]);
 
         $data = $request->only('name', 'city', 'bio');
@@ -220,12 +227,12 @@ class AdminController extends Controller
         $artist = Artist::findOrFail($id);
 
         $request->validate([
-            'name'            => 'required|string|max:255',
-            'city'            => 'nullable|string|max:255',
-            'bio'             => 'nullable|string',
-            'photo'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'name' => 'required|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'bio' => 'nullable|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'artwork_preview' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'is_newcomer'     => 'nullable|boolean',
+            'is_newcomer' => 'nullable|boolean',
         ]);
 
         $data = $request->only('name', 'city', 'bio');
@@ -267,15 +274,15 @@ class AdminController extends Controller
     public function storeArtwork(Request $request)
     {
         $request->validate([
-            'artist_id'   => 'required|exists:artists,id',
-            'title'       => 'required|string|max:255',
-            'medium'      => 'nullable|string|max:255',
-            'dimensions'  => 'nullable|string|max:100',
-            'year'        => 'nullable|string|max:20',
-            'status'      => 'nullable|string|max:100',
-            'price'       => 'nullable|numeric',
+            'artist_id' => 'required|exists:artists,id',
+            'title' => 'required|string|max:255',
+            'medium' => 'nullable|string|max:255',
+            'dimensions' => 'nullable|string|max:100',
+            'year' => 'nullable|string|max:20',
+            'status' => 'nullable|string|max:100',
+            'price' => 'nullable|numeric',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
@@ -297,15 +304,15 @@ class AdminController extends Controller
         $artwork = Artwork::findOrFail($id);
 
         $request->validate([
-            'artist_id'   => 'required|exists:artists,id',
-            'title'       => 'required|string|max:255',
-            'medium'      => 'nullable|string|max:255',
-            'dimensions'  => 'nullable|string|max:100',
-            'year'        => 'nullable|string|max:20',
-            'status'      => 'nullable|string|max:100',
-            'price'       => 'nullable|numeric',
+            'artist_id' => 'required|exists:artists,id',
+            'title' => 'required|string|max:255',
+            'medium' => 'nullable|string|max:255',
+            'dimensions' => 'nullable|string|max:100',
+            'year' => 'nullable|string|max:20',
+            'status' => 'nullable|string|max:100',
+            'price' => 'nullable|numeric',
             'description' => 'nullable|string',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
@@ -326,6 +333,7 @@ class AdminController extends Controller
         $artwork = Artwork::findOrFail($id);
         $this->deleteStorageFile($artwork->getRawOriginal('image'));
         $artwork->delete();
+
         return redirect()->back()->with('success', 'Karya seni berhasil dihapus.');
     }
 
@@ -333,13 +341,13 @@ class AdminController extends Controller
     public function storeEditorial(Request $request)
     {
         $request->validate([
-            'artist_id'  => 'required|exists:artists,id',
-            'title'      => 'required|string|max:255',
-            'author'     => 'nullable|string|max:255',
-            'excerpt'    => 'nullable|string',
-            'content'    => 'required|string',
-            'video_url'  => 'nullable|string',
-            'image'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'artist_id' => 'required|exists:artists,id',
+            'title' => 'required|string|max:255',
+            'author' => 'nullable|string|max:255',
+            'excerpt' => 'nullable|string',
+            'content' => 'required|string',
+            'video_url' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
@@ -361,13 +369,13 @@ class AdminController extends Controller
         $editorial = Editorial::findOrFail($id);
 
         $request->validate([
-            'artist_id'  => 'required|exists:artists,id',
-            'title'      => 'required|string|max:255',
-            'author'     => 'nullable|string|max:255',
-            'excerpt'    => 'nullable|string',
-            'content'    => 'required|string',
-            'video_url'  => 'nullable|string',
-            'image'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'artist_id' => 'required|exists:artists,id',
+            'title' => 'required|string|max:255',
+            'author' => 'nullable|string|max:255',
+            'excerpt' => 'nullable|string',
+            'content' => 'required|string',
+            'video_url' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
@@ -388,6 +396,7 @@ class AdminController extends Controller
         $editorial = Editorial::findOrFail($id);
         $this->deleteStorageFile($editorial->getRawOriginal('image'));
         $editorial->delete();
+
         return redirect()->back()->with('success', 'Artikel editorial berhasil dihapus.');
     }
 
@@ -395,28 +404,28 @@ class AdminController extends Controller
     public function storeMedia(Request $request)
     {
         $request->validate([
-            'section'     => 'required|string|in:carousel,footage',
-            'title'       => 'nullable|string|max:255',
+            'section' => 'required|string|in:carousel,footage',
+            'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'order'       => 'nullable|integer',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'order' => 'nullable|integer',
         ]);
 
-        $order = $request->filled('order') 
-            ? (int)$request->order 
+        $order = $request->filled('order')
+            ? (int) $request->order
             : ((SiteMedia::where('section', $request->section)->max('order') ?? 0) + 1);
 
         $path = $request->file('image')->store('site-media', 'public');
 
         SiteMedia::create([
-            'section'     => $request->section,
-            'title'       => $request->title ?: 'Slide ' . $order,
+            'section' => $request->section,
+            'title' => $request->title ?: 'Slide '.$order,
             'description' => $request->description,
-            'image'       => $path,
-            'order'       => $order,
+            'image' => $path,
+            'order' => $order,
         ]);
 
-        return redirect()->back()->with('success', 'Gambar ' . ($request->section === 'carousel' ? 'Hero Carousel' : 'Footage') . ' baru berhasil ditambahkan.');
+        return redirect()->back()->with('success', 'Gambar '.($request->section === 'carousel' ? 'Hero Carousel' : 'Footage').' baru berhasil ditambahkan.');
     }
 
     public function updateMedia(Request $request, $id)
@@ -424,11 +433,11 @@ class AdminController extends Controller
         $media = SiteMedia::findOrFail($id);
 
         $request->validate([
-            'title'       => 'nullable|string|max:255',
+            'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'product_id'  => 'nullable',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'order'       => 'nullable|integer',
+            'product_id' => 'nullable',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'order' => 'nullable|integer',
         ]);
 
         $data = [];
@@ -442,7 +451,7 @@ class AdminController extends Controller
             $data['product_id'] = $request->filled('product_id') ? $request->product_id : null;
         }
         if ($request->filled('order')) {
-            $data['order'] = (int)$request->order;
+            $data['order'] = (int) $request->order;
         }
 
         if ($request->hasFile('image')) {
@@ -488,19 +497,20 @@ class AdminController extends Controller
     {
         Artisan::call('biteship:sync-products');
         $output = Artisan::output();
-        return redirect()->back()->with('success', 'Sinkronisasi Biteship Selesai: ' . $output);
+
+        return redirect()->back()->with('success', 'Sinkronisasi Biteship Selesai: '.$output);
     }
 
     // ─── Artwork Offerings ─────────────────────────────────────
     public function updateOfferingStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string'
+            'status' => 'required|string',
         ]);
 
         $offering = ArtworkOffering::findOrFail($id);
         $offering->update([
-            'status' => $request->status
+            'status' => $request->status,
         ]);
 
         return redirect('/admin')->with('success', 'Status penawaran karya berhasil diperbarui!');
@@ -510,17 +520,17 @@ class AdminController extends Controller
     public function storeLookbook(Request $request)
     {
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'year'        => 'nullable|string|max:20',
+            'title' => 'required|string|max:255',
+            'year' => 'nullable|string|max:20',
             'description' => 'nullable|string',
-            'video'       => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
-            'video_url'   => 'nullable|string',
+            'video' => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
+            'video_url' => 'nullable|string',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $data = [
-            'title'       => $request->title,
-            'year'        => $request->year ?: date('Y'),
+            'title' => $request->title,
+            'year' => $request->year ?: date('Y'),
             'description' => $request->description,
         ];
 
@@ -536,7 +546,7 @@ class AdminController extends Controller
 
         $lookbook = Lookbook::create($data);
 
-        return redirect('/admin')->with('success', 'Lookbook album "' . $lookbook->title . '" berhasil dibuat.');
+        return redirect('/admin')->with('success', 'Lookbook album "'.$lookbook->title.'" berhasil dibuat.');
     }
 
     public function updateLookbook(Request $request, $id)
@@ -544,11 +554,11 @@ class AdminController extends Controller
         $lookbook = Lookbook::findOrFail($id);
 
         $request->validate([
-            'title'       => 'required|string|max:255',
-            'year'        => 'nullable|string|max:20',
+            'title' => 'required|string|max:255',
+            'year' => 'nullable|string|max:20',
             'description' => 'nullable|string',
-            'video'       => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
-            'video_url'   => 'nullable|string',
+            'video' => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
+            'video_url' => 'nullable|string',
             'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
@@ -572,7 +582,7 @@ class AdminController extends Controller
 
         $lookbook->save();
 
-        return redirect('/admin')->with('success', 'Lookbook "' . $lookbook->title . '" berhasil diperbarui.');
+        return redirect('/admin')->with('success', 'Lookbook "'.$lookbook->title.'" berhasil diperbarui.');
     }
 
     public function deleteLookbook($id)
@@ -589,7 +599,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($lookbook->getRawOriginal('video_url'));
         $lookbook->delete();
 
-        return redirect('/admin')->with('success', 'Lookbook "' . $title . '" beserta foto-fotonya berhasil dihapus.');
+        return redirect('/admin')->with('success', 'Lookbook "'.$title.'" beserta foto-fotonya berhasil dihapus.');
     }
 
     public function storeLookbookPhoto(Request $request, $id)
@@ -597,25 +607,25 @@ class AdminController extends Controller
         $lookbook = Lookbook::findOrFail($id);
 
         $request->validate([
-            'title'       => 'nullable|string|max:255',
+            'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image'       => 'required|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
         $path = $request->file('image')->store('lookbooks/photos', 'public');
 
         Fotoshoot::create([
             'lookbook_id' => $lookbook->id,
-            'title'       => $request->title ?: $lookbook->title,
+            'title' => $request->title ?: $lookbook->title,
             'description' => $request->description,
-            'image'       => $path,
+            'image' => $path,
         ]);
 
         if (empty($lookbook->getRawOriginal('cover_image'))) {
             $lookbook->update(['cover_image' => $path]);
         }
 
-        return redirect('/admin')->with('success', 'Foto berhasil ditambahkan ke lookbook "' . $lookbook->title . '".');
+        return redirect('/admin')->with('success', 'Foto berhasil ditambahkan ke lookbook "'.$lookbook->title.'".');
     }
 
     public function deleteLookbookPhoto($id)
@@ -623,6 +633,7 @@ class AdminController extends Controller
         $photo = Fotoshoot::findOrFail($id);
         $this->deleteStorageFile($photo->getRawOriginal('image'));
         $photo->delete();
+
         return redirect('/admin')->with('success', 'Foto lookbook berhasil dihapus.');
     }
 
@@ -659,28 +670,162 @@ class AdminController extends Controller
             return response()->json(['success' => true, 'order' => $order]);
         }
 
-        return redirect('/admin')->with('success', 'Status pesanan #' . $order->id . ' berhasil diperbarui.');
+        return redirect('/admin')->with('success', 'Status pesanan #'.$order->id.' berhasil diperbarui.');
     }
 
     public function dispatchBiteship(Request $request, $id)
     {
         $order = Order::with('items')->findOrFail($id);
 
-        $checkoutController = new \App\Http\Controllers\CheckoutController();
+        $checkoutController = new CheckoutController;
         $result = $checkoutController->dispatchBiteshipOrder($order);
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'success' => $result !== null,
                 'result' => $result,
-                'order' => $order->fresh()
+                'order' => $order->fresh(),
             ]);
         }
 
         if ($result) {
-            return redirect('/admin')->with('success', 'Pesanan #' . $order->id . ' berhasil didispatch ke Biteship.');
+            return redirect('/admin')->with('success', 'Pesanan #'.$order->id.' berhasil didispatch ke Biteship.');
         } else {
             return redirect('/admin')->with('error', 'Gagal dispatch ke Biteship. Periksa konfigurasi API Key atau saldo Biteship.');
         }
+    }
+
+    // ─── Discount Codes (Promo Codes) ─────────────────────────
+    public function storeDiscountCode(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string|max:50|unique:discount_codes,code',
+            'description' => 'nullable|string|max:255',
+            'type' => 'required|in:percentage,fixed',
+            'value' => 'required|numeric|min:0',
+            'min_order_amount' => 'nullable|numeric|min:0',
+            'max_discount_amount' => 'nullable|numeric|min:0',
+            'usage_limit' => 'nullable|integer|min:1',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $validated['code'] = strtoupper(trim($validated['code']));
+        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['min_order_amount'] = $validated['min_order_amount'] ?? 0;
+
+        DiscountCode::create($validated);
+
+        return redirect('/admin#section-discounts')->with('success', 'Kode diskon '.$validated['code'].' berhasil ditambahkan.');
+    }
+
+    public function updateDiscountCode(Request $request, $id)
+    {
+        $discount = DiscountCode::findOrFail($id);
+
+        $validated = $request->validate([
+            'code' => 'required|string|max:50|unique:discount_codes,code,'.$id,
+            'description' => 'nullable|string|max:255',
+            'type' => 'required|in:percentage,fixed',
+            'value' => 'required|numeric|min:0',
+            'min_order_amount' => 'nullable|numeric|min:0',
+            'max_discount_amount' => 'nullable|numeric|min:0',
+            'usage_limit' => 'nullable|integer|min:1',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $validated['code'] = strtoupper(trim($validated['code']));
+        $validated['is_active'] = $request->boolean('is_active');
+        $validated['min_order_amount'] = $validated['min_order_amount'] ?? 0;
+
+        $discount->update($validated);
+
+        return redirect('/admin#section-discounts')->with('success', 'Kode diskon '.$discount->code.' berhasil diperbarui.');
+    }
+
+    public function deleteDiscountCode($id)
+    {
+        $discount = DiscountCode::findOrFail($id);
+        $code = $discount->code;
+        $discount->delete();
+
+        return redirect('/admin#section-discounts')->with('success', 'Kode diskon '.$code.' berhasil dihapus.');
+    }
+
+    public function toggleDiscountCode($id)
+    {
+        $discount = DiscountCode::findOrFail($id);
+        $discount->update(['is_active' => ! $discount->is_active]);
+
+        $statusText = $discount->is_active ? 'diaktifkan' : 'dinonaktifkan';
+
+        return redirect('/admin#section-discounts')->with('success', 'Kode diskon '.$discount->code.' berhasil '.$statusText.'.');
+    }
+
+    // ─── Admins Management ────────────────────────────────────
+    public function storeAdmin(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6',
+            'phone' => 'nullable|string|max:50',
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => strtolower(trim($validated['email'])),
+            'password' => Hash::make($validated['password']),
+            'phone' => $validated['phone'] ?? null,
+            'role' => 'admin',
+        ]);
+
+        return redirect('/admin#section-admins')->with('success', 'Admin baru '.$validated['name'].' berhasil ditambahkan.');
+    }
+
+    public function updateAdmin(Request $request, $id)
+    {
+        $admin = User::where('role', 'admin')->findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,'.$id,
+            'password' => 'nullable|string|min:6',
+            'phone' => 'nullable|string|max:50',
+        ]);
+
+        $admin->name = $validated['name'];
+        $admin->email = strtolower(trim($validated['email']));
+        $admin->phone = $validated['phone'] ?? null;
+
+        if (! empty($validated['password'])) {
+            $admin->password = Hash::make($validated['password']);
+        }
+
+        $admin->save();
+
+        return redirect('/admin#section-admins')->with('success', 'Data admin '.$admin->name.' berhasil diperbarui.');
+    }
+
+    public function deleteAdmin($id)
+    {
+        $admin = User::where('role', 'admin')->findOrFail($id);
+
+        if (auth()->id() === (int) $id) {
+            return redirect('/admin#section-admins')->with('error', 'Anda tidak dapat menghapus akun admin yang sedang Anda gunakan.');
+        }
+
+        $totalAdmins = User::where('role', 'admin')->count();
+        if ($totalAdmins <= 1) {
+            return redirect('/admin#section-admins')->with('error', 'Tidak dapat menghapus admin terakhir pada sistem.');
+        }
+
+        $name = $admin->name;
+        $admin->delete();
+
+        return redirect('/admin#section-admins')->with('success', 'Akun admin '.$name.' berhasil dihapus.');
     }
 }

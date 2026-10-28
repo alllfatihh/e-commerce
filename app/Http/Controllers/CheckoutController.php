@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Cart;
+use App\Models\DiscountCode;
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Support\Facades\Http;
+use App\Models\Product;
+use App\Models\ProductStock;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
-use Midtrans\Snap;
 use Midtrans\Notification;
+use Midtrans\Snap;
 
 class CheckoutController extends Controller
 {
@@ -31,7 +36,7 @@ class CheckoutController extends Controller
                     $pendingOrder->update(['status' => 'cancelled']);
                     foreach ($pendingOrder->items as $pItem) {
                         if ($pItem->product_id) {
-                            \App\Models\ProductStock::where('product_id', $pItem->product_id)
+                            ProductStock::where('product_id', $pItem->product_id)
                                 ->where('size', $pItem->size)
                                 ->increment('stock', $pItem->quantity);
                         }
@@ -41,7 +46,7 @@ class CheckoutController extends Controller
                         'error' => 'Anda masih memiliki transaksi yang belum diselesaikan.',
                         'pending_order' => true,
                         'order_id' => $pendingOrder->id,
-                        'snap_token' => $pendingOrder->snap_token
+                        'snap_token' => $pendingOrder->snap_token,
                     ], 403);
                 }
             }
@@ -67,7 +72,7 @@ class CheckoutController extends Controller
             $size = $item['size'] ?? 'All Size';
             $quantity = max(1, (int) ($item['quantity'] ?? 1));
 
-            $product = $productId ? \App\Models\Product::find($productId) : null;
+            $product = $productId ? Product::find($productId) : null;
             $unitPrice = $product ? (int) $product->price : (int) ($item['price'] ?? 0);
             $productName = $product ? $product->name : ($item['name'] ?? 'Product');
 
@@ -82,11 +87,20 @@ class CheckoutController extends Controller
             ];
         }
 
-        // Kalkulasi diskon promo code secara server-side
+        // Kalkulasi diskon promo code secara dinamis dari database
         $discountAmount = 0;
+        $appliedDiscount = null;
         $promoCode = strtoupper(trim($request->input('promo_code', '')));
         if ($promoCode) {
-            if ($promoCode === 'NOTISSE' || $promoCode === 'NOTISSE10') {
+            $discountModel = DiscountCode::where('code', $promoCode)
+                ->where('is_active', true)
+                ->first();
+
+            if ($discountModel && $discountModel->isValidForSubtotal($subtotal)) {
+                $discountAmount = $discountModel->calculateDiscount($subtotal);
+                $appliedDiscount = $discountModel;
+            } elseif ($promoCode === 'NOTISSE' || $promoCode === 'NOTISSE10') {
+                // Backward-compatible fallback
                 $discountAmount = (int) round($subtotal * 0.10);
             } elseif ($promoCode === 'NOTISSE50') {
                 $discountAmount = (int) round($subtotal * 0.50);
@@ -104,20 +118,20 @@ class CheckoutController extends Controller
 
         // ATOMIC INVENTORY CONCURRENCY LOCK & TRANSACTION
         try {
-            $order = DB::transaction(function () use ($validated, $verifiedItems, $subtotal, $shippingCost, $discountAmount, $totalAmount) {
+            $order = DB::transaction(function () use ($validated, $verifiedItems, $subtotal, $shippingCost, $discountAmount, $totalAmount, $appliedDiscount) {
                 // 1. Pessimistic Locking: Kunci dan verifikasi stok secara atomik
                 foreach ($verifiedItems as $item) {
                     $productId = $item['id'];
                     $size = $item['size'];
-                    
+
                     if ($productId) {
-                        $stockRecord = \App\Models\ProductStock::where('product_id', $productId)
+                        $stockRecord = ProductStock::where('product_id', $productId)
                             ->where('size', $size)
                             ->lockForUpdate()
                             ->first();
 
-                        if (!$stockRecord || $stockRecord->stock < $item['quantity']) {
-                            throw new \Exception('Maaf, stok produk "' . $item['name'] . '" (' . $size . ') tidak mencukupi.');
+                        if (! $stockRecord || $stockRecord->stock < $item['quantity']) {
+                            throw new \Exception('Maaf, stok produk "'.$item['name'].'" ('.$size.') tidak mencukupi.');
                         }
                     }
                 }
@@ -142,7 +156,7 @@ class CheckoutController extends Controller
                 foreach ($verifiedItems as $item) {
                     $productId = $item['id'];
                     $size = $item['size'];
-                    
+
                     OrderItem::create([
                         'order_id' => $createdOrder->id,
                         'product_id' => $productId,
@@ -153,21 +167,27 @@ class CheckoutController extends Controller
                     ]);
 
                     if ($productId) {
-                        \App\Models\ProductStock::where('product_id', $productId)
+                        ProductStock::where('product_id', $productId)
                             ->where('size', $size)
                             ->decrement('stock', $item['quantity']);
                     }
                 }
 
+                // 4. Catat penggunaan kode promo
+                if ($appliedDiscount) {
+                    $appliedDiscount->increment('used_count');
+                }
+
                 return $createdOrder;
             });
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('Checkout order/stock transaction aborted: ' . $e->getMessage());
+            Log::warning('Checkout order/stock transaction aborted: '.$e->getMessage());
+
             return response()->json(['success' => false, 'error' => $e->getMessage()], 400);
         }
 
         // Konfigurasi Midtrans
-        $midtransOrderId = $order->id . '-' . time();
+        $midtransOrderId = $order->id.'-'.time();
         $params = [
             'transaction_details' => [
                 'order_id' => $midtransOrderId,
@@ -184,12 +204,12 @@ class CheckoutController extends Controller
             $snapToken = Snap::getSnapToken($params);
             $order->update([
                 'midtrans_order_id' => $midtransOrderId,
-                'snap_token' => $snapToken
+                'snap_token' => $snapToken,
             ]);
 
             // Bersihkan cart di database jika user login
             if (auth()->check()) {
-                $userCart = \App\Models\Cart::where('user_id', auth()->id())->first();
+                $userCart = Cart::where('user_id', auth()->id())->first();
                 if ($userCart) {
                     $userCart->items()->delete();
                 }
@@ -197,7 +217,8 @@ class CheckoutController extends Controller
 
             return response()->json(['snap_token' => $snapToken, 'order_id' => $order->id]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Checkout Error: ' . $e->getMessage());
+            Log::error('Checkout Error: '.$e->getMessage());
+
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -205,14 +226,16 @@ class CheckoutController extends Controller
     public function searchArea(Request $request)
     {
         $keyword = $request->query('keyword');
-        if (!$keyword) return response()->json(['areas' => []]);
+        if (! $keyword) {
+            return response()->json(['areas' => []]);
+        }
 
         $response = Http::withHeaders([
-            'Authorization' => env('BITESHIP_API_KEY')
+            'Authorization' => env('BITESHIP_API_KEY'),
         ])->get('https://api.biteship.com/v1/maps/areas', [
             'countries' => 'ID',
             'input' => $keyword,
-            'type' => 'single'
+            'type' => 'single',
         ]);
 
         return response()->json($response->json());
@@ -223,47 +246,49 @@ class CheckoutController extends Controller
         try {
             $validated = $request->validate([
                 'destination_area_id' => 'required|string',
-                'items' => 'required|array'
+                'items' => 'required|array',
             ]);
 
-            $biteshipItems = array_map(function($item) {
+            $biteshipItems = array_map(function ($item) {
                 return [
-                    "name" => $item['name'] ?? "Item",
-                    "description" => $item['name'] ?? "Apparel Notisse",
-                    "value" => $item['price'] ?? 100000,
-                    "length" => 20,
-                    "width" => 20,
-                    "height" => 5,
-                    "weight" => 200, // asumsikan 200gram per baju
-                    "quantity" => $item['quantity'] ?? 1
+                    'name' => $item['name'] ?? 'Item',
+                    'description' => $item['name'] ?? 'Apparel Notisse',
+                    'value' => $item['price'] ?? 100000,
+                    'length' => 20,
+                    'width' => 20,
+                    'height' => 5,
+                    'weight' => 200, // asumsikan 200gram per baju
+                    'quantity' => $item['quantity'] ?? 1,
                 ];
             }, $validated['items']);
 
             $response = Http::withHeaders([
-                'Authorization' => env('BITESHIP_API_KEY')
+                'Authorization' => env('BITESHIP_API_KEY'),
             ])->post('https://api.biteship.com/v1/rates/couriers', [
-                "origin_area_id" => env('STORE_ORIGIN_AREA_ID', "IDNP9IDNC22IDND2044IDZ40353"),
-                "destination_area_id" => $validated['destination_area_id'],
-                "couriers" => "jne,sicepat,jnt,anteraja",
-                "items" => $biteshipItems
+                'origin_area_id' => env('STORE_ORIGIN_AREA_ID', 'IDNP9IDNC22IDND2044IDZ40353'),
+                'destination_area_id' => $validated['destination_area_id'],
+                'couriers' => 'jne,sicepat,jnt,anteraja',
+                'items' => $biteshipItems,
             ]);
 
             $data = $response->json();
 
             // Live Biteship API Check
-            if ($response->successful() && !empty($data['pricing']) && (!isset($data['success']) || $data['success'] !== false)) {
+            if ($response->successful() && ! empty($data['pricing']) && (! isset($data['success']) || $data['success'] !== false)) {
                 return response()->json($data);
             }
 
             // Log info jika Biteship API rate tidak mengembalikan pricing (misal saldo habis / akun test)
-            \Illuminate\Support\Facades\Log::info('Biteship rates API fallback triggered: ' . json_encode($data));
+            Log::info('Biteship rates API fallback triggered: '.json_encode($data));
 
             // Gunakan Kalkulasi Fallback Cerdas Berbasis Zona & Berat Destinasi
             $fallbackPricing = $this->getZoneFallbackRates($validated['destination_area_id'], $biteshipItems);
+
             return response()->json($fallbackPricing);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('getShippingRates error: ' . $e->getMessage());
+            Log::error('getShippingRates error: '.$e->getMessage());
             $fallbackPricing = $this->getZoneFallbackRates($request->input('destination_area_id', ''), $request->input('items', []));
+
             return response()->json($fallbackPricing);
         }
     }
@@ -288,18 +313,18 @@ class CheckoutController extends Controller
         if ($destinationAreaId) {
             try {
                 $areaRes = Http::withHeaders([
-                    'Authorization' => env('BITESHIP_API_KEY')
+                    'Authorization' => env('BITESHIP_API_KEY'),
                 ])->timeout(3)->get("https://api.biteship.com/v1/maps/areas/{$destinationAreaId}");
 
                 if ($areaRes->successful()) {
                     $areaData = $areaRes->json();
-                    if (!empty($areaData['areas'][0])) {
+                    if (! empty($areaData['areas'][0])) {
                         $province = strtolower($areaData['areas'][0]['administrative_division_level_1_name'] ?? '');
                         $city = strtolower($areaData['areas'][0]['administrative_division_level_2_name'] ?? '');
                     }
                 }
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::warning('Failed area lookup for zone fallback: ' . $e->getMessage());
+                Log::warning('Failed area lookup for zone fallback: '.$e->getMessage());
             }
         }
 
@@ -360,21 +385,21 @@ class CheckoutController extends Controller
                     'courier_name' => 'SiCepat',
                     'courier_service_name' => 'REG',
                     'duration' => $duration,
-                    'price' => $sicepatBase * $weightKg
+                    'price' => $sicepatBase * $weightKg,
                 ],
                 [
                     'courier_name' => 'JNE',
                     'courier_service_name' => 'REG',
                     'duration' => $duration,
-                    'price' => $jneBase * $weightKg
+                    'price' => $jneBase * $weightKg,
                 ],
                 [
                     'courier_name' => 'J&T',
                     'courier_service_name' => 'EZ',
                     'duration' => $duration,
-                    'price' => $jntBase * $weightKg
-                ]
-            ]
+                    'price' => $jntBase * $weightKg,
+                ],
+            ],
         ];
     }
 
@@ -385,20 +410,21 @@ class CheckoutController extends Controller
     {
         $rates = $this->getZoneFallbackRates($destinationAreaId, $items);
         $minPrice = 9000;
-        if (!empty($rates['pricing'])) {
+        if (! empty($rates['pricing'])) {
             $prices = array_column($rates['pricing'], 'price');
-            if (!empty($prices)) {
+            if (! empty($prices)) {
                 $minPrice = (int) min($prices);
             }
         }
+
         return $minPrice;
     }
 
     public function webhook(Request $request)
     {
         try {
-            $notif = new Notification();
-            
+            $notif = new Notification;
+
             $transaction = $notif->transaction_status;
             $type = $notif->payment_type;
             $order_id = explode('-', $notif->order_id)[0];
@@ -406,16 +432,19 @@ class CheckoutController extends Controller
 
             // Verifikasi Signature Key Resmi Midtrans untuk mencegah manipulasi data
             $serverKey = env('MIDTRANS_SERVER_KEY');
-            if ($serverKey && !empty($notif->signature_key)) {
-                $signatureKey = hash('sha512', $notif->order_id . $notif->status_code . $notif->gross_amount . $serverKey);
+            if ($serverKey && ! empty($notif->signature_key)) {
+                $signatureKey = hash('sha512', $notif->order_id.$notif->status_code.$notif->gross_amount.$serverKey);
                 if ($notif->signature_key !== $signatureKey) {
-                    \Illuminate\Support\Facades\Log::warning('Midtrans webhook invalid signature: ' . $notif->order_id);
+                    Log::warning('Midtrans webhook invalid signature: '.$notif->order_id);
+
                     return response()->json(['message' => 'Invalid signature'], 403);
                 }
             }
 
             $order = Order::where('midtrans_order_id', $notif->order_id)->first() ?? Order::find($order_id);
-            if(!$order) return response()->json('Order not found', 404);
+            if (! $order) {
+                return response()->json('Order not found', 404);
+            }
 
             $oldStatus = $order->status;
             if ($transaction == 'capture') {
@@ -426,20 +455,20 @@ class CheckoutController extends Controller
                         $order->status = 'paid';
                     }
                 }
-            } else if ($transaction == 'settlement') {
+            } elseif ($transaction == 'settlement') {
                 $order->status = 'paid';
-            } else if (in_array($transaction, ['deny', 'expire', 'cancel'])) {
+            } elseif (in_array($transaction, ['deny', 'expire', 'cancel'])) {
                 $order->status = 'cancelled';
             }
 
-            if (!empty($notif->transaction_id)) {
+            if (! empty($notif->transaction_id)) {
                 $order->midtrans_transaction_id = $notif->transaction_id;
             }
 
             if ($oldStatus !== 'cancelled' && $order->status === 'cancelled') {
                 foreach ($order->items as $item) {
                     if ($item->product_id) {
-                        \App\Models\ProductStock::where('product_id', $item->product_id)
+                        ProductStock::where('product_id', $item->product_id)
                             ->where('size', $item->size)
                             ->increment('stock', $item->quantity);
                     }
@@ -455,7 +484,8 @@ class CheckoutController extends Controller
 
             return response()->json(['status' => 'success', 'order_status' => $order->status]);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Midtrans Webhook Exception: ' . $e->getMessage());
+            Log::error('Midtrans Webhook Exception: '.$e->getMessage());
+
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -466,13 +496,14 @@ class CheckoutController extends Controller
     public function dispatchBiteshipOrder(Order $order): ?array
     {
         // Don't duplicate if already dispatched to live Biteship
-        if ($order->biteship_order_id && !str_starts_with($order->biteship_order_id, 'BS-MANUAL') && !str_starts_with($order->biteship_order_id, 'BS-')) {
+        if ($order->biteship_order_id && ! str_starts_with($order->biteship_order_id, 'BS-MANUAL') && ! str_starts_with($order->biteship_order_id, 'BS-')) {
             return ['success' => true, 'already_dispatched' => true, 'id' => $order->biteship_order_id];
         }
 
         $apiKey = env('BITESHIP_API_KEY');
-        if (!$apiKey) {
-            \Illuminate\Support\Facades\Log::warning('dispatchBiteshipOrder skipped: BITESHIP_API_KEY is not configured');
+        if (! $apiKey) {
+            Log::warning('dispatchBiteshipOrder skipped: BITESHIP_API_KEY is not configured');
+
             return null;
         }
 
@@ -481,75 +512,143 @@ class CheckoutController extends Controller
         $biteshipItems = [];
         foreach ($order->items as $item) {
             $biteshipItems[] = [
-                "name" => $item->product_name ?? 'Produk Notisse',
-                "description" => ($item->product_name ?? 'Produk Notisse') . ($item->size ? ' (' . $item->size . ')' : ''),
-                "value" => (int) $item->price,
-                "length" => 20,
-                "width" => 20,
-                "height" => 5,
-                "weight" => 200,
-                "quantity" => (int) $item->quantity
+                'name' => $item->product_name ?? 'Produk Notisse',
+                'description' => ($item->product_name ?? 'Produk Notisse').($item->size ? ' ('.$item->size.')' : ''),
+                'value' => (int) $item->price,
+                'length' => 20,
+                'width' => 20,
+                'height' => 5,
+                'weight' => 200,
+                'quantity' => (int) $item->quantity,
             ];
         }
 
         if (empty($biteshipItems)) {
             $biteshipItems[] = [
-                "name" => "Apparel Notisse",
-                "description" => "Apparel Notisse",
-                "value" => (int) $order->total_amount,
-                "length" => 20,
-                "width" => 20,
-                "height" => 5,
-                "weight" => 200,
-                "quantity" => 1
+                'name' => 'Apparel Notisse',
+                'description' => 'Apparel Notisse',
+                'value' => (int) $order->total_amount,
+                'length' => 20,
+                'width' => 20,
+                'height' => 5,
+                'weight' => 200,
+                'quantity' => 1,
             ];
         }
 
         $courierParts = explode(' ', $order->courier_name ?? 'JNE REG');
         $courierCompany = strtolower($courierParts[0] ?? 'jne');
-        if ($courierCompany === 'j&t') $courierCompany = 'jnt';
+        if ($courierCompany === 'j&t') {
+            $courierCompany = 'jnt';
+        }
         $courierType = strtolower($courierParts[1] ?? 'reg');
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => $apiKey
+                'Authorization' => $apiKey,
             ])->timeout(8)->post('https://api.biteship.com/v1/orders', [
-                "shipper_contact_name" => "Notisse Admin",
-                "shipper_contact_phone" => "081234567890",
-                "shipper_contact_email" => "admin@notisse.com",
-                "shipper_organization" => "Notisse",
-                "origin_contact_name" => "Notisse Admin",
-                "origin_contact_phone" => "081234567890",
-                "origin_address" => env('STORE_ORIGIN_ADDRESS', "Jl. Sukapura No.62, Dayeuhkolot"),
-                "origin_area_id" => env('STORE_ORIGIN_AREA_ID', "IDNP9IDNC22IDND2044IDZ40353"),
-                "destination_contact_name" => $order->customer_name,
-                "destination_contact_phone" => $order->customer_phone,
-                "destination_contact_email" => $order->customer_email,
-                "destination_address" => $order->shipping_address,
-                "destination_area_id" => $order->destination_area_id,
-                "courier_company" => $courierCompany,
-                "courier_type" => $courierType,
-                "delivery_type" => "now",
-                "items" => $biteshipItems
+                'shipper_contact_name' => 'Notisse Admin',
+                'shipper_contact_phone' => '081234567890',
+                'shipper_contact_email' => 'admin@notisse.com',
+                'shipper_organization' => 'Notisse',
+                'origin_contact_name' => 'Notisse Admin',
+                'origin_contact_phone' => '081234567890',
+                'origin_address' => env('STORE_ORIGIN_ADDRESS', 'Jl. Sukapura No.62, Dayeuhkolot'),
+                'origin_area_id' => env('STORE_ORIGIN_AREA_ID', 'IDNP9IDNC22IDND2044IDZ40353'),
+                'destination_contact_name' => $order->customer_name,
+                'destination_contact_phone' => $order->customer_phone,
+                'destination_contact_email' => $order->customer_email,
+                'destination_address' => $order->shipping_address,
+                'destination_area_id' => $order->destination_area_id,
+                'courier_company' => $courierCompany,
+                'courier_type' => $courierType,
+                'delivery_type' => 'now',
+                'items' => $biteshipItems,
             ]);
 
             $biteshipData = $response->json();
-            \Illuminate\Support\Facades\Log::info('Biteship Dispatch Order Response for #' . $order->id . ':', (array) $biteshipData);
+            Log::info('Biteship Dispatch Order Response for #'.$order->id.':', (array) $biteshipData);
 
             if (isset($biteshipData['id'])) {
                 $updateData = ['biteship_order_id' => $biteshipData['id']];
-                if (!empty($biteshipData['courier']['waybill_id'])) {
+                if (! empty($biteshipData['courier']['waybill_id'])) {
                     $updateData['tracking_number'] = $biteshipData['courier']['waybill_id'];
-                } elseif (!empty($biteshipData['courier']['tracking_id'])) {
+                } elseif (! empty($biteshipData['courier']['tracking_id'])) {
                     $updateData['tracking_number'] = $biteshipData['courier']['tracking_id'];
                 }
                 $order->update($updateData);
+
                 return $biteshipData;
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('dispatchBiteshipOrder exception for #' . $order->id . ': ' . $e->getMessage());
+            Log::warning('dispatchBiteshipOrder exception for #'.$order->id.': '.$e->getMessage());
         }
 
         return null;
+    }
+
+    public function checkPromoCode(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string',
+            'subtotal' => 'required|numeric|min:0',
+        ]);
+
+        $code = strtoupper(trim($request->input('code')));
+        $subtotal = (float) $request->input('subtotal');
+
+        $discount = DiscountCode::where('code', $code)->first();
+
+        if (! $discount) {
+            if ($code === 'NOTISSE' || $code === 'NOTISSE10') {
+                $amt = (int) round($subtotal * 0.10);
+
+                return response()->json([
+                    'success' => true,
+                    'code' => $code,
+                    'type' => 'percentage',
+                    'value' => 10,
+                    'discount_amount' => $amt,
+                    'message' => 'Kode promo 10% berhasil diterapkan.',
+                ]);
+            }
+            if ($code === 'NOTISSE50') {
+                $amt = (int) round($subtotal * 0.50);
+
+                return response()->json([
+                    'success' => true,
+                    'code' => $code,
+                    'type' => 'percentage',
+                    'value' => 50,
+                    'discount_amount' => $amt,
+                    'message' => 'Kode promo 50% berhasil diterapkan.',
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode diskon tidak valid atau tidak ditemukan.',
+            ], 422);
+        }
+
+        $reason = $discount->getInvalidReason($subtotal);
+        if ($reason !== null) {
+            return response()->json([
+                'success' => false,
+                'message' => $reason,
+            ], 422);
+        }
+
+        $amount = $discount->calculateDiscount($subtotal);
+
+        return response()->json([
+            'success' => true,
+            'code' => $discount->code,
+            'description' => $discount->description,
+            'type' => $discount->type,
+            'value' => $discount->value,
+            'discount_amount' => $amount,
+            'message' => 'Kode diskon '.$discount->code.' berhasil diterapkan!',
+        ]);
     }
 }

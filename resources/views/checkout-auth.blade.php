@@ -637,45 +637,79 @@
             }
         }
 
-        function handleApplyPromo(e) {
+        async function handleApplyPromo(e) {
             e.preventDefault();
             const input = document.getElementById('promo-code-input');
             const errorMsg = document.getElementById('promo-error-msg');
+            const btn = e.target.querySelector('button[type="submit"]');
             const code = (input.value || '').trim().toUpperCase();
 
             errorMsg.classList.add('hidden');
             errorMsg.innerText = '';
 
             if (!code) {
-                errorMsg.innerText = 'Enter a valid discount code';
+                errorMsg.innerText = 'Masukkan kode diskon yang valid.';
                 errorMsg.classList.remove('hidden');
                 return;
             }
 
             if (subtotal <= 0) {
-                errorMsg.innerText = 'Add items to your cart first';
+                errorMsg.innerText = 'Tambahkan produk ke keranjang belanja terlebih dahulu.';
                 errorMsg.classList.remove('hidden');
                 return;
             }
 
-            // Supported demo codes: NOTISSE (10%), NOTISSE10 (10%), NOTISSE50 (50%)
-            if (code === 'NOTISSE' || code === 'NOTISSE10') {
-                discountAmount = Math.round(subtotal * 0.10);
-                appliedPromoCode = code;
-            } else if (code === 'NOTISSE50') {
-                discountAmount = Math.round(subtotal * 0.50);
-                appliedPromoCode = code;
-            } else {
-                errorMsg.innerText = 'Enter a valid discount code';
-                errorMsg.classList.remove('hidden');
-                return;
+            const origBtnText = btn ? btn.innerText : 'Apply';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = '...';
             }
 
-            input.value = '';
-            document.getElementById('applied-promo-tag').classList.remove('hidden');
-            document.getElementById('applied-promo-code').innerText = appliedPromoCode;
-            document.getElementById('applied-promo-discount-text').innerText = `(-Rp ${discountAmount.toLocaleString('id-ID')})`;
-            updateTotalDisplay();
+            try {
+                const res = await fetch('/api/check-promo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ code: code, subtotal: subtotal })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    discountAmount = data.discount_amount || 0;
+                    appliedPromoCode = data.code || code;
+
+                    input.value = '';
+                    document.getElementById('applied-promo-tag').classList.remove('hidden');
+                    document.getElementById('applied-promo-code').innerText = appliedPromoCode;
+                    document.getElementById('applied-promo-discount-text').innerText = `(-Rp ${discountAmount.toLocaleString('id-ID')})`;
+                    updateTotalDisplay();
+                } else {
+                    errorMsg.innerText = data.message || 'Kode diskon tidak valid atau telah kedaluwarsa.';
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                if (code === 'NOTISSE' || code === 'NOTISSE10') {
+                    discountAmount = Math.round(subtotal * 0.10);
+                    appliedPromoCode = code;
+                    input.value = '';
+                    document.getElementById('applied-promo-tag').classList.remove('hidden');
+                    document.getElementById('applied-promo-code').innerText = appliedPromoCode;
+                    document.getElementById('applied-promo-discount-text').innerText = `(-Rp ${discountAmount.toLocaleString('id-ID')})`;
+                    updateTotalDisplay();
+                } else {
+                    errorMsg.innerText = 'Gagal memverifikasi kode promo. Silakan coba lagi.';
+                    errorMsg.classList.remove('hidden');
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = origBtnText;
+                }
+            }
         }
 
         function removePromoCode() {
