@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\UserAddress;
 use Illuminate\Support\Facades\Auth;
 
 class AddressController extends Controller
@@ -13,11 +12,12 @@ class AddressController extends Controller
      */
     public function index()
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
         $addresses = Auth::user()->addresses;
+
         return response()->json([
             'success' => true,
             'count' => $addresses->count(),
@@ -31,7 +31,7 @@ class AddressController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
@@ -41,7 +41,7 @@ class AddressController extends Controller
         if ($currentCount >= 3) {
             return response()->json([
                 'success' => false,
-                'message' => 'Maksimal 3 alamat yang dapat disimpan. Hapus alamat lama terlebih dahulu untuk menambahkan alamat baru.'
+                'message' => 'Maksimal 3 alamat yang dapat disimpan. Hapus alamat lama terlebih dahulu untuk menambahkan alamat baru.',
             ], 422);
         }
 
@@ -91,14 +91,14 @@ class AddressController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
         $user = Auth::user();
         $address = $user->addresses()->find($id);
 
-        if (!$address) {
+        if (! $address) {
             return response()->json(['success' => false, 'message' => 'Alamat tidak ditemukan.'], 404);
         }
 
@@ -149,14 +149,14 @@ class AddressController extends Controller
      */
     public function destroy($id)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
         $user = Auth::user();
         $address = $user->addresses()->find($id);
 
-        if (!$address) {
+        if (! $address) {
             return response()->json(['success' => false, 'message' => 'Alamat tidak ditemukan.'], 404);
         }
 
@@ -191,14 +191,14 @@ class AddressController extends Controller
      */
     public function setPrimary($id)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
 
         $user = Auth::user();
         $address = $user->addresses()->find($id);
 
-        if (!$address) {
+        if (! $address) {
             return response()->json(['success' => false, 'message' => 'Alamat tidak ditemukan.'], 404);
         }
 

@@ -2,13 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Order;
+use App\Models\ProductStock;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use App\Models\Order;
-use App\Models\ProductStock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Midtrans\Config;
+use Midtrans\Transaction;
 
 #[Signature('orders:cancel-expired {--hours=24 : Jam kedaluwarsa pesanan pending (default 24 jam)}')]
 #[Description('Batalkan pesanan pending yang sudah kedaluwarsa dan kembalikan stok produk secara otomatis')]
@@ -17,7 +19,9 @@ class CancelExpiredOrders extends Command
     public function handle()
     {
         $hours = (int) $this->option('hours');
-        if ($hours <= 0) $hours = 24;
+        if ($hours <= 0) {
+            $hours = 24;
+        }
 
         $threshold = now()->subHours($hours);
         $this->info("Mencari pesanan pending yang dibuat sebelum {$threshold->toDateTimeString()} ({$hours} jam lalu)...");
@@ -28,7 +32,8 @@ class CancelExpiredOrders extends Command
             ->get();
 
         if ($expiredOrders->isEmpty()) {
-            $this->info("Tidak ada pesanan kedaluwarsa yang ditemukan.");
+            $this->info('Tidak ada pesanan kedaluwarsa yang ditemukan.');
+
             return;
         }
 
@@ -52,10 +57,10 @@ class CancelExpiredOrders extends Command
 
             // Coba batalkan transaksi di Midtrans jika ada midtrans_order_id
             try {
-                \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-                \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-                $midtransId = $order->midtrans_order_id ?? ($order->id . '-' . strtotime($order->created_at));
-                \Midtrans\Transaction::cancel($midtransId);
+                Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+                Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+                $midtransId = $order->midtrans_order_id ?? ($order->id.'-'.strtotime($order->created_at));
+                Transaction::cancel($midtransId);
             } catch (\Exception $e) {
                 // Abaikan jika tidak ada di Midtrans
             }

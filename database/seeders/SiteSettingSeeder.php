@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\SiteSetting;
 use Illuminate\Database\Seeder;
 
 class SiteSettingSeeder extends Seeder
@@ -21,7 +21,7 @@ class SiteSettingSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            \App\Models\SiteSetting::updateOrCreate(['key' => $setting['key']], $setting);
+            SiteSetting::updateOrCreate(['key' => $setting['key']], $setting);
         }
     }
 }

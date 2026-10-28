@@ -12,25 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            if (!Schema::hasColumn('products', 'specs')) {
+            if (! Schema::hasColumn('products', 'specs')) {
                 $table->text('specs')->nullable()->after('description');
             }
-            if (!Schema::hasColumn('products', 'artist')) {
+            if (! Schema::hasColumn('products', 'artist')) {
                 $table->string('artist')->nullable()->after('specs');
             }
         });
 
         Schema::table('fotoshoots', function (Blueprint $table) {
-            if (!Schema::hasColumn('fotoshoots', 'artist_name')) {
+            if (! Schema::hasColumn('fotoshoots', 'artist_name')) {
                 $table->string('artist_name')->nullable()->after('title');
             }
-            if (!Schema::hasColumn('fotoshoots', 'medium')) {
+            if (! Schema::hasColumn('fotoshoots', 'medium')) {
                 $table->string('medium')->nullable()->after('artist_name');
             }
-            if (!Schema::hasColumn('fotoshoots', 'year')) {
+            if (! Schema::hasColumn('fotoshoots', 'year')) {
                 $table->string('year')->nullable()->after('medium');
             }
-            if (!Schema::hasColumn('fotoshoots', 'status')) {
+            if (! Schema::hasColumn('fotoshoots', 'status')) {
                 $table->string('status')->default('Available for Offering')->after('year');
             }
         });

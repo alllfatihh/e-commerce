@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,7 +27,7 @@ return new class extends Migration
         });
 
         // Create default 2025 lookbook and link existing fotoshoots
-        $defaultLb = \Illuminate\Support\Facades\DB::table('lookbooks')->insertGetId([
+        $defaultLb = DB::table('lookbooks')->insertGetId([
             'title' => '2025 LOOKBOOK',
             'year' => '2025',
             'video_url' => 'video/editorial.mp4',
@@ -36,8 +37,8 @@ return new class extends Migration
             'updated_at' => now(),
         ]);
 
-        \Illuminate\Support\Facades\DB::table('fotoshoots')->whereNull('lookbook_id')->update([
-            'lookbook_id' => $defaultLb
+        DB::table('fotoshoots')->whereNull('lookbook_id')->update([
+            'lookbook_id' => $defaultLb,
         ]);
     }
 

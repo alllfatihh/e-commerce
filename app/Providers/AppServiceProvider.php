@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\SiteSetting;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,11 +23,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         try {
-            if (\Illuminate\Support\Facades\Schema::hasTable('site_settings')) {
-                \Illuminate\Support\Facades\View::share('settings', \App\Models\SiteSetting::pluck('value', 'key')->toArray());
+            if (Schema::hasTable('site_settings')) {
+                View::share('settings', SiteSetting::pluck('value', 'key')->toArray());
             }
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\View::share('settings', []);
+            View::share('settings', []);
         }
     }
 }

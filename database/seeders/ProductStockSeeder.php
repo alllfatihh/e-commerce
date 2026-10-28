@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\ProductStock;
+use Illuminate\Database\Seeder;
 
 class ProductStockSeeder extends Seeder
 {
@@ -15,9 +15,9 @@ class ProductStockSeeder extends Seeder
     {
         $products = Product::all();
         $defaultStocks = [
-            'S'  => 10,
-            'M'  => 15,
-            'L'  => 12,
+            'S' => 10,
+            'M' => 15,
+            'L' => 12,
             'XL' => 8,
         ];
 
@@ -26,10 +26,10 @@ class ProductStockSeeder extends Seeder
                 ProductStock::firstOrCreate(
                     [
                         'product_id' => $product->id,
-                        'size'       => $size,
+                        'size' => $size,
                     ],
                     [
-                        'stock'      => $stock,
+                        'stock' => $stock,
                     ]
                 );
             }

@@ -18,6 +18,7 @@ use App\Models\SiteMedia;
 use App\Models\SiteSetting;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Midtrans\Config;
 use Midtrans\Snap;
@@ -224,12 +225,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/admins/{id}', [AdminController::class, 'deleteAdmin']);
 });
 
-// Cart Routes
+// Cart Routes (Protected with Rate Limiting)
 Route::get('/api/cart', [CartController::class, 'index']);
-Route::post('/api/cart', [CartController::class, 'add']);
-Route::post('/api/cart/clear', [CartController::class, 'clear']);
-Route::put('/api/cart/{id}', [CartController::class, 'updateItem']);
-Route::delete('/api/cart/{id}', [CartController::class, 'remove']);
+Route::post('/api/cart', [CartController::class, 'add'])->middleware('throttle:60,1');
+Route::post('/api/cart/clear', [CartController::class, 'clear'])->middleware('throttle:30,1');
+Route::put('/api/cart/{id}', [CartController::class, 'updateItem'])->middleware('throttle:60,1');
+Route::delete('/api/cart/{id}', [CartController::class, 'remove'])->middleware('throttle:60,1');
 
 // User Address Book Routes (Max 3)
 Route::get('/api/user/addresses', [AddressController::class, 'index']);
@@ -280,17 +281,27 @@ Route::get('/my-orders', function () {
                 $status = Transaction::status($midtransId);
 
                 if ($status && in_array($status->transaction_status, ['settlement', 'capture'])) {
-                    $order->update(['status' => 'paid']);
-                    (new CheckoutController)->dispatchBiteshipOrder($order);
-                } elseif ($status && in_array($status->transaction_status, ['cancel', 'deny', 'expire'])) {
-                    $order->update(['status' => 'cancelled']);
-                    foreach ($order->items as $item) {
-                        if ($item->product_id) {
-                            ProductStock::where('product_id', $item->product_id)
-                                ->where('size', $item->size)
-                                ->increment('stock', $item->quantity);
+                    DB::transaction(function () use ($order) {
+                        $locked = Order::where('id', $order->id)->lockForUpdate()->first();
+                        if ($locked && $locked->status === 'pending') {
+                            $locked->update(['status' => 'paid']);
+                            (new CheckoutController)->dispatchBiteshipOrder($locked);
                         }
-                    }
+                    });
+                } elseif ($status && in_array($status->transaction_status, ['cancel', 'deny', 'expire'])) {
+                    DB::transaction(function () use ($order) {
+                        $locked = Order::with('items')->where('id', $order->id)->lockForUpdate()->first();
+                        if ($locked && $locked->status === 'pending') {
+                            $locked->update(['status' => 'cancelled']);
+                            foreach ($locked->items as $item) {
+                                if ($item->product_id) {
+                                    ProductStock::where('product_id', $item->product_id)
+                                        ->where('size', $item->size)
+                                        ->increment('stock', $item->quantity);
+                                }
+                            }
+                        }
+                    });
                 }
             } catch (Exception $e) {
                 // Abaikan jika tidak ditemukan di Midtrans
@@ -311,16 +322,21 @@ Route::post('/my-orders/{id}/cancel', function ($id) {
         return response()->json(['error' => 'Pesanan tidak ditemukan atau Anda tidak memiliki akses.'], 403);
     }
 
-    $order->update(['status' => 'cancelled']);
+    DB::transaction(function () use ($order) {
+        $lockedOrder = Order::with('items')->where('id', $order->id)->lockForUpdate()->first();
+        if ($lockedOrder && $lockedOrder->status === 'pending') {
+            $lockedOrder->update(['status' => 'cancelled']);
 
-    // Restore stock since order is cancelled
-    foreach ($order->items as $item) {
-        if ($item->product_id) {
-            ProductStock::where('product_id', $item->product_id)
-                ->where('size', $item->size)
-                ->increment('stock', $item->quantity);
+            // Restore stock since order is cancelled
+            foreach ($lockedOrder->items as $item) {
+                if ($item->product_id) {
+                    ProductStock::where('product_id', $item->product_id)
+                        ->where('size', $item->size)
+                        ->increment('stock', $item->quantity);
+                }
+            }
         }
-    }
+    });
 
     try {
         Config::$serverKey = env('MIDTRANS_SERVER_KEY');
@@ -335,9 +351,13 @@ Route::post('/my-orders/{id}/cancel', function ($id) {
 });
 
 Route::post('/my-orders/{id}/pay', function ($id) {
+    if (! auth()->check()) {
+        return response()->json(['error' => 'Silakan login terlebih dahulu.'], 401);
+    }
+
     $order = Order::with('items')->find($id);
-    if (! $order || $order->status !== 'pending' || $order->user_id !== auth()->id()) {
-        return response()->json(['error' => 'Pesanan tidak valid.'], 400);
+    if (! $order || $order->status !== 'pending' || ($order->user_id !== auth()->id() && ! auth()->user()->isAdmin())) {
+        return response()->json(['error' => 'Pesanan tidak valid atau Anda tidak memiliki akses.'], 403);
     }
 
     Config::$serverKey = env('MIDTRANS_SERVER_KEY');

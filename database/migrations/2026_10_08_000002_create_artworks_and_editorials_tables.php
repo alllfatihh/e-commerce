@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('artworks')) {
+        if (! Schema::hasTable('artworks')) {
             Schema::create('artworks', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('artist_id')->constrained('artists')->onDelete('cascade');
@@ -27,7 +27,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('editorials')) {
+        if (! Schema::hasTable('editorials')) {
             Schema::create('editorials', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('artist_id')->constrained('artists')->onDelete('cascade');

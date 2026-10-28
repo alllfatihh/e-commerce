@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ArtworkOffering;
 use App\Models\Artwork;
+use App\Models\ArtworkOffering;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -13,13 +13,13 @@ class ArtworkOfferingController extends Controller
     {
         $request->validate([
             'artwork_id' => 'required|exists:artworks,id',
-            'offering_price' => 'required|numeric|min:0'
+            'offering_price' => 'required|numeric|min:0',
         ]);
 
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Silakan login terlebih dahulu untuk melakukan penawaran.'
+                'message' => 'Silakan login terlebih dahulu untuk melakukan penawaran.',
             ], 401);
         }
 
@@ -30,7 +30,7 @@ class ArtworkOfferingController extends Controller
             'artwork_id' => $request->artwork_id,
             'offering_price' => $request->offering_price,
             'status' => 'Dalam Tinjauan Kurasi',
-            'reference_number' => 'NTS-ART-' . strtoupper(Str::random(6))
+            'reference_number' => 'NTS-ART-'.strtoupper(Str::random(6)),
         ]);
 
         return response()->json([
@@ -42,8 +42,8 @@ class ArtworkOfferingController extends Controller
                 'artwork_title' => $artwork->title,
                 'artist_name' => $artwork->artist->name ?? 'Unknown',
                 'offering_price' => $offering->offering_price,
-                'status' => $offering->status
-            ]
+                'status' => $offering->status,
+            ],
         ]);
     }
 }

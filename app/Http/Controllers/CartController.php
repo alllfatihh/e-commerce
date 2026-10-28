@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Cart;
-use App\Models\CartItem;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
     public static function mergeGuestCart(int $userId, ?string $sessionId): void
     {
-        if (!$sessionId) return;
+        if (! $sessionId) {
+            return;
+        }
 
         $guestCart = Cart::where('session_id', $sessionId)->first();
-        if (!$guestCart) return;
+        if (! $guestCart) {
+            return;
+        }
 
         $userCart = Cart::firstOrCreate(['user_id' => $userId]);
 
@@ -46,7 +49,7 @@ class CartController extends Controller
             }
             $cart = Cart::firstOrCreate(['user_id' => $userId]);
         } else {
-            if (!$sessionId) {
+            if (! $sessionId) {
                 $sessionId = Str::uuid()->toString();
             }
             $cart = Cart::firstOrCreate(['session_id' => $sessionId]);
@@ -57,7 +60,7 @@ class CartController extends Controller
 
     private function getFormattedItems($cart)
     {
-        return $cart->items()->with('product')->get()->map(function($item) {
+        return $cart->items()->with('product')->get()->map(function ($item) {
             $imageUrl = asset('footage-baju.jpg'); // fallback
             if ($item->product && $item->product->image) {
                 $img = $item->product->image;
@@ -72,20 +75,21 @@ class CartController extends Controller
                 'unitPrice' => $item->product ? $item->product->price : 0, // needed for existing JS
                 'qty' => $item->quantity,
                 'size' => $item->size,
-                'image' => $imageUrl
+                'image' => $imageUrl,
             ];
         });
     }
 
     public function index(Request $request)
     {
-        list($cart, $sessionId) = $this->getCart($request);
+        [$cart, $sessionId] = $this->getCart($request);
         $items = $this->getFormattedItems($cart);
-        
+
         $response = response()->json($items);
-        if ($sessionId && !$request->cookie('notisse_cart_session')) {
+        if ($sessionId && ! $request->cookie('notisse_cart_session')) {
             $response->cookie('notisse_cart_session', $sessionId, 60 * 24 * 30);
         }
+
         return $response;
     }
 
@@ -94,10 +98,10 @@ class CartController extends Controller
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'size' => 'required|string',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
         ]);
 
-        list($cart, $sessionId) = $this->getCart($request);
+        [$cart, $sessionId] = $this->getCart($request);
 
         $item = $cart->items()->where('product_id', $validated['product_id'])
             ->where('size', $validated['size'])->first();
@@ -110,22 +114,23 @@ class CartController extends Controller
 
         $items = $this->getFormattedItems($cart);
         $response = response()->json(['success' => true, 'items' => $items]);
-        
-        if ($sessionId && !$request->cookie('notisse_cart_session')) {
+
+        if ($sessionId && ! $request->cookie('notisse_cart_session')) {
             $response->cookie('notisse_cart_session', $sessionId, 60 * 24 * 30);
         }
+
         return $response;
     }
 
     public function updateItem(Request $request, $id)
     {
         $validated = $request->validate([
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
         ]);
 
-        list($cart, $sessionId) = $this->getCart($request);
+        [$cart, $sessionId] = $this->getCart($request);
         $item = $cart->items()->find($id);
-        
+
         if ($item) {
             $item->update(['quantity' => $validated['quantity']]);
         }
@@ -135,9 +140,9 @@ class CartController extends Controller
 
     public function remove(Request $request, $id)
     {
-        list($cart, $sessionId) = $this->getCart($request);
+        [$cart, $sessionId] = $this->getCart($request);
         $item = $cart->items()->find($id);
-        
+
         if ($item) {
             $item->delete();
         }
@@ -147,8 +152,9 @@ class CartController extends Controller
 
     public function clear(Request $request)
     {
-        list($cart, $sessionId) = $this->getCart($request);
+        [$cart, $sessionId] = $this->getCart($request);
         $cart->items()->delete();
+
         return response()->json(['success' => true, 'items' => []]);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Product;
+use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
@@ -15,60 +15,60 @@ class ProductSeeder extends Seeder
         Product::updateOrCreate(
             ['id' => 1],
             [
-                'name'             => 'Raja Diamuk Massa Tee V1',
-                'price'            => '250000',
-                'image'            => 'footage-baju.jpg',
-                'back_image'       => 'footage-baju-belakang.jpg',
-                'footage_image'    => 'footagebaju2.jpg',
+                'name' => 'Raja Diamuk Massa Tee V1',
+                'price' => '250000',
+                'image' => 'footage-baju.jpg',
+                'back_image' => 'footage-baju-belakang.jpg',
+                'footage_image' => 'footagebaju2.jpg',
                 'size_chart_image' => 'size chart 1.png',
-                'description'      => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
-                'specs'            => '100% Heavyweight 24s Cotton Combed (220 GSM) • Boxy Drop Shoulder Fit • Plastisol High-Density Screenprint • Pre-shrunk Fabric',
-                'artist'           => 'Mustafa Alatas'
+                'description' => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
+                'specs' => '100% Heavyweight 24s Cotton Combed (220 GSM) • Boxy Drop Shoulder Fit • Plastisol High-Density Screenprint • Pre-shrunk Fabric',
+                'artist' => 'Mustafa Alatas',
             ]
         );
 
         Product::updateOrCreate(
             ['id' => 2],
             [
-                'name'             => 'Muscle Tank V2 - Black',
-                'price'            => '180000',
-                'image'            => 'footage-baju.jpg',
-                'back_image'       => 'footage-baju-belakang.jpg',
-                'footage_image'    => 'footagebaju2.jpg',
+                'name' => 'Muscle Tank V2 - Black',
+                'price' => '180000',
+                'image' => 'footage-baju.jpg',
+                'back_image' => 'footage-baju-belakang.jpg',
+                'footage_image' => 'footagebaju2.jpg',
                 'size_chart_image' => 'size chart 1.png',
-                'description'      => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
-                'specs'            => 'Cotton Rib Knit • Raw Hem Cut • Tailored Armholes • Pre-washed for Soft Vintage Feel',
-                'artist'           => 'Asep Suhendar'
+                'description' => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
+                'specs' => 'Cotton Rib Knit • Raw Hem Cut • Tailored Armholes • Pre-washed for Soft Vintage Feel',
+                'artist' => 'Asep Suhendar',
             ]
         );
 
         Product::updateOrCreate(
             ['id' => 3],
             [
-                'name'             => 'Relaxed Tailored Shirt V1',
-                'price'            => '320000',
-                'image'            => 'footage-baju.jpg',
-                'back_image'       => 'footage-baju-belakang.jpg',
-                'footage_image'    => 'footagebaju2.jpg',
+                'name' => 'Relaxed Tailored Shirt V1',
+                'price' => '320000',
+                'image' => 'footage-baju.jpg',
+                'back_image' => 'footage-baju-belakang.jpg',
+                'footage_image' => 'footagebaju2.jpg',
                 'size_chart_image' => 'size chart 1.png',
-                'description'      => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
-                'specs'            => 'Premium Poplin Cotton • Mother of Pearl Buttons • Relaxed Drape Silhouette • Cuban Collar',
-                'artist'           => 'Notisse Original'
+                'description' => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
+                'specs' => 'Premium Poplin Cotton • Mother of Pearl Buttons • Relaxed Drape Silhouette • Cuban Collar',
+                'artist' => 'Notisse Original',
             ]
         );
 
         Product::updateOrCreate(
             ['id' => 4],
             [
-                'name'             => 'Collarless Leather Blazer',
-                'price'            => '650000',
-                'image'            => 'footage-baju.jpg',
-                'back_image'       => 'footage-baju-belakang.jpg',
-                'footage_image'    => 'footagebaju2.jpg',
+                'name' => 'Collarless Leather Blazer',
+                'price' => '650000',
+                'image' => 'footage-baju.jpg',
+                'back_image' => 'footage-baju-belakang.jpg',
+                'footage_image' => 'footagebaju2.jpg',
                 'size_chart_image' => 'size chart 1.png',
-                'description'      => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
-                'specs'            => 'Vegan Full-Grain Leather • Cupro Satin Lining • Minimalist Hidden Magnetic Fasteners • Structured Shoulders',
-                'artist'           => 'Notisse Original'
+                'description' => "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting",
+                'specs' => 'Vegan Full-Grain Leather • Cupro Satin Lining • Minimalist Hidden Magnetic Fasteners • Structured Shoulders',
+                'artist' => 'Notisse Original',
             ]
         );
     }

@@ -17,6 +17,7 @@ use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -76,7 +77,7 @@ class AdminController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
+            'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'specs' => 'nullable|string',
             'artist' => 'nullable|string|max:255',
@@ -85,6 +86,7 @@ class AdminController extends Controller
             'footage_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'stocks' => 'nullable|array',
+            'stocks.*' => 'nullable|integer|min:0',
         ]);
 
         $data = $request->only('name', 'price', 'description', 'specs', 'artist');
@@ -125,7 +127,7 @@ class AdminController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
+            'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'specs' => 'nullable|string',
             'artist' => 'nullable|string|max:255',
@@ -134,6 +136,7 @@ class AdminController extends Controller
             'footage_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'stocks' => 'nullable|array',
+            'stocks.*' => 'nullable|integer|min:0',
         ]);
 
         $data = $request->only('name', 'price', 'description', 'specs', 'artist');
@@ -647,24 +650,37 @@ class AdminController extends Controller
         ]);
 
         $oldStatus = $order->status;
-        $order->status = $request->input('status');
+        $newStatus = $request->input('status');
+        $order->status = $newStatus;
 
         if ($request->has('tracking_number')) {
             $order->tracking_number = $request->input('tracking_number');
         }
 
-        // If status changed to cancelled and wasn't cancelled before, restore stock
-        if ($oldStatus !== 'cancelled' && $order->status === 'cancelled') {
-            foreach ($order->items as $item) {
-                if ($item->product_id) {
-                    ProductStock::where('product_id', $item->product_id)
-                        ->where('size', $item->size)
-                        ->increment('stock', $item->quantity);
+        DB::transaction(function () use ($order, $oldStatus, $newStatus) {
+            // If status changed to cancelled and wasn't cancelled before, restore stock
+            if ($oldStatus !== 'cancelled' && $newStatus === 'cancelled') {
+                foreach ($order->items as $item) {
+                    if ($item->product_id) {
+                        ProductStock::where('product_id', $item->product_id)
+                            ->where('size', $item->size)
+                            ->increment('stock', $item->quantity);
+                    }
                 }
             }
-        }
+            // If status changed from cancelled back to an active status, deduct stock again
+            elseif ($oldStatus === 'cancelled' && $newStatus !== 'cancelled') {
+                foreach ($order->items as $item) {
+                    if ($item->product_id) {
+                        ProductStock::where('product_id', $item->product_id)
+                            ->where('size', $item->size)
+                            ->decrement('stock', $item->quantity);
+                    }
+                }
+            }
 
-        $order->save();
+            $order->save();
+        });
 
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json(['success' => true, 'order' => $order]);

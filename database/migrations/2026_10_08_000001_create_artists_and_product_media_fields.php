@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Create artists table
-        if (!Schema::hasTable('artists')) {
+        if (! Schema::hasTable('artists')) {
             Schema::create('artists', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -26,20 +26,20 @@ return new class extends Migration
 
         // 2. Add product images & size chart to products table
         Schema::table('products', function (Blueprint $table) {
-            if (!Schema::hasColumn('products', 'back_image')) {
+            if (! Schema::hasColumn('products', 'back_image')) {
                 $table->string('back_image')->nullable()->after('image');
             }
-            if (!Schema::hasColumn('products', 'footage_image')) {
+            if (! Schema::hasColumn('products', 'footage_image')) {
                 $table->string('footage_image')->nullable()->after('back_image');
             }
-            if (!Schema::hasColumn('products', 'size_chart_image')) {
+            if (! Schema::hasColumn('products', 'size_chart_image')) {
                 $table->string('size_chart_image')->nullable()->after('footage_image');
             }
         });
 
         // 3. Add product_id to site_media table for linking footage to specific product
         Schema::table('site_media', function (Blueprint $table) {
-            if (!Schema::hasColumn('site_media', 'product_id')) {
+            if (! Schema::hasColumn('site_media', 'product_id')) {
                 $table->unsignedBigInteger('product_id')->nullable()->after('section');
             }
         });

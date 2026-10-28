@@ -11,7 +11,7 @@ trait ResolvesMediaUrls
      */
     protected function resolveMediaUrl(?string $path): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return $path;
         }
 
@@ -27,7 +27,7 @@ trait ResolvesMediaUrls
 
         // Starts with storage/
         if (Str::startsWith($path, 'storage/')) {
-            return '/' . $path;
+            return '/'.$path;
         }
 
         // Uploaded into subfolders of storage/app/public/
@@ -40,10 +40,10 @@ trait ResolvesMediaUrls
             'site-media/',
             'avatars/',
         ])) {
-            return '/storage/' . $path;
+            return '/storage/'.$path;
         }
 
         // Public directory assets like 'footage-baju.jpg' or '/footage-baju.jpg'
-        return Str::startsWith($path, '/') ? $path : '/' . $path;
+        return Str::startsWith($path, '/') ? $path : '/'.$path;
     }
 }

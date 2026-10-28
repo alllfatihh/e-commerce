@@ -19,16 +19,16 @@ return new class extends Migration
             $table->text('shipping_address');
             $table->decimal('total_amount', 15, 2);
             $table->string('status')->default('pending'); // pending, paid, shipped, completed, cancelled
-            
+
             // Midtrans
             $table->string('snap_token')->nullable();
             $table->string('midtrans_transaction_id')->nullable();
-            
+
             // Biteship
             $table->string('biteship_order_id')->nullable();
             $table->string('courier_name')->nullable();
             $table->string('tracking_number')->nullable();
-            
+
             $table->timestamps();
         });
     }

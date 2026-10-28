@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
-use App\Http\Controllers\CartController;
 
 class AuthController extends Controller
 {
@@ -81,6 +82,7 @@ class AuthController extends Controller
     public function showCheckoutAuth()
     {
         $addresses = Auth::check() ? Auth::user()->addresses : collect();
+
         return view('checkout-auth', compact('addresses'));
     }
 
@@ -119,6 +121,7 @@ class AuthController extends Controller
                     'is_primary' => true,
                 ]);
             }
+
             return response()->json(['success' => true]);
         }
 
@@ -143,6 +146,7 @@ class AuthController extends Controller
                 Auth::login($user);
                 CartController::mergeGuestCart($user->id, $request->cookie('notisse_cart_session'));
                 $request->session()->regenerate();
+
                 return response()->json(['success' => true]);
             } else {
                 return response()->json(['success' => false, 'message' => 'Email sudah terdaftar namun password salah.'], 401);
@@ -173,6 +177,7 @@ class AuthController extends Controller
             Auth::login($user);
             CartController::mergeGuestCart($user->id, $request->cookie('notisse_cart_session'));
             $request->session()->regenerate();
+
             return response()->json(['success' => true]);
         }
     }
@@ -184,46 +189,49 @@ class AuthController extends Controller
                 session(['google_auth_from' => $request->get('from')]);
                 session()->save();
             }
+
             return Socialite::driver('google')
                 ->stateless()
                 ->with(['prompt' => 'select_account'])
                 ->redirect();
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Google redirect error: ' . $e->getMessage());
-            return redirect('/login')->with('error', 'Gagal menghubungkan ke Google: ' . $e->getMessage());
+            Log::error('Google redirect error: '.$e->getMessage());
+
+            return redirect('/login')->with('error', 'Gagal menghubungkan ke Google: '.$e->getMessage());
         }
     }
 
     public function googleCallback(Request $request)
     {
         try {
-            if (!$request->has('code') || $request->has('error')) {
+            if (! $request->has('code') || $request->has('error')) {
                 $errorMsg = $request->get('error_description', $request->get('error', 'Login Google dibatalkan atau ditolak.'));
-                \Illuminate\Support\Facades\Log::warning('Google callback canceled or missing code: ' . $errorMsg);
+                Log::warning('Google callback canceled or missing code: '.$errorMsg);
+
                 return redirect('/login')->with('error', $errorMsg);
             }
 
             $googleUser = Socialite::driver('google')->stateless()->user();
-            
+
             $user = User::where('email', $googleUser->getEmail())->first();
 
-            if (!$user) {
+            if (! $user) {
                 $user = User::create([
                     'name' => $googleUser->getName() ?? 'User',
                     'email' => $googleUser->getEmail(),
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
-                    'password' => null, 
+                    'password' => null,
                 ]);
             } else {
                 $updates = [];
-                if (!$user->google_id) {
+                if (! $user->google_id) {
                     $updates['google_id'] = $googleUser->getId();
                 }
-                if (!$user->getRawOriginal('avatar') && $googleUser->getAvatar()) {
+                if (! $user->getRawOriginal('avatar') && $googleUser->getAvatar()) {
                     $updates['avatar'] = $googleUser->getAvatar();
                 }
-                if (!empty($updates)) {
+                if (! empty($updates)) {
                     $user->update($updates);
                 }
             }
@@ -241,20 +249,21 @@ class AuthController extends Controller
                 return redirect('/checkout')->with('success', 'Berhasil masuk dengan akun Google!');
             }
 
-            if (!$user->area_id) {
+            if (! $user->area_id) {
                 return redirect('/checkout')->with('success', 'Berhasil masuk dengan akun Google! Silakan lengkapi detail pengiriman.');
             }
 
             return redirect('/checkout')->with('success', 'Berhasil masuk dengan akun Google!');
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Google login error: ' . $e->getMessage());
-            return redirect('/login')->with('error', 'Login via Google gagal: ' . $e->getMessage());
+            Log::error('Google login error: '.$e->getMessage());
+
+            return redirect('/login')->with('error', 'Login via Google gagal: '.$e->getMessage());
         }
     }
 
     public function updateProfile(Request $request)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['success' => false, 'message' => 'Not authenticated.'], 401);
         }
 
@@ -264,7 +273,7 @@ class AuthController extends Controller
             'birthdate' => 'nullable|date',
             'address' => 'required|string',
             'area_id' => 'required|string',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096'
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
         $user = Auth::user();
@@ -282,8 +291,8 @@ class AuthController extends Controller
                 if (Str::startsWith($oldAvatar, 'storage/')) {
                     $oldAvatar = substr($oldAvatar, 8);
                 }
-                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($oldAvatar)) {
-                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldAvatar);
+                if (Storage::disk('public')->exists($oldAvatar)) {
+                    Storage::disk('public')->delete($oldAvatar);
                 }
             }
             $path = $request->file('avatar')->store('avatars', 'public');

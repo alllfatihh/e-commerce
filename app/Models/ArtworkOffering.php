@@ -14,7 +14,7 @@ class ArtworkOffering extends Model
         'artwork_id',
         'offering_price',
         'status',
-        'reference_number'
+        'reference_number',
     ];
 
     public function user()

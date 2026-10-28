@@ -3,13 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\ResolvesMediaUrls;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Traits\ResolvesMediaUrls;
 
 #[Fillable(['name', 'email', 'password', 'google_id', 'phone', 'birthdate', 'address', 'area_id', 'avatar', 'role'])]
 #[Hidden(['password', 'remember_token'])]

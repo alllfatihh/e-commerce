@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -28,7 +28,7 @@ return new class extends Migration
             ['section' => 'carousel', 'key' => 'slide_3', 'image' => 'home2.png',  'title' => 'Hero Slide 3', 'description' => null, 'order' => 3, 'created_at' => now(), 'updated_at' => now()],
             // Footage / Look Section
             ['section' => 'footage',  'key' => 'footage_1', 'image' => 'footage-baju.jpg',         'title' => 'Front View',   'description' => null, 'order' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['section' => 'footage',  'key' => 'footage_2', 'image' => 'footage-baju-belakang.jpg','title' => 'Back Graphic', 'description' => null, 'order' => 2, 'created_at' => now(), 'updated_at' => now()],
+            ['section' => 'footage',  'key' => 'footage_2', 'image' => 'footage-baju-belakang.jpg', 'title' => 'Back Graphic', 'description' => null, 'order' => 2, 'created_at' => now(), 'updated_at' => now()],
             ['section' => 'footage',  'key' => 'footage_3', 'image' => 'footagebaju2.jpg',         'title' => 'Look Detail',  'description' => null, 'order' => 3, 'created_at' => now(), 'updated_at' => now()],
         ]);
     }

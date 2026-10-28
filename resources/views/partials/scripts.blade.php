@@ -935,21 +935,21 @@
                 product = productsData ? productsData.find(p => p.name === productIdOrName || String(p.id) === productIdOrName) : null;
             }
 
-            if (product) {
-                currentProduct = product;
-            } else {
-                currentProduct = {
-                    id: typeof productIdOrName === 'number' ? productIdOrName : 1,
-                    name: productIdOrName || 'Product',
-                    price: price ? (typeof price === 'string' ? parseFloat(price.replace(/[^0-9]/g, '')) : price) : 250000,
-                    stocks: [
-                        { size: 'S', stock: 5 },
-                        { size: 'M', stock: 10 },
-                        { size: 'L', stock: 5 },
-                        { size: 'XL', stock: 2 }
-                    ]
-                };
+            if (!product) {
+                console.warn('Product not found:', productIdOrName);
+                if (typeof showToast === 'function') {
+                    showToast('Produk tidak ditemukan atau sudah tidak tersedia.');
+                }
+                if (window.location.pathname.startsWith('/product/')) {
+                    history.replaceState(null, '', '/shop');
+                    if (typeof showPage === 'function') {
+                        showPage('view-shop', false, false);
+                    }
+                }
+                return;
             }
+
+            currentProduct = product;
 
             const titleEl = document.getElementById('pdetail-title');
             if (titleEl) titleEl.innerText = currentProduct.name;

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Traits\ResolvesMediaUrls;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\ResolvesMediaUrls;
 
 class SiteMedia extends Model
 {

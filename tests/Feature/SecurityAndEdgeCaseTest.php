@@ -682,4 +682,167 @@ class SecurityAndEdgeCaseTest extends TestCase
         ]);
         $resForbidden->assertStatus(403);
     }
+
+    /** 15. Guest and Unauthorized Users Cannot Hijack / Pay Other Orders (IDOR Fix) */
+    public function test_unauthenticated_or_unauthorized_user_cannot_trigger_payment_for_order(): void
+    {
+        $owner = User::create([
+            'name' => 'Order Owner',
+            'email' => 'owner@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        $attacker = User::create([
+            'name' => 'Attacker User',
+            'email' => 'attacker_pay@example.com',
+            'password' => Hash::make('password123'),
+        ]);
+
+        $userOrder = Order::create([
+            'user_id' => $owner->id,
+            'customer_name' => $owner->name,
+            'customer_email' => $owner->email,
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Jl. Owner',
+            'total_amount' => 300000,
+            'status' => 'pending',
+        ]);
+
+        $guestOrder = Order::create([
+            'user_id' => null,
+            'customer_name' => 'Guest Customer',
+            'customer_email' => 'guest@example.com',
+            'customer_phone' => '08123456780',
+            'shipping_address' => 'Jl. Guest',
+            'total_amount' => 250000,
+            'status' => 'pending',
+        ]);
+
+        // 1. Unauthenticated guest cannot trigger pay on user order (401)
+        $res1 = $this->postJson("/my-orders/{$userOrder->id}/pay");
+        $res1->assertStatus(401);
+
+        // 2. Unauthenticated guest cannot trigger pay on guest order either (401)
+        $res2 = $this->postJson("/my-orders/{$guestOrder->id}/pay");
+        $res2->assertStatus(401);
+
+        // 3. Attacker logged in cannot pay victim's order (403)
+        $this->actingAs($attacker);
+        $res3 = $this->postJson("/my-orders/{$userOrder->id}/pay");
+        $res3->assertStatus(403);
+
+        // 4. Attacker logged in cannot claim guest order either (403)
+        $res4 = $this->postJson("/my-orders/{$guestOrder->id}/pay");
+        $res4->assertStatus(403);
+    }
+
+    /** 16. Admin Order Status Reversal Restores and Decrements Stock Accurately */
+    public function test_admin_order_status_reversal_decrements_stock_back(): void
+    {
+        $admin = User::create([
+            'name' => 'Super Admin',
+            'email' => 'admin_stock@example.com',
+            'password' => Hash::make('password123'),
+            'role' => 'admin',
+        ]);
+
+        $product = Product::create([
+            'name' => 'T-Shirt Reversal Test',
+            'price' => 150000,
+        ]);
+
+        $stock = ProductStock::create([
+            'product_id' => $product->id,
+            'size' => 'L',
+            'stock' => 10,
+        ]);
+
+        $order = Order::create([
+            'user_id' => null,
+            'customer_name' => 'Buyer',
+            'customer_email' => 'buyer@example.com',
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Jl. Test',
+            'total_amount' => 150000,
+            'status' => 'pending',
+        ]);
+
+        $order->items()->create([
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'size' => 'L',
+            'quantity' => 2,
+            'price' => 150000,
+        ]);
+
+        $this->actingAs($admin);
+
+        // 1. Change status from pending to cancelled -> stock should increment by 2 (10 + 2 = 12)
+        $resCancel = $this->postJson("/admin/orders/{$order->id}/status", [
+            'status' => 'cancelled',
+        ]);
+        $resCancel->assertStatus(200);
+        $this->assertEquals(12, $stock->fresh()->stock);
+
+        // 2. Change status from cancelled back to processing -> stock should decrement by 2 (12 - 2 = 10)
+        $resProcessing = $this->postJson("/admin/orders/{$order->id}/status", [
+            'status' => 'processing',
+        ]);
+        $resProcessing->assertStatus(200);
+        $this->assertEquals(10, $stock->fresh()->stock);
+
+        // 3. Change status from processing back to cancelled again -> stock incremented back to 12
+        $resCancel2 = $this->postJson("/admin/orders/{$order->id}/status", [
+            'status' => 'cancelled',
+        ]);
+        $resCancel2->assertStatus(200);
+        $this->assertEquals(12, $stock->fresh()->stock);
+    }
+
+    /** 17. Admin Product Form Strictly Rejects Negative Stock and Price */
+    public function test_admin_product_stock_and_price_rejects_negative_values(): void
+    {
+        $admin = User::create([
+            'name' => 'Admin Validator',
+            'email' => 'admin_validator@example.com',
+            'password' => Hash::make('password123'),
+            'role' => 'admin',
+        ]);
+
+        $this->actingAs($admin);
+
+        // 1. Negative price rejected on create
+        $resPriceNeg = $this->post('/admin/products', [
+            'name' => 'Negative Price Product',
+            'price' => -50000,
+            'stocks' => ['S' => 5],
+        ]);
+        $resPriceNeg->assertSessionHasErrors(['price']);
+
+        // 2. Negative stock rejected on create
+        $resStockNeg = $this->post('/admin/products', [
+            'name' => 'Negative Stock Product',
+            'price' => 100000,
+            'stocks' => ['S' => -5],
+        ]);
+        $resStockNeg->assertSessionHasErrors(['stocks.S']);
+
+        // 3. Valid product creates successfully
+        $resValid = $this->post('/admin/products', [
+            'name' => 'Valid Product',
+            'price' => 125000,
+            'stocks' => ['S' => 10, 'M' => 0],
+        ]);
+        $resValid->assertSessionHas('success');
+        $product = Product::where('name', 'Valid Product')->first();
+        $this->assertNotNull($product);
+
+        // 4. Negative stock rejected on update
+        $resUpdateNeg = $this->post("/admin/products/{$product->id}", [
+            'name' => 'Valid Product Updated',
+            'price' => 125000,
+            'stocks' => ['S' => -2],
+        ]);
+        $resUpdateNeg->assertSessionHasErrors(['stocks.S']);
+    }
 }
