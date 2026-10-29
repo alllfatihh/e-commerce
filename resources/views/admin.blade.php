@@ -1280,7 +1280,8 @@
                                 'paid' => 'bg-emerald-100 text-emerald-800 border-emerald-300',
                                 'processing' => 'bg-blue-100 text-blue-800 border-blue-300',
                                 'shipped' => 'bg-purple-100 text-purple-800 border-purple-300',
-                                'delivered' => 'bg-emerald-600 text-white border-emerald-700',
+                                'delivered' => 'bg-teal-100 text-teal-800 border-teal-300',
+                                'completed' => 'bg-emerald-600 text-white border-emerald-700 shadow-sm',
                                 'cancelled' => 'bg-red-100 text-red-800 border-red-300',
                                 'pending' => 'bg-amber-100 text-amber-800 border-amber-300',
                             ];
@@ -1325,8 +1326,29 @@
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap">
                                 <span class="inline-block px-2.5 py-1 text-[10px] font-space-grotesk font-bold uppercase tracking-wider rounded border {{ $badgeCls }}">
-                                    {{ $order->status }}
+                                    @if($order->status === 'completed')
+                                        ✓ Selesai (Diterima)
+                                    @elseif($order->status === 'delivered')
+                                        Pesanan Tiba
+                                    @elseif($order->status === 'shipped')
+                                        Sedang Dikirim
+                                    @elseif($order->status === 'processing')
+                                        Diproses
+                                    @elseif($order->status === 'paid')
+                                        Sudah Dibayar
+                                    @else
+                                        {{ $order->status }}
+                                    @endif
                                 </span>
+                                @if($order->received_at)
+                                <p class="text-[10px] text-emerald-700 font-inter font-medium mt-1">
+                                    Diterima: {{ \Carbon\Carbon::parse($order->received_at)->format('d M Y, H:i') }}
+                                </p>
+                                @elseif(in_array($order->status, ['shipped', 'delivered']))
+                                <p class="text-[10px] text-purple-600 font-inter italic mt-1">
+                                    Menunggu konfirmasi pembeli
+                                </p>
+                                @endif
                             </td>
                             <td class="px-5 py-4 min-w-[190px]">
                                 <p class="text-xs font-bold font-space-grotesk text-gray-800 uppercase">{{ $order->courier_name ?? '—' }}</p>
@@ -1363,6 +1385,7 @@
                                             <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing</option>
                                             <option value="shipped" {{ $order->status === 'shipped' ? 'selected' : '' }}>Shipped</option>
                                             <option value="delivered" {{ $order->status === 'delivered' ? 'selected' : '' }}>Delivered</option>
+                                            <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed (Selesai)</option>
                                             <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                                         </select>
                                         <button type="submit" class="px-2.5 py-1 bg-black text-white rounded text-[11px] font-space-grotesk font-bold uppercase tracking-wider hover:bg-neutral-800 transition-colors">

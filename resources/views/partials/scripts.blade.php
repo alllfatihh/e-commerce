@@ -454,25 +454,63 @@
                         });
                     }
 
+                    let statusBadgeText = order.status ? order.status.toUpperCase() : 'PENDING';
+                    let statusDesc = '';
                     let statusClass = "bg-black text-white";
                     let actionButtons = '';
                     const st = (order.status || '').toLowerCase();
-                    if (st === 'paid') {
-                        statusClass = "bg-emerald-600 text-white";
-                    } else if (st === 'processing') {
-                        statusClass = "bg-blue-600 text-white";
-                    } else if (st === 'shipped') {
-                        statusClass = "bg-purple-600 text-white";
-                    } else if (st === 'delivered') {
-                        statusClass = "bg-emerald-700 text-white";
-                    } else if (st === 'pending') {
-                        statusClass = "bg-yellow-500 text-black";
+
+                    if (st === 'pending') {
+                        statusBadgeText = "Menunggu Pembayaran";
+                        statusDesc = "Silakan selesaikan pembayaran pesanan Anda.";
+                        statusClass = "bg-amber-100 text-amber-800 border border-amber-300";
                         actionButtons = `
-                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full hover:bg-neutral-800 transition-colors cursor-pointer">Pay Now</button>
-                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-space-grotesk mt-2 w-full text-center cursor-pointer">Cancel Order</button>
+                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full hover:bg-neutral-800 transition-colors cursor-pointer shadow-sm">Bayar Sekarang</button>
+                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-space-grotesk mt-1.5 w-full text-center cursor-pointer">Batalkan Pesanan</button>
+                        `;
+                    } else if (st === 'paid') {
+                        statusBadgeText = "Pembayaran Diterima";
+                        statusDesc = "Pembayaran telah terverifikasi. Menunggu pesanan diproses oleh admin.";
+                        statusClass = "bg-emerald-100 text-emerald-800 border border-emerald-300";
+                    } else if (st === 'processing') {
+                        statusBadgeText = "Sedang Diproses";
+                        statusDesc = "Pesanan sedang dikemas dan disiapkan di gudang Notisse.";
+                        statusClass = "bg-blue-100 text-blue-800 border border-blue-300";
+                    } else if (st === 'shipped') {
+                        statusBadgeText = "Sedang Dikirim";
+                        statusDesc = "Paket sedang dalam perjalanan ekspedisi ke alamat tujuan Anda.";
+                        statusClass = "bg-purple-100 text-purple-800 border border-purple-300";
+                        actionButtons = `
+                            <button onclick="confirmOrderReceived(${order.id})" class="text-[10px] text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-2 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                Konfirmasi Pesanan Diterima
+                            </button>
+                        `;
+                    } else if (st === 'delivered') {
+                        statusBadgeText = "Pesanan Telah Tiba";
+                        statusDesc = "Kurir telah mengantarkan paket. Silakan periksa barang dan konfirmasi.";
+                        statusClass = "bg-teal-100 text-teal-800 border border-teal-300";
+                        actionButtons = `
+                            <button onclick="confirmOrderReceived(${order.id})" class="text-[10px] text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-2 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                Konfirmasi Pesanan Diterima
+                            </button>
+                        `;
+                    } else if (st === 'completed') {
+                        statusBadgeText = "Selesai (Diterima)";
+                        const recvDate = order.received_at ? new Date(order.received_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                        statusDesc = `Pesanan telah diterima dan selesai.${recvDate ? ` (${recvDate})` : ''} Terima kasih telah berbelanja di Notisse Atelier!`;
+                        statusClass = "bg-emerald-600 text-white border border-emerald-700 shadow-sm";
+                        actionButtons = `
+                            <div class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 font-space-grotesk mt-1.5">
+                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                Pesanan Selesai
+                            </div>
                         `;
                     } else if (st === 'cancelled') {
-                        statusClass = "bg-red-600 text-white";
+                        statusBadgeText = "Dibatalkan";
+                        statusDesc = "Pesanan ini telah dibatalkan.";
+                        statusClass = "bg-red-100 text-red-800 border border-red-300";
                     }
 
                     let shippingInfoHtml = '';
@@ -522,12 +560,13 @@
                                 <p class="text-gray-400">Placed on ${placedDate}</p>
                             </div>
                             <div class="flex flex-col items-end">
-                                <span class="px-2.5 py-1 ${statusClass} font-bold rounded text-[10px] tracking-wider uppercase font-space-grotesk">${order.status}</span>
-                                <div class="mt-2 w-full flex flex-col gap-1">
+                                <span class="px-2.5 py-1 ${statusClass} font-bold rounded text-[10px] tracking-wider uppercase font-space-grotesk">${statusBadgeText}</span>
+                                <div class="mt-2 w-full flex flex-col gap-1 items-end">
                                     ${actionButtons}
                                 </div>
                             </div>
                         </div>
+                        <p class="text-[11px] text-gray-600 font-inter italic">${statusDesc}</p>
                         ${itemsHtml}
                         ${breakdownHtml}
                         ${shippingInfoHtml}
@@ -536,6 +575,32 @@
                 });
             } catch(e) {
                 console.error("Failed to load orders:", e);
+            }
+        }
+
+        async function confirmOrderReceived(id) {
+            if (!confirm("Apakah Anda yakin telah menerima paket pesanan ini dalam kondisi baik? Tindakan ini akan menyelesaikan pesanan.")) {
+                return;
+            }
+            try {
+                const response = await fetch(`/my-orders/${id}/confirm-received`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    }
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    showToast("Terima kasih! Pesanan berhasil dikonfirmasi selesai.");
+                    await fetchOrderHistory();
+                } else {
+                    showToast(data.error || "Gagal mengonfirmasi pesanan.");
+                }
+            } catch (e) {
+                console.error(e);
+                showToast("Terjadi kesalahan sistem.");
             }
         }
 

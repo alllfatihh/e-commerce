@@ -66,7 +66,7 @@ class AdminController extends Controller
             'total_lookbooks' => $lookbooks->count(),
             'total_discounts' => $discounts->count(),
             'total_admins' => $admins->count(),
-            'paid_revenue' => Order::where('status', 'paid')->sum('total_amount'),
+            'paid_revenue' => Order::whereIn('status', ['paid', 'processing', 'shipped', 'delivered', 'completed'])->sum('total_amount'),
         ];
 
         return view('admin', compact('products', 'orders', 'carousels', 'footages', 'artworks', 'editorials', 'artists', 'offerings', 'lookbooks', 'discounts', 'admins', 'settings', 'stats'));
@@ -645,7 +645,7 @@ class AdminController extends Controller
         $order = Order::with('items')->findOrFail($id);
 
         $request->validate([
-            'status' => 'required|string|in:pending,paid,processing,shipped,delivered,cancelled',
+            'status' => 'required|string|in:pending,paid,processing,shipped,delivered,completed,cancelled',
             'tracking_number' => 'nullable|string|max:100',
         ]);
 
@@ -655,6 +655,12 @@ class AdminController extends Controller
 
         if ($request->has('tracking_number')) {
             $order->tracking_number = $request->input('tracking_number');
+        }
+
+        if ($newStatus === 'completed' && ! $order->received_at) {
+            $order->received_at = now();
+        } elseif ($newStatus !== 'completed' && $oldStatus === 'completed') {
+            $order->received_at = null;
         }
 
         DB::transaction(function () use ($order, $oldStatus, $newStatus) {

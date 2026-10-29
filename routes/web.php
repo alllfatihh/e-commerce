@@ -391,6 +391,37 @@ Route::post('/my-orders/{id}/pay', function ($id) {
     }
 });
 
+Route::post('/my-orders/{id}/confirm-received', function ($id) {
+    if (! auth()->check()) {
+        return response()->json(['error' => 'Silakan login terlebih dahulu.'], 401);
+    }
+
+    $order = Order::find($id);
+    if (! $order || ($order->user_id !== auth()->id() && ! auth()->user()->isAdmin())) {
+        return response()->json(['error' => 'Pesanan tidak ditemukan atau Anda tidak memiliki akses.'], 403);
+    }
+
+    if (! in_array($order->status, ['shipped', 'delivered'])) {
+        return response()->json(['error' => 'Pesanan belum dalam status pengiriman untuk dapat dikonfirmasi diterima.'], 422);
+    }
+
+    DB::transaction(function () use ($order) {
+        $lockedOrder = Order::where('id', $order->id)->lockForUpdate()->first();
+        if ($lockedOrder && in_array($lockedOrder->status, ['shipped', 'delivered'])) {
+            $lockedOrder->update([
+                'status' => 'completed',
+                'received_at' => now(),
+            ]);
+        }
+    });
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Pesanan telah berhasil dikonfirmasi diterima.',
+        'order' => $order->fresh(),
+    ]);
+});
+
 // HANYA UNTUK TESTING LOKAL (Karena Midtrans tidak bisa menembak webhook ke localhost)
 if (app()->environment('local', 'testing')) {
     Route::post('/midtrans/local-success', function (Request $request) {

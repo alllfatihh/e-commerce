@@ -8,6 +8,10 @@ class Order extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'received_at' => 'datetime',
+    ];
+
     public function items()
     {
         return $this->hasMany(OrderItem::class);
@@ -16,5 +20,15 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function canBeConfirmedReceived(): bool
+    {
+        return in_array($this->status, ['shipped', 'delivered']);
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === 'completed';
     }
 }
