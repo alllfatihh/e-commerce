@@ -717,6 +717,39 @@ class AdminController extends Controller
         }
     }
 
+    public function syncOrderBiteship(Request $request, $id)
+    {
+        $order = Order::findOrFail($id);
+
+        if (! $order->biteship_order_id) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'error' => 'Pesanan belum memiliki Biteship Order ID.'], 422);
+            }
+
+            return redirect('/admin')->with('error', 'Pesanan ini belum memiliki Biteship Order ID.');
+        }
+
+        $checkoutController = new CheckoutController;
+        $result = $checkoutController->syncBiteshipOrderStatus($order);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => $result !== null,
+                'result' => $result,
+                'order' => $order->fresh(),
+            ]);
+        }
+
+        if ($result) {
+            $freshOrder = $order->fresh();
+            $statusLabel = strtoupper($freshOrder->biteship_status ?? $freshOrder->status);
+
+            return redirect('/admin')->with('success', 'Status pesanan #'.$order->id.' berhasil disinkronkan dengan Biteship (Status: '.$statusLabel.', Resi: '.($freshOrder->tracking_number ?? '—').').');
+        }
+
+        return redirect('/admin')->with('error', 'Gagal menyinkronkan status dengan Biteship API.');
+    }
+
     // ─── Discount Codes (Promo Codes) ─────────────────────────
     public function storeDiscountCode(Request $request)
     {

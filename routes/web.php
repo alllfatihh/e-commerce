@@ -216,6 +216,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/admin/biteship/sync', [AdminController::class, 'syncBiteship']);
     Route::post('/admin/orders/{id}/status', [AdminController::class, 'updateOrderStatus']);
     Route::post('/admin/orders/{id}/dispatch', [AdminController::class, 'dispatchBiteship']);
+    Route::post('/admin/orders/{id}/sync-biteship', [AdminController::class, 'syncOrderBiteship']);
     Route::post('/admin/discounts', [AdminController::class, 'storeDiscountCode']);
     Route::match(['post', 'put'], '/admin/discounts/{id}', [AdminController::class, 'updateDiscountCode']);
     Route::delete('/admin/discounts/{id}', [AdminController::class, 'deleteDiscountCode']);
@@ -259,6 +260,7 @@ Route::post('/api/check-promo', [CheckoutController::class, 'checkPromoCode'])
 Route::get('/shipping-areas', [CheckoutController::class, 'searchArea'])->middleware('throttle:60,1');
 Route::post('/shipping-rates', [CheckoutController::class, 'getShippingRates'])->middleware('throttle:60,1');
 Route::post('/midtrans/webhook', [CheckoutController::class, 'webhook'])->withoutMiddleware([VerifyCsrfToken::class]);
+Route::post('/biteship/webhook', [CheckoutController::class, 'biteshipWebhook'])->withoutMiddleware([VerifyCsrfToken::class]);
 
 Route::get('/my-orders', function () {
     if (! auth()->check()) {
@@ -271,7 +273,9 @@ Route::get('/my-orders', function () {
         ->take(10)
         ->get();
 
-    // Sinkronisasi otomatis ke Midtrans (Berguna untuk localhost yang tidak dapat Webhook)
+    $checkoutController = new CheckoutController;
+
+    // Sinkronisasi otomatis ke Midtrans & Biteship (Berguna untuk localhost yang tidak dapat Webhook)
     foreach ($orders as $order) {
         if ($order->status === 'pending') {
             try {
@@ -281,11 +285,11 @@ Route::get('/my-orders', function () {
                 $status = Transaction::status($midtransId);
 
                 if ($status && in_array($status->transaction_status, ['settlement', 'capture'])) {
-                    DB::transaction(function () use ($order) {
+                    DB::transaction(function () use ($order, $checkoutController) {
                         $locked = Order::where('id', $order->id)->lockForUpdate()->first();
                         if ($locked && $locked->status === 'pending') {
                             $locked->update(['status' => 'paid']);
-                            (new CheckoutController)->dispatchBiteshipOrder($locked);
+                            $checkoutController->dispatchBiteshipOrder($locked);
                         }
                     });
                 } elseif ($status && in_array($status->transaction_status, ['cancel', 'deny', 'expire'])) {
@@ -306,10 +310,21 @@ Route::get('/my-orders', function () {
             } catch (Exception $e) {
                 // Abaikan jika tidak ditemukan di Midtrans
             }
+        } elseif ($order->biteship_order_id && ! in_array($order->status, ['completed', 'cancelled'])) {
+            // Live sync tracking & status from Biteship API
+            try {
+                $checkoutController->syncBiteshipOrderStatus($order);
+            } catch (Exception $e) {
+                // Abaikan jika error koneksi sementara
+            }
         }
     }
 
-    return $orders;
+    return Order::with('items.product')
+        ->where('user_id', auth()->id())
+        ->orderBy('created_at', 'desc')
+        ->take(10)
+        ->get();
 });
 
 Route::post('/my-orders/{id}/cancel', function ($id) {
@@ -401,13 +416,13 @@ Route::post('/my-orders/{id}/confirm-received', function ($id) {
         return response()->json(['error' => 'Pesanan tidak ditemukan atau Anda tidak memiliki akses.'], 403);
     }
 
-    if (! in_array($order->status, ['shipped', 'delivered'])) {
+    if (! in_array($order->status, ['shipped', 'delivered', 'in_transit'])) {
         return response()->json(['error' => 'Pesanan belum dalam status pengiriman untuk dapat dikonfirmasi diterima.'], 422);
     }
 
     DB::transaction(function () use ($order) {
         $lockedOrder = Order::where('id', $order->id)->lockForUpdate()->first();
-        if ($lockedOrder && in_array($lockedOrder->status, ['shipped', 'delivered'])) {
+        if ($lockedOrder && in_array($lockedOrder->status, ['shipped', 'delivered', 'in_transit'])) {
             $lockedOrder->update([
                 'status' => 'completed',
                 'received_at' => now(),

@@ -470,16 +470,36 @@
                         `;
                     } else if (st === 'paid') {
                         statusBadgeText = "Pembayaran Diterima";
-                        statusDesc = "Pembayaran telah terverifikasi. Menunggu pesanan diproses oleh admin.";
+                        statusDesc = "Pembayaran telah terverifikasi. Menunggu pesanan diproses oleh admin/Biteship.";
                         statusClass = "bg-emerald-100 text-emerald-800 border border-emerald-300";
                     } else if (st === 'processing') {
-                        statusBadgeText = "Sedang Diproses";
-                        statusDesc = "Pesanan sedang dikemas dan disiapkan di gudang Notisse.";
-                        statusClass = "bg-blue-100 text-blue-800 border border-blue-300";
-                    } else if (st === 'shipped') {
-                        statusBadgeText = "Sedang Dikirim";
-                        statusDesc = "Paket sedang dalam perjalanan ekspedisi ke alamat tujuan Anda.";
-                        statusClass = "bg-purple-100 text-purple-800 border border-purple-300";
+                        if (order.biteship_status === 'confirmed' || order.biteship_status === 'allocated') {
+                            statusBadgeText = "Terkonfirmasi Biteship";
+                            statusDesc = "Pesanan telah dikonfirmasi dan menunggu jadwal penjemputan oleh kurir.";
+                            statusClass = "bg-blue-100 text-blue-800 border border-blue-300";
+                        } else {
+                            statusBadgeText = "Sedang Diproses";
+                            statusDesc = "Pesanan sedang dikemas dan disiapkan di gudang Notisse.";
+                            statusClass = "bg-blue-100 text-blue-800 border border-blue-300";
+                        }
+                    } else if (st === 'shipped' || st === 'in_transit') {
+                        if (order.biteship_status === 'picking_up') {
+                            statusBadgeText = "Kurir Menuju Pickup";
+                            statusDesc = "Kurir sedang dalam perjalanan menjemput paket dari gudang Notisse.";
+                            statusClass = "bg-purple-100 text-purple-800 border border-purple-300";
+                        } else if (order.biteship_status === 'picked') {
+                            statusBadgeText = "Paket Di-pickup Kurir";
+                            statusDesc = "Paket telah diambil kurir dan dibawa menuju pusat sortir ekspedisi.";
+                            statusClass = "bg-purple-100 text-purple-800 border border-purple-300";
+                        } else if (order.biteship_status === 'dropping_off') {
+                            statusBadgeText = "Sedang Diantar Kurir";
+                            statusDesc = "Kurir sedang dalam perjalanan mengantarkan paket ke alamat Anda.";
+                            statusClass = "bg-indigo-100 text-indigo-800 border border-indigo-300";
+                        } else {
+                            statusBadgeText = "Sedang Dikirim (In Transit)";
+                            statusDesc = "Paket sedang dalam perjalanan ekspedisi ke alamat tujuan Anda.";
+                            statusClass = "bg-purple-100 text-purple-800 border border-purple-300";
+                        }
                         actionButtons = `
                             <button onclick="confirmOrderReceived(${order.id})" class="text-[10px] text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-2 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
                                 <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
@@ -514,22 +534,28 @@
                     }
 
                     let shippingInfoHtml = '';
-                    if (order.courier_name || order.tracking_number) {
+                    if (order.courier_name || order.tracking_number || order.biteship_order_id) {
                         shippingInfoHtml = `
                             <div class="mt-3 pt-3 border-t border-gray-200 flex flex-wrap items-center justify-between text-xs font-inter gap-2">
                                 <div class="flex items-center gap-1.5">
                                     <span class="text-gray-500">Kurir:</span>
                                     <span class="font-bold text-gray-800 uppercase font-space-grotesk">${order.courier_name || '—'}</span>
+                                    ${order.biteship_status ? `<span class="text-[9px] font-mono uppercase bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded border border-indigo-200 ml-1 font-semibold">API: ${order.biteship_status.replace('_', ' ')}</span>` : ''}
                                 </div>
-                                ${order.tracking_number ? `
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-gray-500">No. Resi (AWB):</span>
-                                    <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-gray-300 text-gray-900 select-all tracking-wider">${order.tracking_number}</span>
-                                    <button type="button" onclick="navigator.clipboard.writeText('${order.tracking_number}'); showToast('No. Resi disalin!');" class="text-[10px] text-gray-500 hover:text-black underline cursor-pointer font-space-grotesk font-semibold uppercase">Salin</button>
+                                    ${order.tracking_number ? `
+                                        <span class="text-gray-500">No. Resi (AWB):</span>
+                                        <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-gray-300 text-gray-900 select-all tracking-wider">${order.tracking_number}</span>
+                                        <button type="button" onclick="navigator.clipboard.writeText('${order.tracking_number}'); showToast('No. Resi disalin!');" class="text-[10px] text-gray-500 hover:text-black underline cursor-pointer font-space-grotesk font-semibold uppercase">Salin</button>
+                                    ` : `
+                                        <span class="text-gray-400 italic text-[11px]">Resi dalam persiapan pengiriman</span>
+                                    `}
+                                    ${order.biteship_tracking_link ? `
+                                        <a href="${order.biteship_tracking_link}" target="_blank" rel="noopener noreferrer" class="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline font-space-grotesk flex items-center gap-0.5 ml-1">
+                                            <span>Lacak di Biteship ↗</span>
+                                        </a>
+                                    ` : ''}
                                 </div>
-                                ` : `
-                                <span class="text-gray-400 italic text-[11px]">Resi dalam persiapan pengiriman</span>
-                                `}
                             </div>
                         `;
                     }

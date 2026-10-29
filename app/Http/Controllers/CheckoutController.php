@@ -334,7 +334,7 @@ class CheckoutController extends Controller
         $jntBase = 13000;
         $duration = '1 - 3 hari';
 
-        if (str_contains($city, 'bandung') || str_contains($city, 'cimahi')) {
+        if (str_contains($destinationAreaId, 'IDNC22') || str_contains($destinationAreaId, 'IDNC23') || str_contains($city, 'bandung') || str_contains($city, 'cimahi')) {
             // Bandung Raya (Lokal)
             $jneBase = 10000;
             $sicepatBase = 9000;
@@ -570,11 +570,18 @@ class CheckoutController extends Controller
             Log::info('Biteship Dispatch Order Response for #'.$order->id.':', (array) $biteshipData);
 
             if (isset($biteshipData['id'])) {
-                $updateData = ['biteship_order_id' => $biteshipData['id']];
+                $updateData = [
+                    'biteship_order_id' => $biteshipData['id'],
+                    'biteship_status' => strtolower($biteshipData['status'] ?? 'confirmed'),
+                    'biteship_tracking_link' => $biteshipData['courier']['link'] ?? null,
+                ];
                 if (! empty($biteshipData['courier']['waybill_id'])) {
                     $updateData['tracking_number'] = $biteshipData['courier']['waybill_id'];
                 } elseif (! empty($biteshipData['courier']['tracking_id'])) {
                     $updateData['tracking_number'] = $biteshipData['courier']['tracking_id'];
+                }
+                if ($order->status === 'paid') {
+                    $updateData['status'] = 'processing';
                 }
                 $order->update($updateData);
 
@@ -585,6 +592,110 @@ class CheckoutController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Synchronize order tracking & status directly from Biteship API
+     */
+    public function syncBiteshipOrderStatus(Order $order): ?array
+    {
+        if (! $order->biteship_order_id || str_starts_with($order->biteship_order_id, 'BS-MANUAL')) {
+            return null;
+        }
+
+        $apiKey = env('BITESHIP_API_KEY');
+        if (! $apiKey) {
+            return null;
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => $apiKey,
+            ])->timeout(8)->get("https://api.biteship.com/v1/orders/{$order->biteship_order_id}");
+
+            if (! $response->successful()) {
+                Log::warning("Failed to sync Biteship order #{$order->id}: ".$response->body());
+
+                return null;
+            }
+
+            $data = $response->json();
+            $biteshipStatus = strtolower($data['status'] ?? '');
+            $waybill = $data['courier']['waybill_id'] ?? null;
+            $trackingId = $data['courier']['tracking_id'] ?? null;
+            $link = $data['courier']['link'] ?? null;
+
+            $updateData = [];
+
+            if ($biteshipStatus) {
+                $updateData['biteship_status'] = $biteshipStatus;
+            }
+
+            // Always update tracking_number to latest courier waybill (AWB) or tracking ID
+            if (! empty($waybill)) {
+                $updateData['tracking_number'] = $waybill;
+            } elseif (! empty($trackingId) && empty($order->tracking_number)) {
+                $updateData['tracking_number'] = $trackingId;
+            }
+
+            if (! empty($link)) {
+                $updateData['biteship_tracking_link'] = $link;
+            }
+
+            // Map Biteship status to main Order status (unless buyer already completed receipt)
+            if ($order->status !== 'completed' && $biteshipStatus) {
+                if (in_array($biteshipStatus, ['confirmed', 'allocated', 'placed', 'scheduled'])) {
+                    if (in_array($order->status, ['pending', 'paid'])) {
+                        $updateData['status'] = 'processing';
+                    }
+                } elseif (in_array($biteshipStatus, ['picking_up', 'picked', 'in_transit', 'dropping_off'])) {
+                    $updateData['status'] = 'shipped';
+                } elseif ($biteshipStatus === 'delivered') {
+                    $updateData['status'] = 'delivered';
+                } elseif (in_array($biteshipStatus, ['cancelled', 'rejected', 'courier_not_found'])) {
+                    $updateData['status'] = 'cancelled';
+                }
+            }
+
+            if (! empty($updateData)) {
+                $order->update($updateData);
+            }
+
+            return $data;
+        } catch (\Exception $e) {
+            Log::error("syncBiteshipOrderStatus exception for #{$order->id}: ".$e->getMessage());
+
+            return null;
+        }
+    }
+
+    /**
+     * Handle incoming webhook updates from Biteship
+     */
+    public function biteshipWebhook(Request $request)
+    {
+        $payload = $request->all();
+        Log::info('Biteship Webhook Received:', $payload);
+
+        $orderId = $request->input('order_id') ?? $request->input('id');
+        if (! $orderId) {
+            return response()->json(['status' => 'error', 'message' => 'Missing order_id'], 400);
+        }
+
+        $order = Order::where('biteship_order_id', $orderId)->first();
+        if (! $order) {
+            return response()->json(['status' => 'error', 'message' => 'Order not found'], 404);
+        }
+
+        $result = $this->syncBiteshipOrderStatus($order);
+
+        return response()->json([
+            'status' => 'success',
+            'order_id' => $order->id,
+            'biteship_status' => $order->fresh()->biteship_status,
+            'order_status' => $order->fresh()->status,
+            'tracking_number' => $order->fresh()->tracking_number,
+        ]);
     }
 
     public function checkPromoCode(Request $request)

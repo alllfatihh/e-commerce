@@ -1340,6 +1340,13 @@
                                         {{ $order->status }}
                                     @endif
                                 </span>
+                                @if($order->biteship_status)
+                                <div class="mt-1">
+                                    <span class="inline-block px-2 py-0.5 text-[9px] font-mono uppercase bg-indigo-50 text-indigo-700 border border-indigo-200 rounded font-semibold" title="Status Kurir dari Biteship API">
+                                        API: {{ str_replace('_', ' ', $order->biteship_status) }}
+                                    </span>
+                                </div>
+                                @endif
                                 @if($order->received_at)
                                 <p class="text-[10px] text-emerald-700 font-inter font-medium mt-1">
                                     Diterima: {{ \Carbon\Carbon::parse($order->received_at)->format('d M Y, H:i') }}
@@ -1350,10 +1357,10 @@
                                 </p>
                                 @endif
                             </td>
-                            <td class="px-5 py-4 min-w-[190px]">
+                            <td class="px-5 py-4 min-w-[210px]">
                                 <p class="text-xs font-bold font-space-grotesk text-gray-800 uppercase">{{ $order->courier_name ?? '—' }}</p>
                                 @if($order->tracking_number)
-                                <div class="mt-1 flex items-center gap-1.5">
+                                <div class="mt-1 flex items-center gap-1.5 flex-wrap">
                                     <span class="font-mono text-xs font-bold bg-gray-100 text-gray-900 px-2 py-0.5 rounded border border-gray-300">
                                         {{ $order->tracking_number }}
                                     </span>
@@ -1362,14 +1369,29 @@
                                 <p class="text-[11px] text-gray-400 italic mt-0.5">Resi belum diinput</p>
                                 @endif
 
+                                @if($order->biteship_tracking_link)
+                                <div class="mt-1">
+                                    <a href="{{ $order->biteship_tracking_link }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-800 underline font-semibold font-space-grotesk">
+                                        <span>Lacak Biteship</span>
+                                        <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+                                    </a>
+                                </div>
+                                @endif
+
                                 @if($order->biteship_order_id)
                                 <p class="text-[9px] text-emerald-600 font-mono mt-1">Biteship: {{ Str::limit($order->biteship_order_id, 18) }}</p>
+                                <form action="/admin/orders/{{ $order->id }}/sync-biteship" method="POST" class="mt-2 inline-block">
+                                    @csrf
+                                    <button type="submit" class="text-[10px] bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-space-grotesk font-bold uppercase tracking-wider px-2 py-1 rounded border border-neutral-300 transition-colors flex items-center gap-1 cursor-pointer">
+                                        <span>🔄 Sync Biteship</span>
+                                    </button>
+                                </form>
                                 @endif
 
                                 @if(in_array($order->status, ['paid', 'processing']) && empty($order->biteship_order_id))
                                 <form action="/admin/orders/{{ $order->id }}/dispatch" method="POST" class="mt-2">
                                     @csrf
-                                    <button type="submit" onclick="return confirm('Kirim permintaan pickup ke Biteship sekarang?')" class="text-[10px] bg-[#E2FF00] hover:bg-yellow-300 text-black font-space-grotesk font-bold uppercase tracking-wider px-2 py-1 rounded border border-black/10 transition-colors">
+                                    <button type="submit" onclick="return confirm('Kirim permintaan pickup ke Biteship sekarang?')" class="text-[10px] bg-[#E2FF00] hover:bg-yellow-300 text-black font-space-grotesk font-bold uppercase tracking-wider px-2 py-1 rounded border border-black/10 transition-colors cursor-pointer">
                                         ⚡ Dispatch Biteship
                                     </button>
                                 </form>

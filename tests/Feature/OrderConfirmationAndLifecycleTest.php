@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\CheckoutController;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class OrderConfirmationAndLifecycleTest extends TestCase
@@ -194,5 +196,120 @@ class OrderConfirmationAndLifecycleTest extends TestCase
         $this->assertCount(1, $response->json());
         $this->assertEquals('completed', $response->json()[0]['status']);
         $this->assertNotNull($response->json()[0]['received_at']);
+    }
+
+    public function test_sync_biteship_order_status_updates_tracking_and_status(): void
+    {
+        Http::fake([
+            'https://api.biteship.com/v1/orders/BS-TEST-99' => Http::response([
+                'success' => true,
+                'id' => 'BS-TEST-99',
+                'status' => 'in_transit',
+                'courier' => [
+                    'waybill_id' => 'WYB-LIVE-SYNC-12345',
+                    'tracking_id' => 'TRK-998877',
+                    'link' => 'https://track.biteship.com/TRK-998877',
+                ],
+            ], 200),
+        ]);
+
+        $order = Order::create([
+            'customer_name' => 'Test Biteship Buyer',
+            'customer_email' => 'buyer@example.com',
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Jakarta',
+            'total_amount' => 200000,
+            'status' => 'paid',
+            'biteship_order_id' => 'BS-TEST-99',
+            'tracking_number' => 'WYB-OLD-INITIAL',
+        ]);
+
+        $controller = new CheckoutController;
+        $result = $controller->syncBiteshipOrderStatus($order);
+
+        $this->assertNotNull($result);
+        $this->assertEquals('in_transit', $order->fresh()->biteship_status);
+        $this->assertEquals('WYB-LIVE-SYNC-12345', $order->fresh()->tracking_number);
+        $this->assertEquals('https://track.biteship.com/TRK-998877', $order->fresh()->biteship_tracking_link);
+        $this->assertEquals('shipped', $order->fresh()->status);
+    }
+
+    public function test_admin_can_trigger_biteship_sync(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        Http::fake([
+            'https://api.biteship.com/v1/orders/BS-TEST-ADMIN' => Http::response([
+                'success' => true,
+                'id' => 'BS-TEST-ADMIN',
+                'status' => 'delivered',
+                'courier' => [
+                    'waybill_id' => 'WYB-DELIVERED-555',
+                    'link' => 'https://track.biteship.com/555',
+                ],
+            ], 200),
+        ]);
+
+        $order = Order::create([
+            'customer_name' => 'Admin Test Sync',
+            'customer_email' => 'admin-test@example.com',
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Surabaya',
+            'total_amount' => 350000,
+            'status' => 'shipped',
+            'biteship_order_id' => 'BS-TEST-ADMIN',
+            'tracking_number' => 'WYB-OLD',
+        ]);
+
+        $response = $this->actingAs($admin)->post("/admin/orders/{$order->id}/sync-biteship");
+        $response->assertRedirect('/admin');
+
+        $this->assertEquals('delivered', $order->fresh()->biteship_status);
+        $this->assertEquals('delivered', $order->fresh()->status);
+        $this->assertEquals('WYB-DELIVERED-555', $order->fresh()->tracking_number);
+    }
+
+    public function test_biteship_webhook_updates_order_status(): void
+    {
+        Http::fake([
+            'https://api.biteship.com/v1/orders/BS-HOOK-123' => Http::response([
+                'success' => true,
+                'id' => 'BS-HOOK-123',
+                'status' => 'delivered',
+                'courier' => [
+                    'waybill_id' => 'WYB-FINAL-777',
+                    'link' => 'https://track.biteship.com/777',
+                ],
+            ], 200),
+        ]);
+
+        $order = Order::create([
+            'customer_name' => 'Webhook Test Buyer',
+            'customer_email' => 'webhook@example.com',
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Semarang',
+            'total_amount' => 120000,
+            'status' => 'shipped',
+            'biteship_order_id' => 'BS-HOOK-123',
+        ]);
+
+        $response = $this->postJson('/biteship/webhook', [
+            'event' => 'order.status',
+            'order_id' => 'BS-HOOK-123',
+            'status' => 'delivered',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+                'order_id' => $order->id,
+                'biteship_status' => 'delivered',
+                'order_status' => 'delivered',
+                'tracking_number' => 'WYB-FINAL-777',
+            ]);
+
+        $this->assertEquals('delivered', $order->fresh()->status);
+        $this->assertEquals('delivered', $order->fresh()->biteship_status);
+        $this->assertEquals('WYB-FINAL-777', $order->fresh()->tracking_number);
     }
 }
