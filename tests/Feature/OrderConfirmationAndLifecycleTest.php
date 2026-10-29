@@ -53,7 +53,7 @@ class OrderConfirmationAndLifecycleTest extends TestCase
         $this->assertNull($orderA->fresh()->received_at);
     }
 
-    public function test_user_cannot_confirm_order_not_in_shipping_status(): void
+    public function test_user_cannot_confirm_order_when_not_delivered_yet(): void
     {
         $user = User::factory()->create();
         $order = Order::create([
@@ -81,34 +81,20 @@ class OrderConfirmationAndLifecycleTest extends TestCase
         $order->update(['status' => 'paid']);
         $responsePaid = $this->actingAs($user)->postJson("/my-orders/{$order->id}/confirm-received");
         $responsePaid->assertStatus(422);
+
+        // Attempt when shipped (in transit, not delivered yet)
+        $order->update(['status' => 'shipped', 'biteship_status' => 'in_transit']);
+        $responseShipped = $this->actingAs($user)->postJson("/my-orders/{$order->id}/confirm-received");
+        $responseShipped->assertStatus(422);
+        $this->assertEquals('shipped', $order->fresh()->status);
+        $this->assertNull($order->fresh()->received_at);
     }
 
-    public function test_user_can_confirm_order_received_when_shipped_or_delivered(): void
+    public function test_user_can_confirm_order_received_only_when_delivered(): void
     {
         $user = User::factory()->create();
 
-        // 1. Shipped order
-        $orderShipped = Order::create([
-            'user_id' => $user->id,
-            'customer_name' => 'John Doe',
-            'customer_email' => $user->email,
-            'customer_phone' => '08123456789',
-            'shipping_address' => 'Jakarta',
-            'total_amount' => 250000,
-            'status' => 'shipped',
-            'tracking_number' => 'JNE123456789',
-        ]);
-
-        $responseShipped = $this->actingAs($user)->postJson("/my-orders/{$orderShipped->id}/confirm-received");
-        $responseShipped->assertStatus(200)
-            ->assertJson([
-                'success' => true,
-            ]);
-
-        $this->assertEquals('completed', $orderShipped->fresh()->status);
-        $this->assertNotNull($orderShipped->fresh()->received_at);
-
-        // 2. Delivered order
+        // 1. Delivered order by web status
         $orderDelivered = Order::create([
             'user_id' => $user->id,
             'customer_name' => 'John Doe',
@@ -128,6 +114,30 @@ class OrderConfirmationAndLifecycleTest extends TestCase
 
         $this->assertEquals('completed', $orderDelivered->fresh()->status);
         $this->assertNotNull($orderDelivered->fresh()->received_at);
+
+        // 2. Delivered order by Biteship status
+        $orderBiteshipDelivered = Order::create([
+            'user_id' => $user->id,
+            'customer_name' => 'John Doe 2',
+            'customer_email' => $user->email,
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Jakarta',
+            'total_amount' => 220000,
+            'status' => 'shipped',
+            'biteship_order_id' => 'BS-123456',
+            'biteship_status' => 'delivered',
+            'tracking_number' => 'JNE776655',
+        ]);
+
+        $responseBsDelivered = $this->actingAs($user)->postJson("/my-orders/{$orderBiteshipDelivered->id}/confirm-received");
+        $responseBsDelivered->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+            ]);
+
+        $this->assertEquals('completed', $orderBiteshipDelivered->fresh()->status);
+        $this->assertEquals('delivered', $orderBiteshipDelivered->fresh()->biteship_status);
+        $this->assertNotNull($orderBiteshipDelivered->fresh()->received_at);
     }
 
     public function test_admin_can_manage_order_status_pipeline_including_completed(): void

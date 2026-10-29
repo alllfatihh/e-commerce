@@ -416,17 +416,21 @@ Route::post('/my-orders/{id}/confirm-received', function ($id) {
         return response()->json(['error' => 'Pesanan tidak ditemukan atau Anda tidak memiliki akses.'], 403);
     }
 
-    if (! in_array($order->status, ['shipped', 'delivered', 'in_transit'])) {
-        return response()->json(['error' => 'Pesanan belum dalam status pengiriman untuk dapat dikonfirmasi diterima.'], 422);
+    if (! $order->canBeConfirmedReceived()) {
+        return response()->json(['error' => 'Pesanan hanya dapat dikonfirmasi setelah paket tiba / sudah diantarkan oleh kurir.'], 422);
     }
 
     DB::transaction(function () use ($order) {
         $lockedOrder = Order::where('id', $order->id)->lockForUpdate()->first();
-        if ($lockedOrder && in_array($lockedOrder->status, ['shipped', 'delivered', 'in_transit'])) {
-            $lockedOrder->update([
+        if ($lockedOrder && $lockedOrder->canBeConfirmedReceived()) {
+            $updateData = [
                 'status' => 'completed',
                 'received_at' => now(),
-            ]);
+            ];
+            if ($lockedOrder->biteship_order_id && (! $lockedOrder->biteship_status || $lockedOrder->biteship_status !== 'delivered')) {
+                $updateData['biteship_status'] = 'delivered';
+            }
+            $lockedOrder->update($updateData);
         }
     });
 

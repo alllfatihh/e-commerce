@@ -1351,9 +1351,13 @@
                                 <p class="text-[10px] text-emerald-700 font-inter font-medium mt-1">
                                     Diterima: {{ \Carbon\Carbon::parse($order->received_at)->format('d M Y, H:i') }}
                                 </p>
-                                @elseif(in_array($order->status, ['shipped', 'delivered']))
+                                @elseif($order->status === 'delivered')
+                                <p class="text-[10px] text-teal-700 font-inter font-medium mt-1">
+                                    Sudah diantarkan — Menunggu konfirmasi pembeli
+                                </p>
+                                @elseif(in_array($order->status, ['shipped', 'in_transit']))
                                 <p class="text-[10px] text-purple-600 font-inter italic mt-1">
-                                    Menunggu konfirmasi pembeli
+                                    Dalam perjalanan kurir
                                 </p>
                                 @endif
                             </td>

@@ -24,7 +24,7 @@ class Order extends Model
 
     public function canBeConfirmedReceived(): bool
     {
-        return in_array($this->status, ['shipped', 'delivered', 'in_transit']);
+        return $this->status === 'delivered' || $this->biteship_status === 'delivered';
     }
 
     public function isCompleted(): bool

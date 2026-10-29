@@ -501,14 +501,14 @@
                             statusClass = "bg-purple-100 text-purple-800 border border-purple-300";
                         }
                         actionButtons = `
-                            <button onclick="confirmOrderReceived(${order.id})" class="text-[10px] text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-2 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
-                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                Konfirmasi Pesanan Diterima
-                            </button>
+                            <div class="mt-2 text-[10px] text-gray-500 font-inter italic flex items-center gap-1.5 bg-gray-50 px-2.5 py-1.5 rounded border border-gray-200">
+                                <svg class="w-3.5 h-3.5 text-purple-600 flex-shrink-0 fill-current" viewBox="0 0 20 20"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7h-2v4h4.582l-1.414-2.828A2 2 0 0013.382 7H14z"/></svg>
+                                <span>Kurir sedang dalam perjalanan. Tombol konfirmasi aktif saat paket sudah diantarkan/tiba.</span>
+                            </div>
                         `;
-                    } else if (st === 'delivered') {
-                        statusBadgeText = "Pesanan Telah Tiba";
-                        statusDesc = "Kurir telah mengantarkan paket. Silakan periksa barang dan konfirmasi.";
+                    } else if (st === 'delivered' || order.biteship_status === 'delivered') {
+                        statusBadgeText = "Pesanan Telah Tiba (Sudah Diantarkan)";
+                        statusDesc = "Kurir telah mengantarkan paket. Silakan periksa kelengkapan barang dan konfirmasi pesanan diterima di bawah ini.";
                         statusClass = "bg-teal-100 text-teal-800 border border-teal-300";
                         actionButtons = `
                             <button onclick="confirmOrderReceived(${order.id})" class="text-[10px] text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-2 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
