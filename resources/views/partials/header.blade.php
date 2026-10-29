@@ -25,8 +25,11 @@
         <div id="header-right-menu"
             class="flex items-center opacity-100 pointer-events-auto">
             <button id="search-trigger" aria-label="Search"
-                class="header-fade-visible font-space-grotesk font-medium text-xs sm:text-[13px] tracking-[0.16em] uppercase text-black hover:opacity-50 transition-all focus:outline-none cursor-pointer p-0 m-0 h-[16px] leading-[16px] inline-flex items-center">
-                SEARCH
+                class="header-fade-visible font-space-grotesk font-medium text-xs sm:text-[13px] tracking-[0.16em] uppercase text-black hover:opacity-50 transition-all focus:outline-none cursor-pointer p-0 m-0 h-[16px] leading-[16px] inline-flex items-center justify-center">
+                <span class="hidden sm:inline">SEARCH</span>
+                <svg class="w-4 h-4 sm:hidden stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </button>
 
             <!-- EXACT A24 UNIFIED MORPHING CART TRIGGER -->

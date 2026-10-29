@@ -312,8 +312,38 @@
             pointer-events: auto !important;
         }
 
+        #header-logo-container {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
         #search-trigger {
-            margin-right: 32px !important;
+            margin-right: 14px !important;
+        }
+
+        @media (min-width: 640px) {
+            #search-trigger {
+                margin-right: 32px !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header__link--cart {
+                width: 58px !important;
+            }
+            .header__link--cart::before {
+                width: 17px !important;
+            }
+            .header__link--cart__default-label {
+                right: 21px !important;
+                font-size: 11px !important;
+                letter-spacing: 0.1em !important;
+                width: 36px !important;
+            }
         }
 
         /* ========================================================== */
