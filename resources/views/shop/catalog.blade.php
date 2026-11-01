@@ -1,6 +1,6 @@
         <!-- VIEW 1: SHOP CATALOG WITH AUTO-SLIDING HERO CAROUSEL -->
         <section id="view-shop" class="view-page {{ ($activeView ?? 'view-shop') === 'view-shop' ? 'active-view' : '' }} pb-16">
-            <div class="relative w-full h-screen overflow-hidden bg-black group">
+            <div class="relative w-full h-[60vh] sm:h-[75vh] md:h-screen overflow-hidden bg-black group">
                 <div id="hero-carousel-slides" class="relative w-full h-full">
                     @if(isset($carousels) && $carousels->count() > 0)
                         @foreach($carousels as $index => $cSlide)
@@ -8,48 +8,48 @@
                                 $cImg = Str::startsWith($cSlide->image, 'http') ? $cSlide->image : (file_exists(public_path('storage/' . $cSlide->image)) ? asset('storage/' . $cSlide->image) : asset($cSlide->image));
                             @endphp
                             <div class="hero-carousel-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out {{ $index === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }}">
-                                <img src="{{ $cImg }}" alt="{{ $cSlide->title ?? 'Slide ' . ($index + 1) }}" class="w-full h-full object-cover">
+                                <img src="{{ $cImg }}" alt="{{ $cSlide->title ?? 'Slide ' . ($index + 1) }}" class="w-full h-full object-cover object-center">
                             </div>
                         @endforeach
                     @else
                         <div class="hero-carousel-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out opacity-100">
-                            <img src="{{ asset('home.jpg') }}" alt="Slide 1" class="w-full h-full object-cover">
+                            <img src="{{ asset('home.jpg') }}" alt="Slide 1" class="w-full h-full object-cover object-center">
                         </div>
                         <div class="hero-carousel-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out opacity-0 pointer-events-none">
-                            <img src="{{ asset('home1.jpg') }}" alt="Slide 2" class="w-full h-full object-cover">
+                            <img src="{{ asset('home1.jpg') }}" alt="Slide 2" class="w-full h-full object-cover object-center">
                         </div>
                         <div class="hero-carousel-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out opacity-0 pointer-events-none">
-                            <img src="{{ asset('home2.png') }}" alt="Slide 3" class="w-full h-full object-cover">
+                            <img src="{{ asset('home2.png') }}" alt="Slide 3" class="w-full h-full object-cover object-center">
                         </div>
                     @endif
                 </div>
 
                 <!-- OVERLAY MENU PADA CAROUSEL (A24 STYLE) -->
-                <div class="absolute bottom-8 left-5 sm:left-8 md:bottom-12 md:left-10 lg:left-12 z-20 flex flex-col pointer-events-none select-none">
+                <div class="absolute bottom-6 left-5 sm:bottom-8 sm:left-8 md:bottom-12 md:left-10 lg:left-12 z-20 flex flex-col pointer-events-none select-none">
                     <a href="javascript:void(0)" onclick="document.getElementById('shop-catalog').scrollIntoView({behavior: 'smooth'})"
-                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
+                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Shop</span>
+                            class="text-4xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Shop</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-artist-collab')"
-                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
+                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Artist Collab</span>
+                            class="text-4xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Artist Collab</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-lookbook-list')"
-                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
+                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Lookbook</span>
+                            class="text-4xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Lookbook</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-editorials-all')"
-                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1.5 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
+                        class="group flex items-start pointer-events-auto cursor-pointer -mb-1 sm:-mb-2 md:-mb-2.5 transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Editorial</span>
+                            class="text-4xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">Editorial</span>
                     </a>
                     <a href="javascript:void(0)" onclick="navigateTo('view-about')"
                         class="group flex items-start pointer-events-auto cursor-pointer transition-opacity duration-300 text-white hover:opacity-70">
                         <span
-                            class="text-5xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">About</span>
+                            class="text-4xl sm:text-6xl md:text-7xl lg:text-[4.9rem] font-medium tracking-tighter leading-[0.8] font-space-grotesk">About</span>
                     </a>
                 </div>
             </div>
