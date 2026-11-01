@@ -578,8 +578,8 @@
                                                 Collab: {{ $product->artist }}
                                             </span>
                                         @endif
-                                        @if($product->specs)
-                                        <p class="text-[10px] text-gray-400 font-mono mt-0.5 line-clamp-1 max-w-xs">{{ $product->specs }}</p>
+                                        @if($product->description)
+                                        <p class="text-[10px] text-gray-400 font-mono mt-0.5 line-clamp-1 max-w-xs">{{ Str::limit($product->description, 60) }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -631,7 +631,7 @@
                                             'name'             => $product->name,
                                             'price'            => $product->price,
                                             'desc'             => $product->description ?? '',
-                                            'specs'            => $product->specs ?? '',
+                                            'terms'            => $product->terms_and_conditions ?? '',
                                             'artist'           => $product->artist ?? '',
                                             'stocks'           => $product->stocks->pluck('stock','size'),
                                             'frontImg'         => $resImg($product->image),
@@ -1753,14 +1753,6 @@
                     </div>
                 </div>
 
-                <!-- Footer Description -->
-                <div class="p-5 bg-neutral-50 border border-gray-200 space-y-2">
-                    <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black">
-                        Deskripsi Singkat Footer (Brand Narrative)
-                    </label>
-                    <textarea name="footer_description" rows="3" class="admin-input resize-none leading-relaxed">{{ $settings['footer_description'] ?? 'Notisse is a concept brand exploring the intersection of modern aesthetics and raw street culture. Based in Indonesia, curating global narratives.' }}</textarea>
-                </div>
-
                 <div class="pt-2 flex justify-end">
                     <button type="submit" class="btn-primary px-8 py-3 cursor-pointer">
                         Simpan Pengaturan Situs
@@ -1841,20 +1833,25 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Spesifikasi Garmen & Fabric Details</label>
-                    <input type="text" name="specs" id="p-specs" placeholder="Contoh: 100% Heavyweight 24s Cotton Combed (220 GSM) • Boxy Drop Shoulder Fit • High-Density Screenprint" class="admin-input">
-                    <p class="text-[10px] text-gray-400 font-inter mt-1">Detail gramasi kain, model potongan, dan teknik sablon/jahitan.</p>
-                </div>
-
-                <div>
                     <div class="flex justify-between items-center mb-1.5">
-                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600">Deskripsi Editorial Produk</label>
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600">Deskripsi Produk</label>
                         <button type="button" onclick="setDefaultProductDescription()" class="text-[10px] font-space-grotesk font-bold uppercase text-brandRed hover:underline cursor-pointer">
                             + Gunakan Default Notisse Spec
                         </button>
                     </div>
                     <textarea name="description" id="p-desc" rows="4" placeholder="Cotton Combed 16s&#10;Raster Plastisol Screen Printing&#10;Digitized Painting" class="admin-input resize-none leading-relaxed font-mono text-xs"></textarea>
-                    <p class="text-[10px] text-gray-400 font-inter mt-1">Format default 3 baris: Cotton Combed 16s, Raster Plastisol Screen Printing, Digitized Painting.</p>
+                    <p class="text-[10px] text-gray-400 font-inter mt-1">Masukkan seluruh informasi deskripsi garmen, bahan, dan detail produk di sini.</p>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600">Terms and Condition Produk</label>
+                        <button type="button" onclick="setDefaultProductTerms()" class="text-[10px] font-space-grotesk font-bold uppercase text-brandRed hover:underline cursor-pointer">
+                            + Gunakan Default Terms
+                        </button>
+                    </div>
+                    <textarea name="terms_and_conditions" id="p-terms" rows="3" placeholder="All sales are final once order is confirmed.&#10;Exchanges strictly allowed for manufacturing defects within 3 days.&#10;Shipping fee calculated dynamically upon checkout." class="admin-input resize-none leading-relaxed font-mono text-xs"></textarea>
+                    <p class="text-[10px] text-gray-400 font-inter mt-1">Syarat dan ketentuan khusus untuk produk ini. Kosongkan jika ingin menggunakan ketentuan standar toko.</p>
                 </div>
             </div>
 
@@ -2645,7 +2642,19 @@
                 <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">
                     <span id="admin-password-label">Password *</span>
                 </label>
-                <input type="password" name="password" id="admin-password" placeholder="Minimal 6 karakter" class="admin-input font-mono">
+                <div class="relative">
+                    <input type="password" name="password" id="admin-password" placeholder="Minimal 6 karakter" class="admin-input font-mono pr-11">
+                    <button type="button" onclick="togglePasswordVisibility('admin-password', this)" aria-label="Toggle password visibility"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black focus:outline-none cursor-pointer p-1 transition-colors">
+                        <svg class="w-4 h-4 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <svg class="w-4 h-4 eye-slash-icon hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                        </svg>
+                    </button>
+                </div>
                 <p id="admin-password-hint" class="text-[11px] text-gray-400 font-inter mt-1 hidden">Kosongkan kolom password jika tidak ingin mengubah password akun admin ini.</p>
             </div>
 
@@ -2859,6 +2868,13 @@
         }
     }
 
+    function setDefaultProductTerms() {
+        const termsEl = document.getElementById('p-terms');
+        if (termsEl) {
+            termsEl.value = "All sales are final once order is confirmed.\nExchanges strictly allowed for manufacturing defects within 3 days.\nShipping fee calculated dynamically upon checkout.";
+        }
+    }
+
     // ── Image preview ───────────────────────────────────────────
     function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
@@ -2881,6 +2897,8 @@
 
         toggleProductOriginType('notisse');
         setDefaultProductDescription();
+        const termsEl = document.getElementById('p-terms');
+        if (termsEl) termsEl.value = '';
 
         ['preview-front','preview-back','preview-footage','preview-sizechart'].forEach(id => {
             const el = document.getElementById(id);
@@ -2894,7 +2912,7 @@
         document.getElementById('modal-product').classList.add('open');
     }
 
-    function openEditProductModal(id, name, price, desc, specs, artist, stocksObj, frontImg, backImg, footageImg, sizechartImg) {
+    function openEditProductModal(id, name, price, desc, terms, artist, stocksObj, frontImg, backImg, footageImg, sizechartImg) {
         document.getElementById('modal-product-title').textContent = 'Edit Product';
         document.getElementById('product-form').action = '/admin/products/' + id;
         document.getElementById('form-method').value   = 'PUT';
@@ -2903,7 +2921,9 @@
         document.getElementById('p-name').value   = name;
         document.getElementById('p-price').value  = price;
         document.getElementById('p-desc').value   = desc || "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting";
-        document.getElementById('p-specs').value  = specs || '';
+        
+        const termsEl = document.getElementById('p-terms');
+        if (termsEl) termsEl.value = terms || '';
 
         if (!artist || artist === 'Notisse Original') {
             toggleProductOriginType('notisse');
@@ -2929,7 +2949,7 @@
     function openEditProductFromBtn(btn) {
         try {
             const p = JSON.parse(btn.getAttribute('data-product'));
-            openEditProductModal(p.id, p.name, p.price, p.desc, p.specs, p.artist, p.stocks, p.frontImg, p.backImg, p.footageImg, p.sizechartImg);
+            openEditProductModal(p.id, p.name, p.price, p.desc, p.terms || '', p.artist, p.stocks, p.frontImg, p.backImg, p.footageImg, p.sizechartImg);
         } catch(e) {
             console.error("Gagal membuka modal edit produk:", e);
         }
@@ -3361,6 +3381,25 @@
     function closeAdminModal() {
         document.getElementById('modal-admin').classList.remove('open');
     }
+
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        const eyeIcon = btn.querySelector('.eye-icon');
+        const eyeSlashIcon = btn.querySelector('.eye-slash-icon');
+        if (eyeIcon && eyeSlashIcon) {
+            if (isPassword) {
+                eyeIcon.classList.add('hidden');
+                eyeSlashIcon.classList.remove('hidden');
+            } else {
+                eyeIcon.classList.remove('hidden');
+                eyeSlashIcon.classList.add('hidden');
+            }
+        }
+    }
+    window.togglePasswordVisibility = togglePasswordVisibility;
 
     // ── Check Hash on Load ────────────────────────────────────────
     window.addEventListener('load', () => {

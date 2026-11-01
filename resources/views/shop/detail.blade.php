@@ -1,4 +1,14 @@
         <!-- VIEW 2: PRODUCT DETAIL PAGE -->
+        @php
+            $initProduct = null;
+            if (isset($products) && count($products) > 0) {
+                if (!empty($initialProductId)) {
+                    $initProduct = $products->firstWhere('id', (int) $initialProductId) ?? $products->first();
+                } else {
+                    $initProduct = $products->first();
+                }
+            }
+        @endphp
         <section id="view-product-detail" class="view-page {{ ($activeView ?? '') === 'view-product-detail' ? 'active-view' : '' }} w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6">
                 <button onclick="goBack()"
@@ -13,15 +23,14 @@
                     <div>
                         <h1 id="pdetail-title"
                             class="text-2xl md:text-3xl font-semibold uppercase tracking-wider text-black font-space-grotesk">
-                            RAJA DIAMUK MASSA TEE V1
+                            {{ $initProduct ? $initProduct->name : 'RAJA DIAMUK MASSA TEE V1' }}
                         </h1>
                         <p id="pdetail-price" class="text-lg md:text-xl font-medium mt-1 font-space-grotesk text-black">
-                            RP 250.000,00
+                            {{ $initProduct ? 'RP ' . number_format($initProduct->price, 0, ',', '.') . ',00' : 'RP 250.000,00' }}
                         </p>
                         <p class="text-xs md:text-sm text-gray-600 mt-2 font-inter">
-                            by <span id="pdetail-artist" onclick="openArtistProfile('Mustafa Alatas', 'Temanggung')"
-                                class="underline hover:text-black cursor-pointer font-medium transition-colors font-inter">Mustafa
-                                Alatas</span>
+                            by <span id="pdetail-artist" onclick="openArtistProfile('{{ $initProduct ? ($initProduct->artist ?: 'Mustafa Alatas') : 'Mustafa Alatas' }}', 'Temanggung')"
+                                class="underline hover:text-black cursor-pointer font-medium transition-colors font-inter">{{ $initProduct ? ($initProduct->artist ?: 'Mustafa Alatas') : 'Mustafa Alatas' }}</span>
                         </p>
                     </div>
 
@@ -43,10 +52,23 @@
                                     class="accordion-inner pb-4 pt-1 text-xs sm:text-[13px] md:text-sm text-gray-500 font-inter"
                                     id="pdetail-desc-content">
                                     <ul class="list-disc pl-5 space-y-2 leading-relaxed font-inter">
-                                        <li>Heavyweight 24s Cotton Combed construction</li>
-                                        <li>High-density screenprinted artwork on back and chest</li>
-                                        <li>Boxy relaxed fit with reinforced ribbed collar</li>
-                                        <li>Crafted & printed in Bandung, Indonesia</li>
+                                        @if($initProduct && !empty(trim($initProduct->description ?? '')))
+                                            @foreach(preg_split('/\r\n|\r|\n/', trim($initProduct->description)) as $dLine)
+                                                @php
+                                                    $dTrim = trim($dLine);
+                                                    $dClean = preg_replace('/^[•\-\*]\s*/u', '', $dTrim);
+                                                    $dFinal = strlen($dClean) > 0 ? $dClean : $dTrim;
+                                                @endphp
+                                                @if(strlen($dFinal) > 0)
+                                                    <li>{{ $dFinal }}</li>
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            <li>Heavyweight 24s Cotton Combed construction</li>
+                                            <li>High-density screenprinted artwork on back and chest</li>
+                                            <li>Boxy relaxed fit with reinforced ribbed collar</li>
+                                            <li>Crafted & printed in Bandung, Indonesia</li>
+                                        @endif
                                     </ul>
                                 </div>
                             </div>
@@ -93,11 +115,25 @@
                             </button>
                             <div id="acc-content-terms" class="accordion-content">
                                 <div
+                                    id="pdetail-terms-content"
                                     class="accordion-inner pb-4 pt-1 text-xs sm:text-[13px] md:text-sm text-gray-500 font-inter">
                                     <ul class="list-disc pl-5 space-y-2 leading-relaxed font-inter">
-                                        <li>All sales are final once order is confirmed.</li>
-                                        <li>Exchanges strictly allowed for manufacturing defects within 3 days.</li>
-                                        <li>Shipping fee calculated dynamically upon checkout.</li>
+                                        @if($initProduct && !empty(trim($initProduct->terms_and_conditions ?? '')))
+                                            @foreach(preg_split('/\r\n|\r|\n/', trim($initProduct->terms_and_conditions)) as $tLine)
+                                                @php
+                                                    $tTrim = trim($tLine);
+                                                    $tClean = preg_replace('/^[•\-\*]\s*/u', '', $tTrim);
+                                                    $tFinal = strlen($tClean) > 0 ? $tClean : $tTrim;
+                                                @endphp
+                                                @if(strlen($tFinal) > 0)
+                                                    <li>{{ $tFinal }}</li>
+                                                @endif
+                                            @endforeach
+                                        @else
+                                            <li>All sales are final once order is confirmed.</li>
+                                            <li>Exchanges strictly allowed for manufacturing defects within 3 days.</li>
+                                            <li>Shipping fee calculated dynamically upon checkout.</li>
+                                        @endif
                                     </ul>
                                 </div>
                             </div>

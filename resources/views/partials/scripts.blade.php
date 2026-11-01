@@ -838,6 +838,25 @@
             }
         }
 
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            const eyeIcon = btn.querySelector('.eye-icon');
+            const eyeSlashIcon = btn.querySelector('.eye-slash-icon');
+            if (eyeIcon && eyeSlashIcon) {
+                if (isPassword) {
+                    eyeIcon.classList.add('hidden');
+                    eyeSlashIcon.classList.remove('hidden');
+                } else {
+                    eyeIcon.classList.remove('hidden');
+                    eyeSlashIcon.classList.add('hidden');
+                }
+            }
+        }
+        window.togglePasswordVisibility = togglePasswordVisibility;
+
         async function handleLogout() {
             try {
                 await fetch('/logout', { method: 'POST' });
@@ -1094,35 +1113,32 @@
                 artistEl.onclick = () => openArtistProfile(artistName, 'Temanggung');
             }
 
-            // Update Description & Fabric Specs (Consistent with Terms and Condition style)
+            // Safe HTML escape helper
+            const escapeHtml = (str) => {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+
+            // Update Description (Single source of truth from product description)
             const descContent = document.getElementById('pdetail-desc-content');
             if (descContent) {
                 let bulletItems = [];
+                const rawDesc = (currentProduct.description || '').trim();
 
-                if (currentProduct.specs) {
-                    if (currentProduct.specs.includes('•')) {
-                        currentProduct.specs.split('•').forEach(s => {
-                            const trimmed = s.trim();
-                            if (trimmed) bulletItems.push(trimmed);
-                        });
-                    } else if (currentProduct.specs.includes('\n')) {
-                        currentProduct.specs.split('\n').forEach(s => {
-                            const trimmed = s.trim();
-                            if (trimmed) bulletItems.push(trimmed);
-                        });
-                    } else {
-                        const trimmed = currentProduct.specs.trim();
-                        if (trimmed) bulletItems.push(trimmed);
-                    }
+                if (rawDesc.length > 0) {
+                    rawDesc.split(/\r?\n/).forEach(line => {
+                        const trimmedLine = line.trim();
+                        if (trimmedLine.length > 0) {
+                            const clean = trimmedLine.replace(/^[•\-\*]\s*/, '').trim();
+                            bulletItems.push(clean || trimmedLine);
+                        }
+                    });
                 }
-
-                const descText = currentProduct.description || "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting";
-                descText.split('\n').forEach(line => {
-                    const cleanLine = line.replace(/^[•\-\*\s]+/, '').trim();
-                    if (cleanLine && !bulletItems.some(item => item.toLowerCase() === cleanLine.toLowerCase())) {
-                        bulletItems.push(cleanLine);
-                    }
-                });
 
                 if (bulletItems.length === 0) {
                     bulletItems = [
@@ -1135,11 +1151,42 @@
 
                 let html = `<ul class="list-disc pl-5 space-y-2 leading-relaxed font-inter text-xs sm:text-[13px] md:text-sm text-gray-500">`;
                 bulletItems.forEach(item => {
-                    html += `<li>${item}</li>`;
+                    html += `<li>${escapeHtml(item)}</li>`;
                 });
                 html += `</ul>`;
-
                 descContent.innerHTML = html;
+            }
+
+            // Update Terms & Conditions from product data or fallback to defaults
+            const termsContent = document.getElementById('pdetail-terms-content');
+            if (termsContent) {
+                let termsList = [];
+                const rawTerms = (currentProduct.terms_and_conditions || '').trim();
+
+                if (rawTerms.length > 0) {
+                    rawTerms.split(/\r?\n/).forEach(line => {
+                        const trimmedLine = line.trim();
+                        if (trimmedLine.length > 0) {
+                            const clean = trimmedLine.replace(/^[•\-\*]\s*/, '').trim();
+                            termsList.push(clean || trimmedLine);
+                        }
+                    });
+                }
+
+                if (termsList.length === 0) {
+                    termsList = [
+                        "All sales are final once order is confirmed.",
+                        "Exchanges strictly allowed for manufacturing defects within 3 days.",
+                        "Shipping fee calculated dynamically upon checkout."
+                    ];
+                }
+
+                let termsHtml = `<ul class="list-disc pl-5 space-y-2 leading-relaxed font-inter text-xs sm:text-[13px] md:text-sm text-gray-500">`;
+                termsList.forEach(t => {
+                    termsHtml += `<li>${escapeHtml(t)}</li>`;
+                });
+                termsHtml += `</ul>`;
+                termsContent.innerHTML = termsHtml;
             }
 
             const sizeMenu = document.getElementById('size-dropdown-menu');

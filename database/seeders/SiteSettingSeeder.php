@@ -14,7 +14,6 @@ class SiteSettingSeeder extends Seeder
     {
         $settings = [
             ['key' => 'marquee_text', 'value' => 'NOTISSE WORLDWIDE SHIPPING'],
-            ['key' => 'footer_description', 'value' => 'Notisse is a concept brand exploring the intersection of modern aesthetics and raw street culture. Based in Indonesia, curating global narratives.'],
             ['key' => 'contact_email', 'value' => 'hello@notisse.com'],
             ['key' => 'contact_phone', 'value' => '+62 811 2233 4455'],
             ['key' => 'instagram_link', 'value' => '#'],

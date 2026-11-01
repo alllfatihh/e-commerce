@@ -79,7 +79,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'specs' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string',
             'artist' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'back_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
@@ -89,7 +89,8 @@ class AdminController extends Controller
             'stocks.*' => 'nullable|integer|min:0',
         ]);
 
-        $data = $request->only('name', 'price', 'description', 'specs', 'artist');
+        $data = $request->only('name', 'price', 'description', 'terms_and_conditions', 'artist');
+        $data['specs'] = null;
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
@@ -129,7 +130,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'specs' => 'nullable|string',
+            'terms_and_conditions' => 'nullable|string',
             'artist' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
             'back_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
@@ -139,7 +140,8 @@ class AdminController extends Controller
             'stocks.*' => 'nullable|integer|min:0',
         ]);
 
-        $data = $request->only('name', 'price', 'description', 'specs', 'artist');
+        $data = $request->only('name', 'price', 'description', 'terms_and_conditions', 'artist');
+        $data['specs'] = null;
 
         if ($request->hasFile('image')) {
             $this->deleteStorageFile($product->getRawOriginal('image'));
