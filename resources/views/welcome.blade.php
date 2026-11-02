@@ -20,6 +20,7 @@
     @include('partials.overlays.lightbox-modal')
     @include('partials.overlays.address-modal')
     @include('partials.overlays.toast')
+    @include('partials.overlays.confirm-modal')
 
     {{-- Main Application Page Views (Organized Per Module Folder) --}}
     <main class="flex-grow w-full relative">

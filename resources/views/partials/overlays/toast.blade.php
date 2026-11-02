@@ -1,38 +1,114 @@
-    <!-- TOAST NOTIFICATION CONTAINER -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-50 pointer-events-none flex flex-col space-y-2"></div>
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="toast-container" class="fixed bottom-12 right-6 z-[99999] pointer-events-none flex flex-col space-y-2 max-w-sm w-auto"></div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div id="toast-notification"
-        class="fixed top-24 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-full shadow-lg z-[60] flex items-center space-x-3 transition-all duration-300 opacity-0 translate-y-4 hidden font-space-grotesk text-sm tracking-wide">
-        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <span id="toast-message" class="font-medium">Notification message</span>
-    </div>
+<script>
+(function() {
+    // Universal Notisse Toast: Cuma background hitam dan teks putih saja
+    window.showToast = function(message) {
+        if (!message) return;
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'fixed bottom-12 right-6 z-[99999] pointer-events-none flex flex-col space-y-2 max-w-sm w-auto';
+            document.body.appendChild(container);
+        }
 
-    @if(session('error'))
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                if (typeof showToast === 'function') {
-                    showToast(@json(session('error')));
-                }
+        const toast = document.createElement('div');
+        toast.className = 'bg-black text-white px-5 py-3 rounded text-xs font-space-grotesk uppercase tracking-wider shadow-xl transition-all duration-300 opacity-0 transform translate-y-2 pointer-events-auto cursor-pointer select-none';
+        toast.innerText = message;
+
+        let isDismissed = false;
+        let timer = null;
+
+        const dismiss = () => {
+            if (isDismissed) return;
+            isDismissed = true;
+            if (timer) clearTimeout(timer);
+            toast.classList.remove('opacity-100', 'translate-y-0');
+            toast.classList.add('opacity-0', 'translate-y-2');
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
             }, 300);
-        });
-    </script>
-    @endif
+        };
 
-    @if(session('success'))
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                if (typeof showToast === 'function') {
-                    showToast(@json(session('success')));
-                }
-            }, 300);
-        });
-    </script>
-    @endif
+        toast.addEventListener('click', dismiss);
 
+        container.appendChild(toast);
 
+        setTimeout(() => {
+            toast.classList.remove('opacity-0', 'translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+        }, 20);
+
+        timer = setTimeout(dismiss, 3000);
+    };
+
+    // Gantikan alert browser default agar tetap konsisten menggunakan toast hitam Notisse
+    window.alert = function(message) {
+        if (typeof window.showToast === 'function') {
+            window.showToast(message);
+        }
+    };
+})();
+</script>
+
+@if(session('error'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof showToast === 'function') {
+                showToast(@json(session('error')));
+            }
+        }, 300);
+    });
+</script>
+@endif
+
+@if(session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof showToast === 'function') {
+                showToast(@json(session('success')));
+            }
+        }, 300);
+    });
+</script>
+@endif
+
+@if(session('warning'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof showToast === 'function') {
+                showToast(@json(session('warning')));
+            }
+        }, 300);
+    });
+</script>
+@endif
+
+@if(session('info') || session('status'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof showToast === 'function') {
+                showToast(@json(session('info') ?? session('status')));
+            }
+        }, 300);
+    });
+</script>
+@endif
+
+@if(isset($errors) && $errors->any())
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            if (typeof showToast === 'function') {
+                showToast(@json($errors->first()));
+            }
+        }, 300);
+    });
+</script>
+@endif

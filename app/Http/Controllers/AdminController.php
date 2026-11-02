@@ -51,7 +51,7 @@ class AdminController extends Controller
         $editorials = Editorial::with('artist')->orderBy('id', 'desc')->get();
         $offerings = ArtworkOffering::with(['user', 'artwork.artist'])->orderBy('id', 'desc')->get();
         $lookbooks = Lookbook::with('fotoshoots')->orderBy('year', 'desc')->orderBy('id', 'desc')->get();
-        $discounts = DiscountCode::orderBy('id', 'desc')->get();
+        $discounts = DiscountCode::with('products')->orderBy('id', 'desc')->get();
         $admins = User::where('role', 'admin')->orderBy('id', 'asc')->get();
         $settings = SiteSetting::pluck('value', 'key')->toArray();
 
@@ -78,6 +78,11 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
+            'model_gender' => 'nullable|string|max:50',
+            'model_height' => 'nullable|integer|min:50|max:250',
+            'model_weight' => 'nullable|integer|min:20|max:250',
+            'model_size' => 'nullable|string|max:50',
             'description' => 'nullable|string',
             'terms_and_conditions' => 'nullable|string',
             'artist' => 'nullable|string|max:255',
@@ -89,7 +94,13 @@ class AdminController extends Controller
             'stocks.*' => 'nullable|integer|min:0',
         ]);
 
-        $data = $request->only('name', 'price', 'description', 'terms_and_conditions', 'artist');
+        $discPrice = $request->input('discount_price');
+        if ($discPrice !== null && $discPrice !== '' && (float) $discPrice >= (float) $request->price) {
+            return redirect()->back()->withInput()->with('error', 'Harga diskon harus lebih rendah dari harga normal produk.');
+        }
+
+        $data = $request->only('name', 'price', 'description', 'terms_and_conditions', 'artist', 'model_gender', 'model_height', 'model_weight', 'model_size');
+        $data['discount_price'] = ($discPrice !== null && $discPrice !== '' && (float) $discPrice > 0) ? (float) $discPrice : null;
         $data['specs'] = null;
 
         if ($request->hasFile('image')) {
@@ -129,6 +140,11 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0',
+            'model_gender' => 'nullable|string|max:50',
+            'model_height' => 'nullable|integer|min:50|max:250',
+            'model_weight' => 'nullable|integer|min:20|max:250',
+            'model_size' => 'nullable|string|max:50',
             'description' => 'nullable|string',
             'terms_and_conditions' => 'nullable|string',
             'artist' => 'nullable|string|max:255',
@@ -140,7 +156,13 @@ class AdminController extends Controller
             'stocks.*' => 'nullable|integer|min:0',
         ]);
 
-        $data = $request->only('name', 'price', 'description', 'terms_and_conditions', 'artist');
+        $discPrice = $request->input('discount_price');
+        if ($discPrice !== null && $discPrice !== '' && (float) $discPrice >= (float) $request->price) {
+            return redirect()->back()->withInput()->with('error', 'Harga diskon harus lebih rendah dari harga normal produk.');
+        }
+
+        $data = $request->only('name', 'price', 'description', 'terms_and_conditions', 'artist', 'model_gender', 'model_height', 'model_weight', 'model_size');
+        $data['discount_price'] = ($discPrice !== null && $discPrice !== '' && (float) $discPrice > 0) ? (float) $discPrice : null;
         $data['specs'] = null;
 
         if ($request->hasFile('image')) {
@@ -351,17 +373,22 @@ class AdminController extends Controller
             'author' => 'nullable|string|max:255',
             'excerpt' => 'nullable|string',
             'content' => 'required|string',
-            'video_url' => 'nullable|string',
+            'content_2' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image_2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
-        $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
+        $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'content_2');
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('editorials', 'public');
             $data['image'] = $path;
         } else {
             $data['image'] = 'https://placehold.co/600x600/d9d9d9/555555?text=New+Editorial';
+        }
+
+        if ($request->hasFile('image_2')) {
+            $data['image_2'] = $request->file('image_2')->store('editorials', 'public');
         }
 
         Editorial::create($data);
@@ -379,16 +406,23 @@ class AdminController extends Controller
             'author' => 'nullable|string|max:255',
             'excerpt' => 'nullable|string',
             'content' => 'required|string',
-            'video_url' => 'nullable|string',
+            'content_2' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image_2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
         ]);
 
-        $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'video_url');
+        $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'content_2');
 
         if ($request->hasFile('image')) {
             $this->deleteStorageFile($editorial->getRawOriginal('image'));
             $path = $request->file('image')->store('editorials', 'public');
             $data['image'] = $path;
+        }
+
+        if ($request->hasFile('image_2')) {
+            $this->deleteStorageFile($editorial->getRawOriginal('image_2'));
+            $path2 = $request->file('image_2')->store('editorials', 'public');
+            $data['image_2'] = $path2;
         }
 
         $editorial->update($data);
@@ -400,6 +434,7 @@ class AdminController extends Controller
     {
         $editorial = Editorial::findOrFail($id);
         $this->deleteStorageFile($editorial->getRawOriginal('image'));
+        $this->deleteStorageFile($editorial->getRawOriginal('image_2'));
         $editorial->delete();
 
         return redirect()->back()->with('success', 'Artikel editorial berhasil dihapus.');
@@ -759,6 +794,9 @@ class AdminController extends Controller
             'code' => 'required|string|max:50|unique:discount_codes,code',
             'description' => 'nullable|string|max:255',
             'type' => 'required|in:percentage,fixed',
+            'applies_to' => 'nullable|in:all,specific_products',
+            'product_ids' => 'nullable|array',
+            'product_ids.*' => 'exists:products,id',
             'value' => 'required|numeric|min:0',
             'min_order_amount' => 'nullable|numeric|min:0',
             'max_discount_amount' => 'nullable|numeric|min:0',
@@ -771,8 +809,14 @@ class AdminController extends Controller
         $validated['code'] = strtoupper(trim($validated['code']));
         $validated['is_active'] = $request->boolean('is_active', true);
         $validated['min_order_amount'] = $validated['min_order_amount'] ?? 0;
+        $appliesTo = $validated['applies_to'] ?? 'all';
+        $productIds = $validated['product_ids'] ?? [];
+        unset($validated['product_ids']);
 
-        DiscountCode::create($validated);
+        $discount = DiscountCode::create($validated);
+        if ($appliesTo === 'specific_products' && ! empty($productIds)) {
+            $discount->products()->sync($productIds);
+        }
 
         return redirect('/admin#section-discounts')->with('success', 'Kode diskon '.$validated['code'].' berhasil ditambahkan.');
     }
@@ -785,6 +829,9 @@ class AdminController extends Controller
             'code' => 'required|string|max:50|unique:discount_codes,code,'.$id,
             'description' => 'nullable|string|max:255',
             'type' => 'required|in:percentage,fixed',
+            'applies_to' => 'nullable|in:all,specific_products',
+            'product_ids' => 'nullable|array',
+            'product_ids.*' => 'exists:products,id',
             'value' => 'required|numeric|min:0',
             'min_order_amount' => 'nullable|numeric|min:0',
             'max_discount_amount' => 'nullable|numeric|min:0',
@@ -797,8 +844,16 @@ class AdminController extends Controller
         $validated['code'] = strtoupper(trim($validated['code']));
         $validated['is_active'] = $request->boolean('is_active');
         $validated['min_order_amount'] = $validated['min_order_amount'] ?? 0;
+        $appliesTo = $validated['applies_to'] ?? 'all';
+        $productIds = $validated['product_ids'] ?? [];
+        unset($validated['product_ids']);
 
         $discount->update($validated);
+        if ($appliesTo === 'specific_products') {
+            $discount->products()->sync($productIds);
+        } else {
+            $discount->products()->sync([]);
+        }
 
         return redirect('/admin#section-discounts')->with('success', 'Kode diskon '.$discount->code.' berhasil diperbarui.');
     }

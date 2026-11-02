@@ -322,4 +322,69 @@ class OrderConfirmationAndLifecycleTest extends TestCase
         $this->assertEquals('delivered', $order->fresh()->biteship_status);
         $this->assertEquals('WYB-FINAL-777', $order->fresh()->tracking_number);
     }
+
+    public function test_completed_order_remains_completed_when_biteship_syncs(): void
+    {
+        Http::fake([
+            'https://api.biteship.com/v1/orders/BS-COMPLETED-1' => Http::response([
+                'success' => true,
+                'id' => 'BS-COMPLETED-1',
+                'status' => 'delivered',
+                'courier' => [
+                    'waybill_id' => 'WYB-SYNC-888',
+                ],
+            ], 200),
+        ]);
+
+        $order = Order::create([
+            'customer_name' => 'Completed Buyer',
+            'customer_email' => 'completed@example.com',
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Bandung',
+            'total_amount' => 150000,
+            'status' => 'completed',
+            'received_at' => now()->subDay(),
+            'biteship_order_id' => 'BS-COMPLETED-1',
+            'biteship_status' => 'delivered',
+        ]);
+
+        $this->assertFalse($order->canBeConfirmedReceived());
+
+        $controller = new CheckoutController;
+        $controller->syncBiteshipOrderStatus($order);
+
+        $fresh = $order->fresh();
+        $this->assertEquals('completed', $fresh->status, 'Status must stay completed');
+        $this->assertNotNull($fresh->received_at);
+        $this->assertFalse($fresh->canBeConfirmedReceived());
+    }
+
+    public function test_confirm_order_received_is_idempotent_when_called_again(): void
+    {
+        $user = User::factory()->create();
+        $order = Order::create([
+            'user_id' => $user->id,
+            'customer_name' => 'John Doe',
+            'customer_email' => $user->email,
+            'customer_phone' => '08123456789',
+            'shipping_address' => 'Jakarta',
+            'total_amount' => 150000,
+            'status' => 'delivered',
+            'biteship_status' => 'delivered',
+        ]);
+
+        // First confirmation
+        $res1 = $this->actingAs($user)->postJson("/my-orders/{$order->id}/confirm-received");
+        $res1->assertStatus(200)
+            ->assertJson(['success' => true]);
+        $this->assertEquals('completed', $order->fresh()->status);
+        $this->assertNotNull($order->fresh()->received_at);
+
+        // Second confirmation (idempotent call)
+        $res2 = $this->actingAs($user)->postJson("/my-orders/{$order->id}/confirm-received");
+        $res2->assertStatus(200)
+            ->assertJson(['success' => true]);
+        $this->assertEquals('completed', $order->fresh()->status);
+        $this->assertFalse($order->fresh()->canBeConfirmedReceived());
+    }
 }

@@ -73,7 +73,7 @@ class CheckoutController extends Controller
             $quantity = max(1, (int) ($item['quantity'] ?? 1));
 
             $product = $productId ? Product::find($productId) : null;
-            $unitPrice = $product ? (int) $product->price : (int) ($item['price'] ?? 0);
+            $unitPrice = $product ? (int) $product->effective_price : (int) ($item['price'] ?? 0);
             $productName = $product ? $product->name : ($item['name'] ?? 'Product');
 
             $subtotal += ($unitPrice * $quantity);
@@ -96,14 +96,36 @@ class CheckoutController extends Controller
                 ->where('is_active', true)
                 ->first();
 
-            if ($discountModel && $discountModel->isValidForSubtotal($subtotal)) {
-                $discountAmount = $discountModel->calculateDiscount($subtotal);
-                $appliedDiscount = $discountModel;
+            if ($discountModel) {
+                $discountReason = null;
+                $eligibleSubtotal = 0;
+                $calculated = $discountModel->calculateDiscountForItems($verifiedItems, $discountReason, $eligibleSubtotal);
+                if ($discountReason === null && $calculated > 0) {
+                    $discountAmount = $calculated;
+                    $appliedDiscount = $discountModel;
+                }
             } elseif ($promoCode === 'NOTISSE' || $promoCode === 'NOTISSE10') {
-                // Backward-compatible fallback
-                $discountAmount = (int) round($subtotal * 0.10);
+                $eligibleSubtotal = 0;
+                foreach ($verifiedItems as $vItem) {
+                    $p = $vItem['id'] ? Product::find($vItem['id']) : null;
+                    if (! ($p && $p->hasDiscount())) {
+                        $eligibleSubtotal += ($vItem['price'] * $vItem['quantity']);
+                    }
+                }
+                if ($eligibleSubtotal > 0) {
+                    $discountAmount = (int) round($eligibleSubtotal * 0.10);
+                }
             } elseif ($promoCode === 'NOTISSE50') {
-                $discountAmount = (int) round($subtotal * 0.50);
+                $eligibleSubtotal = 0;
+                foreach ($verifiedItems as $vItem) {
+                    $p = $vItem['id'] ? Product::find($vItem['id']) : null;
+                    if (! ($p && $p->hasDiscount())) {
+                        $eligibleSubtotal += ($vItem['price'] * $vItem['quantity']);
+                    }
+                }
+                if ($eligibleSubtotal > 0) {
+                    $discountAmount = (int) round($eligibleSubtotal * 0.50);
+                }
             }
         }
 
@@ -201,7 +223,7 @@ class CheckoutController extends Controller
         ];
 
         try {
-            $snapToken = Snap::getSnapToken($params);
+            $snapToken = app()->environment('testing') ? 'mock_snap_token_testing' : Snap::getSnapToken($params);
             $order->update([
                 'midtrans_order_id' => $midtransOrderId,
                 'snap_token' => $snapToken,
@@ -736,36 +758,72 @@ class CheckoutController extends Controller
         $request->validate([
             'code' => 'required|string',
             'subtotal' => 'required|numeric|min:0',
+            'items' => 'nullable|array',
         ]);
 
         $code = strtoupper(trim($request->input('code')));
         $subtotal = (float) $request->input('subtotal');
+        $items = $request->input('items');
+
+        if (! $items || ! is_array($items) || count($items) === 0) {
+            $userId = auth()->id();
+            $sessionId = $request->cookie('notisse_cart_session');
+            $cart = null;
+            if ($userId) {
+                $cart = Cart::where('user_id', $userId)->first();
+            } elseif ($sessionId) {
+                $cart = Cart::where('session_id', $sessionId)->first();
+            }
+            if ($cart) {
+                $items = $cart->items->map(function ($ci) {
+                    return [
+                        'id' => $ci->product_id,
+                        'quantity' => $ci->quantity,
+                        'price' => $ci->product ? (float) $ci->product->effective_price : 0,
+                    ];
+                })->toArray();
+            }
+        }
 
         $discount = DiscountCode::where('code', $code)->first();
 
         if (! $discount) {
-            if ($code === 'NOTISSE' || $code === 'NOTISSE10') {
-                $amt = (int) round($subtotal * 0.10);
+            if ($code === 'NOTISSE' || $code === 'NOTISSE10' || $code === 'NOTISSE50') {
+                $pct = ($code === 'NOTISSE50') ? 50 : 10;
+                $eligibleSubtotal = $subtotal;
+
+                if (! empty($items)) {
+                    $eligibleSubtotal = 0;
+                    $hasDiscounted = false;
+                    foreach ($items as $it) {
+                        $p = ! empty($it['id']) ? Product::find($it['id']) : null;
+                        if ($p && $p->hasDiscount()) {
+                            $hasDiscounted = true;
+
+                            continue;
+                        }
+                        $pPrice = $p ? (float) $p->effective_price : (float) ($it['price'] ?? 0);
+                        $pQty = max(1, (int) ($it['quantity'] ?? $it['qty'] ?? 1));
+                        $eligibleSubtotal += ($pPrice * $pQty);
+                    }
+
+                    if ($eligibleSubtotal <= 0 && $hasDiscounted) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Kode diskon/potongan harga tidak dapat digunakan pada produk yang sudah diskon.',
+                        ], 422);
+                    }
+                }
+
+                $amt = (int) round($eligibleSubtotal * ($pct / 100));
 
                 return response()->json([
                     'success' => true,
                     'code' => $code,
                     'type' => 'percentage',
-                    'value' => 10,
+                    'value' => $pct,
                     'discount_amount' => $amt,
-                    'message' => 'Kode promo 10% berhasil diterapkan.',
-                ]);
-            }
-            if ($code === 'NOTISSE50') {
-                $amt = (int) round($subtotal * 0.50);
-
-                return response()->json([
-                    'success' => true,
-                    'code' => $code,
-                    'type' => 'percentage',
-                    'value' => 50,
-                    'discount_amount' => $amt,
-                    'message' => 'Kode promo 50% berhasil diterapkan.',
+                    'message' => 'Kode promo '.$pct.'% berhasil diterapkan.',
                 ]);
             }
 
@@ -775,15 +833,27 @@ class CheckoutController extends Controller
             ], 422);
         }
 
-        $reason = $discount->getInvalidReason($subtotal);
-        if ($reason !== null) {
-            return response()->json([
-                'success' => false,
-                'message' => $reason,
-            ], 422);
-        }
+        if (! empty($items)) {
+            $reason = null;
+            $eligibleSubtotal = 0;
+            $amount = $discount->calculateDiscountForItems($items, $reason, $eligibleSubtotal);
 
-        $amount = $discount->calculateDiscount($subtotal);
+            if ($reason !== null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $reason,
+                ], 422);
+            }
+        } else {
+            $reason = $discount->getInvalidReason($subtotal);
+            if ($reason !== null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $reason,
+                ], 422);
+            }
+            $amount = $discount->calculateDiscount($subtotal);
+        }
 
         return response()->json([
             'success' => true,
@@ -807,12 +877,13 @@ class CheckoutController extends Controller
         // Cari berdasarkan kecocokan nama, kota/kabupaten, provinsi, kecamatan, atau kode pos
         $results = array_filter($allAreas, function ($area) use ($keyword) {
             $searchable = strtolower(
-                $area['name'] . ' ' .
-                $area['administrative_division_level_1_name'] . ' ' .
-                $area['administrative_division_level_2_name'] . ' ' .
-                ($area['administrative_division_level_3_name'] ?? '') . ' ' .
+                $area['name'].' '.
+                $area['administrative_division_level_1_name'].' '.
+                $area['administrative_division_level_2_name'].' '.
+                ($area['administrative_division_level_3_name'] ?? '').' '.
                 ($area['postal_code'] ?? '')
             );
+
             return str_contains($searchable, $keyword);
         });
 
@@ -821,13 +892,13 @@ class CheckoutController extends Controller
         if (empty($results) && strlen($keyword) >= 3) {
             $cleanName = ucwords($keyword);
             $results[] = [
-                'id' => 'IDNP-GEN-' . strtoupper(substr(md5($keyword), 0, 8)),
+                'id' => 'IDNP-GEN-'.strtoupper(substr(md5($keyword), 0, 8)),
                 'name' => $cleanName,
                 'country_name' => 'Indonesia',
                 'country_code' => 'ID',
                 'administrative_division_level_1_name' => 'Jawa Barat',
                 'administrative_division_level_1_type' => 'province',
-                'administrative_division_level_2_name' => 'Kota ' . $cleanName,
+                'administrative_division_level_2_name' => 'Kota '.$cleanName,
                 'administrative_division_level_2_type' => 'city',
                 'administrative_division_level_3_name' => $cleanName,
                 'administrative_division_level_3_type' => 'district',
@@ -848,6 +919,7 @@ class CheckoutController extends Controller
                 return $area;
             }
         }
+
         return null;
     }
 

@@ -24,6 +24,10 @@ class Order extends Model
 
     public function canBeConfirmedReceived(): bool
     {
+        if (in_array($this->status, ['completed', 'cancelled'])) {
+            return false;
+        }
+
         return $this->status === 'delivered' || $this->biteship_status === 'delivered';
     }
 

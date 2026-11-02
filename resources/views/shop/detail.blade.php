@@ -11,7 +11,7 @@
         @endphp
         <section id="view-product-detail" class="view-page {{ ($activeView ?? '') === 'view-product-detail' ? 'active-view' : '' }} w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6">
-                <button onclick="goBack()"
+                <button onclick="goBack('view-shop')"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
                     <span>BACK</span>
@@ -26,7 +26,12 @@
                             {{ $initProduct ? $initProduct->name : 'RAJA DIAMUK MASSA TEE V1' }}
                         </h1>
                         <p id="pdetail-price" class="text-lg md:text-xl font-medium mt-1 font-space-grotesk text-black">
-                            {{ $initProduct ? 'RP ' . number_format($initProduct->price, 0, ',', '.') . ',00' : 'RP 250.000,00' }}
+                            @if($initProduct && $initProduct->hasDiscount())
+                                <span class="line-through text-gray-400 mr-2 font-normal text-base md:text-lg">RP {{ number_format($initProduct->price, 0, ',', '.') }},00</span>
+                                <span class="text-black font-semibold">RP {{ number_format($initProduct->discount_price, 0, ',', '.') }},00</span>
+                            @else
+                                {{ $initProduct ? 'RP ' . number_format($initProduct->price, 0, ',', '.') . ',00' : 'RP 250.000,00' }}
+                            @endif
                         </p>
                         <p class="text-xs md:text-sm text-gray-600 mt-2 font-inter">
                             by <span id="pdetail-artist" onclick="openArtistProfile('{{ $initProduct ? ($initProduct->artist ?: 'Mustafa Alatas') : 'Mustafa Alatas' }}', 'Temanggung')"
@@ -140,13 +145,22 @@
                         </div>
                     </div>
 
-                    <!-- MODEL FIT & MEASUREMENTS (TB, BB, SIZE) -->
+                    <!-- MODEL FIT & MEASUREMENTS (GENDER, TB, BB, SIZE) -->
                     <div class="pt-1 flex items-center space-x-2 text-xs sm:text-[13px] md:text-sm text-gray-600 font-inter">
                         <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         <p class="tracking-wide">
-                            <span class="text-black font-semibold uppercase font-space-grotesk text-xs sm:text-[13px]">Model:</span> Height 178 cm / Weight 68 kg — wearing size <span class="font-bold text-black font-space-grotesk">L</span>
+                            <span class="text-black font-semibold uppercase font-space-grotesk text-xs sm:text-[13px]">Model:</span>
+                            <span id="pdetail-model-details">
+                                @php
+                                    $mGender = $initProduct && $initProduct->model_gender ? $initProduct->model_gender : 'Male';
+                                    $mHeight = $initProduct && $initProduct->model_height ? $initProduct->model_height : 178;
+                                    $mWeight = $initProduct && $initProduct->model_weight ? $initProduct->model_weight : 68;
+                                    $mSize   = $initProduct && $initProduct->model_size ? $initProduct->model_size : 'L';
+                                @endphp
+                                {{ $mGender ? $mGender . ' · ' : '' }}Height {{ $mHeight }} cm / Weight {{ $mWeight }} kg — wearing size <span class="font-bold text-black uppercase font-space-grotesk">{{ $mSize }}</span>
+                            </span>
                         </p>
                     </div>
 

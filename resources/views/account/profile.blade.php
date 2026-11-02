@@ -2,10 +2,10 @@
         <section id="view-account-profile" class="view-page {{ ($activeView ?? '') === 'view-account-profile' ? 'active-view' : '' }} w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-24">
             <!-- Back to Shop (Top Left) -->
             <div class="mb-6">
-                <button onclick="showPage('view-shop')"
+                <button onclick="goBack('view-shop')"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK TO SHOP</span>
+                    <span>BACK</span>
                 </button>
             </div>
 

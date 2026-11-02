@@ -113,7 +113,7 @@
         window.addEventListener('scroll', handleHeaderScroll, { passive: true });
         updateHeaderState();
 
-        let navigationHistory = ['view-shop'];
+        let navigationHistory = [];
         let isAuthenticated = localStorage.getItem('notisse_auth') === 'true' || {{ auth()->check() ? 'true' : 'false' }};
         let loggedInUser = @json(auth()->user());
         if (loggedInUser) {
@@ -213,15 +213,73 @@
             }
         }
 
-        function goBack() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else if (navigationHistory.length > 0) {
-                const previousPageId = navigationHistory.pop();
-                showPage(previousPageId, true);
-            } else {
-                showPage('view-shop', true);
+        function goBack(fallbackPageId = null) {
+            // 1. Close overlays or modal drawers safely without aborting navigation
+            if (typeof closeCart === 'function') closeCart();
+            if (typeof closeMenu === 'function') closeMenu();
+            if (typeof closeSearch === 'function') closeSearch();
+            if (typeof closeLightbox === 'function') closeLightbox();
+            if (typeof closeArtworkOfferingModal === 'function') closeArtworkOfferingModal();
+
+            const currentActive = document.querySelector('.view-page.active-view');
+            const currentActiveId = currentActive ? currentActive.id : null;
+
+            // Remove current page from top of navigationHistory if it matches current page
+            while (navigationHistory.length > 0 && navigationHistory[navigationHistory.length - 1] === currentActiveId) {
+                navigationHistory.pop();
             }
+
+            // 2. Target page to navigate back to
+            let targetPage = null;
+
+            if (navigationHistory.length > 0) {
+                targetPage = navigationHistory.pop();
+            }
+
+            if (!targetPage) {
+                targetPage = fallbackPageId;
+            }
+
+            if (!targetPage) {
+                if (currentActiveId === 'view-product-detail') {
+                    targetPage = 'view-shop';
+                } else if (currentActiveId === 'view-lookbook-detail') {
+                    targetPage = 'view-lookbook-list';
+                } else if (currentActiveId === 'view-artist-detail') {
+                    targetPage = 'view-artist-collab';
+                } else if (currentActiveId === 'view-artist-artwork-detail') {
+                    targetPage = 'view-artist-detail';
+                } else if (currentActiveId === 'view-artist-editorial-detail') {
+                    targetPage = 'view-editorials-all';
+                } else if (currentActiveId === 'view-editorials-all') {
+                    targetPage = 'view-shop';
+                } else if (currentActiveId === 'view-edit-profile') {
+                    targetPage = 'view-account-profile';
+                } else if (currentActiveId === 'view-account-profile') {
+                    targetPage = 'view-shop';
+                } else {
+                    targetPage = 'view-shop';
+                }
+            }
+
+            // Special case 1: returning to artist profile from artwork detail
+            if (targetPage === 'view-artist-detail' && currentActiveArtwork && currentActiveArtwork.artist_id) {
+                openArtistProfile(currentActiveArtwork.artist_id, null, true, true);
+                return;
+            }
+
+            // Special case 2: returning to artist profile from editorial detail (if opened from artist profile)
+            if (targetPage === 'view-artist-detail' && typeof currentActiveEditorial !== 'undefined' && currentActiveEditorial && currentActiveEditorial.artist_id) {
+                openArtistProfile(currentActiveEditorial.artist_id, null, true, true);
+                return;
+            }
+
+            // Fallback if targetPage was view-artist-detail but no artist_id is known
+            if (targetPage === 'view-artist-detail') {
+                targetPage = 'view-artist-collab';
+            }
+
+            showPage(targetPage, true, true);
         }
 
         function navigateTo(pageId) {
@@ -230,18 +288,25 @@
         }
 
         window.addEventListener('popstate', (event) => {
+            // Close any open overlays when navigating back or forward
+            if (typeof closeCart === 'function') closeCart();
+            if (typeof closeMenu === 'function') closeMenu();
+            if (typeof closeSearch === 'function') closeSearch();
+            if (typeof closeLightbox === 'function') closeLightbox();
+            if (typeof closeArtworkOfferingModal === 'function') closeArtworkOfferingModal();
+
             const state = event.state;
             if (state && state.pageId) {
                 if (state.pageId === 'view-product-detail' && state.productId) {
-                    openProductDetail(state.productId, null, null, false);
+                    openProductDetail(state.productId, null, null, false, true);
                 } else if (state.pageId === 'view-artist-detail' && state.artistId) {
-                    openArtistProfile(state.artistId, null, false);
+                    openArtistProfile(state.artistId, null, false, true);
                 } else if (state.pageId === 'view-artist-artwork-detail' && state.artworkId) {
-                    openArtistArtworkDetailById(state.artworkId, false);
+                    openArtistArtworkDetailById(state.artworkId, false, true);
                 } else if (state.pageId === 'view-artist-editorial-detail' && state.editorialId) {
-                    openArtistEditorialDetailById(state.editorialId, false);
+                    openArtistEditorialDetailById(state.editorialId, false, true);
                 } else if (state.pageId === 'view-lookbook-detail' && state.lookbookId) {
-                    openLookbookDetail(state.lookbookId, false);
+                    openLookbookDetail(state.lookbookId, false, true);
                 } else {
                     showPage(state.pageId, true, false);
                     if (state.pageId === 'view-account-profile' && state.tab) {
@@ -254,25 +319,25 @@
                     showPage('view-shop', true, false);
                 } else if (path.startsWith('/product/') || path.startsWith('/products/')) {
                     const pid = path.replace(/^\/products?\//, '');
-                    openProductDetail(pid, null, null, false);
+                    openProductDetail(pid, null, null, false, true);
                 } else if (path === '/artist' || path === '/artists' || path === '/artist-collab') {
                     showPage('view-artist-collab', true, false);
                 } else if (path.startsWith('/artist/') || path.startsWith('/artists/')) {
                     const aid = path.replace(/^\/artists?\//, '');
-                    openArtistProfile(aid, null, false);
+                    openArtistProfile(aid, null, false, true);
                 } else if (path.startsWith('/artwork/') || path.startsWith('/artworks/')) {
                     const wid = path.replace(/^\/artworks?\//, '');
-                    openArtistArtworkDetailById(wid, false);
+                    openArtistArtworkDetailById(wid, false, true);
                 } else if (path === '/editorial' || path === '/editorials') {
                     showPage('view-editorials-all', true, false);
                 } else if (path.startsWith('/editorial/') || path.startsWith('/editorials/')) {
                     const eid = path.replace(/^\/editorials?\//, '');
-                    openArtistEditorialDetailById(eid, false);
+                    openArtistEditorialDetailById(eid, false, true);
                 } else if (path === '/lookbook' || path === '/lookbooks') {
                     showPage('view-lookbook-list', true, false);
                 } else if (path.startsWith('/lookbook/') || path.startsWith('/lookbooks/')) {
                     const lid = path.replace(/^\/lookbooks?\//, '');
-                    openLookbookDetail(lid, false);
+                    openLookbookDetail(lid, false, true);
                 } else if (path === '/about') {
                     showPage('view-about', true, false);
                 } else if (path === '/contact') {
@@ -290,12 +355,6 @@
                 } else {
                     showPage('view-shop', true, false);
                 }
-            }
-
-            if (window.location.hash === '#cart' || (state && state.cartOpen)) {
-                openCart(false);
-            } else if (overlayCart && !overlayCart.classList.contains('hidden') && window.location.hash !== '#cart') {
-                closeCart(false);
             }
         });
 
@@ -460,28 +519,31 @@
                     let actionButtons = '';
                     const st = (order.status || '').toLowerCase();
 
-                    if (st === 'pending') {
-                        statusBadgeText = "Menunggu Pembayaran";
-                        statusDesc = "Silakan selesaikan pembayaran pesanan Anda.";
-                        statusClass = "bg-amber-100 text-amber-800 border border-amber-300";
+                    if (st === 'completed') {
+                        statusBadgeText = "Selesai (Diterima)";
+                        const recvDate = order.received_at ? new Date(order.received_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                        statusDesc = `Pesanan telah diterima dan selesai.${recvDate ? ` (${recvDate})` : ''} Terima kasih telah berbelanja di Notisse Atelier!`;
+                        statusClass = "bg-emerald-600 text-white border border-emerald-700 shadow-sm";
                         actionButtons = `
-                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full hover:bg-neutral-800 transition-colors cursor-pointer shadow-sm">Bayar Sekarang</button>
-                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-space-grotesk mt-1.5 w-full text-center cursor-pointer">Batalkan Pesanan</button>
+                            <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 font-space-grotesk mt-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded w-full justify-center">
+                                <svg class="w-3.5 h-3.5 fill-current text-emerald-600 flex-shrink-0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                <span>Pesanan Selesai</span>
+                            </div>
                         `;
-                    } else if (st === 'paid') {
-                        statusBadgeText = "Pembayaran Diterima";
-                        statusDesc = "Pembayaran telah terverifikasi. Menunggu pesanan diproses oleh admin/Biteship.";
-                        statusClass = "bg-emerald-100 text-emerald-800 border border-emerald-300";
-                    } else if (st === 'processing') {
-                        if (order.biteship_status === 'confirmed' || order.biteship_status === 'allocated') {
-                            statusBadgeText = "Terkonfirmasi Biteship";
-                            statusDesc = "Pesanan telah dikonfirmasi dan menunggu jadwal penjemputan oleh kurir.";
-                            statusClass = "bg-blue-100 text-blue-800 border border-blue-300";
-                        } else {
-                            statusBadgeText = "Sedang Diproses";
-                            statusDesc = "Pesanan sedang dikemas dan disiapkan di gudang Notisse.";
-                            statusClass = "bg-blue-100 text-blue-800 border border-blue-300";
-                        }
+                    } else if (st === 'cancelled') {
+                        statusBadgeText = "Dibatalkan";
+                        statusDesc = "Pesanan ini telah dibatalkan.";
+                        statusClass = "bg-red-100 text-red-800 border border-red-300";
+                    } else if (st === 'delivered' || (order.biteship_status === 'delivered' && st !== 'cancelled' && st !== 'completed')) {
+                        statusBadgeText = "Pesanan Telah Tiba (Sudah Diantarkan)";
+                        statusDesc = "Kurir telah mengantarkan paket. Silakan periksa kelengkapan barang dan konfirmasi pesanan diterima di bawah ini.";
+                        statusClass = "bg-teal-100 text-teal-800 border border-teal-300";
+                        actionButtons = `
+                            <button onclick="confirmOrderReceived(${order.id})" class="text-[10px] text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-2 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                Konfirmasi Pesanan Diterima
+                            </button>
+                        `;
                     } else if (st === 'shipped' || st === 'in_transit') {
                         if (order.biteship_status === 'picking_up') {
                             statusBadgeText = "Kurir Menuju Pickup";
@@ -506,31 +568,28 @@
                                 <span>Kurir sedang dalam perjalanan. Tombol konfirmasi aktif saat paket sudah diantarkan/tiba.</span>
                             </div>
                         `;
-                    } else if (st === 'delivered' || order.biteship_status === 'delivered') {
-                        statusBadgeText = "Pesanan Telah Tiba (Sudah Diantarkan)";
-                        statusDesc = "Kurir telah mengantarkan paket. Silakan periksa kelengkapan barang dan konfirmasi pesanan diterima di bawah ini.";
-                        statusClass = "bg-teal-100 text-teal-800 border border-teal-300";
+                    } else if (st === 'processing') {
+                        if (order.biteship_status === 'confirmed' || order.biteship_status === 'allocated') {
+                            statusBadgeText = "Terkonfirmasi Biteship";
+                            statusDesc = "Pesanan telah dikonfirmasi dan menunggu jadwal penjemputan oleh kurir.";
+                            statusClass = "bg-blue-100 text-blue-800 border border-blue-300";
+                        } else {
+                            statusBadgeText = "Sedang Diproses";
+                            statusDesc = "Pesanan sedang dikemas dan disiapkan di gudang Notisse.";
+                            statusClass = "bg-blue-100 text-blue-800 border border-blue-300";
+                        }
+                    } else if (st === 'paid') {
+                        statusBadgeText = "Pembayaran Diterima";
+                        statusDesc = "Pembayaran telah terverifikasi. Menunggu pesanan diproses oleh admin/Biteship.";
+                        statusClass = "bg-emerald-100 text-emerald-800 border border-emerald-300";
+                    } else if (st === 'pending') {
+                        statusBadgeText = "Menunggu Pembayaran";
+                        statusDesc = "Silakan selesaikan pembayaran pesanan Anda.";
+                        statusClass = "bg-amber-100 text-amber-800 border border-amber-300";
                         actionButtons = `
-                            <button onclick="confirmOrderReceived(${order.id})" class="text-[10px] text-white bg-emerald-600 hover:bg-emerald-700 px-3 py-2 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
-                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                Konfirmasi Pesanan Diterima
-                            </button>
+                            <button onclick="payOrder(${order.id})" class="text-[10px] text-white bg-black px-3 py-1.5 font-bold uppercase tracking-wider rounded font-space-grotesk mt-2 w-full hover:bg-neutral-800 transition-colors cursor-pointer shadow-sm">Bayar Sekarang</button>
+                            <button onclick="cancelOrder(${order.id})" class="text-[10px] text-red-600 font-bold uppercase tracking-wider hover:underline font-space-grotesk mt-1.5 w-full text-center cursor-pointer">Batalkan Pesanan</button>
                         `;
-                    } else if (st === 'completed') {
-                        statusBadgeText = "Selesai (Diterima)";
-                        const recvDate = order.received_at ? new Date(order.received_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
-                        statusDesc = `Pesanan telah diterima dan selesai.${recvDate ? ` (${recvDate})` : ''} Terima kasih telah berbelanja di Notisse Atelier!`;
-                        statusClass = "bg-emerald-600 text-white border border-emerald-700 shadow-sm";
-                        actionButtons = `
-                            <div class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 font-space-grotesk mt-1.5">
-                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                Pesanan Selesai
-                            </div>
-                        `;
-                    } else if (st === 'cancelled') {
-                        statusBadgeText = "Dibatalkan";
-                        statusDesc = "Pesanan ini telah dibatalkan.";
-                        statusClass = "bg-red-100 text-red-800 border border-red-300";
                     }
 
                     let shippingInfoHtml = '';
@@ -546,7 +605,7 @@
                                     ${order.tracking_number ? `
                                         <span class="text-gray-500">No. Resi (AWB):</span>
                                         <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-gray-300 text-gray-900 select-all tracking-wider">${order.tracking_number}</span>
-                                        <button type="button" onclick="navigator.clipboard.writeText('${order.tracking_number}'); showToast('No. Resi disalin!');" class="text-[10px] text-gray-500 hover:text-black underline cursor-pointer font-space-grotesk font-semibold uppercase">Salin</button>
+                                        <button type="button" onclick="navigator.clipboard.writeText('${order.tracking_number}'); showToast('No. Resi disalin!', 'success');" class="text-[10px] text-gray-500 hover:text-black underline cursor-pointer font-space-grotesk font-semibold uppercase">Salin</button>
                                     ` : `
                                         <span class="text-gray-400 italic text-[11px]">Resi dalam persiapan pengiriman</span>
                                     `}
@@ -605,9 +664,30 @@
         }
 
         async function confirmOrderReceived(id) {
-            if (!confirm("Apakah Anda yakin telah menerima paket pesanan ini dalam kondisi baik? Tindakan ini akan menyelesaikan pesanan.")) {
-                return;
+            const confirmed = await askStorefrontConfirm({
+                title: 'Konfirmasi Penerimaan',
+                message: 'Apakah Anda yakin telah menerima paket pesanan ini dalam kondisi baik? Tindakan ini akan menyelesaikan status pesanan.',
+                confirmText: 'Ya, Selesai',
+                cancelText: 'Batal',
+                isDanger: false
+            });
+            if (!confirmed) return;
+
+            const btn = document.querySelector(`button[onclick="confirmOrderReceived(${id})"]`);
+            let origBtnHtml = '';
+            if (btn) {
+                origBtnHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+                btn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-white inline" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span>Memproses Konfirmasi...</span>
+                `;
             }
+
             try {
                 const response = await fetch(`/my-orders/${id}/confirm-received`, {
                     method: 'POST',
@@ -619,29 +699,47 @@
                 });
                 const data = await response.json();
                 if (response.ok && data.success) {
-                    showToast("Terima kasih! Pesanan berhasil dikonfirmasi selesai.");
+                    showToast("Terima kasih! Pesanan berhasil dikonfirmasi selesai.", 'success');
                     await fetchOrderHistory();
                 } else {
-                    showToast(data.error || "Gagal mengonfirmasi pesanan.");
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                        btn.innerHTML = origBtnHtml;
+                    }
+                    showToast(data.error || "Gagal mengonfirmasi pesanan.", 'error');
                 }
             } catch (e) {
                 console.error(e);
-                showToast("Terjadi kesalahan sistem.");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                    btn.innerHTML = origBtnHtml;
+                }
+                showToast("Terjadi kesalahan sistem.", 'error');
             }
         }
 
         async function cancelOrder(id) {
-            if (!confirm("Are you sure you want to cancel this order?")) return;
+            const confirmed = await askStorefrontConfirm({
+                title: 'Batalkan Pesanan',
+                message: 'Apakah Anda yakin ingin membatalkan pesanan ini? Tindakan ini tidak dapat dibatalkan.',
+                confirmText: 'Ya, Batalkan',
+                cancelText: 'Batal',
+                isDanger: true
+            });
+            if (!confirmed) return;
+
             try {
                 const response = await fetch(`/my-orders/${id}/cancel`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });
                 if (response.ok) {
-                    showToast("Order cancelled successfully.");
+                    showToast("Pesanan berhasil dibatalkan.", 'success');
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
-                    showToast("Failed to cancel order.");
+                    showToast("Gagal membatalkan pesanan.", 'error');
                 }
             } catch (e) {
                 console.error(e);
@@ -734,7 +832,7 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    showToast('Login berhasil!');
+                    showToast('Login berhasil!', 'success');
                     if (data.user) {
                         localStorage.setItem('notisse_auth', 'true');
                         localStorage.setItem('notisse_user', JSON.stringify(data.user));
@@ -813,7 +911,7 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    showToast('Akun berhasil dibuat!');
+                    showToast('Akun berhasil dibuat!', 'success');
                     if (data.user) {
                         localStorage.setItem('notisse_auth', 'true');
                         localStorage.setItem('notisse_user', JSON.stringify(data.user));
@@ -979,7 +1077,12 @@
                         </div>
                         <div class="flex flex-col justify-between flex-grow pt-1 border-t border-gray-100">
                             <h4 class="font-space-grotesk font-semibold text-xs sm:text-sm text-black group-hover:underline truncate uppercase">${item.name}</h4>
-                            <p class="font-space-grotesk text-xs text-gray-500 mt-1">${item.price}</p>
+                            <p class="font-space-grotesk text-xs text-gray-900 mt-1">
+                                ${item.is_discounted || (item.discount_price && parseFloat(item.discount_price) > 0 && parseFloat(item.discount_price) < parseFloat(item.price))
+                                    ? `<span class="line-through text-gray-400 mr-1.5 font-normal text-[11px]">${formatRupiah(item.price)}</span><span class="font-bold text-black">${formatRupiah(item.discount_price)}</span>`
+                                    : (typeof item.price === 'number' ? formatRupiah(item.price) : item.price)
+                                }
+                            </p>
                         </div>
                     </div>
                 `;
@@ -994,7 +1097,7 @@
         }
 
         /* CART DRAWER LOGIC */
-        function openCart(updateUrl = true) {
+        function openCart() {
             renderCartItems();
             overlayCart.classList.remove('hidden');
             const cartTrigger = document.getElementById('cart-trigger');
@@ -1008,16 +1111,9 @@
             if (loggedInUser && loggedInUser.area_id && cartState.length > 0) {
                 fetchShippingRates(loggedInUser.area_id);
             }
-
-            if (updateUrl && !window.location.hash.includes('cart')) {
-                history.pushState({ cartOpen: true }, '', window.location.pathname + '#cart');
-            }
-            try {
-                sessionStorage.setItem('notisse_cart_open', 'true');
-            } catch(e) {}
         }
 
-        function closeCart(updateUrl = true) {
+        function closeCart() {
             cartDrawerContent.classList.add('translate-x-full');
             overlayCart.classList.add('opacity-0');
             setTimeout(() => {
@@ -1026,18 +1122,18 @@
                 updateHeaderState();
             }, 300);
 
-            if (updateUrl && window.location.hash === '#cart') {
-                history.pushState({}, '', window.location.pathname);
+            if (window.location.hash.includes('cart')) {
+                history.replaceState(history.state, '', window.location.pathname);
             }
             try {
                 sessionStorage.removeItem('notisse_cart_open');
             } catch(e) {}
         }
 
-        cartTrigger.addEventListener('click', () => openCart(true));
-        cartClose.addEventListener('click', () => closeCart(true));
+        cartTrigger.addEventListener('click', () => openCart());
+        cartClose.addEventListener('click', () => closeCart());
 
-        function openProductDetail(productIdOrName, price, image, updateUrl = true) {
+        function openProductDetail(productIdOrName, price, image, updateUrl = true, isBacking = false) {
             let product = null;
             if (typeof productIdOrName === 'number') {
                 product = productsData ? productsData.find(p => p.id === productIdOrName) : null;
@@ -1064,9 +1160,18 @@
             const titleEl = document.getElementById('pdetail-title');
             if (titleEl) titleEl.innerText = currentProduct.name;
 
-            const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(currentProduct.price);
             const priceEl = document.getElementById('pdetail-price');
-            if (priceEl) priceEl.innerText = formattedPrice;
+            if (priceEl) {
+                const isDiscounted = currentProduct.is_discounted || (currentProduct.discount_price && parseFloat(currentProduct.discount_price) > 0 && parseFloat(currentProduct.discount_price) < parseFloat(currentProduct.price));
+                if (isDiscounted) {
+                    const origFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(currentProduct.price);
+                    const discFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(currentProduct.discount_price);
+                    priceEl.innerHTML = `<span class="line-through text-gray-400 mr-2 font-normal text-base md:text-lg">${origFormatted}</span><span class="text-black font-semibold">${discFormatted}</span>`;
+                } else {
+                    const formattedPrice = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(currentProduct.price);
+                    priceEl.innerText = formattedPrice;
+                }
+            }
 
             if (image) {
                 const imgEl = document.getElementById('pdetail-image');
@@ -1123,6 +1228,18 @@
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#039;');
             };
+
+            // Update Model Fit & Measurements (Gender, TB, BB, Size)
+            const modelDetailsEl = document.getElementById('pdetail-model-details');
+            if (modelDetailsEl) {
+                const mGender = currentProduct.model_gender || 'Male';
+                const mHeight = currentProduct.model_height || 178;
+                const mWeight = currentProduct.model_weight || 68;
+                const mSize   = currentProduct.model_size || 'L';
+
+                let genderPart = mGender ? `${escapeHtml(mGender)} · ` : '';
+                modelDetailsEl.innerHTML = `${genderPart}Height ${escapeHtml(mHeight)} cm / Weight ${escapeHtml(mWeight)} kg — wearing size <span class="font-bold text-black font-space-grotesk">${escapeHtml(mSize)}</span>`;
+            }
 
             // Update Description (Single source of truth from product description)
             const descContent = document.getElementById('pdetail-desc-content');
@@ -1236,7 +1353,7 @@
             closeSizeDropdown();
             updateProductDetailScroll();
 
-            showPage('view-product-detail', false, false);
+            showPage('view-product-detail', isBacking, false);
             if (updateUrl && currentProduct && currentProduct.id) {
                 history.pushState({ pageId: 'view-product-detail', productId: currentProduct.id }, '', '/product/' + currentProduct.id);
                 try {
@@ -1246,7 +1363,7 @@
             }
         }
 
-        function openArtistProfile(artistIdOrName, location, updateUrl = true) {
+        function openArtistProfile(artistIdOrName, location, updateUrl = true, isBacking = false) {
             let artist = null;
             if (typeof artistsData !== 'undefined' && artistsData) {
                 if (typeof artistIdOrName === 'number' || (!isNaN(Number(artistIdOrName)) && String(artistIdOrName).trim() !== '')) {
@@ -1332,7 +1449,7 @@
                         const artImg = resolveImageUrl(artw.image, 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork');
                         const card = document.createElement('div');
                         card.className = 'group cursor-pointer';
-                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price, artw.id);
+                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price, artw.id, true, false, artist ? artist.id : (artw.artist_id || null));
                         card.innerHTML = `
                             <div class="w-full aspect-square bg-[#d9d9d9] mb-3.5 overflow-hidden relative">
                                 <img src="${artImg}" alt="${artw.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -1350,7 +1467,7 @@
             }
 
             switchArtistTab('editorial');
-            showPage('view-artist-detail', false, false);
+            showPage('view-artist-detail', isBacking, false);
             if (updateUrl && artist && artist.id) {
                 history.pushState({ pageId: 'view-artist-detail', artistId: artist.id }, '', '/artist/' + artist.id);
                 try {
@@ -1407,9 +1524,18 @@
             image: "https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View"
         };
 
-        function openArtistArtworkDetail(title, artist, medium, dimensions, image, price, id = null, updateUrl = true) {
+        function openArtistArtworkDetail(title, artist, medium, dimensions, image, price, id = null, updateUrl = true, isBacking = false, artistId = null) {
+            if (!artistId && id && typeof artistsData !== 'undefined' && artistsData) {
+                for (const a of artistsData) {
+                    if (a.artworks && a.artworks.some(w => Number(w.id) === Number(id))) {
+                        artistId = a.id;
+                        break;
+                    }
+                }
+            }
             currentActiveArtwork = {
                 id: id,
+                artist_id: artistId,
                 title: title || 'Artwork',
                 artist: artist || 'Mustafa Alatas',
                 medium: medium || 'Oil on canvas',
@@ -1439,7 +1565,7 @@
                 priceEl.innerText = pVal > 0 ? 'Rp ' + pVal.toLocaleString('id-ID') : 'Price on Inquiry';
             }
 
-            showPage('view-artist-artwork-detail', false, false);
+            showPage('view-artist-artwork-detail', isBacking, false);
             if (updateUrl && id) {
                 history.pushState({ pageId: 'view-artist-artwork-detail', artworkId: id }, '', '/artwork/' + id);
                 try {
@@ -1449,7 +1575,7 @@
             }
         }
 
-        function openArtistArtworkDetailById(id, updateUrl = true) {
+        function openArtistArtworkDetailById(id, updateUrl = true, isBacking = false) {
             let foundArt = null;
             let foundArtist = null;
             if (typeof artistsData !== 'undefined' && artistsData) {
@@ -1474,7 +1600,9 @@
                     artImg,
                     foundArt.price || 0,
                     foundArt.id,
-                    updateUrl
+                    updateUrl,
+                    isBacking,
+                    foundArtist ? foundArtist.id : null
                 );
             }
         }
@@ -1586,7 +1714,7 @@
             const message = document.getElementById('offering-buyer-message').value.trim();
 
             if (!priceStr) {
-                showToast("Please enter an offer amount.");
+                showToast("Silakan masukkan nominal tawaran.", 'warning');
                 return;
             }
 
@@ -1599,7 +1727,7 @@
             } catch (err) {}
 
             if (!activeUser) {
-                showToast("Please login or create an account first.");
+                showToast("Silakan login atau daftar akun terlebih dahulu.", 'warning');
                 return;
             }
 
@@ -1641,13 +1769,13 @@
                     document.getElementById('artwork-offering-form-body').classList.add('hidden');
                     document.getElementById('artwork-offering-success-body').classList.remove('hidden');
 
-                    showToast("Acquisition inquiry submitted successfully!");
+                    showToast("Penawaran akuisisi karya berhasil diajukan!", 'success');
                 } else {
-                    showToast(data.message || "Failed to submit acquisition inquiry.");
+                    showToast(data.message || "Gagal mengajukan penawaran.", 'error');
                 }
             } catch (err) {
                 console.error(err);
-                showToast("A system error occurred while submitting inquiry.");
+                showToast("Terjadi kesalahan sistem saat mengirim penawaran.", 'error');
             } finally {
                 btn.innerText = origText;
                 btn.disabled = false;
@@ -1685,11 +1813,12 @@
             }, 300);
         }
 
+        let currentActiveEditorial = null;
         function openArtistEditorialDetail(title) {
             showPage('view-artist-editorial-detail');
         }
 
-        function openArtistEditorialDetailById(id, updateUrl = true) {
+        function openArtistEditorialDetailById(id, updateUrl = true, isBacking = false) {
             let foundEd = null;
             let foundArtist = null;
 
@@ -1714,6 +1843,12 @@
             }
 
             if (foundEd) {
+                currentActiveEditorial = {
+                    id: id,
+                    artist_id: foundArtist ? foundArtist.id : (foundEd.artist_id || null),
+                    editorial: foundEd
+                };
+
                 const titleEl = document.getElementById('editorial-detail-title');
                 if (titleEl) titleEl.innerText = foundEd.title;
 
@@ -1722,76 +1857,73 @@
 
                 const topContent = document.getElementById('editorial-detail-content-top');
                 const bottomContent = document.getElementById('editorial-detail-content-bottom');
-                const rawText = foundEd.content || foundEd.excerpt || '';
-                const paragraphs = rawText.split('\n').map(p => p.trim()).filter(Boolean);
 
-                if (topContent) topContent.innerHTML = '';
-                if (bottomContent) bottomContent.innerHTML = '';
-
-                if (paragraphs.length <= 1) {
-                    if (topContent && paragraphs[0]) {
-                        const pEl = document.createElement('p');
-                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-inter';
-                        pEl.innerText = paragraphs[0];
-                        topContent.appendChild(pEl);
-                    }
-                    if (bottomContent && foundEd.excerpt && foundEd.excerpt !== paragraphs[0]) {
-                        const pEl = document.createElement('p');
-                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-inter';
-                        pEl.innerText = foundEd.excerpt;
-                        bottomContent.appendChild(pEl);
-                    }
-                } else {
-                    // Paragraf 1 di atas foto
-                    if (topContent) {
-                        const pEl = document.createElement('p');
-                        pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-inter';
-                        pEl.innerText = paragraphs[0];
-                        topContent.appendChild(pEl);
-                    }
-                    // Paragraf 2 di bawah foto
-                    if (bottomContent) {
-                        for (let i = 1; i < paragraphs.length; i++) {
+                if (topContent) {
+                    topContent.innerHTML = '';
+                    const rawTop = (foundEd.content || foundEd.excerpt || '').trim();
+                    const topParagraphs = rawTop ? rawTop.split('\n').map(p => p.trim()).filter(Boolean) : [];
+                    if (topParagraphs.length > 0) {
+                        topParagraphs.forEach(pText => {
                             const pEl = document.createElement('p');
                             pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-800 font-inter';
-                            pEl.innerText = paragraphs[i];
-                            bottomContent.appendChild(pEl);
-                        }
+                            pEl.innerText = pText;
+                            topContent.appendChild(pEl);
+                        });
                     }
                 }
 
-                const edImg = resolveImageUrl(foundEd.image, '/home.jpg');
+                if (bottomContent) {
+                    bottomContent.innerHTML = '';
+                    const rawBottom = (foundEd.content_2 || '').trim();
+                    const bottomParagraphs = rawBottom ? rawBottom.split('\n').map(p => p.trim()).filter(Boolean) : [];
+                    if (bottomParagraphs.length > 0) {
+                        bottomParagraphs.forEach(pText => {
+                            const pEl = document.createElement('p');
+                            pEl.className = 'leading-relaxed text-base sm:text-lg md:text-[1.05rem] text-gray-700 font-inter';
+                            pEl.innerText = pText;
+                            bottomContent.appendChild(pEl);
+                        });
+                    }
+                }
+
+                // Foto 1: Portrait (3:4)
                 const portraitEl = document.getElementById('editorial-detail-portrait');
                 if (portraitEl) {
-                    portraitEl.src = (foundArtist && foundArtist.photo) 
-                        ? resolveImageUrl(foundArtist.photo, (edImg.includes('masmus') ? edImg : '/masmus.jpeg')) 
-                        : (edImg.includes('masmus') ? edImg : '/masmus.jpeg');
+                    if (foundEd.image) {
+                        portraitEl.src = resolveImageUrl(foundEd.image, '/masmus.jpeg');
+                    } else if (foundArtist && foundArtist.photo) {
+                        portraitEl.src = resolveImageUrl(foundArtist.photo, '/masmus.jpeg');
+                    } else {
+                        portraitEl.src = '/masmus.jpeg';
+                    }
                 }
 
-                let artImg = '/artwork.jpeg';
-                if (foundArtist && foundArtist.artworks && foundArtist.artworks.length > 0) {
-                    const firstArt = foundArtist.artworks[0].image;
-                    artImg = resolveImageUrl(firstArt, '/artwork.jpeg');
-                } else if (foundArtist && foundArtist.artwork_preview) {
-                    artImg = resolveImageUrl(foundArtist.artwork_preview, '/artwork.jpeg');
-                }
+                // Foto 2: Landscape (4:3)
                 const artworkEl = document.getElementById('editorial-detail-artwork');
-                if (artworkEl) artworkEl.src = artImg;
-
-                let featuredImg = '/home.jpg';
-                if (foundEd.image && !foundEd.image.includes('masmus') && (!foundArtist || foundEd.image !== foundArtist.photo)) {
-                    featuredImg = edImg;
-                } else if (foundArtist && foundArtist.artworks && foundArtist.artworks.length > 2) {
-                    const featArt = foundArtist.artworks[2].image;
-                    featuredImg = resolveImageUrl(featArt, '/home.jpg');
+                if (artworkEl) {
+                    if (foundEd.image_2) {
+                        artworkEl.src = resolveImageUrl(foundEd.image_2, '/artwork.jpeg');
+                    } else if (foundArtist && foundArtist.artworks && foundArtist.artworks.length > 0) {
+                        artworkEl.src = resolveImageUrl(foundArtist.artworks[0].image, '/artwork.jpeg');
+                    } else if (foundArtist && foundArtist.artwork_preview) {
+                        artworkEl.src = resolveImageUrl(foundArtist.artwork_preview, '/artwork.jpeg');
+                    } else {
+                        artworkEl.src = '/artwork.jpeg';
+                    }
                 }
-                const featuredEl = document.getElementById('editorial-detail-featured');
-                if (featuredEl) {
-                    featuredEl.src = featuredImg;
+
+                const cap1 = document.getElementById('editorial-detail-caption-1');
+                if (cap1) {
+                    cap1.innerText = (foundArtist && foundArtist.name) ? `Portrait of ${foundArtist.name}.` : 'Portrait of Mustafa Alatas.';
+                }
+
+                const cap2 = document.getElementById('editorial-detail-caption-2');
+                if (cap2) {
+                    cap2.innerText = (foundArtist && foundArtist.name) ? `Dokumentasi & Karya Seni ${foundArtist.name}.` : 'Raja Diamuk Massa, 2024. Courtesy of Medium.';
                 }
             }
 
-            showPage('view-artist-editorial-detail', false, false);
+            showPage('view-artist-editorial-detail', isBacking, false);
             if (updateUrl && id) {
                 history.pushState({ pageId: 'view-artist-editorial-detail', editorialId: id }, '', '/editorial/' + id);
                 try {
@@ -1802,7 +1934,7 @@
         }
 
         /* LOOKBOOK DYNAMIC LOADER & DETAIL */
-        function openLookbookDetail(id, updateUrl = true) {
+        function openLookbookDetail(id, updateUrl = true, isBacking = false) {
             let lb = null;
             if (typeof lookbooksData !== 'undefined' && lookbooksData && lookbooksData.length > 0) {
                 if (id) {
@@ -1852,7 +1984,7 @@
                 }
             }
 
-            showPage('view-lookbook-detail', false, false);
+            showPage('view-lookbook-detail', isBacking, false);
             if (updateUrl && lb && lb.id) {
                 history.pushState({ pageId: 'view-lookbook-detail', lookbookId: lb.id }, '', '/lookbook/' + lb.id);
                 try {
@@ -1860,23 +1992,6 @@
                     sessionStorage.setItem('notisse_lookbook_id', lb.id);
                 } catch (e) {}
             }
-        }
-
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'bg-black text-white px-5 py-3 rounded text-xs font-space-grotesk uppercase tracking-wider shadow-xl transition-all duration-300 opacity-0 transform translate-y-2';
-            toast.innerText = message;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('opacity-0', 'translate-y-2');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
         }
 
         function updateCarouselUI() {
@@ -2006,11 +2121,17 @@
                 let html = '';
                 cartState.forEach((item, index) => {
                     const itemPrice = item.unitPrice || item.price || 0;
+                    const origPrice = item.original_price || item.price || 0;
+                    const isDiscounted = item.is_discounted || (origPrice > itemPrice);
                     const itemTotal = itemPrice * item.qty;
                     totalAmount += itemTotal;
                     totalItemCount += item.qty;
 
                     let itemImg = resolveImageUrl(item.image, "{{ asset('footage-baju.jpg') }}");
+
+                    const unitPriceHtml = isDiscounted
+                        ? `<span class="line-through text-gray-400 block text-[11px] font-normal">${formatRupiah(origPrice)}</span><span class="text-black font-bold">${formatRupiah(itemPrice)}</span>`
+                        : formatRupiah(itemPrice);
 
                     html += `
                         <div class="grid grid-cols-12 items-center text-xs md:text-sm py-2 border-b border-gray-100 cart-animated-item" style="animation-delay: ${index * 70}ms">
@@ -2030,7 +2151,7 @@
                                     <button onclick="updateCartQty(${index}, 1)" class="px-2 py-1 hover:bg-gray-100 font-bold font-inter cursor-pointer">+</button>
                                 </div>
                             </div>
-                            <div class="hidden md:block md:col-span-2 text-right font-space-grotesk">${formatRupiah(itemPrice)}</div>
+                            <div class="hidden md:block md:col-span-2 text-right font-space-grotesk">${unitPriceHtml}</div>
                             <div class="col-span-3 md:col-span-2 text-right font-medium font-space-grotesk">${formatRupiah(itemTotal)}</div>
                         </div>
                     `;
@@ -2107,7 +2228,7 @@
             }
             if (!currentProduct) return;
             if (!currentSelectedSize) {
-                showToast('Please select a size!');
+                showToast('Silakan pilih ukuran produk terlebih dahulu!', 'warning');
                 return;
             }
 
@@ -2127,13 +2248,13 @@
                     renderCartItems();
                     triggerBadgePop();
                     openCart();
-                    showToast('Added to cart!');
+                    showToast('Item berhasil ditambahkan ke keranjang!', 'success');
                 } else {
-                    showToast(data.message || 'Failed to add to cart');
+                    showToast(data.message || 'Gagal menambahkan ke keranjang.', 'error');
                 }
             } catch(e) {
                 console.error(e);
-                showToast('A system error occurred.');
+                showToast('Terjadi kesalahan sistem.', 'error');
             }
         }
 
@@ -2815,7 +2936,14 @@
         }
 
         async function deleteAddressConfirm(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus alamat ini?')) return;
+            const confirmed = await askStorefrontConfirm({
+                title: 'Hapus Alamat',
+                message: 'Apakah Anda yakin ingin menghapus alamat pengiriman ini? Tindakan ini tidak dapat dibatalkan.',
+                confirmText: 'Ya, Hapus',
+                cancelText: 'Batal',
+                isDanger: true
+            });
+            if (!confirmed) return;
 
             try {
                 const response = await fetch(`/api/user/addresses/${id}`, {
@@ -2827,13 +2955,18 @@
                     userSavedAddresses = data.addresses || [];
                     renderSavedAddresses(userSavedAddresses);
                     if (typeof showToast === 'function') {
-                        showToast(data.message || 'Alamat berhasil dihapus.');
+                        showToast(data.message || 'Alamat berhasil dihapus.', 'success');
                     }
                 } else {
-                    alert(data.message || 'Gagal menghapus alamat.');
+                    if (typeof showToast === 'function') {
+                        showToast(data.message || 'Gagal menghapus alamat.', 'error');
+                    }
                 }
             } catch(e) {
                 console.error(e);
+                if (typeof showToast === 'function') {
+                    showToast('Terjadi kesalahan saat menghapus alamat.', 'error');
+                }
             }
         }
 
@@ -2959,7 +3092,7 @@
             }
 
             const urlParams = new URLSearchParams(window.location.search);
-            const shouldOpenCart = urlParams.get('open_checkout') === 'true' || urlParams.get('cart') === 'true' || window.location.hash === '#cart' || sessionStorage.getItem('notisse_cart_open') === 'true';
+            const shouldOpenCart = urlParams.get('open_checkout') === 'true' || urlParams.get('cart') === 'true';
 
             if (shouldOpenCart) {
                 setTimeout(() => {

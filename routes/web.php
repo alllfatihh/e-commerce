@@ -416,6 +416,14 @@ Route::post('/my-orders/{id}/confirm-received', function ($id) {
         return response()->json(['error' => 'Pesanan tidak ditemukan atau Anda tidak memiliki akses.'], 403);
     }
 
+    if ($order->status === 'completed') {
+        return response()->json([
+            'success' => true,
+            'message' => 'Pesanan telah berhasil dikonfirmasi diterima.',
+            'order' => $order,
+        ]);
+    }
+
     if (! $order->canBeConfirmedReceived()) {
         return response()->json(['error' => 'Pesanan hanya dapat dikonfirmasi setelah paket tiba / sudah diantarkan oleh kurir.'], 422);
     }

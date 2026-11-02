@@ -1,10 +1,10 @@
         <!-- VIEW 3C: ARTWORK DETAIL PAGE (WITH DIRECT OFFERING ACQUISITION PANEL) -->
         <section id="view-artist-artwork-detail" class="view-page {{ ($activeView ?? '') === 'view-artist-artwork-detail' ? 'active-view' : '' }} w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-20 md:pt-24 pb-16">
             <div class="mb-4 sm:mb-6 flex items-center justify-between">
-                <button onclick="goBack()"
+                <button onclick="goBack('view-artist-detail')"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK TO ARTIST PROFILE</span>
+                    <span>BACK</span>
                 </button>
             </div>
 

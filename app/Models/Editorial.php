@@ -21,6 +21,11 @@ class Editorial extends Model
         return $this->resolveMediaUrl($value);
     }
 
+    public function getImage2Attribute($value)
+    {
+        return $this->resolveMediaUrl($value);
+    }
+
     public function getVideoUrlAttribute($value)
     {
         return $this->resolveMediaUrl($value);

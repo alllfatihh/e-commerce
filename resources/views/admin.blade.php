@@ -581,11 +581,25 @@
                                         @if($product->description)
                                         <p class="text-[10px] text-gray-400 font-mono mt-0.5 line-clamp-1 max-w-xs">{{ Str::limit($product->description, 60) }}</p>
                                         @endif
+                                        @if($product->model_gender || $product->model_height || $product->model_weight || $product->model_size)
+                                        <p class="text-[10px] text-gray-500 font-mono mt-1 flex items-center gap-1">
+                                            <span class="text-gray-400">Model:</span>
+                                            <span>{{ $product->model_gender ?? 'Male' }} ({{ $product->model_height ? $product->model_height.'cm' : '-' }} / {{ $product->model_weight ? $product->model_weight.'kg' : '-' }} — Sz: {{ $product->model_size ?? '-' }})</span>
+                                        </p>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
                             <td class="px-5 py-4 font-space-grotesk font-bold text-sm text-gray-900 whitespace-nowrap">
-                                Rp {{ number_format($product->price, 0, ',', '.') }}
+                                @if($product->hasDiscount())
+                                    <div class="flex flex-col">
+                                        <span class="line-through text-gray-400 text-xs font-normal">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        <span class="text-emerald-700 font-bold">Rp {{ number_format($product->discount_price, 0, ',', '.') }}</span>
+                                        <span class="inline-block text-[9px] uppercase font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded w-fit mt-0.5">Diskon Aktif</span>
+                                    </div>
+                                @else
+                                    Rp {{ number_format($product->price, 0, ',', '.') }}
+                                @endif
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap">
                                 <div class="flex flex-wrap gap-1.5">
@@ -630,9 +644,14 @@
                                             'id'               => $product->id,
                                             'name'             => $product->name,
                                             'price'            => $product->price,
+                                            'discount_price'   => $product->discount_price,
                                             'desc'             => $product->description ?? '',
                                             'terms'            => $product->terms_and_conditions ?? '',
                                             'artist'           => $product->artist ?? '',
+                                            'model_gender'     => $product->model_gender ?? 'Male',
+                                            'model_height'     => $product->model_height ?? '',
+                                            'model_weight'     => $product->model_weight ?? '',
+                                            'model_size'       => $product->model_size ?? '',
                                             'stocks'           => $product->stocks->pluck('stock','size'),
                                             'frontImg'         => $resImg($product->image),
                                             'backImg'          => $resImg($product->back_image),
@@ -967,10 +986,9 @@
                         <!-- Thumbnail -->
                         <div class="aspect-[4/3] bg-gray-100 relative overflow-hidden border-b border-gray-200">
                             <img src="{{ $editUrl }}" alt="{{ $edit->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/600x600/d9d9d9/555555?text=Editorial'">
-                            @if($edit->video_url)
+                            @if($edit->image_2)
                             <div class="absolute top-3 left-3 bg-black/85 text-white text-[9px] font-space-grotesk uppercase px-2 py-0.5 flex items-center gap-1 font-bold">
-                                <svg class="w-3 h-3 text-brandAccent" fill="currentColor" viewBox="0 0 20 20"><polygon points="5 3 19 10 5 17 5 3"/></svg>
-                                <span>Includes Video</span>
+                                <span>2 Foto Galeri</span>
                             </div>
                             @endif
                             <div class="absolute bottom-2.5 right-2.5 bg-black/75 backdrop-blur-[1px] text-white text-[9px] font-inter px-2 py-0.5">
@@ -1001,8 +1019,10 @@
                                     'title'     => $edit->title,
                                     'author'    => $edit->author ?? '',
                                     'excerpt'   => $edit->excerpt ?? '',
-                                    'video_url' => $edit->video_url ?? '',
                                     'content'   => $edit->content ?? '',
+                                    'content_2' => $edit->content_2 ?? '',
+                                    'img1'      => $edit->image ?? '',
+                                    'img2'      => $edit->image_2 ?? '',
                                 ];
                             @endphp
                             <button type="button"
@@ -1393,9 +1413,9 @@
                                 @endif
 
                                 @if(in_array($order->status, ['paid', 'processing']) && empty($order->biteship_order_id))
-                                <form action="/admin/orders/{{ $order->id }}/dispatch" method="POST" class="mt-2">
+                                <form action="/admin/orders/{{ $order->id }}/dispatch" method="POST" class="mt-2" onsubmit="event.preventDefault(); askConfirm('Kirim permintaan pickup pesanan ini ke Biteship sekarang?', this, 'Dispatch Biteship', 'Ya, Dispatch', false);">
                                     @csrf
-                                    <button type="submit" onclick="return confirm('Kirim permintaan pickup ke Biteship sekarang?')" class="text-[10px] bg-[#E2FF00] hover:bg-yellow-300 text-black font-space-grotesk font-bold uppercase tracking-wider px-2 py-1 rounded border border-black/10 transition-colors cursor-pointer">
+                                    <button type="submit" class="text-[10px] bg-[#E2FF00] hover:bg-yellow-300 text-black font-space-grotesk font-bold uppercase tracking-wider px-2 py-1 rounded border border-black/10 transition-colors cursor-pointer">
                                         ⚡ Dispatch Biteship
                                     </button>
                                 </form>
@@ -1559,10 +1579,21 @@
                                 </td>
                                 <td class="px-5 py-4 text-gray-600 text-[11px]">
                                     @if($discount->min_order_amount > 0)
-                                        <span>Min. Belanja: Rp {{ number_format($discount->min_order_amount, 0, ',', '.') }}</span>
+                                        <div>Min. Belanja: Rp {{ number_format($discount->min_order_amount, 0, ',', '.') }}</div>
                                     @else
-                                        <span class="text-gray-400">Tanpa min. belanja</span>
+                                        <div class="text-gray-400">Tanpa min. belanja</div>
                                     @endif
+                                    <div class="mt-1">
+                                        @if($discount->applies_to === 'specific_products')
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-space-grotesk font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                                                🎯 {{ $discount->products->count() }} Produk Khusus
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-space-grotesk font-semibold bg-gray-50 text-gray-600 border border-gray-200">
+                                                🌐 Semua Produk
+                                            </span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-5 py-4 font-space-grotesk text-xs">
                                     <span class="font-bold text-black">{{ $discount->used_count }}</span>
@@ -1591,11 +1622,11 @@
                                             class="btn-action-edit">
                                             Edit
                                         </button>
-                                        <form action="/admin/discounts/{{ $discount->id }}" method="POST" onsubmit="return confirm('Hapus kode diskon {{ $discount->code }}?');" class="inline">
+                                        <form action="/admin/discounts/{{ $discount->id }}" method="POST" onsubmit="event.preventDefault(); askConfirm('Hapus kode diskon {{ addslashes($discount->code) }}?', this, 'Hapus Kode Diskon', 'Ya, Hapus', true);" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-action-delete">
-                                                Hapus
+                                                 Hapus
                                             </button>
                                         </form>
                                     </div>
@@ -1683,7 +1714,7 @@
                                             Edit
                                         </button>
                                         @if(auth()->id() !== $adminItem->id && count($admins) > 1)
-                                            <form action="/admin/admins/{{ $adminItem->id }}" method="POST" onsubmit="return confirm('Hapus hak akses admin untuk {{ $adminItem->name }}? Tindakan ini tidak dapat dibatalkan.');" class="inline">
+                                            <form action="/admin/admins/{{ $adminItem->id }}" method="POST" onsubmit="event.preventDefault(); askConfirm('Hapus hak akses admin untuk {{ addslashes($adminItem->name) }}? Tindakan ini tidak dapat dibatalkan.', this, 'Hapus Hak Akses Admin', 'Ya, Hapus', true);" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn-action-delete">
@@ -1827,9 +1858,63 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Harga Produk (IDR) *</label>
-                    <input type="number" name="price" id="p-price" required placeholder="Contoh: 250000" class="admin-input">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Harga Normal Produk (IDR) *</label>
+                        <input type="number" name="price" id="p-price" required placeholder="Contoh: 250000" class="admin-input">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600">Harga Diskon / Coret (IDR)</label>
+                            <span class="text-[10px] text-gray-400 font-inter">Opsional</span>
+                        </div>
+                        <input type="number" name="discount_price" id="p-discount-price" placeholder="Contoh: 200000" class="admin-input">
+                        <p class="text-[10px] text-gray-400 font-inter mt-1">Jika diisi, harga normal akan dicoret & digantikan harga diskon ini.</p>
+                    </div>
+                </div>
+
+                <!-- Spesifikasi Fitting Model Photoshoot -->
+                <div class="p-3.5 bg-gray-50 border border-gray-200 rounded-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-black flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Spesifikasi Model Photoshoot (Fitting Guide)
+                        </label>
+                        <span class="text-[9px] font-space-grotesk font-bold uppercase bg-gray-200 text-gray-800 px-1.5 py-0.5">Detail Produk</span>
+                    </div>
+                    <p class="text-[10px] text-gray-500 font-inter -mt-1">
+                        Informasi spesifikasi model yang mengenakan produk ini pada sesi photoshoot. Ditampilkan di halaman detail produk agar pelanggan dapat memperkirakan ukuran fitting pakaian.
+                    </p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                        <div>
+                            <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Gender Model</label>
+                            <select name="model_gender" id="p-model-gender" class="admin-input text-xs">
+                                <option value="Male">Male / Pria</option>
+                                <option value="Female">Female / Wanita</option>
+                                <option value="Unisex">Unisex</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Tinggi Badan (TB)</label>
+                            <div class="relative">
+                                <input type="number" name="model_height" id="p-model-height" min="50" max="250" placeholder="178" class="admin-input text-xs pr-8">
+                                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-space-grotesk text-gray-400 font-medium">cm</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Berat Badan (BB)</label>
+                            <div class="relative">
+                                <input type="number" name="model_weight" id="p-model-weight" min="20" max="250" placeholder="68" class="admin-input text-xs pr-8">
+                                <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-space-grotesk text-gray-400 font-medium">kg</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-space-grotesk font-semibold uppercase tracking-wider text-gray-600 mb-1">Ukuran Model</label>
+                            <input type="text" name="model_size" id="p-model-size" placeholder="L" maxlength="20" class="admin-input text-xs font-bold uppercase">
+                        </div>
+                    </div>
                 </div>
 
                 <div>
@@ -2176,40 +2261,83 @@
                 <input type="text" name="title" id="edit-title" required placeholder="Contoh: Menafsir Kuasa dan Sosial dalam Lukisan Figuratif" class="admin-input">
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Penulis / Kurator</label>
-                    <input type="text" name="author" id="edit-author" placeholder="Contoh: Laksa Dawantara / Tim Notisse" class="admin-input">
-                </div>
-                <div>
-                    <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Video File / URL (Opsional)</label>
-                    <input type="text" name="video_url" id="edit-video" placeholder="Contoh: video/editorial.mp4 atau URL video" class="admin-input">
-                </div>
+            <div>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Penulis / Kurator</label>
+                <input type="text" name="author" id="edit-author" placeholder="Contoh: Laksa Dawantara / Tim Notisse" class="admin-input">
             </div>
 
             <div>
-                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Ringkasan / Excerpt Singkat</label>
+                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Ringkasan / Excerpt Singkat (Preview Kartu)</label>
                 <textarea name="excerpt" id="edit-excerpt" rows="2" placeholder="Ringkasan 1-2 kalimat pengantar artikel untuk preview kartu..." class="admin-input resize-none leading-relaxed"></textarea>
             </div>
 
-            <div>
-                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Isi Lengkap Tulisan Editorial</label>
-                <textarea name="content" id="edit-content" rows="6" placeholder="Tuliskan esai lengkap, kutipan wawancara seniman, dan refleksi karya seni..." class="admin-input resize-none leading-relaxed font-inter"></textarea>
+            <div class="space-y-4 pt-1">
+                <div>
+                    <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-800 mb-1.5">
+                        Paragraf 1 (Teks di Atas Galeri Foto) *
+                    </label>
+                    <textarea name="content" id="edit-content" rows="4" required placeholder="Tuliskan paragraf pembuka editorial yang akan tampil di atas galeri foto..." class="admin-input resize-none leading-relaxed font-inter"></textarea>
+                    <p class="text-[10px] text-gray-400 font-inter mt-1">Paragraf pengantar yang tampil di atas foto portrait & landscape.</p>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-800 mb-1.5">
+                        Paragraf 2 (Teks di Bawah Galeri Foto)
+                    </label>
+                    <textarea name="content_2" id="edit-content-2" rows="5" placeholder="Tuliskan pembahasan lanjutan, wawancara seniman, dan refleksi karya seni yang akan tampil di bawah galeri foto..." class="admin-input resize-none leading-relaxed font-inter"></textarea>
+                    <p class="text-[10px] text-gray-400 font-inter mt-1">Paragraf lanjutan editorial yang tampil di bawah galeri foto.</p>
+                </div>
             </div>
 
-            <div>
-                <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Foto Sampul / Featured Article Image</label>
-                <div class="admin-dropzone p-4 text-center group" onclick="document.getElementById('editorial-img-input').click()">
-                    <input type="file" name="image" id="editorial-img-input" accept="image/*"
-                        onchange="handleFileSelect(this,'editorial-img-preview','filename-editorial')"
-                        class="hidden">
-                    <div class="flex flex-col items-center justify-center gap-1.5 py-1">
-                        <svg class="w-6 h-6 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-                        <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Pilih / Drag Foto Sampul</span>
-                        <span class="text-[9px] text-gray-400 font-inter">Format PNG, JPG, WEBP maks 8MB</span>
+            <!-- DUA FOTO EDITORIAL (PORTRAIT & LANDSCAPE) -->
+            <div class="space-y-2 pt-1">
+                <label class="block text-[11px] font-space-grotesk font-bold uppercase tracking-widest text-gray-800">
+                    Galeri Foto Artikel Editorial (2 Foto Berdampingan)
+                </label>
+                <p class="text-[10px] text-gray-500 font-inter">Masukkan 2 foto yang akan tampil berdampingan di halaman detail editorial (Foto 1 Portrait 3:4 & Foto 2 Landscape 4:3).</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    <!-- Foto 1: Portrait (3:4) -->
+                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-sm space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-black">Foto 1: Portrait (3:4)</label>
+                            <span class="text-[9px] font-space-grotesk font-bold uppercase bg-black text-white px-1.5 py-0.5">Portrait</span>
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-inter">Foto seniman / portrait profil.</p>
+                        <div class="admin-dropzone p-3 text-center group cursor-pointer" onclick="document.getElementById('editorial-img-input').click()">
+                            <input type="file" name="image" id="editorial-img-input" accept="image/*"
+                                onchange="handleFileSelect(this,'editorial-img-preview','filename-editorial')"
+                                class="hidden">
+                            <div class="flex flex-col items-center justify-center gap-1 py-1">
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Upload Foto 1</span>
+                                <span class="text-[9px] text-gray-400 font-inter">PNG, JPG, WEBP maks 8MB</span>
+                            </div>
+                            <span id="filename-editorial" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                            <img id="editorial-img-preview" class="mt-2 mx-auto w-28 h-36 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview Foto 1">
+                        </div>
                     </div>
-                    <span id="filename-editorial" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
-                    <img id="editorial-img-preview" class="mt-2 mx-auto w-44 h-32 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview">
+
+                    <!-- Foto 2: Landscape (4:3) -->
+                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-sm space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[11px] font-space-grotesk font-bold uppercase tracking-wider text-black">Foto 2: Landscape (4:3)</label>
+                            <span class="text-[9px] font-space-grotesk font-bold uppercase bg-black text-white px-1.5 py-0.5">Landscape</span>
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-inter">Foto karya seni / studio detail.</p>
+                        <div class="admin-dropzone p-3 text-center group cursor-pointer" onclick="document.getElementById('editorial-img2-input').click()">
+                            <input type="file" name="image_2" id="editorial-img2-input" accept="image/*"
+                                onchange="handleFileSelect(this,'editorial-img2-preview','filename-editorial-2')"
+                                class="hidden">
+                            <div class="flex flex-col items-center justify-center gap-1 py-1">
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-black transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                                <span class="text-[10px] font-space-grotesk font-bold uppercase tracking-wider text-gray-700 group-hover:text-black">Upload Foto 2</span>
+                                <span class="text-[9px] text-gray-400 font-inter">PNG, JPG, WEBP maks 8MB</span>
+                            </div>
+                            <span id="filename-editorial-2" class="text-[9px] font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded hidden truncate max-w-full block my-1"></span>
+                            <img id="editorial-img2-preview" class="mt-2 mx-auto w-36 h-28 object-cover border border-gray-200 hidden rounded-sm" src="" alt="Preview Foto 2">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -2558,6 +2686,53 @@
                 <input type="text" name="description" id="discount-description" placeholder="Contoh: Diskon akhir pekan untuk semua apparel" class="admin-input">
             </div>
 
+            <!-- Cakupan Diskon: Semua Produk vs Produk Tertentu Saja -->
+            <div class="border border-gray-200 rounded p-3 bg-gray-50/50 space-y-3">
+                <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black">
+                    Cakupan Produk yang Dapat Menggunakan Diskon *
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2.5 p-2.5 border border-gray-300 rounded cursor-pointer hover:border-black bg-white transition-colors" id="label-applies-all">
+                        <input type="radio" name="applies_to" value="all" id="discount-applies-all" onchange="toggleDiscountAppliesTo('all')" checked class="text-black focus:ring-black">
+                        <div>
+                            <span class="font-space-grotesk font-bold text-xs uppercase block text-black">Semua Produk</span>
+                            <span class="text-[10px] text-gray-500 font-inter block">Dapat dipakai di seluruh item toko</span>
+                        </div>
+                    </label>
+                    <label class="flex items-center gap-2.5 p-2.5 border border-gray-300 rounded cursor-pointer hover:border-black bg-white transition-colors" id="label-applies-specific">
+                        <input type="radio" name="applies_to" value="specific_products" id="discount-applies-specific" onchange="toggleDiscountAppliesTo('specific_products')" class="text-black focus:ring-black">
+                        <div>
+                            <span class="font-space-grotesk font-bold text-xs uppercase block text-black">Produk Tertentu Saja</span>
+                            <span class="text-[10px] text-gray-500 font-inter block">Pilih produk yang berlaku</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Container daftar checkbox produk (hidden by default) -->
+                <div id="discount-products-container" class="hidden pt-2 border-t border-gray-200 space-y-2">
+                    <div class="flex justify-between items-center text-[11px] font-space-grotesk font-semibold text-gray-600">
+                        <span>Pilih Produk yang Berlaku:</span>
+                        <div class="flex gap-2">
+                            <button type="button" onclick="selectAllDiscountProducts(true)" class="text-[10px] text-blue-600 hover:underline cursor-pointer">Pilih Semua</button>
+                            <span>|</span>
+                            <button type="button" onclick="selectAllDiscountProducts(false)" class="text-[10px] text-gray-500 hover:underline cursor-pointer">Hapus Pilihan</button>
+                        </div>
+                    </div>
+                    <div class="max-h-48 overflow-y-auto border border-gray-200 rounded bg-white divide-y divide-gray-100 p-1">
+                        @foreach($products as $prod)
+                            <label class="flex items-center justify-between p-2 hover:bg-neutral-50 rounded cursor-pointer text-xs font-inter">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <input type="checkbox" name="product_ids[]" value="{{ $prod->id }}" class="discount-product-checkbox w-4 h-4 text-black border-gray-300 rounded focus:ring-black">
+                                    <span class="font-space-grotesk font-bold uppercase truncate text-black">{{ $prod->name }}</span>
+                                </div>
+                                <span class="font-mono text-gray-500 shrink-0 text-[11px]">Rp {{ number_format($prod->price, 0, ',', '.') }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                    <p class="text-[10px] text-gray-400 font-inter leading-relaxed">Pemberitahuan: Produk yang sudah memiliki diskon/potongan harga dari admin secara otomatis tidak dapat dipotong lagi oleh kode diskon ini saat checkout.</p>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-space-grotesk font-bold uppercase tracking-wider text-black mb-1.5">Tipe Diskon *</label>
@@ -2672,9 +2847,15 @@
 <div id="modal-confirm" class="modal-backdrop" onclick="closeConfirmModal()">
     <div class="modal-box max-w-md p-6 text-center shadow-2xl" onclick="event.stopPropagation()">
         <!-- Danger Warning Icon -->
-        <div class="mx-auto w-12 h-12 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-4 text-red-600">
+        <div id="confirm-modal-icon-danger" class="mx-auto w-12 h-12 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-4 text-red-600">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+        <!-- Normal / Info Icon -->
+        <div id="confirm-modal-icon-normal" class="hidden mx-auto w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center mb-4 text-black">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
         </div>
         <h3 id="confirm-modal-title" class="font-space-grotesk font-extrabold text-lg uppercase tracking-wider text-gray-900 mb-2">
@@ -2895,6 +3076,18 @@
         document.getElementById('product-form').reset();
         document.getElementById('form-method').disabled = true;
 
+        const discEl = document.getElementById('p-discount-price');
+        if (discEl) discEl.value = '';
+
+        const mGenEl = document.getElementById('p-model-gender');
+        if (mGenEl) mGenEl.value = 'Male';
+        const mHgtEl = document.getElementById('p-model-height');
+        if (mHgtEl) mHgtEl.value = '';
+        const mWgtEl = document.getElementById('p-model-weight');
+        if (mWgtEl) mWgtEl.value = '';
+        const mSzEl = document.getElementById('p-model-size');
+        if (mSzEl) mSzEl.value = '';
+
         toggleProductOriginType('notisse');
         setDefaultProductDescription();
         const termsEl = document.getElementById('p-terms');
@@ -2912,7 +3105,7 @@
         document.getElementById('modal-product').classList.add('open');
     }
 
-    function openEditProductModal(id, name, price, desc, terms, artist, stocksObj, frontImg, backImg, footageImg, sizechartImg) {
+    function openEditProductModal(id, name, price, discountPrice, desc, terms, artist, stocksObj, frontImg, backImg, footageImg, sizechartImg, modelGender, modelHeight, modelWeight, modelSize) {
         document.getElementById('modal-product-title').textContent = 'Edit Product';
         document.getElementById('product-form').action = '/admin/products/' + id;
         document.getElementById('form-method').value   = 'PUT';
@@ -2920,7 +3113,18 @@
 
         document.getElementById('p-name').value   = name;
         document.getElementById('p-price').value  = price;
+        const discEl = document.getElementById('p-discount-price');
+        if (discEl) discEl.value = discountPrice || '';
         document.getElementById('p-desc').value   = desc || "Cotton Combed 16s\nRaster Plastisol Screen Printing\nDigitized Painting";
+
+        const mGenEl = document.getElementById('p-model-gender');
+        if (mGenEl) mGenEl.value = modelGender || 'Male';
+        const mHgtEl = document.getElementById('p-model-height');
+        if (mHgtEl) mHgtEl.value = modelHeight || '';
+        const mWgtEl = document.getElementById('p-model-weight');
+        if (mWgtEl) mWgtEl.value = modelWeight || '';
+        const mSzEl = document.getElementById('p-model-size');
+        if (mSzEl) mSzEl.value = modelSize || '';
         
         const termsEl = document.getElementById('p-terms');
         if (termsEl) termsEl.value = terms || '';
@@ -2949,7 +3153,11 @@
     function openEditProductFromBtn(btn) {
         try {
             const p = JSON.parse(btn.getAttribute('data-product'));
-            openEditProductModal(p.id, p.name, p.price, p.desc, p.terms || '', p.artist, p.stocks, p.frontImg, p.backImg, p.footageImg, p.sizechartImg);
+            openEditProductModal(
+                p.id, p.name, p.price, p.discount_price, p.desc, p.terms || '', p.artist,
+                p.stocks, p.frontImg, p.backImg, p.footageImg, p.sizechartImg,
+                p.model_gender, p.model_height, p.model_weight, p.model_size
+            );
         } catch(e) {
             console.error("Gagal membuka modal edit produk:", e);
         }
@@ -3122,13 +3330,21 @@
             document.getElementById('edit-artist-id').value = String(artistId);
         }
 
-        document.getElementById('editorial-img-preview').classList.add('hidden');
-        const fEd = document.getElementById('filename-editorial');
-        if (fEd) { fEd.classList.add('hidden'); fEd.textContent = ''; }
+        const c2El = document.getElementById('edit-content-2');
+        if (c2El) c2El.value = '';
+
+        ['editorial-img-preview', 'editorial-img2-preview'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.classList.add('hidden'); el.src = ''; }
+        });
+        ['filename-editorial', 'filename-editorial-2'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.classList.add('hidden'); el.textContent = ''; }
+        });
         document.getElementById('modal-editorial').classList.add('open');
     }
 
-    function openEditEditorialModal(id, artistId, title, author, excerpt, videoUrl, content) {
+    function openEditEditorialModal(id, artistId, title, author, excerpt, content, content2, img1, img2) {
         document.getElementById('modal-editorial-title').textContent = 'Edit Artikel Editorial';
         document.getElementById('editorial-form').action = '/admin/editorials/' + id;
         document.getElementById('editorial-form-method').value = 'PUT';
@@ -3138,9 +3354,17 @@
         document.getElementById('edit-title').value     = title || '';
         document.getElementById('edit-author').value    = author || '';
         document.getElementById('edit-excerpt').value   = excerpt || '';
-        document.getElementById('edit-video').value     = videoUrl || '';
         document.getElementById('edit-content').value   = content || '';
-        document.getElementById('editorial-img-preview').classList.add('hidden');
+        const c2El = document.getElementById('edit-content-2');
+        if (c2El) c2El.value = content2 || '';
+
+        setPreviewImage('editorial-img-preview', img1);
+        setPreviewImage('editorial-img2-preview', img2);
+
+        ['filename-editorial', 'filename-editorial-2'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.classList.add('hidden'); el.textContent = ''; }
+        });
 
         document.getElementById('modal-editorial').classList.add('open');
     }
@@ -3148,7 +3372,7 @@
     function openEditEditorialFromBtn(btn) {
         try {
             const ed = JSON.parse(btn.getAttribute('data-editorial'));
-            openEditEditorialModal(ed.id, ed.artist_id, ed.title, ed.author, ed.excerpt, ed.video_url, ed.content);
+            openEditEditorialModal(ed.id, ed.artist_id, ed.title, ed.author, ed.excerpt, ed.content, ed.content_2, ed.img1, ed.img2);
         } catch(e) {
             console.error("Gagal membuka modal edit editorial:", e);
         }
@@ -3194,14 +3418,32 @@
     // ── Universal Custom Confirmation Modal ───────────────────────
     let pendingActionForm = null;
 
-    function askConfirm(message, formOrAction, title = 'Konfirmasi Penghapusan', btnText = 'Ya, Hapus') {
+    function askConfirm(message, formOrAction, title = 'Konfirmasi Penghapusan', btnText = 'Ya, Hapus', isDanger = true) {
         pendingActionForm = formOrAction;
         const titleEl = document.getElementById('confirm-modal-title');
         const msgEl   = document.getElementById('confirm-modal-message');
         const btnEl   = document.getElementById('confirm-modal-btn');
+        const iconDanger = document.getElementById('confirm-modal-icon-danger');
+        const iconNormal = document.getElementById('confirm-modal-icon-normal');
         if (titleEl) titleEl.textContent = title;
         if (msgEl) msgEl.textContent = message;
-        if (btnEl) btnEl.textContent = btnText;
+        if (btnEl) {
+            btnEl.textContent = btnText;
+            if (isDanger) {
+                btnEl.className = 'bg-red-600 hover:bg-red-700 text-white font-space-grotesk font-bold uppercase tracking-wider px-5 py-2.5 text-xs transition-colors rounded-xs shadow-sm cursor-pointer';
+            } else {
+                btnEl.className = 'bg-black hover:bg-neutral-800 text-white font-space-grotesk font-bold uppercase tracking-wider px-5 py-2.5 text-xs transition-colors rounded-xs shadow-sm cursor-pointer';
+            }
+        }
+        if (iconDanger && iconNormal) {
+            if (isDanger) {
+                iconDanger.classList.remove('hidden');
+                iconNormal.classList.add('hidden');
+            } else {
+                iconDanger.classList.add('hidden');
+                iconNormal.classList.remove('hidden');
+            }
+        }
         document.getElementById('modal-confirm').classList.add('open');
     }
 
@@ -3224,11 +3466,17 @@
     function handleFileSelect(input, previewId, filenameId) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
             if (filenameId) {
                 const fEl = document.getElementById(filenameId);
                 if (fEl) {
-                    fEl.textContent = file.name;
+                    fEl.textContent = `${file.name} (${sizeMB} MB)`;
                     fEl.classList.remove('hidden');
+                }
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                if (typeof showToast === 'function') {
+                    showToast(`Perhatian: File "${file.name}" berukuran ${sizeMB} MB. Jika total upload melebihi batas server PHP lokal (${sizeMB} MB), upload dapat gagal. Disarankan mengompres foto sebelum diunggah.`, 'warning', 'Peringatan Ukuran File');
                 }
             }
             if (previewId) {
@@ -3297,6 +3545,8 @@
         document.getElementById('discount-form-method').value = 'POST';
         form.action = '/admin/discounts';
         document.getElementById('discount-is-active').checked = true;
+        toggleDiscountAppliesTo('all');
+        selectAllDiscountProducts(false);
         handleDiscountTypeChange('percentage');
         document.getElementById('modal-discount').classList.add('open');
     }
@@ -3315,6 +3565,14 @@
         document.getElementById('discount-max-discount').value = discount.max_discount_amount || '';
         document.getElementById('discount-usage-limit').value = discount.usage_limit || '';
 
+        const appliesTo = discount.applies_to || 'all';
+        toggleDiscountAppliesTo(appliesTo);
+
+        const allowedIds = (discount.products || []).map(p => p.id);
+        document.querySelectorAll('.discount-product-checkbox').forEach(cb => {
+            cb.checked = (appliesTo === 'specific_products' && allowedIds.includes(parseInt(cb.value)));
+        });
+
         if (discount.start_date) {
             document.getElementById('discount-start-date').value = discount.start_date.substring(0, 10);
         } else {
@@ -3331,6 +3589,28 @@
 
         handleDiscountTypeChange(discount.type || 'percentage');
         document.getElementById('modal-discount').classList.add('open');
+    }
+
+    function toggleDiscountAppliesTo(type) {
+        const isSpecific = (type === 'specific_products');
+        const container = document.getElementById('discount-products-container');
+        const radAll = document.getElementById('discount-applies-all');
+        const radSpec = document.getElementById('discount-applies-specific');
+        if (radAll) radAll.checked = !isSpecific;
+        if (radSpec) radSpec.checked = isSpecific;
+        if (container) {
+            if (isSpecific) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+    }
+
+    function selectAllDiscountProducts(select) {
+        document.querySelectorAll('.discount-product-checkbox').forEach(cb => {
+            cb.checked = !!select;
+        });
     }
 
     function closeDiscountModal() {
@@ -3427,5 +3707,6 @@
     });
 </script>
 
+@include('partials.overlays.toast')
 </body>
 </html>

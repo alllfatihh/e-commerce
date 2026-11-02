@@ -77,8 +77,14 @@
                                 <div
                                     class="flex flex-col xl:flex-row xl:justify-between items-start xl:items-center text-[10px] md:text-xs font-space-grotesk uppercase font-semibold text-black gap-1">
                                     <span>{{ $product->name }}</span>
-                                    <span class="whitespace-nowrap">RP
-                                        {{ number_format($product->price, 2, ',', '.') }}</span>
+                                    <span class="whitespace-nowrap">
+                                        @if($product->hasDiscount())
+                                            <span class="line-through text-gray-400 mr-1.5 font-normal">RP {{ number_format($product->price, 2, ',', '.') }}</span>
+                                            <span class="text-black font-bold">RP {{ number_format($product->discount_price, 2, ',', '.') }}</span>
+                                        @else
+                                            RP {{ number_format($product->price, 2, ',', '.') }}
+                                        @endif
+                                    </span>
                                 </div>
                             </div>
                         </div>

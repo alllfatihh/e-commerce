@@ -1,10 +1,10 @@
         <!-- VIEW 5: LOOKBOOK DETAIL PAGE WITH WIDE VIDEO AT TOP -->
         <section id="view-lookbook-detail" class="view-page {{ ($activeView ?? '') === 'view-lookbook-detail' ? 'active-view' : '' }} min-h-screen pt-20 md:pt-24 pb-20">
             <div class="w-full px-4 sm:px-6 md:px-10 lg:px-12 pt-2 pb-4">
-                <button onclick="goBack()"
+                <button onclick="goBack('view-lookbook-list')"
                     class="text-xs font-semibold tracking-widest text-gray-500 hover:text-black uppercase transition-colors focus:outline-none cursor-pointer flex items-center space-x-2 group font-space-grotesk">
                     <span class="group-hover:-translate-x-1 transition-transform duration-200">&larr;</span>
-                    <span>BACK TO LOOKBOOKS</span>
+                    <span>BACK</span>
                 </button>
             </div>
 

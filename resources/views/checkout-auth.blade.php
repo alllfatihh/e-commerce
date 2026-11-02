@@ -208,7 +208,7 @@
                 <div class="mb-6">
                     <a href="/?open_checkout=true" class="inline-flex items-center space-x-2 text-xs font-space-grotesk font-bold text-gray-400 hover:text-black uppercase tracking-widest transition-colors group">
                         <span class="group-hover:-translate-x-1 transition-transform">&larr;</span>
-                        <span>Back to Cart</span>
+                        <span>BACK</span>
                     </a>
                 </div>
 
@@ -459,6 +459,10 @@
                             Apply
                         </button>
                     </form>
+                    <p class="text-[11px] text-gray-500 font-inter mt-2 flex items-start gap-1.5 leading-tight">
+                        <svg class="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Kode diskon/potongan harga tidak dapat digunakan pada produk yang sudah diskon.</span>
+                    </p>
 
                     <!-- Applied Promo Tag -->
                     <div id="applied-promo-tag" class="hidden mt-2.5 flex items-center justify-between bg-neutral-100 border border-neutral-300 px-3 py-1.5 text-xs">
@@ -594,6 +598,11 @@
                     const formattedPrice = 'Rp ' + (itemPrice * itemQty).toLocaleString('id-ID');
                     const itemName = item.product?.name || item.name || 'Product';
                     const itemSize = item.size || 'All Size';
+                    const origPrice = parseInt(item.original_price || item.price || item.unitPrice || 0);
+                    const isDiscounted = item.is_discounted || (origPrice > itemPrice);
+                    const priceHtml = isDiscounted 
+                        ? `<span class="line-through text-gray-400 mr-1.5 font-normal text-[11px]">Rp ${(origPrice * itemQty).toLocaleString('id-ID')}</span><span>${formattedPrice}</span>`
+                        : formattedPrice;
 
                     summaryContainer.innerHTML += `
                         <div class="flex items-center space-x-3.5 bg-white p-3 border border-gray-200">
@@ -604,7 +613,7 @@
                             <div class="flex-1 min-w-0">
                                 <h4 class="font-space-grotesk font-bold text-xs uppercase text-black truncate">${itemName}</h4>
                                 <p class="text-[11px] text-gray-500 font-inter mt-0.5">Size: <strong class="text-black font-space-grotesk">${itemSize}</strong></p>
-                                <p class="text-xs font-space-grotesk font-bold text-black mt-1">${formattedPrice}</p>
+                                <p class="text-xs font-space-grotesk font-bold text-black mt-1">${priceHtml}</p>
                             </div>
                         </div>
                     `;
@@ -673,7 +682,15 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ code: code, subtotal: subtotal })
+                    body: JSON.stringify({ 
+                        code: code, 
+                        subtotal: subtotal,
+                        items: cart.map(i => ({
+                            id: i.id || i.product_id,
+                            price: i.price || i.unitPrice,
+                            quantity: i.quantity || i.qty || 1
+                        }))
+                    })
                 });
 
                 const data = await res.json();
@@ -1039,8 +1056,12 @@
                     const checkoutData = await checkoutResponse.json();
 
                     if (checkoutResponse.status === 403 && checkoutData.pending_order) {
-                        alert(checkoutData.error);
-                        window.location.href = '/';
+                        if (typeof showToast === 'function') {
+                            showToast(checkoutData.error || 'Anda memiliki pesanan yang sedang menunggu pembayaran.', 'warning', 'Pesanan Tertunda');
+                        }
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 2000);
                         return;
                     }
 
@@ -1067,7 +1088,9 @@
                                 window.location.href = '/?order_pending=true';
                             },
                             onError: function(result) {
-                                alert("Payment failed!");
+                                if (typeof showToast === 'function') {
+                                    showToast("Pembayaran belum berhasil diselesaikan. Silakan coba kembali.", 'error', 'Pembayaran Gagal');
+                                }
                                 document.getElementById('btn-text').innerText = originalText;
                                 btn.disabled = false;
                                 btn.classList.remove('opacity-75');
@@ -1101,5 +1124,6 @@
         // Initialize cart on page load
         document.addEventListener('DOMContentLoaded', initCart);
     </script>
+    @include('partials.overlays.toast')
 </body>
 </html>

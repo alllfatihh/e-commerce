@@ -67,12 +67,19 @@ class CartController extends Controller
                 $imageUrl = Str::startsWith($img, ['http://', 'https://']) ? $img : asset($img);
             }
 
+            $prod = $item->product;
+            $effPrice = $prod ? (int) $prod->effective_price : 0;
+            $origPrice = $prod ? (int) $prod->price : 0;
+            $isDisc = $prod ? $prod->is_discounted : false;
+
             return [
                 'cart_item_id' => $item->id,
                 'id' => $item->product_id,
-                'name' => $item->product ? $item->product->name : 'Unknown Product',
-                'price' => $item->product ? $item->product->price : 0,
-                'unitPrice' => $item->product ? $item->product->price : 0, // needed for existing JS
+                'name' => $prod ? $prod->name : 'Unknown Product',
+                'price' => $effPrice,
+                'unitPrice' => $effPrice, // needed for existing JS
+                'original_price' => $origPrice,
+                'is_discounted' => $isDisc,
                 'qty' => $item->quantity,
                 'size' => $item->size,
                 'image' => $imageUrl,
