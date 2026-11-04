@@ -14,7 +14,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
                 @forelse($editorials as $ed)
                     @php
-                        $edImg = $ed->image ? (Str::startsWith($ed->image, 'http') ? $ed->image : (file_exists(public_path('storage/' . $ed->image)) ? asset('storage/' . $ed->image) : asset($ed->image))) : 'https://placehold.co/600x600/222/fff?text=Editorial';
+                        $edImg = $ed->image ? (Str::startsWith($ed->image, 'http') ? $ed->image : asset($ed->image)) : 'https://placehold.co/600x600/222/fff?text=Editorial';
                     @endphp
                     <div onclick="openArtistEditorialDetailById({{ $ed->id }})" class="group cursor-pointer flex flex-col justify-between border border-gray-200 bg-white hover:border-black transition-colors duration-300">
                         <div class="relative w-full aspect-[16/10] bg-neutral-100 overflow-hidden">

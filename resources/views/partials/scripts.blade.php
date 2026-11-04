@@ -1449,7 +1449,7 @@
                         const artImg = resolveImageUrl(artw.image, 'https://placehold.co/600x800/d9d9d9/555555?text=Artwork');
                         const card = document.createElement('div');
                         card.className = 'group cursor-pointer';
-                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price, artw.id, true, false, artist ? artist.id : (artw.artist_id || null));
+                        card.onclick = () => openArtistArtworkDetail(artw.title, name, artw.medium, artw.dimensions, artImg, artw.price, artw.id, true, false, artist ? artist.id : (artw.artist_id || null), artw.description || '', artw.year || '', artw.status || '');
                         card.innerHTML = `
                             <div class="w-full aspect-square bg-[#d9d9d9] mb-3.5 overflow-hidden relative">
                                 <img src="${artImg}" alt="${artw.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -1524,7 +1524,7 @@
             image: "https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View"
         };
 
-        function openArtistArtworkDetail(title, artist, medium, dimensions, image, price, id = null, updateUrl = true, isBacking = false, artistId = null) {
+        function openArtistArtworkDetail(title, artist, medium, dimensions, image, price, id = null, updateUrl = true, isBacking = false, artistId = null, desc = '', year = '', status = '') {
             if (!artistId && id && typeof artistsData !== 'undefined' && artistsData) {
                 for (const a of artistsData) {
                     if (a.artworks && a.artworks.some(w => Number(w.id) === Number(id))) {
@@ -1541,7 +1541,10 @@
                 medium: medium || 'Oil on canvas',
                 dimensions: dimensions || '60x60cm',
                 image: image || 'https://placehold.co/1000x750/d9d9d9/555555?text=Full+Artwork+View',
-                price: price || 0
+                price: price || 0,
+                desc: desc || '',
+                year: year || '',
+                status: status || ''
             };
 
             const titleEl = document.getElementById('artwork-title');
@@ -1551,10 +1554,26 @@
             if (artistEl) artistEl.innerText = currentActiveArtwork.artist;
 
             const mediumEl = document.getElementById('artwork-medium');
-            if (mediumEl) mediumEl.innerText = "Medium: " + currentActiveArtwork.medium;
+            if (mediumEl) mediumEl.innerText = "Medium: " + (currentActiveArtwork.medium || 'Mixed Media');
 
             const dimEl = document.getElementById('artwork-dimensions');
-            if (dimEl) dimEl.innerText = "Dimensions: " + currentActiveArtwork.dimensions;
+            if (dimEl) dimEl.innerText = "Dimensions: " + (currentActiveArtwork.dimensions || 'Custom Size');
+
+            const yearEl = document.getElementById('artwork-year');
+            if (yearEl) {
+                yearEl.innerText = currentActiveArtwork.year ? "Year: " + currentActiveArtwork.year : '';
+                yearEl.style.display = currentActiveArtwork.year ? '' : 'none';
+            }
+
+            const descEl = document.getElementById('artwork-description');
+            if (descEl) {
+                descEl.innerText = currentActiveArtwork.desc || 'Original physical artwork created exclusively by the artist. Accompanied by a certificate of authenticity signed by Notisse curatorial team.';
+            }
+
+            const statusBadge = document.getElementById('artwork-status-badge');
+            if (statusBadge) {
+                statusBadge.innerText = currentActiveArtwork.status || 'Direct Acquisition / Inquiry';
+            }
 
             const imgEl = document.getElementById('artwork-detail-image');
             if (imgEl && currentActiveArtwork.image) imgEl.src = currentActiveArtwork.image;
@@ -1602,7 +1621,10 @@
                     foundArt.id,
                     updateUrl,
                     isBacking,
-                    foundArtist ? foundArtist.id : null
+                    foundArtist ? foundArtist.id : null,
+                    foundArt.description || '',
+                    foundArt.year || '',
+                    foundArt.status || ''
                 );
             }
         }

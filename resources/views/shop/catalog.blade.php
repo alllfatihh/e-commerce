@@ -57,10 +57,10 @@
 
             <!-- PRODUCT CATALOG GRID -->
             <div id="shop-catalog" class="w-full">
-                <div class="grid grid-cols-2 lg:grid-cols-4 bg-black gap-[1px] border-b border-black">
-                    @foreach($products as $product)
+                <div class="grid grid-cols-2 lg:grid-cols-4 bg-white">
+                    @forelse($products as $product)
                         <div onclick="openProductDetail({{ $product->id }})"
-                            class="group cursor-pointer bg-white flex flex-col justify-between h-full hover:bg-gray-50 transition-colors duration-300">
+                            class="group cursor-pointer bg-white flex flex-col justify-between h-full hover:bg-gray-50 transition-colors duration-300 border-r border-b border-black">
 
                             <div class="relative w-full aspect-[3/4] bg-[#f4f4f4] overflow-hidden">
                                 @php
@@ -88,7 +88,11 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="col-span-full py-16 text-center text-gray-400 font-space-grotesk text-xs uppercase tracking-widest bg-white">
+                            No products available at the moment.
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </section>

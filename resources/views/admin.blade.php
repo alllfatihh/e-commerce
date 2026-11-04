@@ -480,6 +480,19 @@
                 {{ session('error') }}
             </div>
             @endif
+            @if(isset($errors) && $errors->any())
+            <div id="toast-validation-error" class="flex items-start gap-2 bg-red-600 text-white px-4 py-2 text-xs font-space-grotesk tracking-wide border border-red-700 shadow-md">
+                <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div>
+                    <span class="font-bold uppercase block">Gagal Menyimpan (Validasi):</span>
+                    <ul class="list-disc list-inside font-inter text-[11px] opacity-95">
+                        @foreach($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+            @endif
             <a href="/" target="_blank" class="text-xs font-space-grotesk font-semibold tracking-wider uppercase border border-gray-300 hover:border-black px-3.5 py-1.5 transition-colors text-gray-700 hover:text-black">
                 Lihat Toko &rarr;
             </a>
@@ -927,8 +940,9 @@
                                     'dimensions' => $art->dimensions ?? '',
                                     'year'       => $art->year ?? '',
                                     'status'     => $art->status ?? '',
-                                    'price'      => $art->price ?? '',
+                                    'price'      => $art->price ? (float)$art->price : '',
                                     'desc'       => $art->description ?? '',
+                                    'imageUrl'   => $art->image ? (Str::startsWith($art->image, 'http') ? $art->image : asset($art->image)) : '',
                                 ];
                             @endphp
                             <button type="button"
@@ -1021,8 +1035,8 @@
                                     'excerpt'   => $edit->excerpt ?? '',
                                     'content'   => $edit->content ?? '',
                                     'content_2' => $edit->content_2 ?? '',
-                                    'img1'      => $edit->image ?? '',
-                                    'img2'      => $edit->image_2 ?? '',
+                                    'img1'      => $edit->image ? (Str::startsWith($edit->image, 'http') ? $edit->image : asset($edit->image)) : '',
+                                    'img2'      => $edit->image_2 ? (Str::startsWith($edit->image_2, 'http') ? $edit->image_2 : asset($edit->image_2)) : '',
                                 ];
                             @endphp
                             <button type="button"
@@ -1053,21 +1067,17 @@
         </section>
 
         {{-- ─────────────────────────────────────────────────────
-             SECTION 4: SITE MEDIA (CAROUSEL & FOOTAGE)
+             SECTION 4: SITE MEDIA (CAROUSEL & LOOKBOOKS)
         ───────────────────────────────────────────────────────── --}}
         <section id="section-media" class="section-card hidden">
-            <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] mb-2 text-brandDark">Site Media & Lookbook Footage</h2>
-            <p class="text-xs text-gray-500 font-inter mb-6">Kelola Hero Carousel slides, Footage On-Model, dan Galeri Foto Lookbook Photoshoot toko Notisse.</p>
+            <h2 class="font-space-grotesk font-extrabold text-lg uppercase tracking-[0.18em] mb-2 text-brandDark">Site Media & Lookbooks</h2>
+            <p class="text-xs text-gray-500 font-inter mb-6">Kelola Hero Carousel slides halaman utama dan Galeri Foto/Video Lookbook Photoshoot toko Notisse.</p>
 
-            <!-- TAB: Carousel vs Footage vs Lookbook -->
+            <!-- TAB: Carousel vs Lookbook -->
             <div class="flex gap-0 border-b border-gray-200 mb-6">
                 <button onclick="switchMediaTab('carousel')" id="tab-carousel"
                     class="tab-btn active px-5 py-2.5 text-xs font-space-grotesk uppercase tracking-widest text-gray-500 cursor-pointer">
                     Hero Carousel
-                </button>
-                <button onclick="switchMediaTab('footage')" id="tab-footage"
-                    class="tab-btn px-5 py-2.5 text-xs font-space-grotesk uppercase tracking-widest text-gray-500 cursor-pointer">
-                    Footage / Product Media
                 </button>
                 <button onclick="switchMediaTab('lookbook')" id="tab-lookbook"
                     class="tab-btn px-5 py-2.5 text-xs font-space-grotesk uppercase tracking-widest text-gray-500 cursor-pointer">
@@ -1138,41 +1148,6 @@
                     </div>
                     @endforelse
                 </div>
-            </div>
-
-            <!-- Footage Grid -->
-            <div id="media-tab-footage" class="grid grid-cols-1 md:grid-cols-3 gap-5 hidden">
-                @foreach($footages as $media)
-                <div class="bg-white border border-gray-200 overflow-hidden group shadow-sm">
-                    <div class="media-card">
-                        @php
-                            $mUrl = Str::startsWith($media->image,'http') ? $media->image : (file_exists(public_path('storage/'.$media->image)) ? asset('storage/'.$media->image) : asset($media->image));
-                        @endphp
-                        <img src="{{ $mUrl }}" alt="{{ $media->title }}" onerror="this.style.display='none'">
-                        <div class="media-card-overlay">
-                            <button onclick="openMediaModal({{ $media->id }}, '{{ addslashes($media->title ?? '') }}', '{{ addslashes($media->description ?? '') }}', '{{ $media->product_id ?? '' }}')"
-                                class="btn-accent text-xs px-4 py-2 cursor-pointer">
-                                Ganti Gambar
-                            </button>
-                        </div>
-                    </div>
-                    <div class="px-4 py-3 flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-space-grotesk font-bold uppercase tracking-wide text-gray-800">{{ $media->title ?? 'Footage ' . $loop->iteration }}</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">
-                                Order {{ $media->order }} 
-                                @if($media->product_id)
-                                    &bull; <span class="text-emerald-600 font-semibold">Terkait Produk #{{ $media->product_id }}</span>
-                                @endif
-                            </p>
-                        </div>
-                        <button onclick="openMediaModal({{ $media->id }}, '{{ addslashes($media->title ?? '') }}', '{{ addslashes($media->description ?? '') }}', '{{ $media->product_id ?? '' }}')"
-                            class="text-xs font-space-grotesk font-semibold uppercase tracking-wider text-blue-600 hover:underline">
-                            Edit
-                        </button>
-                    </div>
-                </div>
-                @endforeach
             </div>
 
             <!-- Lookbook Collections Cards -->
@@ -2192,7 +2167,7 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-space-grotesk font-semibold uppercase tracking-widest text-gray-600 mb-1.5">Est. Nilai / Harga (IDR)</label>
-                    <input type="number" name="price" id="art-price" placeholder="Contoh: 15000000" class="admin-input">
+                    <input type="number" step="any" name="price" id="art-price" placeholder="Contoh: 15000000" class="admin-input">
                 </div>
             </div>
 
@@ -2883,6 +2858,10 @@
 
     // ── Section switcher ────────────────────────────────────────
     function showSection(name) {
+        try {
+            sessionStorage.setItem('notisse_admin_section', name);
+        } catch(e) {}
+
         const sections = ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'discounts', 'admins', 'settings'];
         const titles = {
             'products':  'Products Catalog Management',
@@ -2911,7 +2890,7 @@
 
     // ── Media tab switcher ──────────────────────────────────────
     function switchMediaTab(tab) {
-        ['carousel','footage','lookbook'].forEach(t => {
+        ['carousel','lookbook'].forEach(t => {
             const pane = document.getElementById('media-tab-' + t);
             const btn  = document.getElementById('tab-' + t);
             if (pane) pane.classList.toggle('hidden', t !== tab);
@@ -3209,6 +3188,15 @@
         setPreviewImage('artist-photo-preview', photoUrl);
         setPreviewImage('artist-art-preview', artUrl);
 
+        ['filename-artist-photo', 'filename-artist-art'].forEach(fid => {
+            const el = document.getElementById(fid);
+            if (el) { el.classList.add('hidden'); el.textContent = ''; }
+        });
+        const inPhoto = document.getElementById('artist-photo-input');
+        if (inPhoto) inPhoto.value = '';
+        const inArt = document.getElementById('artist-art-input');
+        if (inArt) inArt.value = '';
+
         const newcomerCheckbox = document.getElementById('artist-is-newcomer');
         if (newcomerCheckbox) newcomerCheckbox.checked = !!isNewcomer;
 
@@ -3287,7 +3275,7 @@
         document.getElementById('modal-artwork').classList.add('open');
     }
 
-    function openEditArtworkModal(id, artistId, title, medium, dimensions, year, status, price, desc) {
+    function openEditArtworkModal(id, artistId, title, medium, dimensions, year, status, price, desc, imageUrl = '') {
         document.getElementById('modal-artwork-title').textContent = 'Edit Artwork Fisik';
         document.getElementById('artwork-form').action = '/admin/artworks/' + id;
         document.getElementById('artwork-form-method').value = 'PUT';
@@ -3301,7 +3289,12 @@
         document.getElementById('art-status').value     = status || '';
         document.getElementById('art-price').value      = price || '';
         document.getElementById('art-desc').value       = desc || '';
-        document.getElementById('artwork-img-preview').classList.add('hidden');
+        
+        setPreviewImage('artwork-img-preview', imageUrl);
+        const fArt = document.getElementById('filename-artwork');
+        if (fArt) { fArt.classList.add('hidden'); fArt.textContent = ''; }
+        const inArtw = document.getElementById('artwork-img-input');
+        if (inArtw) inArtw.value = '';
 
         document.getElementById('modal-artwork').classList.add('open');
     }
@@ -3309,7 +3302,7 @@
     function openEditArtworkFromBtn(btn) {
         try {
             const art = JSON.parse(btn.getAttribute('data-artwork'));
-            openEditArtworkModal(art.id, art.artist_id, art.title, art.medium, art.dimensions, art.year, art.status, art.price, art.desc);
+            openEditArtworkModal(art.id, art.artist_id, art.title, art.medium, art.dimensions, art.year, art.status, art.price, art.desc, art.imageUrl);
         } catch(e) {
             console.error("Gagal membuka modal edit artwork:", e);
         }
@@ -3365,6 +3358,10 @@
             const el = document.getElementById(id);
             if (el) { el.classList.add('hidden'); el.textContent = ''; }
         });
+        const in1 = document.getElementById('editorial-img-input');
+        if (in1) in1.value = '';
+        const in2 = document.getElementById('editorial-img2-input');
+        if (in2) in2.value = '';
 
         document.getElementById('modal-editorial').classList.add('open');
     }
@@ -3467,16 +3464,21 @@
         if (input.files && input.files[0]) {
             const file = input.files[0];
             const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            if (file.size > 16 * 1024 * 1024) {
+                const errMsg = `Error: File "${file.name}" (${sizeMB} MB) melebihi batas upload 16 MB. Harap kompres gambar atau pilih gambar lain.`;
+                if (typeof showToast === 'function') {
+                    showToast(errMsg);
+                } else {
+                    alert(errMsg);
+                }
+                input.value = '';
+                return;
+            }
             if (filenameId) {
                 const fEl = document.getElementById(filenameId);
                 if (fEl) {
                     fEl.textContent = `${file.name} (${sizeMB} MB)`;
                     fEl.classList.remove('hidden');
-                }
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                if (typeof showToast === 'function') {
-                    showToast(`Perhatian: File "${file.name}" berukuran ${sizeMB} MB. Jika total upload melebihi batas server PHP lokal (${sizeMB} MB), upload dapat gagal. Disarankan mengompres foto sebelum diunggah.`, 'warning', 'Peringatan Ukuran File');
                 }
             }
             if (previewId) {
@@ -3684,8 +3686,13 @@
     // ── Check Hash on Load ────────────────────────────────────────
     window.addEventListener('load', () => {
         const hash = window.location.hash.replace('#section-', '').replace('#', '');
-        if (hash && ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'discounts', 'admins', 'settings'].includes(hash)) {
-            showSection(hash);
+        let savedSection = null;
+        try {
+            savedSection = sessionStorage.getItem('notisse_admin_section');
+        } catch(e) {}
+        const target = hash || savedSection || 'products';
+        if (target && ['products', 'artists', 'artworks', 'media', 'orders', 'offerings', 'discounts', 'admins', 'settings'].includes(target)) {
+            showSection(target);
         }
     });
 

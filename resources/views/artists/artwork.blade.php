@@ -31,6 +31,7 @@
                     <div class="text-xs md:text-sm text-gray-700 font-inter space-y-1 py-1 border-y border-gray-100">
                         <p id="artwork-medium">Medium: Oil on canvas</p>
                         <p id="artwork-dimensions">Dimensions: 60x60cm</p>
+                        <p id="artwork-year">Year: 2024</p>
                     </div>
 
                     <div class="py-2 border-y border-gray-100 my-2">
@@ -38,7 +39,7 @@
                         <p id="artwork-price-display" class="font-space-grotesk font-bold text-xl md:text-2xl text-black">Rp 7.500.000</p>
                     </div>
 
-                    <p class="text-xs md:text-sm text-gray-700 leading-relaxed font-inter pt-2">
+                    <p id="artwork-description" class="text-xs md:text-sm text-gray-700 leading-relaxed font-inter pt-2">
                         Original physical artwork created exclusively by the artist. Accompanied by a certificate of authenticity signed by Notisse curatorial team.
                     </p>
 
@@ -47,7 +48,7 @@
                         <div class="p-3 bg-neutral-50 border border-gray-200 text-xs font-inter text-gray-600 space-y-1">
                             <div class="flex items-center justify-between font-space-grotesk">
                                 <span class="font-semibold uppercase tracking-wider text-black text-[11px]">Acquisition Method:</span>
-                                <span class="text-emerald-700 font-bold uppercase tracking-wider text-[11px]">Direct Acquisition / Inquiry</span>
+                                <span id="artwork-status-badge" class="text-emerald-700 font-bold uppercase tracking-wider text-[11px]">Direct Acquisition / Inquiry</span>
                             </div>
                             <p class="text-[11px] text-gray-500 leading-relaxed pt-1">
                                 Artwork acquisition differs from standard apparel checkout. Submitting an inquiry connects your acquisition directly to the artist and Notisse curatorial atelier at the designated value.

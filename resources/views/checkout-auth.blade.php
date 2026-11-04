@@ -186,9 +186,9 @@
                 <div class="pointer-events-auto flex items-center space-x-3 text-xs font-space-grotesk uppercase tracking-wider">
                     <a href="/?open_checkout=true" class="text-gray-400 hover:text-black transition-colors">01 Cart</a>
                     <span class="text-gray-300">/</span>
-                    <span class="text-black font-bold border-b-2 border-black pb-0.5">02 Information & Shipping</span>
+                    <span id="step-indicator-02" class="text-black font-bold border-b-2 border-black pb-0.5 transition-all">02 Information & Shipping</span>
                     <span class="text-gray-300">/</span>
-                    <span class="text-gray-400">03 Payment</span>
+                    <span id="step-indicator-03" class="text-gray-400 transition-all">03 Payment</span>
                 </div>
             </div>
 
@@ -1065,7 +1065,21 @@
                         return;
                     }
 
+                    function updateCheckoutStep(step) {
+                        const s2 = document.getElementById('step-indicator-02');
+                        const s3 = document.getElementById('step-indicator-03');
+                        if (!s2 || !s3) return;
+                        if (step === 3) {
+                            s2.className = 'text-gray-400 hover:text-black transition-colors';
+                            s3.className = 'text-black font-bold border-b-2 border-black pb-0.5 transition-all';
+                        } else {
+                            s2.className = 'text-black font-bold border-b-2 border-black pb-0.5 transition-all';
+                            s3.className = 'text-gray-400 transition-all';
+                        }
+                    }
+
                     if (checkoutData.snap_token) {
+                        updateCheckoutStep(3);
                         snap.pay(checkoutData.snap_token, {
                             onSuccess: async function(result) {
                                 await fetch('/midtrans/local-success', {
@@ -1088,6 +1102,7 @@
                                 window.location.href = '/?order_pending=true';
                             },
                             onError: function(result) {
+                                updateCheckoutStep(2);
                                 if (typeof showToast === 'function') {
                                     showToast("Pembayaran belum berhasil diselesaikan. Silakan coba kembali.", 'error', 'Pembayaran Gagal');
                                 }
@@ -1096,6 +1111,7 @@
                                 btn.classList.remove('opacity-75');
                             },
                             onClose: function() {
+                                updateCheckoutStep(2);
                                 document.getElementById('btn-text').innerText = originalText;
                                 btn.disabled = false;
                                 btn.classList.remove('opacity-75');

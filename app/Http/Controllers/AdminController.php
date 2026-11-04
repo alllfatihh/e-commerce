@@ -86,17 +86,17 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'terms_and_conditions' => 'nullable|string',
             'artist' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'back_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'footage_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'back_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'footage_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
             'stocks' => 'nullable|array',
             'stocks.*' => 'nullable|integer|min:0',
         ]);
 
         $discPrice = $request->input('discount_price');
         if ($discPrice !== null && $discPrice !== '' && (float) $discPrice >= (float) $request->price) {
-            return redirect()->back()->withInput()->with('error', 'Harga diskon harus lebih rendah dari harga normal produk.');
+            return redirect('/admin#section-products')->withInput()->with('error', 'Harga diskon harus lebih rendah dari harga normal produk.');
         }
 
         $data = $request->only('name', 'price', 'description', 'terms_and_conditions', 'artist', 'model_gender', 'model_height', 'model_weight', 'model_size');
@@ -130,7 +130,7 @@ class AdminController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan.');
+        return redirect('/admin#section-products')->with('success', 'Produk berhasil ditambahkan.');
     }
 
     public function updateProduct(Request $request, $id)
@@ -148,17 +148,17 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'terms_and_conditions' => 'nullable|string',
             'artist' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'back_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'footage_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'back_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'footage_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'size_chart_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
             'stocks' => 'nullable|array',
             'stocks.*' => 'nullable|integer|min:0',
         ]);
 
         $discPrice = $request->input('discount_price');
         if ($discPrice !== null && $discPrice !== '' && (float) $discPrice >= (float) $request->price) {
-            return redirect()->back()->withInput()->with('error', 'Harga diskon harus lebih rendah dari harga normal produk.');
+            return redirect('/admin#section-products')->withInput()->with('error', 'Harga diskon harus lebih rendah dari harga normal produk.');
         }
 
         $data = $request->only('name', 'price', 'description', 'terms_and_conditions', 'artist', 'model_gender', 'model_height', 'model_weight', 'model_size');
@@ -197,7 +197,7 @@ class AdminController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Produk berhasil diperbarui.');
+        return redirect('/admin#section-products')->with('success', 'Produk berhasil diperbarui.');
     }
 
     public function deleteProduct($id)
@@ -212,7 +212,7 @@ class AdminController extends Controller
         ProductStock::where('product_id', $product->id)->delete();
         $product->delete();
 
-        return redirect()->back()->with('success', 'Produk berhasil dihapus.');
+        return redirect('/admin#section-products')->with('success', 'Produk berhasil dihapus.');
     }
 
     // ─── Artists (Seniman Kolaborator) ────────────────────────
@@ -222,8 +222,8 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'city' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'artwork_preview' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'artwork_preview' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
             'is_newcomer' => 'nullable|boolean',
         ]);
 
@@ -246,7 +246,7 @@ class AdminController extends Controller
 
         Artist::create($data);
 
-        return redirect()->back()->with('success', 'Seniman kolaborator berhasil ditambahkan.');
+        return redirect('/admin#section-artists')->with('success', 'Seniman kolaborator berhasil ditambahkan.');
     }
 
     public function updateArtist(Request $request, $id)
@@ -257,11 +257,12 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'city' => 'nullable|string|max:255',
             'bio' => 'nullable|string',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'artwork_preview' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'artwork_preview' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
             'is_newcomer' => 'nullable|boolean',
         ]);
 
+        $oldName = $artist->name;
         $data = $request->only('name', 'city', 'bio');
         $isNewcomer = $request->boolean('is_newcomer');
 
@@ -283,7 +284,12 @@ class AdminController extends Controller
 
         $artist->update($data);
 
-        return redirect()->back()->with('success', 'Data seniman kolaborator berhasil diperbarui.');
+        // Sinkronisasi nama seniman di katalog produk jika nama seniman diubah
+        if ($oldName && $oldName !== $data['name']) {
+            Product::where('artist', $oldName)->update(['artist' => $data['name']]);
+        }
+
+        return redirect('/admin#section-artists')->with('success', 'Data seniman kolaborator berhasil diperbarui.');
     }
 
     public function deleteArtist($id)
@@ -294,7 +300,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($artist->getRawOriginal('artwork_preview'));
         $artist->delete();
 
-        return redirect()->back()->with('success', 'Seniman berhasil dihapus.');
+        return redirect('/admin#section-artists')->with('success', 'Seniman berhasil dihapus.');
     }
 
     // ─── Artworks (Karya Seni Fisik per Seniman) ──────────────
@@ -309,7 +315,7 @@ class AdminController extends Controller
             'status' => 'nullable|string|max:100',
             'price' => 'nullable|numeric',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
         ]);
 
         $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
@@ -323,7 +329,7 @@ class AdminController extends Controller
 
         Artwork::create($data);
 
-        return redirect()->back()->with('success', 'Karya seni (Artwork) berhasil ditambahkan untuk seniman terkait.');
+        return redirect('/admin#section-artworks')->with('success', 'Karya seni (Artwork) berhasil ditambahkan untuk seniman terkait.');
     }
 
     public function updateArtwork(Request $request, $id)
@@ -339,7 +345,7 @@ class AdminController extends Controller
             'status' => 'nullable|string|max:100',
             'price' => 'nullable|numeric',
             'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
         ]);
 
         $data = $request->only('artist_id', 'title', 'medium', 'dimensions', 'year', 'status', 'price', 'description');
@@ -352,7 +358,7 @@ class AdminController extends Controller
 
         $artwork->update($data);
 
-        return redirect()->back()->with('success', 'Karya seni berhasil diperbarui.');
+        return redirect('/admin#section-artworks')->with('success', 'Karya seni berhasil diperbarui.');
     }
 
     public function deleteArtwork($id)
@@ -361,7 +367,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($artwork->getRawOriginal('image'));
         $artwork->delete();
 
-        return redirect()->back()->with('success', 'Karya seni berhasil dihapus.');
+        return redirect('/admin#section-artworks')->with('success', 'Karya seni berhasil dihapus.');
     }
 
     // ─── Editorials (Artikel & Wawancara Eksklusif) ────────────
@@ -374,8 +380,8 @@ class AdminController extends Controller
             'excerpt' => 'nullable|string',
             'content' => 'required|string',
             'content_2' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'image_2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'image_2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
         ]);
 
         $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'content_2');
@@ -393,7 +399,7 @@ class AdminController extends Controller
 
         Editorial::create($data);
 
-        return redirect()->back()->with('success', 'Artikel editorial berhasil ditambahkan.');
+        return redirect('/admin#section-artworks')->with('success', 'Artikel editorial berhasil ditambahkan.');
     }
 
     public function updateEditorial(Request $request, $id)
@@ -407,8 +413,8 @@ class AdminController extends Controller
             'excerpt' => 'nullable|string',
             'content' => 'required|string',
             'content_2' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
-            'image_2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
+            'image_2' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
         ]);
 
         $data = $request->only('artist_id', 'title', 'author', 'excerpt', 'content', 'content_2');
@@ -427,7 +433,7 @@ class AdminController extends Controller
 
         $editorial->update($data);
 
-        return redirect()->back()->with('success', 'Artikel editorial berhasil diperbarui.');
+        return redirect('/admin#section-artworks')->with('success', 'Artikel editorial berhasil diperbarui.');
     }
 
     public function deleteEditorial($id)
@@ -437,7 +443,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($editorial->getRawOriginal('image_2'));
         $editorial->delete();
 
-        return redirect()->back()->with('success', 'Artikel editorial berhasil dihapus.');
+        return redirect('/admin#section-artworks')->with('success', 'Artikel editorial berhasil dihapus.');
     }
 
     // ─── Site Media (Carousel & Footage) ─────────────────────
@@ -447,7 +453,7 @@ class AdminController extends Controller
             'section' => 'required|string|in:carousel,footage',
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:16384',
             'order' => 'nullable|integer',
         ]);
 
@@ -465,7 +471,7 @@ class AdminController extends Controller
             'order' => $order,
         ]);
 
-        return redirect()->back()->with('success', 'Gambar '.($request->section === 'carousel' ? 'Hero Carousel' : 'Footage').' baru berhasil ditambahkan.');
+        return redirect('/admin#section-media')->with('success', 'Gambar '.($request->section === 'carousel' ? 'Hero Carousel' : 'Footage').' baru berhasil ditambahkan.');
     }
 
     public function updateMedia(Request $request, $id)
@@ -476,7 +482,7 @@ class AdminController extends Controller
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'product_id' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
             'order' => 'nullable|integer',
         ]);
 
@@ -502,7 +508,7 @@ class AdminController extends Controller
 
         $media->update($data);
 
-        return redirect()->back()->with('success', 'Gambar media berhasil diperbarui.');
+        return redirect('/admin#section-media')->with('success', 'Gambar media berhasil diperbarui.');
     }
 
     public function deleteMedia($id)
@@ -512,7 +518,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($media->getRawOriginal('image'));
         $media->delete();
 
-        return redirect()->back()->with('success', 'Gambar media berhasil dihapus.');
+        return redirect('/admin#section-media')->with('success', 'Gambar media berhasil dihapus.');
     }
 
     // ─── Site Settings ─────────────────────────────────────────
@@ -529,7 +535,7 @@ class AdminController extends Controller
         Artisan::call('cache:clear');
         Artisan::call('view:clear');
 
-        return redirect()->back()->with('success', 'Pengaturan situs (Site Settings) berhasil diperbarui.');
+        return redirect('/admin#section-settings')->with('success', 'Pengaturan situs (Site Settings) berhasil diperbarui.');
     }
 
     // ─── Biteship Sync ───────────────────────────────────────
@@ -538,7 +544,7 @@ class AdminController extends Controller
         Artisan::call('biteship:sync-products');
         $output = Artisan::output();
 
-        return redirect()->back()->with('success', 'Sinkronisasi Biteship Selesai: '.$output);
+        return redirect('/admin#section-settings')->with('success', 'Sinkronisasi Biteship Selesai: '.$output);
     }
 
     // ─── Artwork Offerings ─────────────────────────────────────
@@ -565,7 +571,7 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'video' => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
             'video_url' => 'nullable|string',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
         ]);
 
         $data = [
@@ -586,7 +592,7 @@ class AdminController extends Controller
 
         $lookbook = Lookbook::create($data);
 
-        return redirect('/admin')->with('success', 'Lookbook album "'.$lookbook->title.'" berhasil dibuat.');
+        return redirect('/admin#section-media')->with('success', 'Lookbook album "'.$lookbook->title.'" berhasil dibuat.');
     }
 
     public function updateLookbook(Request $request, $id)
@@ -599,7 +605,7 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'video' => 'nullable|file|mimes:mp4,mov,ogg,qt,webm|max:102400',
             'video_url' => 'nullable|string',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:16384',
         ]);
 
         $lookbook->title = $request->title;
@@ -622,7 +628,7 @@ class AdminController extends Controller
 
         $lookbook->save();
 
-        return redirect('/admin')->with('success', 'Lookbook "'.$lookbook->title.'" berhasil diperbarui.');
+        return redirect('/admin#section-media')->with('success', 'Lookbook "'.$lookbook->title.'" berhasil diperbarui.');
     }
 
     public function deleteLookbook($id)
@@ -639,7 +645,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($lookbook->getRawOriginal('video_url'));
         $lookbook->delete();
 
-        return redirect('/admin')->with('success', 'Lookbook "'.$title.'" beserta foto-fotonya berhasil dihapus.');
+        return redirect('/admin#section-media')->with('success', 'Lookbook "'.$title.'" beserta foto-fotonya berhasil dihapus.');
     }
 
     public function storeLookbookPhoto(Request $request, $id)
@@ -649,7 +655,7 @@ class AdminController extends Controller
         $request->validate([
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:8192',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:16384',
         ]);
 
         $path = $request->file('image')->store('lookbooks/photos', 'public');
@@ -665,7 +671,7 @@ class AdminController extends Controller
             $lookbook->update(['cover_image' => $path]);
         }
 
-        return redirect('/admin')->with('success', 'Foto berhasil ditambahkan ke lookbook "'.$lookbook->title.'".');
+        return redirect('/admin#section-media')->with('success', 'Foto berhasil ditambahkan ke lookbook "'.$lookbook->title.'".');
     }
 
     public function deleteLookbookPhoto($id)
@@ -674,7 +680,7 @@ class AdminController extends Controller
         $this->deleteStorageFile($photo->getRawOriginal('image'));
         $photo->delete();
 
-        return redirect('/admin')->with('success', 'Foto lookbook berhasil dihapus.');
+        return redirect('/admin#section-media')->with('success', 'Foto lookbook berhasil dihapus.');
     }
 
     public function updateOrderStatus(Request $request, $id)
